@@ -11,7 +11,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class ProjectOneServiceSpider(BaseSceneScraper):
+class BrazzersSpider(BaseSceneScraper):
     name = 'Brazzers'
     network = 'Brazzers'
 
