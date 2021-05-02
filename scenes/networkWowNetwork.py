@@ -25,8 +25,6 @@ class VnaNetworkSpider(BaseSceneScraper):
         'pagination': '/category/movies/page/%s/?filtre=date'
     }
 
-    max_pages = 1
-
     def get_scenes(self, response):
         scenes = response.css('.listing-videos li a::attr(href)').getall()
         for scene in scenes:
