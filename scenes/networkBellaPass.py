@@ -42,7 +42,6 @@ class BellaPassnSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         scenes = response.xpath("//div[contains(@class, 'items')]//div[@class='item-thumb']//a/@href").getall()
-        print(scenes)
         for link in scenes:
             if re.search(self.get_selector_map('external_id'), link) is not None:
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene)
