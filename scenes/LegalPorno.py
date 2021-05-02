@@ -30,7 +30,10 @@ class LegalPornoSpider(BaseSceneScraper):
         return response.css('.studio-director__studio a::text').get().strip()
 
     def get_scenes(self, response):
-        scenes = response.css(
-            '.thumbnails .thumbnail .thumbnail-title a::attr(href)').getall()
+        """ Returns a list of scenes
+        @url https://pornworld.com/new-videos/1
+        @returns requests 50 150
+        """
+        scenes = response.css('.thumbnails .thumbnail .thumbnail-title a::attr(href)').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)

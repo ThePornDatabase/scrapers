@@ -24,8 +24,11 @@ class CherryPimpsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css(
-            "div.item-updates .item-thumb a::attr(href)").getall()
+        """ Returns a list of scenes
+        @url https://cherrypimps.com/categories/movies.html
+        @returns requests 10 50
+        """
+        scenes = response.css("div.item-updates .item-thumb a::attr(href)").getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
