@@ -26,6 +26,10 @@ class ClubseventeenSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        """ Returns a list of scenes
+        @url https://www.clubseventeen.com/videos.php?page=1
+        @returns requests 50 150
+        """
         scenes = response.css('.list_item .thumb .video-link::attr(href)').getall()
         for link in scenes:
             if re.search(self.get_selector_map('external_id'), link) is not None:

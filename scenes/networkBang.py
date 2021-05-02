@@ -58,7 +58,7 @@ class BangSpider(BaseSceneScraper):
             item['trailer'] = ''
 
         item['site'] = json['studio']['name'].title()
-        if item['site'] is 'bang! originals':
+        if item['site'] == 'bang! originals':
             item['site'] = json['series']['name'].title()
 
         item['title'] = json['name']
