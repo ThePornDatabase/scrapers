@@ -1,7 +1,6 @@
 import re
 
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -10,19 +9,13 @@ class PornWorldScraper(BaseSceneScraper):
     network = 'ddfnetwork'
 
     start_urls = [
-        'https://houseoftaboo.com',
-        'https://eurogirlsongirls.com',
+        'https://houseoftaboo.com/',
+        'https://eurogirlsongirls.com/',
         'https://euroteenerotica.com/',
-        'https://ddfbusty.com',
-        # 'https://ddfnetworkvr.com/', # Not working
+        'https://ddfbusty.com/',
         'https://1by-day.com/',
         'https://hotlegsandfeet.com/',
         'https://onlyblowjob.com/',
-        'http://www.sandysfantasies.com/',
-        # 'http://cherryjul.com/',
-        # 'http://eveangelofficial.com/',
-        # 'http://sexvideocasting.com/',
-        # 'http://hairytwatter.net/',
         'https://fuckinhd.com',
     ]
 
@@ -38,11 +31,10 @@ class PornWorldScraper(BaseSceneScraper):
         'pagination': '/videos/search/latest/ever/allsite/-/%s'
     }
 
-    max_pages = 47
-
     def get_scenes(self, response):
         scenes = response.xpath(
             "//*[@id='scenesAjaxReplace']//a/@href").getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                
