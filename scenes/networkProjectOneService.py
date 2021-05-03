@@ -1,11 +1,10 @@
 import re
 from urllib.parse import urlencode
-
 import dateparser
+import datetime
 import scrapy
 from slugify import slugify
 from tldextract import tldextract
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -35,7 +34,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         'https://www.letstryanal.com/',
         'https://www.propertysex.com/',
         'https://www.digitalplayground.com/',
-        'https://site-ma.brazzers.com',
+        'https://www.brazzers.com',
         'https://www.metrohd.com/',
         'https://www.girlgrind.com',
         'https://www.men.com',
@@ -140,12 +139,14 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             'limit': response.meta['limit']
         }
 
+        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         query = {
+            'dateReleased': f"<{tomorrow}",
             'limit': meta['limit'],
             'type': 'scene',
-            'orderBy': 'dateReleased',
+            'orderBy': '-dateReleased',
             'offset': (meta['page'] * meta['limit']),
-            'referrer': meta['url']
+            'referrer': meta['url'],
         }
 
         print('NEXT PAGE: ' + str(meta['page']))
