@@ -93,7 +93,32 @@ link_to_info = {
         "site": "Freeuse Fantasy",
         "navText": movies_nav_text,
         "contentText": movies_content_text
-    }
+    },
+    "Organic-pna-OongoaF1": {
+        "site": "PervNana",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },
+    "organic-Baepha2v-1": {
+        "site": "Not My Grandpa",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },
+    "organic-mylfdom-ieH7cuos": {
+        "site": "MYLFDom",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },   
+    "organic-1-goide6Xo": {
+        "site": "BBC Paradise",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },   
+    "organic-alm-Od3Iqu9I": {
+        "site": "Anal Mom",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    }    
 }
 
 

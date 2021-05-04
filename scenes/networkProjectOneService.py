@@ -14,43 +14,54 @@ class ProjectOneServiceSpider(BaseSceneScraper):
     network = 'mindgeek'
 
     start_urls = [
-        'https://www.realitykings.com',
-        'https://www.fakehub.com',
-        'https://www.sweetheartvideo.com',
-        'https://www.babes.com/',
-        'https://www.publicagent.com/',
-        'https://www.devianthardcore.com/',
-        'https://www.welivetogether.com',
-        'https://www.sneakysex.com/',
-        'https://www.milfhunter.com',
         'https://www.8thstreetlatinas.com',
-        'https://www.sexyhub.com',
-        'https://www.mofos.com/',
-        'https://www.iknowthatgirl.com/',
-        'https://www.publicpickups.com',
-        'https://www.milehighmedia.com/',
-        'https://www.dontbreakme.com/',
-        'https://www.doghousedigital.com',
-        'https://www.letstryanal.com/',
-        'https://www.propertysex.com/',
-        'https://www.digitalplayground.com/',
-        'https://www.brazzers.com',
-        'https://www.metrohd.com/',
-        'https://www.girlgrind.com',
-        'https://www.men.com',
-        'https://www.iconmale.com',
-        'https://www.bromo.com',
-        'https://www.transangels.com',
-        'https://www.thegayoffice.com',
-        'https://www.tube8vip.com',
-        'https://www.lookathernow.com/',
-        'https://www.squirted.com',
-        'https://www.twistys.com',
-        'https://www.familysinners.com',
-        'https://www.familyhookups.com/',
+        'https://www.babes.com',
         'https://www.bellesafilms.com',
-        'https://www.trueamateurs.com/',
+        'https://www.biempire.com',
+        'https://www.brazzers.com',
+        'https://www.bromo.com',
+        'https://www.deviante.com',
+        'https://www.devianthardcore.com',
+        'https://www.digitalplayground.com',
+        'https://www.doghousedigital.com',
+        'https://www.dontbreakme.com',
+        'https://www.erito.com',
+        'https://www.fakehub.com',
+        'https://www.familyhookups.com',
+        'https://www.familysinners.com',
+        'https://www.girlgrind.com',
+        'https://www.iconmale.com',
+        'https://www.iknowthatgirl.com',
         'https://www.lesbea.com',
+        'https://www.letstryanal.com',
+        'https://www.lilhumpers.com',
+        'https://www.lookathernow.com',
+        'https://www.men.com',
+        'https://www.metrohd.com',
+        'https://www.milehighmedia.com',
+        'https://www.milfed.com',
+        'https://www.milfhunter.com',
+        'https://www.mofos.com',
+        'https://www.propertysex.com',
+        'https://www.publicagent.com',
+        'https://www.publicpickups.com',
+        'https://www.realityjunkies.com',
+        'https://www.realitykings.com',
+        'https://www.sexyhub.com',
+        'https://www.sneakysex.com',
+        'https://www.squirted.com',
+        'https://www.sweetheartvideo.com',
+        'https://www.sweetsinner.com',
+        'https://www.thegayoffice.com',
+        'https://www.transangels.com',
+        'https://www.transangelsnetwork.com',
+        'https://www.transharder.com',
+        'https://www.transsensual.com',
+        'https://www.trueamateurs.com',
+        'https://www.tube8vip.com',
+        'https://www.twistys.com',
+        'https://www.welivetogether.com',
+        'https://www.whynotbi.com',
     ]
 
     selector_map = {
@@ -122,6 +133,18 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
             path = '/scene/' + str(item['id']) + '/' + slugify(item['title'])
             item['url'] = self.format_url(response.meta['url'], path)
+            
+            # Deviante abbreviations
+            if item['site'] == "fmf":
+                item['site'] = "Forgive Me Father"
+            if item['site'] == "sw":
+                item['site'] = "Sex Working"
+            if item['site'] == "pdt":
+                item['site'] = "Pretty Dirty Teens"
+            if item['site'] == "lha":
+                item['site'] = "Love Her Ass"
+            if item['site'] == "es":
+                item['site'] = "Erotic Spice"
 
             scene_count = scene_count + 1
 
