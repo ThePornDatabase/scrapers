@@ -9,6 +9,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class NubilesSpider(BaseSceneScraper):
     name = 'Nubiles'
     network = 'nubiles'
+    parent = 'nubiles'
     start_urls = [
         "https://nubiles.net/video/gallery",
         "https://nubiles-porn.com/video/gallery",

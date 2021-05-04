@@ -29,7 +29,7 @@ class FullPornNetworkSpider(BaseSceneScraper):
 
     selector_map = {
         'title': "//h4[contains(@class, 'text-center')]/text()",
-        'description': "//p[contains(@class, 'hide-for-small-only')]",
+        'description': "//p[contains(@class, 'hide-for-small-only')]/text()",
         'performers': "//div[@class='small-12'][2]//p[1]//a/text()",
         'tags': "",
         'external_id': 'scene/([A-Za-z0-9-_]+)/?',

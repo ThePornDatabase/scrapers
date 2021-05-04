@@ -10,6 +10,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class DomTheNationSpider(BaseSceneScraper):
     name = 'DomTheNation'
     network = 'DerangedDollars'
+    parent = 'DerangedDollars'
 
     start_urls = [
         'https://www.domthenation.com'

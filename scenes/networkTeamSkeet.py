@@ -143,6 +143,7 @@ def get_site_link_text(url):
 class TeamSkeetNetworkSpider(BaseSceneScraper):
     name = 'TeamSkeetNetwork'
     network = 'teamskeet'
+    parent = 'teamskeet'
 
     selector_map = {
         'external_id': '\\/(.+)\\.json'
@@ -167,6 +168,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                           data['video'] + '/manifest/video.m3u8'
         item['url'] = response.url
         item['network'] = self.network
+        item['parent'] = self.parent
 
         if 'publishedDate' in data:
             item['date'] = dateparser.parse(data['publishedDate']).isoformat()
