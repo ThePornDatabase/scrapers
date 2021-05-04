@@ -14,7 +14,7 @@ class BangSpider(BaseSceneScraper):
         'external_id': 'video/(.+)'
     }
 
-    per_page = 50
+    per_page = 10
 
     def start_requests(self):
         yield scrapy.Request(
@@ -58,7 +58,7 @@ class BangSpider(BaseSceneScraper):
             item['trailer'] = ''
 
         item['site'] = json['studio']['name'].title()
-        if item['site'] == 'bang! originals':
+        if item['site'].lower().strip() == 'bang! originals':
             item['site'] = json['series']['name'].title()
 
         item['title'] = json['name']
@@ -66,8 +66,11 @@ class BangSpider(BaseSceneScraper):
         item['date'] = json['releaseDate']
         item['tags'] = list(map(lambda x: x['name'].title(), json['genres']))
         item['performers'] = list(map(lambda x: x['name'], json['actors']))
-        item['image'] = 'https://i.bang.com/screenshots/%s/movie/%s/%s.jpg' % (
-            json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
+        try:
+            item['image'] = 'https://i.bang.com/screenshots/%s/movie/%s/%s.jpg' % (
+                json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
+        except:
+            print(f"Index out of Range: {item['id']}")
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'
 
