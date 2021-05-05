@@ -55,9 +55,9 @@ class AssylumSpider(BaseSceneScraper):
         performers = response.xpath('//span[contains(@class,"lc_info mas_description")]/text()').get().strip()
         performers = performers.split(",")
         performers = list(filter(None, performers))
+        temp_performers = []
         for performer in performers:
             temppointer=0
-            temp_performers = []
             performer = performer.strip()
             
             if "Patient: " in performer:
@@ -66,13 +66,36 @@ class AssylumSpider(BaseSceneScraper):
                 performer = performer.replace('Patients: ','')
             if "Nurse: " in performer:
                 performer = performer.replace('Nurse: ','')
+            if " (4K trailer available)" in performer:
+                performer = performer.replace(' (4K trailer available)','')
+            if " (1hr 45min)" in performer:
+                performer = performer.replace(' (1hr 45min)','')
+            if " Returns" in performer:
+                performer = performer.replace(' Returns','')
+            if "Order Of The Red Star: " in performer:
+                performer = performer.replace('Order Of The Red Star: ','')
             if '(' in performer or ')' in performer:
                 performer = re.sub('[\(\)]+', '', performer)
+            if 'year-old' in performer.lower():
+                performer = re.sub('\d{2}\ year-old\ ', '', performer.lower())
+                performer = performer.title()
             if " and " in performer.lower():
                 additions = performer.lower().split(' and ')
                 for addition in additions:
                     if not re.search('[^A-Za-z0-9 ]+', addition):
-                        temp_performers.append(addition.title())
+                        temp_performers.append(addition.title().strip())
+                        temppointer=1
+            if " & " in performer.lower():
+                additions = performer.lower().split(' & ')
+                for addition in additions:
+                    if not re.search('[^A-Za-z0-9 ]+', addition):
+                        temp_performers.append(addition.title().strip())
+                        temppointer=1
+            if "/" in performer.lower():
+                additions = performer.lower().split('/')
+                for addition in additions:
+                    if not re.search('[^A-Za-z0-9 ]+', addition):
+                        temp_performers.append(addition.title().strip())
                         temppointer=1
             if " with " in performer.lower():
                 additions = performer.lower().split(' with ')
@@ -81,12 +104,11 @@ class AssylumSpider(BaseSceneScraper):
                         temp_performers.append(addition.title())
                         temppointer=1
             if not temppointer:
-                temp_performers.append(performer.title())
+                temp_performers.append(performer.title().strip())
             
-            performers = temp_performers
-            
+        performers = temp_performers
         for performer in performers:
-            matches = ["Downloadable", "School", "Offer"]
+            matches = ["Downloadable", "School", "Offer", "My Only Joys", "The Gang", "P2"]
             if re.search('[^A-Za-z ]+', performer) or any(x in performer for x in matches):
                 performers.remove(performer)
 
