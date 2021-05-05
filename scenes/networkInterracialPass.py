@@ -7,6 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class InterracialPassSpider(BaseSceneScraper):
     name = 'InterracialPass'
     network = 'InterracialPass'
+    parent = 'InterracialPass'
 
     start_urls = [
         'https://www.interracialpass.com',

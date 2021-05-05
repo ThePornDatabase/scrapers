@@ -28,9 +28,9 @@ class TugPassSpider(BaseSceneScraper):
 
     # This is one of those sites with Date and Site on the index, so have to pull it from the outer loop
     def get_scenes(self, response):
-        parent = response.xpath("//div[@class='item-wrap']")
+        parentxpath = response.xpath("//div[@class='item-wrap']")
 
-        for child in parent:
+        for child in parentxpath:
             testvalid = child.xpath(".//div[@class='item-content']")
             if len(testvalid) > 0:
                 date = child.xpath(".//span[@class='date']/text()").get()

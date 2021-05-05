@@ -107,6 +107,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             item['date'] = dateparser.parse(scene['dateReleased']).isoformat()
             item['id'] = scene['id']
             item['network'] = self.network
+            item['parent'] = item['site']
 
             if 'title' in scene:
                 item['title'] = scene['title']

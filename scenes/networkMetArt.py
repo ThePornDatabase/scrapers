@@ -5,9 +5,11 @@ from tpdb.items import SceneItem
 import dateparser
 
 
-class PornprosSpider(BaseSceneScraper):
+class MetArtNetworkSpider(BaseSceneScraper):
     name = 'MetArtNetwork'
     network = 'metart'
+    parent = 'metart'
+    
     start_urls = [
         "https://www.sexart.com/",
         "https://www.metart.com/",
@@ -65,6 +67,7 @@ class PornprosSpider(BaseSceneScraper):
         item['site'] = self.get_site(response)
         item['url'] = self.format_link(response, movie['path'])
         item['network'] = self.network
+        item['parent'] = self.parent
         res = re.search('movie/(\\d+)/(.+)', movie['path'])
         item['id'] = res.group(2)
 

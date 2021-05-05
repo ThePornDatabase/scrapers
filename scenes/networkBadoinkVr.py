@@ -9,6 +9,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class BadoinkVrSpider(BaseSceneScraper):
     name = 'BadoinkVr'
     network = 'Badoink VR'
+    parent = 'Badoink VR'
 
     start_urls = [
         'https://badoinkvr.com',

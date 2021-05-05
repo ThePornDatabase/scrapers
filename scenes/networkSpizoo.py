@@ -9,6 +9,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class SpizooSpider(BaseSceneScraper):
     name = 'Spizoo'
     network = "Spizoo"
+    parent = "Spizoo"
 
     start_urls = [
         'https://firstclasspov.com/',

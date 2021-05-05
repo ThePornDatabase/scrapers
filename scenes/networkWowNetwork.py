@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class VnaNetworkSpider(BaseSceneScraper):
     name = 'WowNetwork'
     network = 'Wow Girls'
+    parent = 'Wow Girls'
 
     start_urls = [
         'https://www.wowpornblog.com/',

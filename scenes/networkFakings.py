@@ -7,6 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class FakingsSpider(BaseSceneScraper):
     name = 'Fakings'
     network = 'FA Kings'
+    parent = 'FA Kings'
 
     start_urls = [
         'https://www.fakings.com'

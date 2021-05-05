@@ -130,6 +130,11 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         else:
             item['network'] = self.get_network(response)
 
+        if hasattr(self, 'parent'):
+            item['parent'] = self.network
+        else:
+            item['parent'] = self.get_network(response)            
+
         if self.debug:
             print(item)
         else:

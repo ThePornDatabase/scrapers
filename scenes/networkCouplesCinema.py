@@ -1,5 +1,6 @@
 import dateparser
 import scrapy
+import re
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -7,6 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class CouplesCinemaSpider(BaseSceneScraper):
     name = 'CouplesCinema'
     network = 'couplescinema'
+    parent = 'couplescinema'
 
     start_urls = [
         'https://www.couplescinema.com'
@@ -18,11 +20,11 @@ class CouplesCinemaSpider(BaseSceneScraper):
     }
 
     selector_map = {
-        'title': '//div[contains(@class, "mediaHeader")]//span[contains(@class, "title")]/text()',
-        'description': '//span[contains(@class, "description")]/text()',
+        'title': '//div[@class="gqTop"]/div/span[@class="gqTitle"]/text()',
+        'description': '//span[@class="gqDescription"]/text()',
 
-        'image': '//video/@poster',
-        'performers': '//div[contains(@class, "cast")]/a/text()',
+        'image': '//div[@class="gqTop"]/@style',
+        'performers': '//a[@class="gqModel"]/text()',
         'tags': "",
         'external_id': 'post/details/(\d+)',
         'trailer': '',
@@ -30,7 +32,7 @@ class CouplesCinemaSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css('.post a::attr(href)').getall()
+        scenes = response.xpath('//div[contains(@class,"gqPostContainer")]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
@@ -38,14 +40,15 @@ class CouplesCinemaSpider(BaseSceneScraper):
         return dateparser.parse('today').isoformat()
 
     def get_site(self, response):
-        text = response.xpath('//span[contains(@class, "type")]/text()').get()
-        return text.split('|')[0].strip()
+        site = response.xpath('//div[@class="gqProducer"]/a/text()').get()
+        return site.strip()
 
     def get_image(self, response):
         image = self.process_xpath(
             response, self.get_selector_map('image')).get()
 
-        if image:
-            return self.format_link(response, image)
-        else:
-            return ''
+        if "background" in image:
+            image = re.search('url\((.*)\)',image).group(1).strip()
+
+        return self.format_link(response, image)
+

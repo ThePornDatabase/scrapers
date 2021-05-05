@@ -7,7 +7,8 @@ import dateparser
 class GirlsOutWestSpider(BaseSceneScraper):
     name = 'GirlsOutWest'
     network = "GirlsOutWest"
-
+    parent = "GirlsOutWest"
+    
     start_urls = [
         'https://tour.girlsoutwest.com/'
     ]

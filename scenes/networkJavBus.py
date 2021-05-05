@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class JavBusSpider(BaseSceneScraper):
     name = 'JavBus'
     network = 'JavBus'
+    parent = 'JavBus'
 
     start_urls = [
         'https://www.javbus.com'
