@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class DorcelClubSpider(BaseSceneScraper):
     name = 'DorcelClub'
     network = 'Dorcel Club'
+    parent = 'Dorcel Club'
 
     start_urls = [
         'https://www.dorcelclub.com'

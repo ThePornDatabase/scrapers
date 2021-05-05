@@ -9,6 +9,7 @@ from tpdb.items import SceneItem
 class BangSpider(BaseSceneScraper):
     name = 'Bang'
     network = 'Bang'
+    parent = 'Bang'
 
     selector_map = {
         'external_id': 'video/(.+)'
@@ -73,6 +74,7 @@ class BangSpider(BaseSceneScraper):
             print(f"Index out of Range: {item['id']}")
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'
+        item['parent'] = 'Bang'
 
         return item
 

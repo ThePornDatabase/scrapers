@@ -8,6 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class VnaNetworkSpider(BaseSceneScraper):
     name = 'VnaNetwork'
     network = 'vna'
+    parent = 'vna'
 
     start_urls = [
         'https://www.allanalallthetime.com',

@@ -11,6 +11,7 @@ from tpdb.items import SceneItem
 class SexLikeRealSpider(BaseSceneScraper):
     name = 'SexLikeReal'
     network = 'SexLikeReal'
+    parent = 'SexLikeReal'
 
     start_urls = [
         'https://www.sexlikereal.com'
@@ -54,6 +55,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         item['date'] = dateparser.parse(data['datePublished']).isoformat()
         item['site'] = data['author']['name']
         item['network'] = self.network
+        item['parent'] = self.parent
 
         item['performers'] = []
         for model in data['actor']:

@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class ModelHubScraper(BaseSceneScraper):
     name = 'ModelHub'
     network = 'Pornhub'
+    network = 'ModelHub'
 
     models = [
         'Alice Redlips',

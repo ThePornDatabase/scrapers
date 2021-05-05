@@ -8,6 +8,7 @@ from tpdb.items import SceneItem
 class VixenScraper(BaseSceneScraper):
     name = 'Vixen'
     network = 'vixen'
+    parent='vixen'
 
     start_urls = [
         'https://vixen.com',
@@ -61,5 +62,6 @@ class VixenScraper(BaseSceneScraper):
 
         scene['id'] = data['id']
         scene['network'] = self.network
+        scene['parent'] = self.parent
 
         yield scene

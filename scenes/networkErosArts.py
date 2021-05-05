@@ -6,17 +6,20 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class TabooPOVSpider(BaseSceneScraper):
-    name = 'TabooPOV'
-    network = "TabooPOV"
-    site = "TabooPOV"
+class ErosArtsSpider(BaseSceneScraper):
+    name = 'ErosArts'
+    network = "Eros Arts"
 
     start_urls = [
+        'https://www.jerkoffinstructions.com/',
+        'https://www.sexpov.com/',
+        'https://www.stepmomfun.com/',
+        'https://www.taboohandjobs.com/',
         'https://www.taboopov.com/'
     ]
 
     selector_map = {
-        'title': '//tr/td/p/text()',
+        'title': '//div[@class="title"]/text()',
         'description': '//div[@class="title"]/following::p/text()',
         'date': "//div[@class='views']/span/text()",
         'image': '//img[@class="photo"]/@src',
