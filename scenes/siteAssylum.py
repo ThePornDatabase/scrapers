@@ -22,7 +22,7 @@ class AssylumSpider(BaseSceneScraper):
         'image': '//div[@class="mainpic"]/comment()',
         'performers': '',
         'tags': '//p[@class="tags"]/a/text()',
-        'external_id': '\/(.+)$',
+        'external_id': '.*\/(.*)$',
         'trailer': '',
         'pagination': '/show.php?a=65_%s'
     }
@@ -52,9 +52,43 @@ class AssylumSpider(BaseSceneScraper):
         return domain
         
     def get_performers(self, response):
-        performers = response.xpath('//div[@class="lch"]/span[contains(@class,"lc_info")]/text()').get().strip()
+        performers = response.xpath('//span[contains(@class,"lc_info mas_description")]/text()').get().strip()
         performers = performers.split(",")
-        performers = list(filter(None, performers))        
+        performers = list(filter(None, performers))
+        for performer in performers:
+            temppointer=0
+            temp_performers = []
+            performer = performer.strip()
+            
+            if "Patient: " in performer:
+                performer = performer.replace('Patient: ','')
+            if "Patients: " in performer:
+                performer = performer.replace('Patients: ','')
+            if "Nurse: " in performer:
+                performer = performer.replace('Nurse: ','')
+            if '(' in performer or ')' in performer:
+                performer = re.sub('[\(\)]+', '', performer)
+            if " and " in performer.lower():
+                additions = performer.lower().split(' and ')
+                for addition in additions:
+                    if not re.search('[^A-Za-z0-9 ]+', addition):
+                        temp_performers.append(addition.title())
+                        temppointer=1
+            if " with " in performer.lower():
+                additions = performer.lower().split(' with ')
+                for addition in additions:
+                    if not re.search('[^A-Za-z0-9 ]+', addition):
+                        temp_performers.append(addition.title())
+                        temppointer=1
+            if not temppointer:
+                temp_performers.append(performer.title())
+            
+            performers = temp_performers
+            
+        for performer in performers:
+            matches = ["Downloadable", "School", "Offer"]
+            if re.search('[^A-Za-z ]+', performer) or any(x in performer for x in matches):
+                performers.remove(performer)
 
         return list(map(lambda x: x.strip(), performers))        
 
