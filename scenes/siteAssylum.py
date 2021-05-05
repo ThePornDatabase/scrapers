@@ -22,7 +22,7 @@ class AssylumSpider(BaseSceneScraper):
         'image': '//div[@class="mainpic"]/comment()',
         'performers': '',
         'tags': '//p[@class="tags"]/a/text()',
-        'external_id': '\/(.+)$',
+        'external_id': '(\d+)$',
         'trailer': '',
         'pagination': '/show.php?a=65_%s'
     }
