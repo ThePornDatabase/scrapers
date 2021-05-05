@@ -5,7 +5,6 @@ from tpdb.items import SceneItem
 from extruct.jsonld import JsonLdExtractor
 import tldextract
 import re
-import dateparser
 
 
 
@@ -38,7 +37,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.girlsandstuds.com/',
         'https://www.jaysinxxx.com',
         'https://www.jonnidarkkoxxx.com',
-        'https://www.nudefightclub.com',
         'https://www.outofthefamily.com',
         'https://www.peternorth.com',
         'https://www.prettydirty.com',
@@ -59,7 +57,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'date': '//div[@class="tlcSpecs"]/span[@class="tlcSpecsDate"]/span[@class="tlcDetailsValue"]/text() | //*[@class="updatedDate"]/text()',
         'image': '//meta[@name="twitter:image"]/@content | //video/@poster | //meta[@property="og:image"]/@content | //div[@class="module-content"]//img[contains(@src,"/previews/")]/@src',
         'performers': '//div[@class="sceneCol sceneColActors"]//a/text() | //p[@class="starringLinks"]//a/text() | //div[@class="sceneCol actors"]//a/text() | //div[@class="actors sceneCol"]//a/text() | //div[@class="sceneCol sceneActors"]//a/text() | //div[@class="pornstarName"]/text() | //a[@class="pornstarName"]/text() | //div[@id="slick_DVDInfoActorCarousel"]//a/text() | //div[@id="slick_sceneInfoPlayerActorCarousel"]//a/text() | //div[@id="slick_sceneInfoActorCarousel"]//a/text()',
-        'tags': '//div[@class="sceneCol sceneColCategories"]/a/text()',
+        'tags': "",
         'external_id': '(\\d+)/?$',
         'trailer': '',
     }
@@ -133,11 +131,8 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'date' in response.meta:
             item['date'] = response.meta['date']
-        elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url:
+        elif 'dateCreated' in jsonlde:
             item['date'] = jsonlde['dateCreated']
-        elif 'nudefightclub' in response.url:
-            date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
-            item['date'] = dateparser.parse(date.strip()).isoformat()
         else:
             item['date'] = self.get_date(response)
 
@@ -247,9 +242,8 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if 'buttman' in base:
             selector = '/en/scenes/All/0/%s'
                                                 
-        if 'footsiebabes' in base or 'nudefightclub' in base:
+        if 'footsiebabes' in base:
             selector = '/en/videos/All-Categories/0/All-Pornstars/0/latest/%s'
-
                                                 
         return self.format_url(base, selector % page)
 
@@ -282,3 +276,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             return response.css('span.siteNameSpan::text').get()
             
         return tldextract.extract(response.url).domain
+
+
+                
+                

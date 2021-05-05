@@ -8,7 +8,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class ClubseventeenSpider(BaseSceneScraper):
     name = 'ClubSeventeen'
     network = 'ClubSeventeen'
-    parent = 'ClubSeventeen'
 
     start_urls = [
         'https://www.clubseventeen.com',
@@ -31,7 +30,7 @@ class ClubseventeenSpider(BaseSceneScraper):
         @url https://www.clubseventeen.com/videos.php?page=1
         @returns requests 50 150
         """
-        scenes = response.xpath('//div[@class="thumb show-lg"]/a/@href').getall()
+        scenes = response.css('.list_item .thumb .video-link::attr(href)').getall()
         for link in scenes:
             if re.search(self.get_selector_map('external_id'), link) is not None:
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene)
