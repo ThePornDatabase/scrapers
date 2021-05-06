@@ -23,7 +23,7 @@ class OnePassForAllSitesSpider(BaseSceneScraper):
         'tags': '//p[@class="niches-list"]/a/text()',
         'external_id': '\/episode\/(\d+)\/',
         'trailer': '//video/source[@data-quality="SD"]/@src',
-        'pagination': '/scenes?page=%s&site=0'
+        'pagination': '/scenes/date?page=%s&site=0&order=date'
     }
 
     def get_scenes(self, response):
@@ -49,5 +49,5 @@ class OnePassForAllSitesSpider(BaseSceneScraper):
         if not title:
             title = "No Title Available"
         else:
-            title = title.strip()
+            title = title.strip().replace(u'\xa0', u' ')
         return title

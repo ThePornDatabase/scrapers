@@ -19,7 +19,7 @@ class LetsDoeItSpider(BaseSceneScraper):
         'description': '//meta[@name="description"]/@content',
         'date': "//meta[@itemprop='uploadDate']/@content",
         'image': '//meta[@itemprop="thumbnailUrl"]/@content',
-        'performers': '//div[@class="actors"]/h2/span/a/@href',
+        'performers': '//div[@class="actors"]/h2/span/a/strong/text()',
         'tags': "//a[contains(@href,'/tags/') or contains(@href,'/categories/')]/text()",
         'external_id': '\/watch\/(.*)\/',
         'trailer': '//meta[@itemprop="contentURL"]/@content',
