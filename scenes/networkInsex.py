@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class InsexSpider(BaseSceneScraper):
     name = 'Insex'
     network = "Insex Network"
+    parent = "Insex Network"
 
     start_urls = [
         'https://www.insexondemand.com'
