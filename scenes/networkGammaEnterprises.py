@@ -199,7 +199,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         selectors = [
             "//div[@class='content']/ul[@class='sceneList']/li[contains(@class,'scene')]//a[contains(@class,'imgLink')]/@href",
             "//ul[@class='sceneList']/li[contains(@class,'sceneItem')]//a[contains(@class,'imgLink')]/@href",
-            "//div[@class='tlcAllContentHolder']//div[@class='tlcContent']//div[contains(@class, 'tlcContent')]//div[contains(@class, 'tlcItem')]/a[1]/@href",
+            "//div[@class='tlcAllContentHolder']//div[@class='tlcContent']//div[contains(@class, 'tlcContent')]//div[contains(@class, 'tlcItem')]/a[not(contains(@href,'/pornstar/'))][1]/@href",
             "//div[@class='sceneContainer']/a/@href",
         ]
         
