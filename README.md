@@ -12,7 +12,7 @@ We'll use ``AmateurBoxxx`` as an example.
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class AmatuerBoxxxSpider(BaseSceneScraper):
+class AmateurBoxxxSpider(BaseSceneScraper):
     name = 'AmateurBoxxx'
     network = 'Amateur Boxxx'
 ```
@@ -21,7 +21,7 @@ First we import the BaseSceneScraper which has all of our helper methods, you ca
 
 Name is the name of this scraper, used when running it, this scraper is called AmateurBoxxx so we would run it like `scrapy crawl AmateurBoxxx`
 
-Network is what network this site or group of sites belong to. We do this to group sites, scenes and performers together. AmataeurBoxxx is a one of site as far as we know, so we'll just leave it apart of it's own Network.
+Network is what network this site or group of sites belong to. We do this to group sites, scenes and performers together. AmateurBoxxx is a one of site as far as we know, so we'll just leave it apart of it's own Network.
 
 ```Python
     start_urls = [
