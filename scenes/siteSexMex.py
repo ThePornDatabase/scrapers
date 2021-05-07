@@ -28,20 +28,23 @@ class SexMexSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="thumbnail"]')
+        scenes = response.xpath('//div[@class="col-lg-4 col-md-4 col-xs-16 thumb"]')
         for scene in scenes:
-            date = scene.xpath('./div/p[@class="scene-date"]/text()').get()
+            date = scene.xpath('./div/div/p[@class="scene-date"]/text()').get()
             date = dateparser.parse(date.strip()).isoformat()            
-            title = scene.xpath('./div/h5/a/text()').get()
+            title = scene.xpath('./div/div/h5/a/text()').get()
             if " . " in title:
                 title = re.search('^(.*)\ \.\ ', title).group(1).strip()
-            description = scene.xpath('./div/p[@class="scene-descr"]/text()').get()
-            image = 'https://sexmex.xxx/tour/' + scene.xpath('./a/img/@src').get()
-            performers = scene.xpath('./div/p[@class="cptn-model"]/a/text()').getall()
+            description = scene.xpath('./div/div/p[@class="scene-descr"]/text()').get()
+            image = scene.xpath('./div/a/img/@src').get()
+            if "transform.php" in image or "url=" in image:
+                image = re.search('url=(.*)',image).group(1)
+            performers = scene.xpath('./div/div/p[@class="cptn-model"]/a/text()').getall()
             
-            scene = scene.xpath('./a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
+            sceneid = scene.xpath('./@data-setid').get()
+            
+            scene = scene.xpath('./div/a/@href').get()
+            if sceneid:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
-                    meta={'date': date, 'title': title, 'description': description, 'image': image, 'performers': performers})
-
+                    meta={'date': date, 'title': title, 'description': description, 'image': image, 'performers': performers,'id': sceneid})
 
