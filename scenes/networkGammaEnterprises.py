@@ -266,7 +266,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if 'date' in response.meta:
             item['date'] = response.meta['date']
         elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url:
-            item['date'] = jsonlde['dateCreated']
+            item['date'] = dateparser.parse(jsonlde['dateCreated']).isoformat()
         elif 'nudefightclub' in response.url:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
             item['date'] = dateparser.parse(date.strip()).isoformat()
@@ -461,6 +461,11 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         else:
             date = self.process_xpath(response, self.get_selector_map('date')).get()
             date.replace('Released:', '').replace('Added:', '').strip()
+        
+        matches = ['21sextreme']
+        if not date or any(x in response.url for x in matches):
+            date = response.xpath('//script[contains(text(),"sceneReleaseDate")]').get()
+            date = re.search('sceneReleaseDate\":\"(\d{4}-\d{2}-\d{2})', date).group(1)
             
         return dateparser.parse(date.strip()).isoformat()        
         
