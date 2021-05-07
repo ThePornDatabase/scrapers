@@ -260,8 +260,11 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         item['site'] = self.get_site(response)
 
-        if item['site'] is None and 'siteName' in json_data:
-           item['site'] = json_data['siteName']
+        if item['site'] is None:
+            if 'siteName_pretty' in json_data:
+               item['site'] = json_data['siteName_pretty']
+            elif 'siteName' in json_data:
+               item['site'] = json_data['siteName']
 
         if 'date' in response.meta:
             item['date'] = response.meta['date']
