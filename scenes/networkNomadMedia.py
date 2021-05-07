@@ -5,7 +5,7 @@ import re
 import dateparser
 from datetime import datetime
 
-class HitzefreiSpider(BaseSceneScraper):
+class NomadMediaSpider(BaseSceneScraper):
     name = 'NomadMedia'
     network = "Nomad Media"
     parent = "Aziani"
