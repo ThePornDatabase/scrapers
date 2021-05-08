@@ -5,26 +5,50 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
+def match_site(argument):
+    match = {
+        'Eurobabefacials': "Euro Babe Facials",
+        'Simplyanal': "Simply Anal",
+        'Weliketosuck': "We Like to Suck",
+        'Wetandpissy': "Wet and Pissy",
+        'Wetandpuffy': "Wet and Puffy",
+    }
+    return match.get(argument, "Puffy Network")
+
+
 class PuffySpider(BaseSceneScraper):
     name = 'PuffyNetwork'
     network = "Puffy Network"
     parent = "Puffy Network"
 
     start_urls = [
-        'https://www.puffynetwork.com/',
+        'https://www.puffynetwork.com/'
+        ## 'https://www.eurobabefacials.com'
+        ## 'https://www.simplyanal.com'
+        ## 'https://www.weliketosuck.com'
+        ## 'https://www.wetandpissy.com'
+        ## 'https://www.wetandpuffy.com'
     ]
 
     selector_map = {
         'title': "//h2[@class='title']/span/text()",
         'description': "//section[@class='downloads']//div[@class='show_more']/text()",
         'date': "//section[contains(@class, 'downloads2')]/dl[1]/dt[2]/span/text()",
-        'image': "//video[1]/@poster",
+        'image': "//video[1]/@poster | //meta[@property='og:image']/@content",
         'performers': "//section[contains(@class, 'downloads2')]/dl[1]/dd[1]//a/text()",
         'tags': "",
         'external_id': 'videos/(.+)/?$',
         'trailer': '',
         'pagination': '/videos/page-%s/?&sort=recent'
     }
+
+    def get_site(self, response):
+        site = response.xpath('//h2[@class="title"]//div[contains(text(),"Site:")]/a/text()').get()
+        site = match_site(site)
+        if site:
+            return site.strip()
+        else:
+            return "Puffy Network"
 
     def get_scenes(self, response):
         scenes = response.xpath("//article[@id='updates-list']//li//a[1]/@href").getall()
