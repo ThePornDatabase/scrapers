@@ -37,7 +37,7 @@ class Only3XSpider(BaseSceneScraper):
         if site:
             return site.strip()
         else:
-            return ''
+            super.get_site(response)
 
     def get_description(self, response):
         description = response.xpath('//div[@class="set-desc"]').getall()
