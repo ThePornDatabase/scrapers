@@ -11,30 +11,30 @@ class NubilesSpider(BaseSceneScraper):
     network = 'nubiles'
     parent = 'nubiles'
     start_urls = [
-        "https://nubiles.net/video/gallery",
-        "https://nubiles-porn.com/video/gallery",
-        "https://brattysis.com/video/gallery",
-        "https://thatsitcomshow.com/video/gallery",
-        "https://nfbusty.com/video/gallery",
         "https://anilos.com/video/gallery",
-        "https://nubilefilms.com/video/gallery",
-        "https://deeplush.com/video/gallery"
-        "https://stepsiblingscaught.com/video/gallery"
-        "https://momsteachsex.com/video/gallery"
         "https://badteenspunished.com/video/gallery"
-        "https://princesscum.com/video/gallery"
-        "https://nubilesunscripted.com/video/gallery"
-        "https://nubiles-casting.com/video/gallery"
-        "https://petitdehdporn.com/video/gallery"
-        "https://driverxxx.com/video/gallery"
-        "https://petitebalerinasfucked.com/video/gallery"
-        "https://teacherfucksteens.com/video/gallery"
         "https://bountyhunterporn.com/video/gallery"
+        "https://brattysis.com/video/gallery",
         "https://daddyslilangel.com/video/gallery"
-        "https://myfamilypies.com/video/gallery"
+        "https://deeplush.com/video/gallery"
         "https://detentiaongirls.com/video/gallery"
-        "https://nubileset.com/video/gallery"
+        "https://driverxxx.com/video/gallery"
         "https://familyswap.xxx/video/gallery"
+        "https://momsteachsex.com/video/gallery"
+        "https://myfamilypies.com/video/gallery"
+        "https://nfbusty.com/video/gallery",
+        "https://nubilefilms.com/video/gallery",
+        "https://nubiles-casting.com/video/gallery"
+        "https://nubiles-porn.com/video/gallery",
+        "https://nubiles.net/video/gallery",
+        "https://nubileset.com/video/gallery"
+        "https://nubilesunscripted.com/video/gallery"
+        "https://petitdehdporn.com/video/gallery"
+        "https://petiteballerinasfucked.com/video/gallery"
+        "https://princesscum.com/video/gallery"
+        "https://stepsiblingscaught.com/video/gallery"
+        "https://teacherfucksteens.com/video/gallery"
+        "https://thatsitcomshow.com/video/gallery",
     ]
 
     selector_map = {
@@ -59,17 +59,13 @@ class NubilesSpider(BaseSceneScraper):
                     'date': dateparser.parse(scene.css('.date::text').extract_first()).isoformat()
                 }
 
-                if scene.css('a.site-link::text').get() is not None:
-                    meta['site'] = scene.css(
-                        'a.site-link::text').extract_first()
-
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        if response.xpath(
-                "//div[contains(@class, 'content-pane-container')]//a[@class='site-link']/text()").get() is not None:
-            return response.xpath(
-                "//div[contains(@class, 'content-pane-container')]//a[@class='site-link']/text()").get()
+        site = response.xpath('//meta[@property="og:site_name"]/@content').get().replace("'", "")
+        if site:
+            return site
+            
         return super().get_site(response)
 
     def get_next_page_url(self, base, page):
