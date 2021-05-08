@@ -39,6 +39,7 @@ class NaughtyAmericaSpider(BaseSceneScraper):
             
         if image[0:2] == "//":
             image = "https:" + image
+
         return self.format_link(response, image)
 
     def get_site(self, response):
@@ -46,4 +47,4 @@ class NaughtyAmericaSpider(BaseSceneScraper):
         if site:
             return site.strip()
         else:
-            return ''
+            return super.get_site(response)
