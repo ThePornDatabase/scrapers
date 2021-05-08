@@ -7,8 +7,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class Only3XSpider(BaseSceneScraper):
     name = 'Only3X'
-    network = 'Only 3X'
-    parent = 'Only 3X'
+    network = 'Only3X'
+    parent = 'Only3X'
 
     start_urls = [
         'https://only3x.com'
@@ -34,6 +34,7 @@ class Only3XSpider(BaseSceneScraper):
 
     def get_site(self, response):
         site = response.xpath('//i[@class="icon-home"]/following-sibling::text()').get()
+        print (f"Site: {site}")
         if site:
             return site.strip()
         else:
