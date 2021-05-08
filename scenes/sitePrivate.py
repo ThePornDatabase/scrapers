@@ -12,6 +12,17 @@ class PrivateSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.private.com'
+        ## 'https://www.analintroductions.com'
+        ## 'https://www.blacksonsluts.com'
+        ## 'https://www.iconfessfiles.com'
+        ## 'https://www.missionasspossible.com'
+        ## 'https://www.privatefetish.com'
+        ## 'https://www.privatemilfs.com'
+        ## 'https://www.privatestars.com'
+        ## 'https://www.russianfakeagent.com'
+        ## 'https://www.russianteenass.com'
+        ## 'https://www.tightandteen.com'
+        ## 'https://www.trannytemptation.com'
     ]
 
     selector_map = {
