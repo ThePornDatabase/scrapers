@@ -34,7 +34,6 @@ class Only3XSpider(BaseSceneScraper):
 
     def get_site(self, response):
         site = response.xpath('//i[@class="icon-home"]/following-sibling::text()').get()
-        print (f"Site: {site}")
         if site:
             return site.strip()
         else:
