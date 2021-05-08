@@ -16,6 +16,7 @@ class PrivateSpider(BaseSceneScraper):
         ## 'https://www.blacksonsluts.com'
         ## 'https://www.iconfessfiles.com'
         ## 'https://www.missionasspossible.com'
+        ## 'https://www.privatecastings.com'
         ## 'https://www.privatefetish.com'
         ## 'https://www.privatemilfs.com'
         ## 'https://www.privatestars.com'
