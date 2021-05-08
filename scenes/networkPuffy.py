@@ -1,10 +1,8 @@
 import re
-
 import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
-   
+
 def match_site(argument):
     match = {
         'Eurobabefacials': "Euro Babe Facials",
@@ -16,9 +14,10 @@ def match_site(argument):
     return match.get(argument, "Puffy Network")
 
 
-class PrivateSpider(BaseSceneScraper):
+class PuffySpider(BaseSceneScraper):
     name = 'PuffyNetwork'
     network = "Puffy Network"
+    parent = "Puffy Network"
 
     start_urls = [
         'https://www.puffynetwork.com/'
@@ -27,18 +26,17 @@ class PrivateSpider(BaseSceneScraper):
         ## 'https://www.weliketosuck.com'
         ## 'https://www.wetandpissy.com'
         ## 'https://www.wetandpuffy.com'
-
     ]
 
     selector_map = {
-        'title': '//h2[@class="title"]/span/text()',
-        'description': '//div[@class="show_more"]/text()[1]',
-        'date': '//dl/dt[contains(text(),"Released on:")]/span/text()',
-        'image': '//meta[@property="og:image"]/@content',
-        'performers': '//dl/dd/a/text()',
-        'tags': '//p[@class="tags"]/a/text()',
-        'external_id': 'videos\/(.*)',
-        'trailer': '//div[@id="videoplayer"]//video/source/@src',
+        'title': "//h2[@class='title']/span/text()",
+        'description': "//section[@class='downloads']//div[@class='show_more']/text()",
+        'date': "//section[contains(@class, 'downloads2')]/dl[1]/dt[2]/span/text()",
+        'image': "//video[1]/@poster | //meta[@property='og:image']/@content",
+        'performers': "//section[contains(@class, 'downloads2')]/dl[1]/dd[1]//a/text()",
+        'tags': "",
+        'external_id': 'videos/(.+)/?$',
+        'trailer': '',
         'pagination': '/videos/page-%s/?&sort=recent'
     }
 
@@ -55,11 +53,3 @@ class PrivateSpider(BaseSceneScraper):
             return site.strip()
         else:
             return "Puffy Network"
-
-    def get_id(self, response):
-        search = re.search(self.get_selector_map(
-            'external_id'), response.url, re.IGNORECASE)
-        search = search.group(1)
-        if "/" in search:
-            search = search.replace("/","").strip()
-        return search
