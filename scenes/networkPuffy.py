@@ -1,9 +1,7 @@
 import re
-
+import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
 
 def match_site(argument):
     match = {
@@ -42,6 +40,12 @@ class PuffySpider(BaseSceneScraper):
         'pagination': '/videos/page-%s/?&sort=recent'
     }
 
+    def get_scenes(self, response):
+        scenes = response.xpath('//a[@class="image-wrapper"]/@href').getall()
+        for scene in scenes:
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
     def get_site(self, response):
         site = response.xpath('//h2[@class="title"]//div[contains(text(),"Site:")]/a/text()').get()
         site = match_site(site)
@@ -49,9 +53,3 @@ class PuffySpider(BaseSceneScraper):
             return site.strip()
         else:
             return "Puffy Network"
-
-    def get_scenes(self, response):
-        scenes = response.xpath("//article[@id='updates-list']//li//a[1]/@href").getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
