@@ -3,14 +3,42 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 import dateparser
 
+def match_site(argument):
+    match = {
+        'allinternal': "All Internal",
+        'asstraffic': "Ass Traffic",
+        'cumforcover': "All Internal",
+        'fistflush': "Fist Flush",
+        'givemepink': "Give Me Pink",
+        'milfthing': "MILF Thing",
+        'primecups': "Prime Cups",
+        'purepov': "Pure POV",
+        'sapphicerotica': "Sapphic Erotica",
+        'spermswap': "Sperm Swap",
+        'tamedteens': "Tamed Teens",
+    }
+    return match.get(argument, argument)
+
 
 class PefectGonzoSpider(BaseSceneScraper):
     name = 'PerfectGonzo'
     network = "DEV8 Entertainment"
-    parent = "PerfectGonzo"
 
     start_urls = [
-        'https://www.perfectgonzo.com/'
+        'https://www.perfectgonzo.com',
+        # 'https://www.allinternal.com',
+        # 'https://www.asstraffic.com',
+        # 'https://www.cumforcover.com',
+        # 'https://www.milfthing.com',
+        # 'https://www.primecups.com',
+        # 'https://www.purepov.com',
+        # 'https://www.spermswap.com',
+        # 'https://www.tamedteens.com',
+
+        'https://www.sapphix.com',
+        # 'https://www.fistflush.com',
+        # 'https://www.givemepink.com',
+        # 'https://www.sapphicerotica.com',
     ]
 
     selector_map = {
@@ -30,11 +58,19 @@ class PefectGonzoSpider(BaseSceneScraper):
         for scene in scenes:
             try:
                 site = scene.xpath(
-                    './/p[contains(text(),"Site")]/a/text()').get().strip()
+                    './/img[@class="domain-label"]/@src').get().strip()
+                site = re.search('\\/img\\/(.*)\\.com',site).group(1)
             except BaseException:
-                site = 'PerfectGonzo'
+                if "sapphix" in response.url:
+                    site = "Sapphix"
+                else:
+                    site = 'Perfect Gonzo'
             if not site:
-                site = 'PerfectGonzo'
+                if "sapphix" in response.url:
+                    site = "Sapphix"
+                else:
+                    site = 'Perfect Gonzo'
+            site = match_site(site)
 
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
@@ -57,3 +93,28 @@ class PefectGonzoSpider(BaseSceneScraper):
                 return ''
 
         return self.format_link(response, image)
+
+    def get_id(self, response):
+        search = re.search(self.get_selector_map(
+            'external_id'), response.url, re.IGNORECASE)
+        search = search.group(1)
+        if '/?nats' in search:
+            search = re.search ('(.*)\/\\?nats',search).group(1)
+        
+        return search.strip()
+
+    def get_tags(self, response):
+        if self.get_selector_map('tags'):
+            tags = self.process_xpath(
+                response, self.get_selector_map('tags')).getall()
+            tags = list(set(tags))
+            return list(map(lambda x: x.strip(), tags))
+        return []
+
+
+    def get_parent(self, response):
+        if "sapphix" in response.url:
+            return "Sapphix"
+        else:
+            return "Perfect Gonzo"
+            

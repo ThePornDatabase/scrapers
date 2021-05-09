@@ -33,3 +33,9 @@ class PuffyPerformerSpider(BasePerformerScraper):
                 url=self.format_link(response, performer),
                 callback=self.parse_performer
             )
+
+    def get_cupsize(self, response):
+        if 'cupsize' in self.selector_map:
+            cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get().strip().replace("-","")
+            return cupsize
+        return ''
