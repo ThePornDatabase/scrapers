@@ -7,10 +7,18 @@ import dateparser
 class PefectGonzoSpider(BaseSceneScraper):
     name = 'PerfectGonzo'
     network = "DEV8 Entertainment"
-    parent = "PerfectGonzo"
 
     start_urls = [
-        'https://www.perfectgonzo.com/'
+        'https://www.sapphix.com',
+        'https://www.perfectgonzo.com',
+        # 'https://www.allinternal.com',
+        # 'https://www.asstraffic.com',
+        # 'https://www.cumforcover.com',
+        # 'https://www.milfthing.com',
+        # 'https://www.primecups.com',
+        # 'https://www.purepov.com',
+        # 'https://www.spermswap.com',
+        # 'https://www.tamedteens.com',
     ]
 
     selector_map = {
@@ -57,3 +65,28 @@ class PefectGonzoSpider(BaseSceneScraper):
                 return ''
 
         return self.format_link(response, image)
+
+    def get_id(self, response):
+        search = re.search(self.get_selector_map(
+            'external_id'), response.url, re.IGNORECASE)
+        search = search.group(1)
+        if '/?nats' in search:
+            search = re.search ('(.*)\/\\?nats',search).group(1)
+        
+        return search.strip()
+
+    def get_tags(self, response):
+        if self.get_selector_map('tags'):
+            tags = self.process_xpath(
+                response, self.get_selector_map('tags')).getall()
+            tags = list(set(tags))
+            return list(map(lambda x: x.strip(), tags))
+        return []
+
+
+    def get_parent(self, response):
+        if "sapphix" in response.url:
+            return "Sapphix"
+        else:
+            return "Perfect Gonzo"
+            
