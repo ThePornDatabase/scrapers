@@ -29,10 +29,3 @@ class FemdomEmpireSpider(BaseSceneScraper):
         scenes = self.process_xpath(response, '//div[@class="item-thumb"]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image')).get()
-        if image:
-            return self.format_link(response, image)
-
-        return None
