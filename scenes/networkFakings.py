@@ -18,7 +18,7 @@ class FakingsSpider(BaseSceneScraper):
         'description': '//span[@class="grisoscuro"]/text()',
         'performers': '//strong[contains(., "Actr")]//following-sibling::a/text()',
         'tags': '//strong[contains(., "Categori")]//following-sibling::a/text()',
-        'external_id': 'video/(.+)\.htm',
+        'external_id': 'video/(.+)\\.htm',
         'trailer': '',
         'pagination': '/en/buscar/%s.htm'
     }
@@ -29,11 +29,14 @@ class FakingsSpider(BaseSceneScraper):
 
             meta = {}
 
-            date = scene.xpath('.//p[@class="txtmininfo calen sinlimite"]//text()').get().strip()
-            meta['date'] = dateparser.parse(date,settings={'DATE_ORDER': 'DMY'}).isoformat()
+            date = scene.xpath(
+                './/p[@class="txtmininfo calen sinlimite"]//text()').get().strip()
+            meta['date'] = dateparser.parse(
+                date, settings={'DATE_ORDER': 'DMY'}).isoformat()
             meta['image'] = scene.css('.bordeimagen::attr(src)').get()
 
             yield scrapy.Request(url=self.format_link(response, scene.css('a::attr(href)').get()), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        return response.xpath('//strong[contains(., "Serie")]//following-sibling::a/text()').get().strip()
+        return response.xpath(
+            '//strong[contains(., "Serie")]//following-sibling::a/text()').get().strip()

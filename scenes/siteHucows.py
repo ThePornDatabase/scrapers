@@ -7,6 +7,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class HucowsSpider(BaseSceneScraper):
     name = 'Hucows'
+    network = 'Hucows'
+    parent = 'Hucows'
 
     start_urls = [
         'https://www.hucows.com'
@@ -19,7 +21,7 @@ class HucowsSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[@class="posttags"]/a/text()',
         'tags': '//span[@class="postedintop"]/a/text()',
-        'external_id': '\/\d+\/\d+\/(.*)',
+        'external_id': '\\/\\d+\\/\\d+\\/(.*)',
         'trailer': '',
         'pagination': '/category/updates/page/%s/'
     }
@@ -33,5 +35,5 @@ class HucowsSpider(BaseSceneScraper):
     def get_id(self, response):
         search = re.search(self.get_selector_map(
             'external_id'), response.url, re.IGNORECASE)
-        sceneid = search.group(1).replace("/","")
+        sceneid = search.group(1).replace("/", "")
         return sceneid

@@ -74,9 +74,11 @@ class ScorePassSpider(BaseSceneScraper):
             return self.format_url(base, '/scenes/?page=%s' % page)
 
         if 'creampieforgranny' in base:
-            return self.format_url(base, '/milf-creampie-scenes/?page=%s' % page)
+            return self.format_url(
+                base, '/milf-creampie-scenes/?page=%s' % page)
 
         if 'grannygetsafacial' in base:
-            return self.format_url(base, '/granny-facial-scenes/?page=%s' % page)
+            return self.format_url(
+                base, '/granny-facial-scenes/?page=%s' % page)
 
         return self.format_url(base, '/videos/?page=%s' % page)

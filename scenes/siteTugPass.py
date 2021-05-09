@@ -21,12 +21,13 @@ class TugPassSpider(BaseSceneScraper):
         'image': '//div[@class="player"]/img/@src',
         'performers': 'Performers not borken out on sit',
         'tags': "",
-        'external_id': '\/videos\/(.*).htm',
+        'external_id': '\\/videos\\/(.*).htm',
         'trailer': '',
         'pagination': '/updates_%s.html'
     }
 
-    # This is one of those sites with Date and Site on the index, so have to pull it from the outer loop
+    # This is one of those sites with Date and Site on the index, so have to
+    # pull it from the outer loop
     def get_scenes(self, response):
         parentxpath = response.xpath("//div[@class='item-wrap']")
 
@@ -35,16 +36,17 @@ class TugPassSpider(BaseSceneScraper):
             if len(testvalid) > 0:
                 date = child.xpath(".//span[@class='date']/text()").get()
                 try:
-                    site = child.xpath(".//a[@class='tag-btn']/text()").get().strip()
-                except:
+                    site = child.xpath(
+                        ".//a[@class='tag-btn']/text()").get().strip()
+                except BaseException:
                     site = "TugPass"
 
                 if ".com" in site:
-                    site = re.search('(.*?)\.com', site).group(1).strip()
+                    site = re.search('(.*?)\\.com', site).group(1).strip()
 
                 scene = child.xpath(".//h4/a/@href").get()
                 if "?nats" in scene:
-                    scene = re.search("(.*)(\?nats)", scene).group(1).strip()
+                    scene = re.search("(.*)(\\?nats)", scene).group(1).strip()
 
                 if re.search(self.get_selector_map('external_id'), scene):
                     yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
@@ -56,7 +58,9 @@ class TugPassSpider(BaseSceneScraper):
     def get_image(self, response):
         html_response = response.text
         if "posterImage:" in html_response:
-            image = re.search('posterImage:\ \'(.*?)\',', html_response).group(1)
+            image = re.search(
+                'posterImage:\\ \'(.*?)\',',
+                html_response).group(1)
         else:
             image = self.process_xpath(
                 response, self.get_selector_map('image')).get()

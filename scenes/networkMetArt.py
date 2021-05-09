@@ -9,7 +9,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
     name = 'MetArtNetwork'
     network = 'metart'
     parent = 'metart'
-    
+
     start_urls = [
         "https://www.sexart.com/",
         "https://www.metart.com/",

@@ -2,6 +2,7 @@ import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+
 class HussiepassSpider(BaseSceneScraper):
     name = 'Hussiepass'
     network = "Hussiepass"
@@ -20,7 +21,7 @@ class HussiepassSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//li[@class="update_models"]/a/text()',
         'tags': '//div[contains(@class,"featuring")]/ul/li/a[contains(@href,"/categories/")]/text()',
-        'external_id': '.*\/(.*?)\.html',
+        'external_id': '.*\\/(.*?)\\.html',
         'trailer': '//script[contains(text(),"video_content")]',
         'pagination': ''
     }
@@ -36,8 +37,11 @@ class HussiepassSpider(BaseSceneScraper):
             trailer = self.process_xpath(
                 response, self.get_selector_map('trailer')).get()
             if trailer:
-                base = re.search(r'^http[s]*:\/\/[\w\.]*', response.url).group()
-                trailer = base + re.search('src=\"(.*.mp4)\"',trailer).group(1).strip()
+                base = re.search(
+                    r'^http[s]*:\/\/[\w\.]*',
+                    response.url).group()
+                trailer = base + \
+                    re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
                 return trailer
         return ''
 
@@ -47,5 +51,5 @@ class HussiepassSpider(BaseSceneScraper):
 
         if 'povpornstars' in base:
             selector = '/tour/categories/movies/%s/latest/'
-            
-        return self.format_url(base, selector % page)            
+
+        return self.format_url(base, selector % page)

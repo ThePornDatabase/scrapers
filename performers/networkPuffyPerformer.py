@@ -23,6 +23,9 @@ class PuffyPerformerSpider(BasePerformerScraper):
         'https://www.puffynetwork.com/',
     ]
 
+    def get_gender(self, response):
+        return 'Female'
+
     def get_performers(self, response):
         performers = response.css('#models a.img02::attr(href)').getall()
         for performer in performers:

@@ -21,23 +21,23 @@ class AnnaClaireCloudsSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': 'updates\/(.*).html',
+        'external_id': 'updates\\/(.*).html',
         'trailer': '//video/source/@src',
         'pagination': '/categories/Movies_%s_d.html'
     }
-            
+
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)            
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
         return "Anna Claire Clouds"
-        
+
     def get_tags(self, response):
         if self.get_selector_map('tags'):
             tags = self.process_xpath(
                 response, self.get_selector_map('tags')).getall()
             return list(map(lambda x: x.strip().title(), tags))
-        return []        
+        return []

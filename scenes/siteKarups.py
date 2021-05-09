@@ -22,12 +22,12 @@ class VrAllureSpider(BaseSceneScraper):
         'performers': '//span[@class="models"]/span[@class="content"]/a/text()',
         'tags': '',
         'trailer': '//video//source/@src',
-        'external_id': '(\d*).html$',
+        'external_id': '(\\d*).html$',
         'pagination': '/videos/page%s.html'
     }
 
     def get_scenes(self, response):
-        
+
         scenes = response.xpath('//div[@class="item-inside"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
@@ -37,8 +37,9 @@ class VrAllureSpider(BaseSceneScraper):
         return ''
 
     def get_site(self, response):
-        site = response.xpath('//span[@class="sup-title"]/span[contains(@class,"site")]/text()').get()
-        
+        site = response.xpath(
+            '//span[@class="sup-title"]/span[contains(@class,"site")]/text()').get()
+
         if site:
             site = site.strip()
             return site
@@ -49,8 +50,9 @@ class VrAllureSpider(BaseSceneScraper):
             response, self.get_selector_map('image')).get()
 
         if not image:
-            image = response.xpath('//div[@class="video-poster"]/img/@src').get()
-            
+            image = response.xpath(
+                '//div[@class="video-poster"]/img/@src').get()
+
         if image:
             return self.format_link(response, image)
         return ''

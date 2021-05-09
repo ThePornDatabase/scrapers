@@ -7,6 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class AdultEmpireCashScraper(BaseSceneScraper):
     name = 'AdultEmpireCash'
     network = 'AdultEmpireCash'
+    parent = 'AdultEmpireCash'
 
     start_urls = [
         'https://www.mypervyfamily.com/',

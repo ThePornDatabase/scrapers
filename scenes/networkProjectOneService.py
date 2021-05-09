@@ -107,14 +107,14 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             item['date'] = dateparser.parse(scene['dateReleased']).isoformat()
             item['id'] = scene['id']
             item['network'] = self.network
-            item['parent'] = item['site']
+            item['parent'] = tldextract.extract(response.meta['url']).domain
 
             if 'title' in scene:
                 item['title'] = scene['title']
             else:
                 item['title'] = item['site'] + ' ' + \
-                                dateparser.parse(scene['dateReleased']
-                                                 ).strftime('%b/%d/%Y')
+                    dateparser.parse(scene['dateReleased']
+                                     ).strftime('%b/%d/%Y')
 
             if 'description' in scene:
                 item['description'] = scene['description']
@@ -134,7 +134,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
             path = '/scene/' + str(item['id']) + '/' + slugify(item['title'])
             item['url'] = self.format_url(response.meta['url'], path)
-            
+
             # Deviante abbreviations
             if item['site'] == "fmf":
                 item['site'] = "Forgive Me Father"
@@ -152,7 +152,8 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             yield item
 
         if scene_count > 0:
-            if 'page' in response.meta and (response.meta['page'] % response.meta['limit']) < self.limit_pages:
+            if 'page' in response.meta and (
+                    response.meta['page'] % response.meta['limit']) < self.limit_pages:
                 yield self.get_next_page(response)
 
     def get_next_page(self, response):
@@ -175,8 +176,10 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
         print('NEXT PAGE: ' + str(meta['page']))
 
-        link = 'https://site-api.project1service.com/v2/releases?' + urlencode(query)
-        return scrapy.Request(url=link, callback=self.get_scenes, headers=response.meta['headers'], meta=meta)
+        link = 'https://site-api.project1service.com/v2/releases?' + \
+            urlencode(query)
+        return scrapy.Request(url=link, callback=self.get_scenes,
+                              headers=response.meta['headers'], meta=meta)
 
     def get_token(self, response):
         token = re.search('instance_token=(.+?);',

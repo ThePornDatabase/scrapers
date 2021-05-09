@@ -22,7 +22,7 @@ class EvolvedFightsSpider(BaseSceneScraper):
         'date': '//div[@class="updatesBlock"]//span[@class="update_date"]/text()',
         'image': '//div[@class="updatesBlock"]//span[@class="model_update_thumb"]/img/@src',
         'tags': '//div[@class="updatesBlock"]//span[@class="tour_update_tags"]/a/text()',
-        'external_id': 'updates\/(.*)\.html',
+        'external_id': 'updates\\/(.*)\\.html',
         'trailer': '//div[@class="updatesBlock"]//div[@class="model_update_block_image"]/a/@onclick',
         'pagination': '/categories/movies_%s_d.html'
     }
@@ -39,12 +39,14 @@ class EvolvedFightsSpider(BaseSceneScraper):
                 response, self.get_selector_map('trailer')).get()
             if "trailers" in trailer:
                 if "evolvedfightslez" in response.url:
-                    trailer = "https://www.evolvedfightslez.com" + re.search('\(\'(.*)\'\)',trailer).group(1)
+                    trailer = "https://www.evolvedfightslez.com" + \
+                        re.search('\\(\'(.*)\'\\)', trailer).group(1)
                 else:
-                    trailer = "https://www.evolvedfights.com" + re.search('\(\'(.*)\'\)',trailer).group(1)
+                    trailer = "https://www.evolvedfights.com" + \
+                        re.search('\\(\'(.*)\'\\)', trailer).group(1)
                 return trailer
         return ''
-        
+
     def get_tags(self, response):
         if self.get_selector_map('tags'):
             tags = self.process_xpath(

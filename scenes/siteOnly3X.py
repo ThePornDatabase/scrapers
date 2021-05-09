@@ -21,19 +21,21 @@ class Only3XSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//li/i[@class="icon-female"]/following-sibling::a/text()',
         'tags': '//span[contains(text(),"Tags")]/following-sibling::a/text()',
-        'external_id': 'updates\/(.*).html',
+        'external_id': 'updates\\/(.*).html',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html'
     }
-            
+
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"mpp-playlist-item")]/@data-link').getall()
+        scenes = response.xpath(
+            '//div[contains(@class,"mpp-playlist-item")]/@data-link').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)            
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//i[@class="icon-home"]/following-sibling::text()').get()
+        site = response.xpath(
+            '//i[@class="icon-home"]/following-sibling::text()').get()
         if site:
             return site.strip()
         else:
@@ -41,7 +43,7 @@ class Only3XSpider(BaseSceneScraper):
 
     def get_description(self, response):
         description = response.xpath('//div[@class="set-desc"]').getall()
-        
+
         if not isinstance(description, str):
             description = " ".join(description)
 

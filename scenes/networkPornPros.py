@@ -32,7 +32,7 @@ class PornprosSpider(BaseSceneScraper):
         'date': '//div[@class="tlcSpecs"]/span[@class="tlcSpecsDate"]/span[@class="tlcDetailsValue"]/text() | //*[@class="updatedDate"]/text() | //div[@id="t2019-stime"]//span/text()',
         'performers': '//div[@class="sceneCol sceneColActors"]//a/text() | //div[@class="sceneCol scenePerformers"]//a/text() | //div[@class="pornstarName"]/text() | //div[@id="slick_DVDInfoPerformerCarousel"]//a/text() | //div[@id="slick_sceneInfoPlayerPerformerCarousel"]//a/text() | //div[@id="t2019-models"]/a/text()',
         'tags': '//div[@class="sceneCol sceneColCategories"]//a/text() | //div[@class="sceneCategories"]//a/text() | //p[@class="dvdCol"]/a/text()',
-        'external_id': 'video\/(.+)',
+        'external_id': 'video\\/(.+)',
         'trailer': '//video//source/@src',
         'pagination': '/?page=%s'
     }

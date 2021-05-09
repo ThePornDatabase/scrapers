@@ -19,17 +19,19 @@ class InsexSpider(BaseSceneScraper):
         'image': '//video-js[1]/@poster',
         'performers': '//div[contains(@class, "has-text-white-ter")][1]//a[contains(@class, "is-dark")][position() < last()]/text()',
         'tags': '',
-        'external_id': 'play.php\?id\=(\w+)',
+        'external_id': 'play.php\\?id\\=(\\w+)',
         'trailer': '//video-js[1]//source/@src',
         'pagination': '/iod/home.php?p=%s&s=&d=&o=newest'
     }
 
     def get_scenes(self, response):
-        scenes = response.css("div.is-multiline div.column a::attr(href)").getall()
+        scenes = response.css(
+            "div.is-multiline div.column a::attr(href)").getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, '/iod/' + scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//div[contains(@class, "has-text-white-ter")][1]//a[contains(@class, "is-dark")][last()]/text()').get().strip()
+        site = response.xpath(
+            '//div[contains(@class, "has-text-white-ter")][1]//a[contains(@class, "is-dark")][last()]/text()').get().strip()
         return site

@@ -25,7 +25,7 @@ class KinkFeaturedSpider(BaseSceneScraper):
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '//p[@class="starring"]/span/a/text()',
         'tags': "//a[@class='tag']/text()",
-        'external_id': '\\/shoot\\/(\d+)',
+        'external_id': '\\/shoot\\/(\\d+)',
         'trailer': '//meta[@name="twitter:player"]/@content',
         'pagination': '/shoots/latest?page=%s'
     }
@@ -34,9 +34,10 @@ class KinkFeaturedSpider(BaseSceneScraper):
         for pagination in self.paginations:
             yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination': pagination},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+                                 meta={
+                'page': self.page, 'pagination': pagination},
+                headers=self.headers,
+                cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         if response.status == 200:
@@ -64,10 +65,12 @@ class KinkFeaturedSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        return response.xpath('//div[@class="shoot-page"]/@data-sitename').get().strip()
+        return response.xpath(
+            '//div[@class="shoot-page"]/@data-sitename').get().strip()
 
     def get_performers(self, response):
-        performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
+        performers = self.process_xpath(
+            response, self.get_selector_map('performers')).getall()
         performers_stripped = [s.strip() for s in performers]
         performers_stripped = [s.rstrip(',') for s in performers_stripped]
         return list(map(lambda x: x.strip(), performers_stripped))

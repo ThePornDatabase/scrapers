@@ -5,6 +5,7 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+
 class ProducersFunSpider(BaseSceneScraper):
     name = 'ProducersFun'
     network = "Producers Fun"
@@ -21,13 +22,14 @@ class ProducersFunSpider(BaseSceneScraper):
         'image': '//section[@class="top-wrapper"]/div//video/@poster',
         'performers': '//h1/text()',
         'tags': '//p[@class="video-tags"]/a/text()',
-        'external_id': 'video\/(.*)',
+        'external_id': 'video\\/(.*)',
         'trailer': '',
         'pagination': '/videos?page=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//article[@class="shadow video"]/a/@href').getall()
+        scenes = response.xpath(
+            '//article[@class="shadow video"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
@@ -36,32 +38,38 @@ class ProducersFunSpider(BaseSceneScraper):
         return "Producers Fun"
 
     def get_trailer(self, response):
-        trailer = response.xpath('//input[@type="hidden" and @id="videoJsConfig"]/@value').get()
+        trailer = response.xpath(
+            '//input[@type="hidden" and @id="videoJsConfig"]/@value').get()
         try:
-            trailer = re.search('480\},\{\"src\":\"(.*?)\".\"type', trailer).group(1)
-        except:
-            trailer = re.search('1080\},\{\"src\":\"(.*?)\".\"type', trailer).group(1)
-            
-        trailer = trailer.replace("\\","")
-        
+            trailer = re.search(
+                '480\\},\\{\"src\":\"(.*?)\".\"type',
+                trailer).group(1)
+        except BaseException:
+            trailer = re.search(
+                '1080\\},\\{\"src\":\"(.*?)\".\"type',
+                trailer).group(1)
+
+        trailer = trailer.replace("\\", "")
+
         if trailer:
             return trailer
         else:
             return ''
 
     def get_description(self, response):
-        description = response.xpath('//div[@class="shadow video-details"]/p[not(@class="video-date") and not(@class="video-tags")][1]/text()').get()
+        description = response.xpath(
+            '//div[@class="shadow video-details"]/p[not(@class="video-date") and not(@class="video-tags")][1]/text()').get()
         if description:
             return description.strip()
         else:
             return ''
-            
+
     def get_performers(self, response):
         performers = response.xpath('//h1/text()').get()
         if " - " in performers:
-            performers = re.search('(.*)\ -\ ', performers).group(1)
+            performers = re.search('(.*)\\ -\\ ', performers).group(1)
             performers = performers.strip()
-            
+
         if performers and "Volume" not in performers and "Compilation" not in performers:
             return performers
         else:

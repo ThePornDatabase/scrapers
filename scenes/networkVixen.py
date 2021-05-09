@@ -8,7 +8,6 @@ from tpdb.items import SceneItem
 class VixenScraper(BaseSceneScraper):
     name = 'Vixen'
     network = 'vixen'
-    parent='vixen'
 
     start_urls = [
         'https://vixen.com',

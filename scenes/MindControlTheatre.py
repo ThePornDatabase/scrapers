@@ -6,6 +6,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class MindControlTheatreScraper(BaseSceneScraper):
     name = 'MindControlTheatre'
+    network = 'MindControlTheatre'
+    parent = 'MindControlTheatre'
 
     start_urls = [
         'https://mindcontroltheatre.com'

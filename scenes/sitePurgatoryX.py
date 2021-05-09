@@ -22,13 +22,14 @@ class PurgatoryXSpider(BaseSceneScraper):
         'image': '//div[contains(@class,"player-wrap")]/*/@poster',
         'performers': '//div[@class="model-wrap"]/ul/li/h5/text()',
         'tags': '//meta[@name="keywords"]/@content',
-        'external_id': 'view\/(\d+)\/',
+        'external_id': 'view\\/(\\d+)\\/',
         'trailer': '//a[contains(@class,"download-trailer")]/@href',
         'pagination': '/videos?page=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="details-wrap"]/h3/a/@href').getall()
+        scenes = response.xpath(
+            '//div[@class="details-wrap"]/h3/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

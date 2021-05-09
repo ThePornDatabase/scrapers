@@ -23,11 +23,11 @@ class SpizooSpider(BaseSceneScraper):
         'title': '/',
         'description': '',
         'date': "//p[@class='date']/text()",
-        'image': '', #Hashed and tokened link.  Will be no good later
+        'image': '',  # Hashed and tokened link.  Will be no good later
         'performers': '',
         'tags': "",
-        'external_id': '\/updates\/(.*)\.html$',
-        'trailer': '', #Hashed and tokened link.  Will be no good later
+        'external_id': '\\/updates\\/(.*)\\.html$',
+        'trailer': '',  # Hashed and tokened link.  Will be no good later
         'pagination': '/categories/movies_%s_d.html'
     }
 
@@ -41,8 +41,8 @@ class SpizooSpider(BaseSceneScraper):
         if "spizoo" in response.request.url:
             titlexpath = '//div[@class="title"]/h1/text()'
         matches = ["firstclasspov", "mrluckypov"]
-        if any(x in response.request.url for x in matches):       
-            titlexpath = '//section[@id="scene"]/div/div/div/h1/text()'            
+        if any(x in response.request.url for x in matches):
+            titlexpath = '//section[@id="scene"]/div/div/div/h1/text()'
         if "rawattack" in response.request.url:
             titlexpath = '//title/text()'
         if "realsensual" in response.request.url:
@@ -53,19 +53,19 @@ class SpizooSpider(BaseSceneScraper):
         if "spizoo" in response.request.url:
             tagsxpath = '//a[contains(@class,"category-tag")]/@title'
         else:
-            tagsxpath = '//a[contains(@href,"/categories/")]/text()'            
-        
+            tagsxpath = '//a[contains(@href,"/categories/")]/text()'
+
         tags = response.xpath(tagsxpath).getall()
         return list(map(lambda x: x.strip(), tags))
-        
+
     def get_performers(self, response):
         matches = ["firstclasspov", "rawattack"]
-        if any(x in response.request.url for x in matches):   
-            performersxpath = '//div[@class="col-12"]//a[contains(@href, "/models")]/@title'            
+        if any(x in response.request.url for x in matches):
+            performersxpath = '//div[@class="col-12"]//a[contains(@href, "/models")]/@title'
         matches = ["mrluckypov", "realsensual", "spizoo"]
-        if any(x in response.request.url for x in matches):   
-            performersxpath = '//div[@class="col-3"]//a[contains(@href, "/models")]/@title'            
-        
+        if any(x in response.request.url for x in matches):
+            performersxpath = '//div[@class="col-3"]//a[contains(@href, "/models")]/@title'
+
         tags = response.xpath(performersxpath).getall()
         return list(map(lambda x: x.strip(), tags))
 
@@ -82,7 +82,7 @@ class SpizooSpider(BaseSceneScraper):
         else:
             trailerxpath = '//video/source/@src'
         return response.xpath(trailerxpath).get().strip()
-        
+
     def get_description(self, response):
         if "rawattack" in response.request.url:
             descriptionxpath = '//section[@id="sceneInfo"]/div/div/div/p/text()'
@@ -90,5 +90,4 @@ class SpizooSpider(BaseSceneScraper):
             descriptionxpath = '//p[@class="description-scene"]/text()'
         else:
             descriptionxpath = '//p[@class="description"]/text()'
-        return response.xpath(descriptionxpath).get().strip()        
-        
+        return response.xpath(descriptionxpath).get().strip()

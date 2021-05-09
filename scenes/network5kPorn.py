@@ -8,6 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class FiveKPornSpider(BaseSceneScraper):
     name = '5kporn'
     network = '5kporn'
+    parent = '5kporn'
 
     start_urls = [
         'https://www.5kporn.com'

@@ -9,21 +9,22 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class PrivateSpider(BaseSceneScraper):
     name = 'Private'
     network = "Private"
+    parent = "Private"
 
     start_urls = [
         'https://www.private.com'
-        ## 'https://www.analintroductions.com'
-        ## 'https://www.blacksonsluts.com'
-        ## 'https://www.iconfessfiles.com'
-        ## 'https://www.missionasspossible.com'
-        ## 'https://www.privatecastings.com'
-        ## 'https://www.privatefetish.com'
-        ## 'https://www.privatemilfs.com'
-        ## 'https://www.privatestars.com'
-        ## 'https://www.russianfakeagent.com'
-        ## 'https://www.russianteenass.com'
-        ## 'https://www.tightandteen.com'
-        ## 'https://www.trannytemptation.com'
+        # 'https://www.analintroductions.com'
+        # 'https://www.blacksonsluts.com'
+        # 'https://www.iconfessfiles.com'
+        # 'https://www.missionasspossible.com'
+        # 'https://www.privatecastings.com'
+        # 'https://www.privatefetish.com'
+        # 'https://www.privatemilfs.com'
+        # 'https://www.privatestars.com'
+        # 'https://www.russianfakeagent.com'
+        # 'https://www.russianteenass.com'
+        # 'https://www.tightandteen.com'
+        # 'https://www.trannytemptation.com'
     ]
 
     selector_map = {
@@ -33,7 +34,7 @@ class PrivateSpider(BaseSceneScraper):
         'image': '//meta[@itemprop="thumbnailUrl"]/@content',
         'performers': '//ul[@class="scene-models-list"]/li/a[@data-track="PORNSTAR_NAME"]/text()',
         'tags': '//ul[@class="scene-tags"]/li/a/text()',
-        'external_id': '\/(\d+)$',
+        'external_id': '\\/(\\d+)$',
         'trailer': '',
         'pagination': '/scenes/%s/'
     }

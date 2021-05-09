@@ -6,6 +6,7 @@ from datetime import date
 class FullPornNetworkSpider(BaseSceneScraper):
     name = 'FullPorn'
     network = 'fullpornnetwork'
+    parent = 'fullpornnetwork'
 
     start_urls = [
         'https://analized.com',

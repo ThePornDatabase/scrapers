@@ -6,7 +6,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class VnaNetworkSpider(BaseSceneScraper):
     name = 'WowNetwork'
     network = 'Wow Girls'
-    parent = 'Wow Girls'
 
     start_urls = [
         'https://www.wowpornblog.com/',
@@ -32,7 +31,8 @@ class VnaNetworkSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//span[@itemprop="name"]/text()').extract_first()
+        site = response.xpath(
+            '//span[@itemprop="name"]/text()').extract_first()
         return site
 
     def get_tags(self, response):

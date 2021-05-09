@@ -5,6 +5,7 @@ import re
 import dateparser
 from datetime import datetime
 
+
 class HotGuysFuckSpider(BaseSceneScraper):
     name = 'HotMilfsFuck'
     network = "Hot Milfs Fuck"
@@ -22,13 +23,14 @@ class HotGuysFuckSpider(BaseSceneScraper):
         'performers': '//section[@class="p-tb-50 bio-section-head"]/div/div/h2/text()',
         'tags': '//ul[@class="tags"]/li/a/text()',
         'trailer': '//script[contains(text(),"video_content")]',
-        'external_id': '.*\/(.*?)\.html',
+        'external_id': '.*\\/(.*?)\\.html',
         'pagination': '/categories/movies_%s_d.html'
     }
 
     def get_scenes(self, response):
-        
-        scenes = response.xpath('//div[@class="item item-update item-video"]/div[@class="content-div"]/h4/a/@href').getall()
+
+        scenes = response.xpath(
+            '//div[@class="item item-update item-video"]/div[@class="content-div"]/h4/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
@@ -36,21 +38,24 @@ class HotGuysFuckSpider(BaseSceneScraper):
     def get_image(self, response):
         image = self.process_xpath(
             response, self.get_selector_map('image')).get()
-        image = "https://www.hotmilfsfuck.com/" + re.search('poster=\"(.*.jpg)\"',image).group(1).strip()
-        
+        image = "https://www.hotmilfsfuck.com/" + \
+            re.search('poster=\"(.*.jpg)\"', image).group(1).strip()
+
         return self.format_link(response, image)
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(
                 response, self.get_selector_map('trailer')).get()
-            trailer = "https://www.hotmilfsfuck.com/" + re.search('src=\"(.*.mp4)\"',trailer).group(1).strip()
+            trailer = "https://www.hotmilfsfuck.com/" + \
+                re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
             return trailer
         return ''
-        
+
     def get_description(self, response):
 
-        description = response.xpath('//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()').get()
-        description = description.replace('\r\n','').strip()
-        
+        description = response.xpath(
+            '//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()').get()
+        description = description.replace('\r\n', '').strip()
+
         return description

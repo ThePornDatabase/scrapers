@@ -9,7 +9,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class NubilesSpider(BaseSceneScraper):
     name = 'Nubiles'
     network = 'nubiles'
-    parent = 'nubiles'
+
     start_urls = [
         "https://anilos.com/video/gallery",
         "https://badteenspunished.com/video/gallery"
@@ -62,10 +62,11 @@ class NubilesSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        site = response.xpath('//meta[@property="og:site_name"]/@content').get().replace("'", "")
+        site = response.xpath(
+            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
         if site:
             return site
-            
+
         return super().get_site(response)
 
     def get_next_page_url(self, base, page):

@@ -22,7 +22,7 @@ class AD4XSpider(BaseSceneScraper):
         'image': '//video/@poster',
         'performers': '//p[@class="models mb-0"]/a/text()',
         'tags': '',
-        'external_id': 'videos\/(\d+)\/',
+        'external_id': 'videos\\/(\\d+)\\/',
         'trailer': '//a[contains(@class,"download-trailer")]/@href',
         'pagination': '/tour/en/videos?page=%s'
     }
@@ -46,6 +46,6 @@ class AD4XSpider(BaseSceneScraper):
         performers = self.process_xpath(
             response, self.get_selector_map('performers')).getall()
         return list(map(lambda x: x.strip().title(), performers))
-    
+
     def get_description(self, response):
         return ''

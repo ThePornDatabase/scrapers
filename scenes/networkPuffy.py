@@ -3,6 +3,7 @@ import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+
 def match_site(argument):
     match = {
         'Eurobabefacials': "Euro Babe Facials",
@@ -21,11 +22,11 @@ class PuffySpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.puffynetwork.com/'
-        ## 'https://www.eurobabefacials.com'
-        ## 'https://www.simplyanal.com'
-        ## 'https://www.weliketosuck.com'
-        ## 'https://www.wetandpissy.com'
-        ## 'https://www.wetandpuffy.com'
+        # 'https://www.eurobabefacials.com'
+        # 'https://www.simplyanal.com'
+        # 'https://www.weliketosuck.com'
+        # 'https://www.wetandpissy.com'
+        # 'https://www.wetandpuffy.com'
     ]
 
     selector_map = {
@@ -47,7 +48,8 @@ class PuffySpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//h2[@class="title"]//div[contains(text(),"Site:")]/a/text()').get()
+        site = response.xpath(
+            '//h2[@class="title"]//div[contains(text(),"Site:")]/a/text()').get()
         site = match_site(site)
         if site:
             return site.strip()

@@ -24,18 +24,18 @@ class VnaNetworkSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="clipbox medium"]/a[1]/@href').getall()
+        scenes = response.xpath(
+            '//div[@class="clipbox medium"]/a[1]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-    
+
     def get_image(self, response):
         image = self.process_xpath(
             response, self.get_selector_map('image')).get().split("url('//")[1][:-2]
         return self.format_link(response, image)
-    
-    #### no date aviable, is there a better solution?
 
-    def get_date(self,desponse):
+    # no date aviable, is there a better solution?
+
+    def get_date(self, desponse):
         date = '1970-01-01'
         return dateparser.parse(date).isoformat()
-

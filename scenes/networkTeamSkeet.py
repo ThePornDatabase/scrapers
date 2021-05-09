@@ -108,17 +108,17 @@ link_to_info = {
         "site": "MYLFDom",
         "navText": movies_nav_text,
         "contentText": movies_content_text
-    },   
+    },
     "organic-1-goide6Xo": {
         "site": "BBC Paradise",
         "navText": movies_nav_text,
         "contentText": movies_content_text
-    },   
+    },
     "organic-alm-Od3Iqu9I": {
         "site": "Anal Mom",
         "navText": movies_nav_text,
         "contentText": movies_content_text
-    }    
+    }
 }
 
 
@@ -168,7 +168,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                           data['video'] + '/manifest/video.m3u8'
         item['url'] = response.url
         item['network'] = self.network
-        item['parent'] = self.parent
+        item['parent'] = response.meta['site']
 
         if 'publishedDate' in data:
             item['date'] = dateparser.parse(data['publishedDate']).isoformat()

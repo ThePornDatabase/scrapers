@@ -8,6 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from datetime import datetime
 import dateparser
 
+
 class PornWorldScraper(BaseSceneScraper):
     name = 'PornWorldAlt'
     network = 'ddfnetwork'
@@ -27,7 +28,7 @@ class PornWorldScraper(BaseSceneScraper):
         'image': '//div[@class="videoPlayerContainer"]/img/@src | //video/@poster',
         'performers': "",
         'tags': "",
-        'external_id': 'videos\/.*\/(\d+)',
+        'external_id': 'videos\\/.*\\/(\\d+)',
         'trailer': '',
         'pagination': '/videos/%s'
     }
@@ -39,7 +40,7 @@ class PornWorldScraper(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_date(self, response):
-        search = re.search('Added:\ (.*?\d{2,4})\ {1,3}', response.text)
+        search = re.search('Added:\\ (.*?\\d{2,4})\\ {1,3}', response.text)
         return dateparser.parse(search.group(1)).isoformat()
 
     def get_performers(self, response):

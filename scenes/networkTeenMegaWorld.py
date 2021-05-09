@@ -46,10 +46,12 @@ class TeenMegaWorldSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath("//a[contains(@class, 'title')]/@href").getall()
+        scenes = response.xpath(
+            "//a[contains(@class, 'title')]/@href").getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//div[contains(@class, "site")]//a[starts-with(@href, "/search")]/text()').extract_first()
+        site = response.xpath(
+            '//div[contains(@class, "site")]//a[starts-with(@href, "/search")]/text()').extract_first()
         return tldextract.extract(site).domain

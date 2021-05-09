@@ -44,7 +44,11 @@ class BangSpider(BaseSceneScraper):
                 headers={'Content-Type': 'application/json'},
                 callback=self.parse,
                 meta={'page': next_page},
-                body=json.dumps(self.get_elastic_payload(self.per_page, self.per_page * next_page))
+                body=json.dumps(
+                    self.get_elastic_payload(
+                        self.per_page,
+                        self.per_page *
+                        next_page))
             )
 
     def parse_scene(self, json):
@@ -54,7 +58,8 @@ class BangSpider(BaseSceneScraper):
         json = json['_source']
 
         if 'preview' in json:
-            item['trailer'] = 'https://i.bang.com/v/%s/%s/preview720.mp4' % (json['dvd']['id'], json['identifier'])
+            item['trailer'] = 'https://i.bang.com/v/%s/%s/preview720.mp4' % (
+                json['dvd']['id'], json['identifier'])
         else:
             item['trailer'] = ''
 
@@ -70,7 +75,7 @@ class BangSpider(BaseSceneScraper):
         try:
             item['image'] = 'https://i.bang.com/screenshots/%s/movie/%s/%s.jpg' % (
                 json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
-        except:
+        except BaseException:
             print(f"Index out of Range: {item['id']}")
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'

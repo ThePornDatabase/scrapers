@@ -6,8 +6,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class CherryPimpsSpider(BaseSceneScraper):
     name = 'CherryPimps'
-    network = 'cherrypimps'
-    parent = 'cherrypimps'
+    network = 'Cherry Pimps'
+    parent = 'Cherry Pimps'
 
     start_urls = [
         'https://www.cherrypimps.com'
@@ -29,7 +29,8 @@ class CherryPimpsSpider(BaseSceneScraper):
         @url https://cherrypimps.com/categories/movies.html
         @returns requests 10 50
         """
-        scenes = response.css("div.item-updates .item-thumb a::attr(href)").getall()
+        scenes = response.css(
+            "div.item-updates .item-thumb a::attr(href)").getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 

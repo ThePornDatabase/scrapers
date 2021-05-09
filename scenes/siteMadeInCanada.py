@@ -22,13 +22,14 @@ class MadeInCanadaSpider(BaseSceneScraper):
         'performers': '',
         'tags': '',
         'trailer': '',
-        'external_id': '\/view\/(\d*)\/',
+        'external_id': '\\/view\\/(\\d*)\\/',
         'pagination': '/scenes?page=%s'
     }
 
     def get_scenes(self, response):
-        
-        scenes = response.xpath('//div[contains(@class,"set-thumb")]/a/@href').getall()
+
+        scenes = response.xpath(
+            '//div[contains(@class,"set-thumb")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
@@ -40,6 +41,6 @@ class MadeInCanadaSpider(BaseSceneScraper):
         if description is not None:
             return re.sub('<[^<]+?>', '', description.strip())
         return ""
-        
+
     def get_performers(self, response):
         return ''

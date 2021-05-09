@@ -21,29 +21,33 @@ class NaughtyAmericaSpider(BaseSceneScraper):
         'image': '//a[@class="play-trailer"]/picture//img/@data-srcset',
         'performers': '//a[@class="scene-title grey-text link"]/text()',
         'tags': '//a[@class="cat-tag"]/text()',
-        'external_id': '(\d+)$',
+        'external_id': '(\\d+)$',
         'trailer': '',
         'pagination': '/new-porn-videos?page=%s'
     }
-            
+
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="scene-grid-item"]/a[contains(@href,"/scene/")]/@href').getall()
+        scenes = response.xpath(
+            '//div[@class="scene-grid-item"]/a[contains(@href,"/scene/")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)            
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_image(self, response):
-        image = response.xpath('//a[@class="play-trailer"]/picture[1]//source[contains(@data-srcset,"jpg")]/@data-srcset').get()
+        image = response.xpath(
+            '//a[@class="play-trailer"]/picture[1]//source[contains(@data-srcset,"jpg")]/@data-srcset').get()
         if not image:
-            image = response.xpath('//dl8-video/@poster[contains(.,"jpg")]').get()
-            
+            image = response.xpath(
+                '//dl8-video/@poster[contains(.,"jpg")]').get()
+
         if image[0:2] == "//":
             image = "https:" + image
 
         return self.format_link(response, image)
 
     def get_site(self, response):
-        site = response.xpath('//div[@class="scene-info"]/a[contains(@class,"site-title")]/text()').get()
+        site = response.xpath(
+            '//div[@class="scene-info"]/a[contains(@class,"site-title")]/text()').get()
         if site:
             return site.strip()
         else:

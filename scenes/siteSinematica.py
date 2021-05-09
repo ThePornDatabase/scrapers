@@ -20,13 +20,14 @@ class SinematicaSpider(BaseSceneScraper):
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '//div[@class="feat"]/a/text()',
         'tags': "",
-        'external_id': 'details\/(\d+)?',
+        'external_id': 'details\\/(\\d+)?',
         'trailer': '//video/source/@src',
         'pagination': '/search/videos?page=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@id="_posts"]/div[@class="post_new"]/a/@href').getall()
+        scenes = response.xpath(
+            '//div[@id="_posts"]/div[@class="post_new"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

@@ -23,12 +23,12 @@ class MyBoobsSpider(BaseSceneScraper):
         'performers': '',
         'tags': '',
         'trailer': '',
-        'external_id': 'view\/(\d+)\/',
+        'external_id': 'view\\/(\\d+)\\/',
         'pagination': '/videos?page=%s'
     }
 
     def get_scenes(self, response):
-        
+
         scenes = response.xpath('//div[contains(@class,"set-thumb")]')
         for scene in scenes:
             date = scene.xpath('./div/div/div/span/span[1]/text()').get()
@@ -39,6 +39,6 @@ class MyBoobsSpider(BaseSceneScraper):
 
     def get_performers(self, response):
         return''
-    
+
     def get_description(self, response):
         return ''

@@ -26,13 +26,14 @@ class CouplesCinemaSpider(BaseSceneScraper):
         'image': '//div[@class="gqTop"]/@style',
         'performers': '//a[@class="gqModel"]/text()',
         'tags': "",
-        'external_id': 'post/details/(\d+)',
+        'external_id': 'post/details/(\\d+)',
         'trailer': '',
         'pagination': '/search/videos?page=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"gqPostContainer")]/a/@href').getall()
+        scenes = response.xpath(
+            '//div[contains(@class,"gqPostContainer")]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
@@ -48,7 +49,6 @@ class CouplesCinemaSpider(BaseSceneScraper):
             response, self.get_selector_map('image')).get()
 
         if "background" in image:
-            image = re.search('url\((.*)\)',image).group(1).strip()
+            image = re.search('url\\((.*)\\)', image).group(1).strip()
 
         return self.format_link(response, image)
-
