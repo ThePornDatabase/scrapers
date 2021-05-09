@@ -18,7 +18,7 @@ class Only3XSpider(BaseSceneScraper):
         'title': '//h1/text()',
         'description': '',
         'date': '//li/i[@class="icon-eye-open"]/following-sibling::span/following-sibling::text()',
-        'image': '//meta[@property="og:image"]/@content',
+        'image': '//span[@class="update_thumb"]/img/@src',
         'performers': '//li/i[@class="icon-female"]/following-sibling::a/text()',
         'tags': '//span[contains(text(),"Tags")]/following-sibling::a/text()',
         'external_id': 'updates\\/(.*).html',
