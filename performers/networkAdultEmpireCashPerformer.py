@@ -14,7 +14,7 @@ def match_path(argument):
     }
     return match.get(argument, "")
 
-class networkAdultEmpireCashSpider(BasePerformerScraper):
+class networkAdultEmpireCashPerformerSpider(BasePerformerScraper):
 
     selector_map = {
         'name': '//div[@id="performer"]//h1/text()',
