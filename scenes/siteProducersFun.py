@@ -71,6 +71,6 @@ class ProducersFunSpider(BaseSceneScraper):
             performers = performers.strip()
 
         if performers and "Volume" not in performers and "Compilation" not in performers:
-            return performers
+            return [performers]
         else:
             return ''
