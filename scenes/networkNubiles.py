@@ -12,28 +12,28 @@ class NubilesSpider(BaseSceneScraper):
 
     start_urls = [
         "https://anilos.com/video/gallery",
-        "https://badteenspunished.com/video/gallery"
-        "https://bountyhunterporn.com/video/gallery"
+        "https://badteenspunished.com/video/gallery",
+        "https://bountyhunterporn.com/video/gallery",
         "https://brattysis.com/video/gallery",
-        "https://daddyslilangel.com/video/gallery"
-        "https://deeplush.com/video/gallery"
-        "https://detentiaongirls.com/video/gallery"
-        "https://driverxxx.com/video/gallery"
-        "https://familyswap.xxx/video/gallery"
-        "https://momsteachsex.com/video/gallery"
-        "https://myfamilypies.com/video/gallery"
+        "https://daddyslilangel.com/video/gallery",
+        "https://deeplush.com/video/gallery",
+        "https://detentiaongirls.com/video/gallery",
+        "https://driverxxx.com/video/gallery",
+        "https://familyswap.xxx/video/gallery",
+        "https://momsteachsex.com/video/gallery",
+        "https://myfamilypies.com/video/gallery",
         "https://nfbusty.com/video/gallery",
         "https://nubilefilms.com/video/gallery",
-        "https://nubiles-casting.com/video/gallery"
+        "https://nubiles-casting.com/video/gallery",
         "https://nubiles-porn.com/video/gallery",
         "https://nubiles.net/video/gallery",
-        "https://nubileset.com/video/gallery"
-        "https://nubilesunscripted.com/video/gallery"
-        "https://petitdehdporn.com/video/gallery"
-        "https://petiteballerinasfucked.com/video/gallery"
-        "https://princesscum.com/video/gallery"
-        "https://stepsiblingscaught.com/video/gallery"
-        "https://teacherfucksteens.com/video/gallery"
+        "https://nubileset.com/video/gallery",
+        "https://nubilesunscripted.com/video/gallery",
+        "https://petitdehdporn.com/video/gallery",
+        "https://petiteballerinasfucked.com/video/gallery",
+        "https://princesscum.com/video/gallery",
+        "https://stepsiblingscaught.com/video/gallery",
+        "https://teacherfucksteens.com/video/gallery",
         "https://thatsitcomshow.com/video/gallery",
     ]
 

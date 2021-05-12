@@ -28,7 +28,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
         'birthday': '//a[contains(@href,"dateOfBirth")]/@href',
         'bio': '//div[@data-test="biography"]/text()',
         'aliases': '//p[@data-test="p_aliases"]/text()',
-        'pagination': '/babes?s=latest&o=desc&p=%s&l=96',
+        'pagination': '/babes?s=latest&o=desc&p=%s&l=96&f[professions]=porn_stars&f[careerStatus]=active',
         'external_id': '\.ru\/(.*)\/'
     }
 
