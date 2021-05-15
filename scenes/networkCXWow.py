@@ -21,7 +21,7 @@ class CXWowSpider(BaseSceneScraper):
         'performers': '//ul[contains(@class, "featuredModels")]/li//span/text()',
         'date': '//div[contains(@class, "video_description")]//h4/text()',
         're_date': r'\b(\d{1,4}-\d{1,2}-\d{1,2})\b',
-        'image': '//div[contains(@class, "videohere")]//img/@src',
+        'image': '//div[contains(@class, "videohere")]//img[contains(@src,"contentthumbs")]/@src',
         'tags': '//meta[@name="keywords"]/@content',
         'trailer': '//script[contains(text(),"playTrailer")]/text()',
         'external_id': '/trailers/(.*).html',
