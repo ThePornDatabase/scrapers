@@ -8,7 +8,6 @@ import dateparser
 class MetArtNetworkSpider(BaseSceneScraper):
     name = 'MetArtNetwork'
     network = 'metart'
-    parent = 'metart'
 
     start_urls = [
         "https://www.sexart.com/",
@@ -24,6 +23,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
         "https://www.rylskyart.com",
         "https://www.stunning18.com",
         "https://www.thelifeerotic.com",
+        'https://www.hustler.com'
     ]
 
     selector_map = {
@@ -44,6 +44,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
     def parse_scene(self, response):
         movie = response.json()
+
         item = SceneItem()
         item['title'] = movie['name']
         item['description'] = movie['description']
@@ -53,12 +54,15 @@ class MetArtNetworkSpider(BaseSceneScraper):
             item['performers'].append(performer['name'])
 
         if 'coverCleanImagePath' in movie:
-            item['image'] = self.format_link(
-                response, movie['coverCleanImagePath'])
+            item['image'] = movie['coverCleanImagePath']
 
         if 'splashImagePath' in movie:
-            item['image'] = self.format_link(
-                response, movie['splashImagePath'])
+            item['image'] = movie['splashImagePath']
+
+        if 'hustler' in response.url:
+            item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']
+        else:
+            item['image'] = self.format_link(response, item['image'])
 
         item['date'] = dateparser.parse(movie['publishedAt']).isoformat()
         item['tags'] = movie['tags']
@@ -67,7 +71,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
         item['site'] = self.get_site(response)
         item['url'] = self.format_link(response, movie['path'])
         item['network'] = self.network
-        item['parent'] = self.parent
+        item['parent'] = self.get_parent(response)
         res = re.search('movie/(\\d+)/(.+)', movie['path'])
         item['id'] = res.group(2)
 
