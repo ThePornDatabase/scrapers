@@ -3,7 +3,7 @@ import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class PuffyPerformerSpider(BasePerformerScraper):
+class NubilesPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '.model-profile-desc h2::text',
         'image': ".model-profile img::attr(src)",
