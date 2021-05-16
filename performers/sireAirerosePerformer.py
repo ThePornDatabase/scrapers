@@ -31,6 +31,8 @@ class AirerosePerformerSpider(BasePerformerScraper):
         'http://airerose.com',
     ]
 
+    max_pages = 18
+
 
     def get_aliases(self, response):
         image = self.process_xpath(response, self.get_selector_map('aliases')).get()

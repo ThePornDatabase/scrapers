@@ -14,6 +14,9 @@ class siteAireroseSpider(BaseSceneScraper):
     start_urls = [
         'http://airerose.com/'
     ]
+    
+    max_pages = 10
+    
 
     selector_map = {
         'title': '//div[@id="vidinfo"]/h2/text()',
