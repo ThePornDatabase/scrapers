@@ -42,9 +42,10 @@ class FittingRoomSpider(BaseSceneScraper):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(
                 response, self.get_selector_map('trailer')).get()
-            trailer = re.search('video_url:\ .*?(https:\/\/www\.fitting.*?\.mp4)', trailer).group(1)
             if trailer:
-                return trailer
+                trailer = re.search('video_url:\ .*?(https:\/\/www\.fitting.*?\.mp4)', trailer).group(1)
+                if trailer:
+                    return trailer
         return ''
 
     def get_tags(self, response):

@@ -8,6 +8,92 @@ import re
 import dateparser
 
 
+def match_site(argument):
+    match = {
+        '1000facials': "1000 Facials",
+        '21sextreme': "21Sextreme",
+        '21naturals': "21Naturals",
+        'activeduty': "Active Duty",
+        'allblackx': "All BlackX",
+        'allgirlmassage': "All Girl Massage",
+        'bearback': "Bear Back",
+        'bigfatcreampie': "Big Fat Creampie",
+        'bigtoyxxx': "Big Toy XXX",
+        'blowbanged': "Blowbanged",
+        'blowpass': "Blowpass",
+        'bondagelegend': "Bondage Legend",
+        'bskow': "BSkow",
+        'burningangel': "Burning Angel",
+        'bushybushy': "Bushy Bushy",
+        'buttman': "Butt-Man",
+        'christophclarkonline': "Christoph Clark Online",
+        'circlejerkboys': "Circlejerk Boys",
+        'cockvirgins': "Cock Virgins",
+        'cumshotoasis': "Cumshot Oasis",
+        'currycreampie': "Curry Creampie",
+        'darkx': "DarkX",
+        'devilsgangbangs': "Devils Gangbangs",
+        'dpfanatics': "DPFanatics",
+        'dylanlucas': "Dylan Lucas",
+        'eroticax': "EroticaX",
+        'extrabigdicks': "Extra Big Dicks",
+        'falconstudios': "Falcon Studios",
+        'famedigital': "Fame Digital",
+        'fantasymassage': "Fantasy Massage",
+        'familycreep': "Family Creep",
+        'footsiebabes': "Footsie Babes",
+        'gapingangels': "Gaping Angels",
+        'girlfriendsfilms': "Girlfriends Films",
+        'girlsandstuds': "Girls and Studs",
+        'girlstryanal': "Girls Try Anal",
+        'grannyghetto': "Granny Ghetto",
+        'hairyundies': "Hairy Undies",
+        'hardx': "HardX",
+        'highperformancemen': "High Performance Men",
+        'hothouse': "Hothouse",
+        'jakemalone': "Jake Malone",
+        'jaysinxxx': "Jay Sinxxx",
+        'joeysilvera': "Joey Silvera",
+        'jonnidarkkoxxx': "Jonni Darkkoxxx",
+        'lesbianfactor': "Lesbian Factor",
+        'lesbianx': "LesbianX",
+        'lewood': "Lewood",
+        'lexingtonsteele': "Lexington Steele",
+        'maledigital': "Male Digital",
+        'maskurbate': "Maskurbate",
+        'menover30': "Men Over 30",
+        'milkingtable': "Milking Table",
+        'myxxxpass.com': "My XXX Pass",
+        'mommyblowsbest': "Mommy Blows Best",
+        'mommysgirl': "Mommys Girl",
+        'nachovidalhardcore': "Nacho Vidal Hardcore",
+        'nudefightclub': "Nude Fightclub",
+        'nurumassage': "Nuru Massage",
+        'nurunetwork': "Nuru Network",
+        'onlyteenblowjobs': "Only Teen Blowjobs",
+        'outofthefamily': "Out of the Family",
+        'pantypops': "Panty Pops",
+        'pridestudios': "Pride Studios",
+        'prettydirty': "Pretty Dirty",
+        'povblowjobs': "POV Blowjobs",
+        'povmassage': "POV Massage",
+        'povthis': "POV This",
+        'ragingstallion': "Raging Stallion",
+        'roccosiffredi': "Rocco Siffredi",
+        'soapymassage': "Soapy Massage",
+        'squirtalicious': "Squirtalicious",
+        'squirtingorgies': "Squirting Orgies",
+        'strapattackers': "Strap Attackers",
+        'throated': "Throated",
+        'tittycreampies': "Titty Creampies",
+        'transexualroadtrip': "Transexual Roadtrip",
+        'trickyspa': "Tricky Spa",
+        'tsfactor': "TS Factor",
+        'xempire': "XEmpire",
+    }
+    return match.get(argument.lower(), argument)
+
+
 class GammaEnterprisesSpider(BaseSceneScraper):
     name = 'GammaEnterprises'
     network = 'GammaEnterprises'
@@ -24,11 +110,11 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
 
         'https://www.blowpass.com',
-        ## ~ 'https://www.1000facials.com',
-        ## ~ 'https://www.immorallive.com',
-        ## ~ 'https://www.mommyblowsbest.com',
-        ## ~ 'https://www.onlyteenblowjobs.com',
-        ## ~ 'https://www.throated.com',
+        # 'https://www.1000facials.com',
+        # 'https://www.immorallive.com',
+        # 'https://www.mommyblowsbest.com',
+        # 'https://www.onlyteenblowjobs.com',
+        # 'https://www.throated.com',
 
 
         'https://www.famedigital.com',
@@ -46,15 +132,15 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.whiteghetto.com',
 
         'https://www.fantasymassage.com',
-        ## ~ 'https://www.allgirlmassage.com',
-        ## ~ 'https://www.nurumassage.com',
+        # 'https://www.allgirlmassage.com',
+        # 'https://www.nurumassage.com',
 
         'https://www.xempire.com',
-        ## ~ 'https://www.allblackx.com/',
-        ## ~ 'https://www.darkx.com/',
-        ## ~ 'https://www.eroticaX.com/',
-        ## ~ 'https://www.hardx.com/',
-        ## ~ 'https://www.lesbianx.com/',
+        # 'https://www.allblackx.com/',
+        # 'https://www.darkx.com/',
+        # 'https://www.eroticaX.com/',
+        # 'https://www.hardx.com/',
+        # 'https://www.lesbianx.com/',
 
         'https://www.pridestudios.com',
         # 'https://www.familycreep.com',
@@ -68,9 +154,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.menover30.com',
 
 
-        ##############################
-        # Standalone Sites
-        ##############################
+        # ~ ##############################
+        # ~ # Standalone Sites
+        # ~ ##############################
         'https://www.21naturals.com',
         'https://www.activeduty.com',
         'https://www.bigfatcreampie.com',
@@ -205,6 +291,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if "fantasymassage" in response.url:
             scenes = response.xpath(
                 "//div[@class='tlcAllContentHolder']//div[@class='tlcContent']//div[contains(@class, 'tlcContent')]//div[contains(@class, 'tlcItem')]")
+        elif "blowpass" in response.url or "xempire" in response.url or "pridestudios" in response.url:
+            scenes = response.xpath(
+                '//h3[@class="sceneTitle"]')
         else:
             scenes = response.xpath(' | '.join(selectors)).getall()
 
@@ -214,9 +303,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 site = scene.xpath(
                     './/div[@class="tlcSourceSite"]/span/a/text()').get().strip()
                 scene = scene.xpath('./a[1]/@href').get().strip()
+            elif "blowpass" in response.url or "xempire" in response.url or "pridestudios" in response.url:
+                site = scene.xpath(
+                    './following-sibling::p[@class="fromSite"]/a/strong/text()').get().strip()
+                scene = scene.xpath('./a[1]/@href').get().strip()
 
-            if "fantasymassage" in response.url and site:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': site})
+            if "fantasymassage" in response.url or "blowpass" in response.url or "xempire" in response.url  or "pridestudios" in response.url and site:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': site.lower().replace(".com","")})
             else:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
@@ -247,95 +340,112 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             return self.format_link(response, image)
 
     def parse_scene(self, response):
+
         data = response.css('script:contains("dataLayer =")::text').get()
-        json_data = chompjs.parse_js_object(data)[0]
+        if len(chompjs.parse_js_object(data)):
+            json_data = chompjs.parse_js_object(data)[0]
 
-        jslde = JsonLdExtractor().extract(response.text)
-        jsonlde = {}
-        for obj in jslde:
-            jsonlde.update(obj)
+            jslde = JsonLdExtractor().extract(response.text)
+            jsonlde = {}
+            for obj in jslde:
+                jsonlde.update(obj)
 
-        item = SceneItem()
+            item = SceneItem()
 
-        if 'sceneDetails' in json_data and 'sceneTitle' in json_data['sceneDetails']:
-            item['title'] = json_data['sceneDetails']['sceneTitle']
-        elif 'name' in jsonlde:
-            item['title'] = jsonlde['title']
-        else:
-            item['title'] = self.get_title(response)
+            if 'sceneDetails' in json_data and 'sceneTitle' in json_data['sceneDetails']:
+                item['title'] = json_data['sceneDetails']['sceneTitle']
+            elif 'name' in jsonlde:
+                item['title'] = jsonlde['title']
+            else:
+                item['title'] = self.get_title(response)
 
-        if 'sceneDetails' in json_data and 'sceneDescription' in json_data['sceneDetails']:
-            item['description'] = json_data['sceneDetails']['sceneDescription']
-        elif 'description' in jsonlde:
-            item['description'] = jsonlde['description']
-        else:
-            item['description'] = self.get_description(response)
+            if 'sceneDetails' in json_data and 'sceneDescription' in json_data['sceneDetails']:
+                item['description'] = json_data['sceneDetails']['sceneDescription']
+            elif 'description' in jsonlde:
+                item['description'] = jsonlde['description']
+            else:
+                item['description'] = self.get_description(response)
 
-        item['site'] = self.get_site(response)
 
-        if item['site'] is None:
-            if 'siteName_pretty' in json_data:
+            if 'site' in response.meta:
+                item['site'] = response.meta['site']
+
+            elif 'siteName_pretty' in json_data:
                 item['site'] = json_data['siteName_pretty']
             elif 'siteName' in json_data:
                 item['site'] = json_data['siteName']
+                    
+            if item['site']:
+                item['site'] = match_site(item['site'])
 
-        if 'date' in response.meta:
-            item['date'] = response.meta['date']
-        elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url:
-            item['date'] = dateparser.parse(jsonlde['dateCreated']).isoformat()
-        elif 'nudefightclub' in response.url:
-            date = response.xpath(
-                '//div[@class="updatedDate"]/b/following-sibling::text()').get()
-            item['date'] = dateparser.parse(date.strip()).isoformat()
+            if not item['site']:
+                item['site'] = self.get_site(response)
+            
+                
+
+            if 'date' in response.meta:
+                item['date'] = response.meta['date']
+            elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['dateCreated']:
+                item['date'] = dateparser.parse(jsonlde['dateCreated']).isoformat()
+            elif 'nudefightclub' in response.url:
+                date = response.xpath(
+                    '//div[@class="updatedDate"]/b/following-sibling::text()').get()
+                item['date'] = dateparser.parse(date.strip()).isoformat()
+            else:
+                item['date'] = self.get_date(response)
+                
+            if not item['date']:
+                item['date'] = self.get_date(response)
+
+            if 'image' in response.meta:
+                item['image'] = response.meta['image']
+            else:
+                item['image'] = self.get_image(response)
+
+            if 'performers' in response.meta:
+                item['performers'] = response.meta['performers']
+            elif 'actor' in jsonlde:
+                item['performers'] = list(
+                    map(lambda x: x['name'].strip(), jsonlde['actor']))
+            else:
+                item['performers'] = self.get_performers(response)
+
+            if 'tags' in response.meta:
+                item['tags'] = response.meta['tags']
+            elif 'keywords' in jsonlde:
+                item['tags'] = jsonlde['keywords'].split(',')
+            else:
+                item['tags'] = self.get_tags(response)
+
+            if 'id' in response.meta:
+                item['id'] = response.meta['id']
+            else:
+                item['id'] = self.get_id(response)
+
+            if 'trailer' in response.meta:
+                item['trailer'] = response.meta['trailer']
+            else:
+                item['trailer'] = self.get_trailer(response)
+
+            item['url'] = self.get_url(response)
+
+            if hasattr(self, 'network'):
+                item['network'] = self.network
+            else:
+                item['network'] = self.get_network(response)
+
+            if hasattr(self, 'parent'):
+                item['parent'] = self.parent
+            else:
+                item['parent'] = self.get_parent(response)
+
+            if self.debug:
+                print(item)
+            else:
+                return item
+                
         else:
-            item['date'] = self.get_date(response)
-
-        if 'image' in response.meta:
-            item['image'] = response.meta['image']
-        else:
-            item['image'] = self.get_image(response)
-
-        if 'performers' in response.meta:
-            item['performers'] = response.meta['performers']
-        elif 'actor' in jsonlde:
-            item['performers'] = list(
-                map(lambda x: x['name'].strip(), jsonlde['actor']))
-        else:
-            item['performers'] = self.get_performers(response)
-
-        if 'tags' in response.meta:
-            item['tags'] = response.meta['tags']
-        elif 'keywords' in jsonlde:
-            item['tags'] = jsonlde['keywords'].split(',')
-        else:
-            item['tags'] = self.get_tags(response)
-
-        if 'id' in response.meta:
-            item['id'] = response.meta['id']
-        else:
-            item['id'] = self.get_id(response)
-
-        if 'trailer' in response.meta:
-            item['trailer'] = response.meta['trailer']
-        else:
-            item['trailer'] = self.get_trailer(response)
-
-        item['url'] = self.get_url(response)
-
-        if hasattr(self, 'network'):
-            item['network'] = self.network
-        else:
-            item['network'] = self.get_network(response)
-
-        if hasattr(self, 'parent'):
-            item['parent'] = self.parent
-        else:
-            item['parent'] = self.get_parent(response)
-
-        if self.debug:
-            print(item)
-        else:
-            return item
+            super().parse_scene(response)
 
     def get_next_page_url(self, base, page):
         selector = '/en/videos/AllCategories/0/%s'
@@ -484,21 +594,42 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             date = re.search(
                 'sceneReleaseDate\":\"(\\d{4}-\\d{2}-\\d{2})',
                 date).group(1)
-            if not date:
-                date = ''
         else:
-            date = self.process_xpath(
-                response, self.get_selector_map('date')).get()
-            date.replace('Released:', '').replace('Added:', '').strip()
+            date = self.process_xpath(response, self.get_selector_map('date')).getall()
+            if len(date) > 1:
+                for daterow in date: 
+                    datetemp=""
+                    daterow.replace('Released:', '').replace('Added:', '').rstrip().strip()
+                    if re.match('(\\d{4}-\\d{2}-\\d{2})', daterow):
+                        datetemp = re.search('(\\d{4}-\\d{2}-\\d{2})', daterow).group(1).strip()
+                    elif re.match('(\\d{2}-\\d{2}-\\d{4})', daterow):
+                        datetemp = re.search('(\\d{2}-\\d{2}-\\d{4})', daterow).group(1).strip()
+                    if not datetemp:
+                        date = datetemp.strip()            
 
         matches = ['21sextreme']
         if not date or any(x in response.url for x in matches):
             date = response.xpath(
-                '//script[contains(text(),"sceneReleaseDate")]').get()
-            date = re.search(
-                'sceneReleaseDate\":\"(\\d{4}-\\d{2}-\\d{2})',
-                date).group(1)
+                '//script[contains(text(),"sceneReleaseDate")]').getall()
+            if len(date) > 1:
+                for daterow in date: 
+                    datetemp = re.search('sceneReleaseDate\":\"(\\d{4}-\\d{2}-\\d{2})', daterow)
+                    if datetemp:
+                        datetemp = datetemp.group(1)
+                        if datetemp:
+                            date = datetemp.strip()   
+                            
 
+
+        if not date:
+            date = response.xpath(
+                '//div[@class="updatedDate"]/b/following-sibling::text()').get()
+            print (f"Date4: {date}")
+                
+        if not date:
+            date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
+            print (f"Date5: {date}")
+    
         return dateparser.parse(date.strip()).isoformat()
 
     def get_title(self, response):
@@ -553,10 +684,12 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                         tag.lower()).group(1)
                 else:
                     tag = re.search('\\ in\\ (.*?)\\ updated', tag).group(1)
-                if "," in tag:
-                    tags = tag.split(",")
-                else:
-                    tags = [tags]
+                if tag:
+                    if "," in tag:
+                        tags = tag.split(",")
+                    else:
+                        tags = [tag]
+                    
         elif 'nachovidalhardcore' in response.url:
             return []
         else:
@@ -581,10 +714,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
     def get_parent(self, response):
 
+        tld = tldextract.extract(response.url).domain
+        parent = match_site(tld)
+        
         if "girlstryanal" in response.url or "webyoung" in response.url:
             return "Girlsway"
 
         if "mommysgirl" in response.url:
             return "Adult Time"
 
-        return tldextract.extract(response.url).domain
+        return parent

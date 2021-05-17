@@ -117,7 +117,7 @@ class AndomarkSpider(BaseSceneScraper):
     }
     
     cookies = {
-        'SPSI':'336b584b3890468c42321263035c44d4',
+        'SPSI':'1d516e4fb3be12e8c9f490625a3ae7b7',
     }
 
     def get_next_page_url(self, base, page):

@@ -1,7 +1,17 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+import tldextract
 
+def match_site(argument):
+    match = {
+        'hardtied': "Hard Tied",
+        'infernalrestraints': "Infernal Restraints",
+        'realtimebondage': "Real Time Bondage",
+        'sexuallybroken': "Sexually Broken",
+        'topgrl': "Topgrl",
+    }
+    return match.get(argument, '')
 
 class InsexSpider(BaseSceneScraper):
     name = 'Insex'
@@ -34,4 +44,8 @@ class InsexSpider(BaseSceneScraper):
     def get_site(self, response):
         site = response.xpath(
             '//div[contains(@class, "has-text-white-ter")][1]//a[contains(@class, "is-dark")][last()]/text()').get().strip()
+        if site:
+            site = match_site(site)
+        if not site:
+            site = tldextract.extract(response.url).domain            
         return site
