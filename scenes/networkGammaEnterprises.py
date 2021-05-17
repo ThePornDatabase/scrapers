@@ -22,6 +22,7 @@ def match_site(argument):
         'blowbanged': "Blowbanged",
         'blowpass': "Blowpass",
         'bondagelegend': "Bondage Legend",
+        'boyzparty': "Boyz Party",
         'bskow': "BSkow",
         'burningangel': "Burning Angel",
         'bushybushy': "Bushy Bushy",
