@@ -61,6 +61,6 @@ class VixenScraper(BaseSceneScraper):
 
         scene['id'] = data['id']
         scene['network'] = self.network
-        scene['parent'] = self.parent
+        scene['parent'] = self.get_parent(response)
 
         yield scene
