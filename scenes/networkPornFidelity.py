@@ -10,7 +10,6 @@ from scrapy.http import HtmlResponse
 class PornFidelitySpider(BaseSceneScraper):
     name = 'PornFidelity'
     network = 'pornfidelity'
-    parent = 'pornfidelity'
 
     start_urls = [
         # 'https://www.teenfidelity.com',

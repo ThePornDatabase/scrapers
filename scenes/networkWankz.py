@@ -8,8 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class networkWankzSpider(BaseSceneScraper):
     name = 'Wankz'
-    network = "HOH Limited"
-    parent = "Wankz"
+    network = "Wankz"
 
     start_urls = [
         'https://www.wankz.com',

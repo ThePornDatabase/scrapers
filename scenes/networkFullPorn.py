@@ -34,7 +34,6 @@ def match_site(argument):
 class FullPornNetworkSpider(BaseSceneScraper):
     name = 'FullPorn'
     network = 'Full Porn Network'
-    parent = 'Full Porn Network'
 
     start_urls = [
         'https://analbbc.com',

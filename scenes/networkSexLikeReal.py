@@ -11,10 +11,9 @@ from tpdb.items import SceneItem
 class SexLikeRealSpider(BaseSceneScraper):
     name = 'SexLikeReal'
     network = 'SexLikeReal'
-    parent = 'SexLikeReal'
 
     start_urls = [
-        'https://www.sexlikereal.com'
+        # 'https://www.sexlikereal.com'
     ]
 
     selector_map = {

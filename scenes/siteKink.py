@@ -8,7 +8,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class KinkFeaturedSpider(BaseSceneScraper):
     name = 'Kink'
     network = "Kink"
-    parent = "Kink"
 
     url = 'https://www.kink.com'
 

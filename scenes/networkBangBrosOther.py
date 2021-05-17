@@ -9,7 +9,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class BangBrosAltSpider(BaseSceneScraper):
     name = 'BangBrosAlt'
     network = 'BangBros'
-    parent = 'BangBros'
 
     start_urls = [
         'http://xxxpawn.com',
