@@ -22,6 +22,7 @@ def match_site(argument):
         'blowbanged': "Blowbanged",
         'blowpass': "Blowpass",
         'bondagelegend': "Bondage Legend",
+        'boyzparty': "Boyz Party",
         'bskow': "BSkow",
         'burningangel': "Burning Angel",
         'bushybushy': "Bushy Bushy",
@@ -352,12 +353,16 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
             item = SceneItem()
 
-            if 'sceneDetails' in json_data and 'sceneTitle' in json_data['sceneDetails']:
+            if 'name' in jsonlde:
+                item['title'] = jsonlde['name']
+            elif 'sceneDetails' in json_data and 'sceneTitle' in json_data['sceneDetails']:
                 item['title'] = json_data['sceneDetails']['sceneTitle']
-            elif 'name' in jsonlde:
-                item['title'] = jsonlde['title']
             else:
                 item['title'] = self.get_title(response)
+            
+            if item['title']:
+                if ", scene #01" in item['title'].lower():
+                    item['title'] = item['title'].replace(", Scene #01", "").replace(", scene #01", "")
 
             if 'sceneDetails' in json_data and 'sceneDescription' in json_data['sceneDetails']:
                 item['description'] = json_data['sceneDetails']['sceneDescription']
@@ -387,6 +392,8 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 item['date'] = response.meta['date']
             elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['dateCreated']:
                 item['date'] = dateparser.parse(jsonlde['dateCreated']).isoformat()
+            elif 'datePublished' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['datePublished']:
+                item['date'] = dateparser.parse(jsonlde['datePublished']).isoformat()
             elif 'nudefightclub' in response.url:
                 date = response.xpath(
                     '//div[@class="updatedDate"]/b/following-sibling::text()').get()

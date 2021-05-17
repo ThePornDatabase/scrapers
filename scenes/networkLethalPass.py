@@ -66,7 +66,7 @@ class LethalPassSpider(BaseSceneScraper):
             sitetest = response.xpath('//div[@class="pdSRC"]/p/text()').get()
             if sitetest:
                 if "site" not in sitetest.lower():
-                    site = "Series: " + site
+                    site = "LethalPass"
             return site
         return tldextract.extract(response.url).domain
 
