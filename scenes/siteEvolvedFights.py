@@ -8,7 +8,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class EvolvedFightsSpider(BaseSceneScraper):
     name = 'EvolvedFights'
     network = 'Evolved Fights'
-    parent = 'Evolved Fights'
 
     start_urls = [
         'https://www.evolvedfights.com',

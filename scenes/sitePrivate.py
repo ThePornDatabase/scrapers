@@ -9,7 +9,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class PrivateSpider(BaseSceneScraper):
     name = 'Private'
     network = "Private"
-    parent = "Private"
 
     start_urls = [
         'https://www.private.com'

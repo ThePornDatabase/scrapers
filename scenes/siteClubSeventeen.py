@@ -12,7 +12,7 @@ class ClubseventeenSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.clubseventeen.com',
-        'https://www.clubsweethearts.com'
+        # 'https://www.clubsweethearts.com'
     ]
 
     selector_map = {

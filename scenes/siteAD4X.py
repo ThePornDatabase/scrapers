@@ -9,7 +9,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class AD4XSpider(BaseSceneScraper):
     name = "AD4X"
     network = 'Radical Entertainment'
-    parent = "AD4X"
 
     start_urls = [
         'https://tour.ad4x.com'

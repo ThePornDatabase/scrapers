@@ -143,7 +143,6 @@ def get_site_link_text(url):
 class TeamSkeetNetworkSpider(BaseSceneScraper):
     name = 'TeamSkeetNetwork'
     network = 'teamskeet'
-    parent = 'teamskeet'
 
     selector_map = {
         'external_id': '\\/(.+)\\.json'

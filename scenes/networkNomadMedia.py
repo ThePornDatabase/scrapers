@@ -9,7 +9,6 @@ from datetime import datetime
 class NomadMediaSpider(BaseSceneScraper):
     name = 'NomadMedia'
     network = "Nomad Media"
-    parent = "Aziani"
 
     start_urls = [
         'https://www.aziani.com',

@@ -7,7 +7,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class FemdomEmpireSpider(BaseSceneScraper):
     name = 'FemdomEmpire'
     network = 'Femdom Empire'
-    parent = 'Femdom Empire'
 
     start_urls = [
         'https://femdomempire.com',

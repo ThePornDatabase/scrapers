@@ -18,7 +18,6 @@ def match_site(argument):
 class PuffySpider(BaseSceneScraper):
     name = 'PuffyNetwork'
     network = "Puffy Network"
-    parent = "Puffy Network"
 
     start_urls = [
         'https://www.puffynetwork.com/'

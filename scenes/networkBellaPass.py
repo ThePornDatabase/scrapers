@@ -9,7 +9,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class BellaPassnSpider(BaseSceneScraper):
     name = 'BellaPass'
     network = 'Bella Pass'
-    parent = 'Bella Pass'
 
     start_urls = [
         'https://alexismonroe.com',
