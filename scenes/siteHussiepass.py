@@ -1,7 +1,18 @@
 import re
 import scrapy
+import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+
+
+def match_site(argument):
+    match = {
+        'hussiepass': "Hussie Pass",
+        'povpornstars': "POV Pornstars",
+        'seehimfuck': "See Him Fuck",
+
+    }
+    return match.get(argument, '')
 
 class HussiepassSpider(BaseSceneScraper):
     name = 'Hussiepass'
@@ -53,3 +64,14 @@ class HussiepassSpider(BaseSceneScraper):
             selector = '/tour/categories/movies/%s/latest/'
 
         return self.format_url(base, selector % page)
+
+
+        
+    def get_site(self, response):
+        parsed_uri = tldextract.extract(response.url)
+        domain = parsed_uri.domain
+        site = match_site(domain)
+        if not site:
+            site = tldextract.extract(response.url).domain
+            
+        return site

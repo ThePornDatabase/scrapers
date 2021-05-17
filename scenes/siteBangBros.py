@@ -18,7 +18,7 @@ class BangBrosSpider(BaseSceneScraper):
         'image': '//img[@id="player-overlay-image"]/@src',
         'performers': "//div[@class='vdoAllDesc']//div[@class='vdoCast']//a[position()>1]/text()",
         'tags': "//div[@class='vdoTags']//a/text()",
-        'external_id': '/([A-Za-z0-9-_]+)$',
+        'external_id': '\/([A-Za-z0-9-_+=%]+)$',
         'trailer': '//video//source/@src',
         'pagination': '/videos/%s'
     }

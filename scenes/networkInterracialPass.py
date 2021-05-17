@@ -1,9 +1,20 @@
 import dateparser
 import scrapy
-
+import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
+def match_site(argument):
+    match = {
+        'backroomcastingcouch': "Backroom Casting Couch",
+        'blackambush': "Black Ambush",
+        'exploitedcollegegirls': "Exploited College Girls",
+        'ikissgirls': "I Kiss Girls",
+        'interracialpass': "Interracial Pass",
+    }
+    return match.get(argument, '')
+    
+    
 class InterracialPassSpider(BaseSceneScraper):
     name = 'InterracialPass'
     network = 'InterracialPass'
@@ -19,7 +30,7 @@ class InterracialPassSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//h2[@class="section-title"]/text()',
-        'description': '//div[@class="row"]//div[@class="update-info-block"][1]',
+        'description': '//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()',
         'date': '//div[@class="update-info-row"]/text()',
         'image': '//div[@class="player-thumb"]//img/@src0_1x | //img[contains(@class,"main-preview")]/@src',
         'performers': '//div[contains(@class, "models-list-thumbs")]//li//span/text()',
@@ -58,3 +69,10 @@ class InterracialPassSpider(BaseSceneScraper):
         date = self.process_xpath(
             response, self.get_selector_map('date')).extract()
         return dateparser.parse(date[1].strip()).isoformat()
+
+
+
+    def get_site(self, response):
+        site = tldextract.extract(response.url).domain            
+        site = match_site(site)
+        return site

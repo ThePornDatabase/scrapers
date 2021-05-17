@@ -35,16 +35,16 @@ class EvolvedFightsSpider(BaseSceneScraper):
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
-            trailer = self.process_xpath(
-                response, self.get_selector_map('trailer')).get()
-            if "trailers" in trailer:
-                if "evolvedfightslez" in response.url:
-                    trailer = "https://www.evolvedfightslez.com" + \
-                        re.search('\\(\'(.*)\'\\)', trailer).group(1)
-                else:
-                    trailer = "https://www.evolvedfights.com" + \
-                        re.search('\\(\'(.*)\'\\)', trailer).group(1)
-                return trailer
+            trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
+            if trailer:
+                if "trailers" in trailer:
+                    if "evolvedfightslez" in response.url:
+                        trailer = "https://www.evolvedfightslez.com" + \
+                            re.search('\\(\'(.*)\'\\)', trailer).group(1)
+                    else:
+                        trailer = "https://www.evolvedfights.com" + \
+                            re.search('\\(\'(.*)\'\\)', trailer).group(1)
+                    return trailer
         return ''
 
     def get_tags(self, response):
