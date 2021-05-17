@@ -358,6 +358,10 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 item['title'] = json_data['sceneDetails']['sceneTitle']
             else:
                 item['title'] = self.get_title(response)
+            
+            if item['title']:
+                if ", scene #01" in item['title'].lower():
+                    item['title'] = item['title'].replace(", Scene #01", "").replace(", scene #01", "")
 
             if 'sceneDetails' in json_data and 'sceneDescription' in json_data['sceneDetails']:
                 item['description'] = json_data['sceneDetails']['sceneDescription']
