@@ -8,7 +8,6 @@ import dateparser
 class VrAllureSpider(BaseSceneScraper):
     name = 'Karups'
     network = "Karups"
-    parent = "Karups"
 
     start_urls = [
         'https://www.karups.com/'

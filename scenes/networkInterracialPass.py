@@ -18,7 +18,6 @@ def match_site(argument):
 class InterracialPassSpider(BaseSceneScraper):
     name = 'InterracialPass'
     network = 'InterracialPass'
-    parent = 'InterracialPass'
 
     start_urls = [
         'https://www.interracialpass.com',

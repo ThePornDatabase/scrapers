@@ -17,7 +17,6 @@ def match_site(argument):
 class HussiepassSpider(BaseSceneScraper):
     name = 'Hussiepass'
     network = "Hussiepass"
-    parent = "Hussiepass"
 
     start_urls = [
         'https://www.hussiepass.com',

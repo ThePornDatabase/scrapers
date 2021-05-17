@@ -9,7 +9,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class ErosArtsSpider(BaseSceneScraper):
     name = 'ErosArts'
     network = "Eros Arts"
-    parent = "Eros Arts"
 
     start_urls = [
         'https://www.jerkoffinstructions.com/',

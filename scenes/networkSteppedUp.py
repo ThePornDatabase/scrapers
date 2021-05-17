@@ -8,7 +8,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class SteppedUpSpider(BaseSceneScraper):
     name = 'SteppedUp'
     network = 'Stepped Up'
-    parent = 'Stepped Up'
 
     start_urls = [
         'https://tour.swallowed.com',

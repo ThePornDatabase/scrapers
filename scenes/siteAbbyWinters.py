@@ -11,7 +11,6 @@ class AbbyWintersSpider(BaseSceneScraper):
 
     name = 'AbbyWinters'
     network = 'Abby Winters'
-    parent = 'Abby Winters'
 
     custom_settings = {'CONCURRENT_REQUESTS': '4',
                        'AUTOTHROTTLE_ENABLED': 'True',

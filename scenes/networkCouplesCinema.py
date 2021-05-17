@@ -8,7 +8,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class CouplesCinemaSpider(BaseSceneScraper):
     name = 'CouplesCinema'
     network = 'couplescinema'
-    parent = 'couplescinema'
 
     start_urls = [
         'https://www.couplescinema.com'

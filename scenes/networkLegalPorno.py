@@ -6,7 +6,6 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class LegalPornoSpider(BaseSceneScraper):
     name = 'LegalPorno'
     network = 'Legal Porno'
-    parent = 'Legal Porno'
 
     start_urls = [
         'https://www.analvids.com',

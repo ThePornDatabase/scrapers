@@ -6,7 +6,6 @@ import re
 class CXWowSpider(BaseSceneScraper):
     name = 'CXWow'
     network = 'CX Wow'
-    parent = 'CX Wow'
 
     start_urls = [
         'https://www.becomingfemme.com/',
