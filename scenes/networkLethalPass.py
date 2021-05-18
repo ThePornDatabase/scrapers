@@ -80,3 +80,18 @@ class LethalPassSpider(BaseSceneScraper):
             title = title.strip()
         return title
         
+
+    def get_id(self, response):
+        search = re.search(self.get_selector_map(
+            'external_id'), response.url, re.IGNORECASE)
+        search = search.group(1)
+        if re.match('.*(\d+)$', search):
+            search = re.search('(\d+)$', search.strip()).group(1)
+            return search.strip()
+        if re.match('.*(\d+)', search):
+            search = re.search('(\d+)$', search.strip()).group(1)
+            if len(search) > 4:
+                return search.strip()
+            
+        return search
+        
