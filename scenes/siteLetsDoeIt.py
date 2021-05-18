@@ -1,5 +1,4 @@
 import re
-
 import dateparser
 import scrapy
 
@@ -27,8 +26,9 @@ class LetsDoeItSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            "//div[@class='cards card-video']//a[@class='link']/@href").getall()
+        responsetext = response.xpath('//*').getall()
+        responsetext = "".join(responsetext)
+        scenes = re.findall('a\ target=\"_self\" class=\"-g-vc-fake\"\ href=\"(.*?.html)\"', responsetext)
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
