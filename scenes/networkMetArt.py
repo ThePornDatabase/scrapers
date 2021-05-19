@@ -73,6 +73,6 @@ class MetArtNetworkSpider(BaseSceneScraper):
         item['network'] = self.network
         item['parent'] = self.get_parent(response)
         res = re.search('movie/(\\d+)/(.+)', movie['path'])
-        item['id'] = res.group(2)
+        item['id'] = res.group(1) + "_" + res.group(2)
 
         yield item

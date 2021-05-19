@@ -86,7 +86,6 @@ class MontysPOVSpider(BaseSceneScraper):
 
             # URL
             url = sceneresponse.xpath('./a/img/@src').get()
-            print(f"The URL: {url}")
             url = re.search('(.*)\\.(?:jpg|png|gif)', url).group(1)
             item['url'] = url.strip()
 

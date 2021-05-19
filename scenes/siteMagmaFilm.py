@@ -4,7 +4,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class VnaNetworkSpider(BaseSceneScraper):
+class MagemaFilmNetworkSpider(BaseSceneScraper):
     name = 'MagmaFilm'
 
     start_urls = [
