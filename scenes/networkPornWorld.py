@@ -1,4 +1,5 @@
 import re
+import dateparser
 
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -37,3 +38,13 @@ class PornWorldScraper(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+    def get_date(self, response):
+        date = self.process_xpath(response, self.get_selector_map('date')).get()
+        if date:
+            date.replace('Released:', '').replace('Added:', '').strip()
+            return dateparser.parse(date.strip()).isoformat()
+        else:
+            date = response.xpath('//div[@id="video-specs"]/div/div/div[contains(@class, "d-inline-flex")]/p/text()').get()
+            if re.match('\d{2}.\d{2}.\d{4}', date):
+                return dateparser.parse(date.strip()).isoformat()
