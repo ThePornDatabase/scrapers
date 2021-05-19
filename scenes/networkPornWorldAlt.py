@@ -29,7 +29,7 @@ class PornWorldScraper(BaseSceneScraper):
         'performers': "",
         'tags': "",
         'external_id': 'videos\\/.*\\/(\\d+)',
-        'trailer': '',
+        'trailer': '//video/source/@src',
         'pagination': '/videos/%s'
     }
 
