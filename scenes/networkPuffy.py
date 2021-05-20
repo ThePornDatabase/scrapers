@@ -34,9 +34,9 @@ class PuffySpider(BaseSceneScraper):
         'date': "//section[contains(@class, 'downloads2')]/dl[1]/dt[2]/span/text()",
         'image': "//video[1]/@poster | //meta[@property='og:image']/@content",
         'performers': "//section[contains(@class, 'downloads2')]/dl[1]/dd[1]//a/text()",
-        'tags': "",
+        'tags': "//p[@class='tags']/a[contains(@href,'tag')]/text()",
         'external_id': 'videos/(.+)/?$',
-        'trailer': '',
+        'trailer': '//div[@id="videoplayer"]//source/@src',
         'pagination': '/videos/page-%s/?&sort=recent'
     }
 
@@ -54,3 +54,11 @@ class PuffySpider(BaseSceneScraper):
             return site.strip()
         else:
             return "Puffy Network"
+
+    def get_tags(self, response):
+        if self.get_selector_map('tags'):
+            tags = self.process_xpath(
+                response, self.get_selector_map('tags')).getall()
+            if tags:
+                return list(map(lambda x: x.strip().title(), tags))
+        return []
