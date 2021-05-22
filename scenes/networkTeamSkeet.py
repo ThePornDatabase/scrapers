@@ -163,8 +163,12 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         item['image'] = data['img']
         item['tags'] = []
         item['id'] = data['id']
-        item['trailer'] = 'https://videodelivery.net/' + \
-                          data['video'] + '/manifest/video.m3u8'
+        if 'video' in data:
+            item['trailer'] = 'https://videodelivery.net/' + \
+                              data['video'] + '/manifest/video.m3u8'
+        else:
+            item['trailer'] = ''
+            
         item['url'] = response.url
         item['network'] = self.network
         item['parent'] = response.meta['site']
@@ -183,8 +187,9 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             item['site'] = response.meta['site']
 
         item['performers'] = []
-        for model in data['models']:
-            item['performers'].append(model['modelName'])
+        if 'models' in data:
+            for model in data['models']:
+                item['performers'].append(model['modelName'])
 
         if self.debug:
             print(item)

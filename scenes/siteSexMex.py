@@ -23,7 +23,7 @@ class SexMexSpider(BaseSceneScraper):
         'performers': '',
         'tags': "",
         'external_id': 'updates\\/(.*)\\.html$',
-        'trailer': '',
+        'trailer': '//video/source/@src',
         'pagination': '/tour/categories/movies_%s_d.html'
     }
 
@@ -50,3 +50,14 @@ class SexMexSpider(BaseSceneScraper):
             if sceneid:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
                                      meta={'date': date, 'title': title, 'description': description, 'image': image, 'performers': performers, 'id': sceneid})
+
+
+
+    def get_trailer(self, response):
+        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
+            trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
+            if trailer:
+                if trailer.startswith("/"):
+                    trailer = "https://sexmex.xxx/" + trailer
+                return trailer
+        return ''
