@@ -67,7 +67,7 @@ class VnaNetworkSpider(BaseSceneScraper):
         tags = []
         for tag in tagLink.strip().split(','):
             if tag.strip():
-                tags.append(tag.strip())
+                tags.append(tag.strip().title())
         return tags
 
     def get_performers(self, response):
