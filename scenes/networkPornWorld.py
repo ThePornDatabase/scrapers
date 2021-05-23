@@ -10,14 +10,15 @@ class PornWorldScraper(BaseSceneScraper):
     network = 'ddfnetwork'
 
     start_urls = [
-        'https://houseoftaboo.com/',
+        'https://1by-day.com/',
+        'https://ddfbusty.com/',
         'https://eurogirlsongirls.com/',
         'https://euroteenerotica.com/',
-        'https://ddfbusty.com/',
-        'https://1by-day.com/',
-        'https://hotlegsandfeet.com/',
-        'https://onlyblowjob.com/',
         'https://fuckinhd.com',
+        'https://handsonhardcore.com/',
+        'https://hotlegsandfeet.com/',
+        'https://houseoftaboo.com/',
+        'https://onlyblowjob.com/',
     ]
 
     selector_map = {
