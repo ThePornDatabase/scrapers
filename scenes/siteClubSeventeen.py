@@ -1,5 +1,5 @@
 import re
-
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -37,3 +37,13 @@ class ClubseventeenSpider(BaseSceneScraper):
             if re.search(self.get_selector_map(
                     'external_id'), link) is not None:
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene)
+
+
+    def get_date(self, response):
+        date = self.process_xpath(response, self.get_selector_map('date')).get()
+        if re.search(r'\d{2}-\d{2}-\d{4}', date):
+            datereg = re.search('(\d{2})-(\d{2})-(\d{4})', date)
+            date = datereg.group(3) + "-" + datereg.group(2) + "-" + datereg.group(1)
+        else:
+            date = "1970-01-01"
+        return dateparser.parse(date.strip()).isoformat()
