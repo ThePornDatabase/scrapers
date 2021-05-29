@@ -1,11 +1,10 @@
 import re
 from urllib.parse import urlencode
-
 import dateparser
+import datetime
 import scrapy
 from slugify import slugify
 from tldextract import tldextract
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -15,43 +14,54 @@ class ProjectOneServiceSpider(BaseSceneScraper):
     network = 'mindgeek'
 
     start_urls = [
-        'https://www.realitykings.com',
-        'https://www.fakehub.com',
-        'https://www.sweetheartvideo.com',
-        'https://www.babes.com/',
-        'https://www.publicagent.com/',
-        'https://www.devianthardcore.com/',
-        'https://www.welivetogether.com',
-        'https://www.sneakysex.com/',
-        'https://www.milfhunter.com',
         'https://www.8thstreetlatinas.com',
-        'https://www.sexyhub.com',
-        'https://www.mofos.com/',
-        'https://www.iknowthatgirl.com/',
-        'https://www.publicpickups.com',
-        'https://www.milehighmedia.com/',
-        'https://www.dontbreakme.com/',
-        'https://www.doghousedigital.com',
-        'https://www.letstryanal.com/',
-        'https://www.propertysex.com/',
-        'https://www.digitalplayground.com/',
-        'https://site-ma.brazzers.com',
-        'https://www.metrohd.com/',
-        'https://www.girlgrind.com',
-        'https://www.men.com',
-        'https://www.iconmale.com',
-        'https://www.bromo.com',
-        'https://www.transangels.com',
-        'https://www.thegayoffice.com',
-        'https://www.tube8vip.com',
-        'https://www.lookathernow.com/',
-        'https://www.squirted.com',
-        'https://www.twistys.com',
-        'https://www.familysinners.com',
-        'https://www.familyhookups.com/',
+        'https://www.babes.com',
         'https://www.bellesafilms.com',
-        'https://www.trueamateurs.com/',
+        'https://www.biempire.com',
+        'https://www.brazzers.com',
+        'https://www.bromo.com',
+        'https://www.deviante.com',
+        'https://www.devianthardcore.com',
+        'https://www.digitalplayground.com',
+        'https://www.doghousedigital.com',
+        'https://www.dontbreakme.com',
+        'https://www.erito.com',
+        'https://www.fakehub.com',
+        'https://www.familyhookups.com',
+        'https://www.familysinners.com',
+        'https://www.girlgrind.com',
+        'https://www.iconmale.com',
+        'https://www.iknowthatgirl.com',
         'https://www.lesbea.com',
+        'https://www.letstryanal.com',
+        'https://www.lilhumpers.com',
+        'https://www.lookathernow.com',
+        'https://www.men.com',
+        'https://www.metrohd.com',
+        'https://www.milehighmedia.com',
+        'https://www.milfed.com',
+        'https://www.milfhunter.com',
+        'https://www.mofos.com',
+        'https://www.propertysex.com',
+        'https://www.publicagent.com',
+        'https://www.publicpickups.com',
+        'https://www.realityjunkies.com',
+        'https://www.realitykings.com',
+        'https://www.sexyhub.com',
+        'https://www.sneakysex.com',
+        'https://www.squirted.com',
+        'https://www.sweetheartvideo.com',
+        'https://www.sweetsinner.com',
+        'https://www.thegayoffice.com',
+        'https://www.transangels.com',
+        'https://www.transangelsnetwork.com',
+        'https://www.transharder.com',
+        'https://www.transsensual.com',
+        'https://www.trueamateurs.com',
+        'https://www.tube8vip.com',
+        'https://www.twistys.com',
+        'https://www.welivetogether.com',
+        'https://www.whynotbi.com',
     ]
 
     selector_map = {
@@ -97,13 +107,14 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             item['date'] = dateparser.parse(scene['dateReleased']).isoformat()
             item['id'] = scene['id']
             item['network'] = self.network
+            item['parent'] = tldextract.extract(response.meta['url']).domain
 
             if 'title' in scene:
                 item['title'] = scene['title']
             else:
                 item['title'] = item['site'] + ' ' + \
-                                dateparser.parse(scene['dateReleased']
-                                                 ).strftime('%b/%d/%Y')
+                    dateparser.parse(scene['dateReleased']
+                                     ).strftime('%b/%d/%Y')
 
             if 'description' in scene:
                 item['description'] = scene['description']
@@ -124,12 +135,25 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             path = '/scene/' + str(item['id']) + '/' + slugify(item['title'])
             item['url'] = self.format_url(response.meta['url'], path)
 
+            # Deviante abbreviations
+            if item['site'] == "fmf":
+                item['site'] = "Forgive Me Father"
+            if item['site'] == "sw":
+                item['site'] = "Sex Working"
+            if item['site'] == "pdt":
+                item['site'] = "Pretty Dirty Teens"
+            if item['site'] == "lha":
+                item['site'] = "Love Her Ass"
+            if item['site'] == "es":
+                item['site'] = "Erotic Spice"
+
             scene_count = scene_count + 1
 
             yield item
 
         if scene_count > 0:
-            if 'page' in response.meta and (response.meta['page'] % response.meta['limit']) < self.limit_pages:
+            if 'page' in response.meta and (
+                    response.meta['page'] % response.meta['limit']) < self.limit_pages:
                 yield self.get_next_page(response)
 
     def get_next_page(self, response):
@@ -140,18 +164,22 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             'limit': response.meta['limit']
         }
 
+        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         query = {
+            'dateReleased': f"<{tomorrow}",
             'limit': meta['limit'],
             'type': 'scene',
-            'orderBy': 'dateReleased',
+            'orderBy': '-dateReleased',
             'offset': (meta['page'] * meta['limit']),
-            'referrer': meta['url']
+            'referrer': meta['url'],
         }
 
         print('NEXT PAGE: ' + str(meta['page']))
 
-        link = 'https://site-api.project1service.com/v2/releases?' + urlencode(query)
-        return scrapy.Request(url=link, callback=self.get_scenes, headers=response.meta['headers'], meta=meta)
+        link = 'https://site-api.project1service.com/v2/releases?' + \
+            urlencode(query)
+        return scrapy.Request(url=link, callback=self.get_scenes,
+                              headers=response.meta['headers'], meta=meta)
 
     def get_token(self, response):
         token = re.search('instance_token=(.+?);',

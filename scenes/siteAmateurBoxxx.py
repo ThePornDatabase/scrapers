@@ -7,6 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class AmatuerBoxxxSpider(BaseSceneScraper):
     name = 'AmateurBoxxx'
     network = 'Amateur Boxxx'
+    parent = 'Amateur Boxxx'
 
     start_urls = [
         'https://tour.amateurboxxx.com'

@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class DorcelClubSpider(BaseSceneScraper):
     name = 'DorcelClub'
     network = 'Dorcel Club'
+    parent = 'Dorcel Club'
 
     start_urls = [
         'https://www.dorcelclub.com'
@@ -18,7 +19,7 @@ class DorcelClubSpider(BaseSceneScraper):
         'performers': '//div[@class="actress"]/a/text()',
         'date': '//span[@class="publish_date"]/text()',
         'tags': '',
-        'external_id': 'scene/(\d+)',
+        'external_id': 'scene/(\\d+)',
         'trailer': '',
         'pagination': '/scene/list/more/?lang=en&page=%s&sorting=new'
     }

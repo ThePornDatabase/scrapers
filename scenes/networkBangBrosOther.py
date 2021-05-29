@@ -20,7 +20,7 @@ class BangBrosAltSpider(BaseSceneScraper):
     selector_map = {
         'title': '//span[@class="vdetitle"]/text() | //h1/text()',
         'description': '//span[@class="vdtx"] | //p[@class="videoDetail"]/text()',
-        'external_id': '(video\d+)/.+',
+        'external_id': '(video\\d+)/.+',
         'pagination': '/videos/%s'
     }
 
@@ -50,7 +50,8 @@ class BangBrosAltSpider(BaseSceneScraper):
 
     def get_tags(self, response):
         tags = []
-        genres = response.xpath('//meta[@http-equiv="keywords"]/@content').get().split(',')
+        genres = response.xpath(
+            '//meta[@http-equiv="keywords"]/@content').get().split(',')
         for genreLink in genres:
             tags.append(genreLink.strip())
 

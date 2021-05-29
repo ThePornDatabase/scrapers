@@ -9,6 +9,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class TonightsGirlfriendSpider(BaseSceneScraper):
     name = 'TonightsGirlfriend'
     network = 'Tonights Girlfriend'
+    parent = 'Tonights Girlfriend'
 
     start_urls = [
         'https://www.tonightsgirlfriend.com'
@@ -26,15 +27,18 @@ class TonightsGirlfriendSpider(BaseSceneScraper):
     }
 
     def get_date(self, response):
-        data = response.xpath(self.selector_map['date']).get().replace('Added:', '').strip()
+        data = response.xpath(
+            self.selector_map['date']).get().replace(
+            'Added:', '').strip()
         return dateparser.parse(data).isoformat()
 
     def get_title(self, response):
         id = self.get_id(response).replace('-', ' ')
-        id = re.sub("(\d+)$", "", id)
+        id = re.sub("(\\d+)$", "", id)
         return id.title()
 
     def get_scenes(self, response):
-        scenes = response.css('div.panel .scene-thumbnail a::attr(href)').getall()
+        scenes = response.css(
+            'div.panel .scene-thumbnail a::attr(href)').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

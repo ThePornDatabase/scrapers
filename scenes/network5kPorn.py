@@ -8,6 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class FiveKPornSpider(BaseSceneScraper):
     name = '5kporn'
     network = '5kporn'
+    parent = '5kporn'
 
     start_urls = [
         'https://www.5kporn.com'
@@ -34,9 +35,5 @@ class FiveKPornSpider(BaseSceneScraper):
             yield scrapy.Request(url=scene, callback=self.parse_scene, cookies=self.cookies)
 
     def get_date(self, response):
-        date = response.xpath('//h5[contains(text(), "Published")]').get()
-        if date:
-            return dateparser.parse(date.replace(
-                'Published:', '').strip()).isoformat()
-
-        return dateparser.parse('today').isoformat()
+        date = response.xpath('//h5[contains(text(), "Published")]/text()').get()
+        return dateparser.parse(date.replace('Published:', '').strip()).isoformat()

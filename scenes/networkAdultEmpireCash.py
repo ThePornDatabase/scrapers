@@ -47,5 +47,4 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         if 'jayspov' in response.url:
             return 'Jays POV'
 
-        return response.xpath(
-            '//div[@class="studio"]//span[2]/text()').get().strip()
+        return response.xpath('//div[@class="studio"]//span[2]/text()').get().strip()

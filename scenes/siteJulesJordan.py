@@ -1,9 +1,20 @@
 import re
 
 import scrapy
+import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
+def match_site(argument):
+    match = {
+        'girlgirl': "Girl Girl",
+        'julesjordan': "Jules Jordan",
+        'manuelferrara': "Manuel Ferrara",
+        'spermswallowers': "Sperm Swallowers",
+    }
+    return match.get(argument, '')
+    
+    
 class JulesJordanSpider(BaseSceneScraper):
     name = 'JulesJordan'
     network = 'julesjordan'
@@ -40,3 +51,9 @@ class JulesJordanSpider(BaseSceneScraper):
         result = re.search('useimage = "(.+?)";', response.text)
         if result:
             return self.format_link(response, result.group(1))
+
+
+    def get_site(self, response):
+        site = tldextract.extract(response.url).domain            
+        site = match_site(site)
+        return site

@@ -93,6 +93,31 @@ link_to_info = {
         "site": "Freeuse Fantasy",
         "navText": movies_nav_text,
         "contentText": movies_content_text
+    },
+    "Organic-pna-OongoaF1": {
+        "site": "PervNana",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },
+    "organic-Baepha2v-1": {
+        "site": "Not My Grandpa",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },
+    "organic-mylfdom-ieH7cuos": {
+        "site": "MYLFDom",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },
+    "organic-1-goide6Xo": {
+        "site": "BBC Paradise",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
+    },
+    "organic-alm-Od3Iqu9I": {
+        "site": "Anal Mom",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text
     }
 }
 
@@ -138,10 +163,15 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         item['image'] = data['img']
         item['tags'] = []
         item['id'] = data['id']
-        item['trailer'] = 'https://videodelivery.net/' + \
-                          data['video'] + '/manifest/video.m3u8'
+        if 'video' in data:
+            item['trailer'] = 'https://videodelivery.net/' + \
+                              data['video'] + '/manifest/video.m3u8'
+        else:
+            item['trailer'] = ''
+            
         item['url'] = response.url
         item['network'] = self.network
+        item['parent'] = response.meta['site']
 
         if 'publishedDate' in data:
             item['date'] = dateparser.parse(data['publishedDate']).isoformat()
@@ -157,8 +187,9 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             item['site'] = response.meta['site']
 
         item['performers'] = []
-        for model in data['models']:
-            item['performers'].append(model['modelName'])
+        if 'models' in data:
+            for model in data['models']:
+                item['performers'].append(model['modelName'])
 
         if self.debug:
             print(item)

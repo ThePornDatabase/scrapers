@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class ModelHubScraper(BaseSceneScraper):
     name = 'ModelHub'
     network = 'Pornhub'
+    network = 'Pornhub'
 
     models = [
         'Alice Redlips',
@@ -53,7 +54,8 @@ class ModelHubScraper(BaseSceneScraper):
     def parse(self, response, **kwargs):
         if response.status == 200:
             count = 0
-            for scene in response.css('li.videoBox a.videoTitle::attr(href)').getall():
+            for scene in response.css(
+                    'li.videoBox a.videoTitle::attr(href)').getall():
                 count += 1
                 yield response.follow(
                     url='https://www.modelhub.com' + scene,
@@ -69,9 +71,10 @@ class ModelHubScraper(BaseSceneScraper):
                     print('NEXT PAGE: ' + str(next_page))
                     yield scrapy.Request(url=self.get_next_page_url(response.meta['model'], next_page),
                                          callback=self.parse,
-                                         meta={'page': next_page, 'model': response.meta['model']},
-                                         headers=self.headers,
-                                         cookies=self.cookies)
+                                         meta={
+                        'page': next_page, 'model': response.meta['model']},
+                        headers=self.headers,
+                        cookies=self.cookies)
 
     def get_performers(self, response):
         return [
@@ -82,4 +85,5 @@ class ModelHubScraper(BaseSceneScraper):
         return 'PornHub Premium: ' + response.meta['model']
 
     def get_next_page_url(self, model: str, page: int):
-        return 'https://www.modelhub.com/%s/videos?t=mr&page=%s' % (slugify(model), page)
+        return 'https://www.modelhub.com/%s/videos?t=mr&page=%s' % (
+            slugify(model), page)

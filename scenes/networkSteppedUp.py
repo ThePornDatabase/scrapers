@@ -29,14 +29,16 @@ class SteppedUpSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class, "thumb-full")] | //div[@class="content-border"]')
+        scenes = response.xpath(
+            '//div[contains(@class, "thumb-full")] | //div[@class="content-border"]')
         for scene in scenes:
             link = scene.css('a::attr(href)').get()
             meta = {
                 'image': scene.css('a img::attr(src)').get()
             }
 
-            if re.search(self.get_selector_map('external_id'), link) is not None:
+            if re.search(self.get_selector_map(
+                    'external_id'), link) is not None:
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_image(self, response):

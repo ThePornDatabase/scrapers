@@ -9,12 +9,13 @@ from tpdb.items import SceneItem
 class BangSpider(BaseSceneScraper):
     name = 'Bang'
     network = 'Bang'
+    parent = 'Bang'
 
     selector_map = {
         'external_id': 'video/(.+)'
     }
 
-    per_page = 50
+    per_page = 10
 
     def start_requests(self):
         yield scrapy.Request(
@@ -43,7 +44,11 @@ class BangSpider(BaseSceneScraper):
                 headers={'Content-Type': 'application/json'},
                 callback=self.parse,
                 meta={'page': next_page},
-                body=json.dumps(self.get_elastic_payload(self.per_page, self.per_page * next_page))
+                body=json.dumps(
+                    self.get_elastic_payload(
+                        self.per_page,
+                        self.per_page *
+                        next_page))
             )
 
     def parse_scene(self, json):
@@ -53,12 +58,13 @@ class BangSpider(BaseSceneScraper):
         json = json['_source']
 
         if 'preview' in json:
-            item['trailer'] = 'https://i.bang.com/v/%s/%s/preview720.mp4' % (json['dvd']['id'], json['identifier'])
+            item['trailer'] = 'https://i.bang.com/v/%s/%s/preview720.mp4' % (
+                json['dvd']['id'], json['identifier'])
         else:
             item['trailer'] = ''
 
         item['site'] = json['studio']['name'].title()
-        if item['site'] == 'bang! originals':
+        if item['site'].lower().strip() == 'bang! originals':
             item['site'] = json['series']['name'].title()
 
         item['title'] = json['name']
@@ -66,10 +72,14 @@ class BangSpider(BaseSceneScraper):
         item['date'] = json['releaseDate']
         item['tags'] = list(map(lambda x: x['name'].title(), json['genres']))
         item['performers'] = list(map(lambda x: x['name'], json['actors']))
-        item['image'] = 'https://i.bang.com/screenshots/%s/movie/%s/%s.jpg' % (
-            json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
+        try:
+            item['image'] = 'https://i.bang.com/screenshots/%s/movie/%s/%s.jpg' % (
+                json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
+        except BaseException:
+            print(f"Index out of Range: {item['id']}")
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'
+        item['parent'] = 'Bang'
 
         return item
 

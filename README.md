@@ -12,16 +12,16 @@ We'll use ``AmateurBoxxx`` as an example.
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class AmatuerBoxxxSpider(BaseSceneScraper):
+class AmateurBoxxxSpider(BaseSceneScraper):
     name = 'AmateurBoxxx'
     network = 'Amateur Boxxx'
 ```
 
-First we import the BaseSceneScraper which has all of our helper methods, you can see this in our [scraper]([test.com](https://github.com/ThePornDatabase/scrapy)) repository.
+First we import the BaseSceneScraper which has all of our helper methods, you can see this in our [scraper](https://github.com/ThePornDatabase/scrapy) repository.
 
-Name is the name of this scraper, used when running it, this scraper is called AmateurBoxxx so we would run it like ``scrapy crawl AmateurBoxxx``
+Name is the name of this scraper, used when running it, this scraper is called AmateurBoxxx so we would run it like `scrapy crawl AmateurBoxxx`
 
-Network is what network this site or group of sites belong to. We do this to group sites, scenes and performers together. AmataeurBoxxx is a one of site as far as we know, so we'll just leave it apart of it's own Network.
+Network is what network this site or group of sites belong to. We do this to group sites, scenes and performers together. AmateurBoxxx is a one of site as far as we know, so we'll just leave it apart of it's own Network.
 
 ```Python
     start_urls = [
@@ -113,4 +113,4 @@ If there is data on these paginated pages that you want to pass into the scraper
             yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 ```
 
-If the site you're scraping doesn't have a standard pagination listing page, or is an API, all functions can be overwritten to work for your specific case. Check out our `MetArt` or `ProjectOneService` scrapers
+If the site you're scraping doesn't have a standard pagination listing page, or is an API, all functions can be overwritten to work for your specific case. Check out our [MetArt](scenes/networkMetArt.py) or [ProjectOneService](./scenes/networkProjectOneService.py) scrapers

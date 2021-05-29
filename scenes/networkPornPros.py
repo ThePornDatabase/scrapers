@@ -50,9 +50,6 @@ class PornprosSpider(BaseSceneScraper):
                 meta['date'] = dateparser.parse(
                     scene.css('div::attr(data-date)').get()).isoformat()
 
-            if scene.css('div::attr(data-video-id)').get() is not None:
-                meta['id'] = scene.css('div::attr(data-video-id)').get()
-
             yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_image(self, response):
@@ -66,6 +63,3 @@ class PornprosSpider(BaseSceneScraper):
 
         if response.xpath('//img[@id="no-player-image"]') is not None:
             return response.xpath('//img[@id="no-player-image"]/@src').get()
-
-    def get_id(self, response):
-        return slugify(self.get_title(response))

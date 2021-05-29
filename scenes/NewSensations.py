@@ -6,6 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class NewSensationsSpider(BaseSceneScraper):
     name = 'NewSensations'
+    network = 'New Sensations'
 
     start_urls = [
         'https://www.newsensations.com'
@@ -13,7 +14,7 @@ class NewSensationsSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//div[@class="indScene"]/h2/text()',
-        'description': '//div[@class="description"]/p',
+        'description': '//div[@class="description"]/p/text()',
         'date': "//div[contains(@class, 'stat')]//span[contains(text(),'Date:')]/following-sibling::span/text()",
         'image': '//span[@id="trailer_thumb"]//img/@src',
         'performers': '//div[@class="sceneTextLink"]//span[@class="tour_update_models"]/a/text()',

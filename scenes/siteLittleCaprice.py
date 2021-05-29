@@ -25,6 +25,7 @@ class LittleCapriceSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css('.et_pb_portfolio_items .et_pb_portfolio_item a::attr(href)').getall()
+        scenes = response.css(
+            '.et_pb_portfolio_items .et_pb_portfolio_item a::attr(href)').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

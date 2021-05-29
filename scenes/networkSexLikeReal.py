@@ -13,7 +13,7 @@ class SexLikeRealSpider(BaseSceneScraper):
     network = 'SexLikeReal'
 
     start_urls = [
-        'https://www.sexlikereal.com'
+        # 'https://www.sexlikereal.com'
     ]
 
     selector_map = {
@@ -54,6 +54,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         item['date'] = dateparser.parse(data['datePublished']).isoformat()
         item['site'] = data['author']['name']
         item['network'] = self.network
+        item['parent'] = self.parent
 
         item['performers'] = []
         for model in data['actor']:
