@@ -8,7 +8,7 @@ class MagemaFilmNetworkSpider(BaseSceneScraper):
     name = 'MagmaFilm'
 
     start_urls = [
-        'http://www.magmafilm.tv/',
+        'http://www.magmafilm.tv',
     ]
 
     selector_map = {
@@ -31,7 +31,7 @@ class MagemaFilmNetworkSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = self.process_xpath(
-            response, self.get_selector_map('image')).get().split("url('//")[1][:-2]
+            response, self.get_selector_map('image')).get().split("url('")[1][:-2]
         return self.format_link(response, image)
 
     # no date aviable, is there a better solution?
