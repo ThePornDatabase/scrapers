@@ -166,7 +166,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         item['title'] = data['title']
         item['description'] = data['description']
         item['image'] = data['img']
-        item['tags'] = []
+        if 'tags' in data:
+            item['tags'] = data['tags']
+        else:
+            item['tags'] = []
         item['id'] = data['id']
         if 'video' in data:
             item['trailer'] = 'https://videodelivery.net/' + \
