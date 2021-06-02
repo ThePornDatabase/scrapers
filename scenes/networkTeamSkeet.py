@@ -163,7 +163,6 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
 
             
     def start_requests(self):
-        limit = 250
 
         for linkName, siteInfo in link_to_info.items():
             if 'v2' in siteInfo:
@@ -172,8 +171,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 is_v2 = False
             if is_v2:
                 start = "0"
+                limit=250
             else:
                 start = "aaaaaaaa"
+                limit=450
             url=format_nav_url(linkName, start, limit, is_v2)
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
