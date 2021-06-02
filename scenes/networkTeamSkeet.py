@@ -34,11 +34,6 @@ link_to_info = {
         "navText": videos_nav_text,
         "contentText": videos_content_text
     },
-    "EXS-organic-ooJ4duo8": {
-        "site": "Exxxtra Small",
-        "navText": movies_nav_text,
-        "contentText": movies_content_text
-    },
     "FOS-organic-n5oaginage": {
         "site": "Foster Tapes",
         "navText": movies_nav_text,
@@ -134,7 +129,10 @@ def format_nav_url(link, start, limit):
 
 
 def format_scene_url(link, sceneId):
-    content_format = "https://store.psmcdn.net/{link}/{contentText}/{sceneId}.json"
+    if link == "ts-organic-iiiokv9kyo":
+        content_format = "https://store2.psmcdn.net/ts-elastic-d5cat0jl5o-videoscontent/_doc/{sceneId}"
+    else:
+        content_format = "https://store.psmcdn.net/{link}/{contentText}/{sceneId}.json"
     return content_format.format(
         link=link, sceneId=sceneId, contentText=link_to_info[link]["contentText"])
 
@@ -163,6 +161,9 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
     def parse_scene(self, response):
         data = response.json()
         item = SceneItem()
+        if "store2" in response.url:
+            data = data['_source']
+            
         item['title'] = data['title']
         item['description'] = data['description']
         item['image'] = data['img']
@@ -170,6 +171,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             item['tags'] = data['tags']
         else:
             item['tags'] = []
+            
         item['id'] = data['id']
         if 'video' in data:
             item['trailer'] = 'https://videodelivery.net/' + \
@@ -177,7 +179,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         else:
             item['trailer'] = ''
             
-        item['url'] = response.url
+        if "store2" in response.url:
+            item['url'] = "https://www.teamskeet.com/movies/" + data['id']
+        else:
+            item['url'] = response.url
         item['network'] = self.network
         item['parent'] = response.meta['site']
 
