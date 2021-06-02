@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/.vs/Scrapers/v16/.suo
