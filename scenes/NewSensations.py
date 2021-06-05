@@ -10,6 +10,11 @@ class NewSensationsSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.newsensations.com'
+        
+        # Sites that are included in scrape, though site names aren't given for scraping
+        # Here for reference so we don't double scrape:
+        # -------------------------------
+        # https://familyxxx.com
     ]
 
     selector_map = {
