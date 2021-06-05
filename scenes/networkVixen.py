@@ -34,7 +34,8 @@ class VixenScraper(BaseSceneScraper):
         'external_id': '',
     }
 
-    per_page = 50
+    page = 0
+    per_page = 200
 
     def start_requests(self):
         for link in self.start_urls:
