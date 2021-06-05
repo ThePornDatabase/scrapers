@@ -26,6 +26,7 @@ def match_site(argument):
         'johnnygoodluck': "Johnny Goodluck",
         'meanawolf': "Meana Wolf",
         'minkaxxx': "Minka XXX",
+        'laurenphillips': "Lauren Phillips",
         'oldsexygrannies': "Old Sexy Grannies",
         'ravenswallowzxxx': "Raven Swallows",
         'reidmylips': "Reid My Lips",
@@ -80,6 +81,7 @@ class AndomarkSpider(BaseSceneScraper):
         'https://www.houseofyre.com',
         'https://internationalnudes.com',
         'https://johnnygoodluck.com',
+        'https://laurenphillips.com',
         'https://www.meanawolf.com',
         'https://www.minkaxxx.com',
         'https://oldsexygrannies.com',
@@ -154,9 +156,12 @@ class AndomarkSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_trailer(self, response):
+        trailerxpath = self.get_selector_map('trailer')
+        if 'laurenphillips' in response.url:
+            trailerxpath = '//div[@class="update_image"]/a[1]/@onclick'
         parsed_uri = urlparse(response.url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-        trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
+        trailer = self.process_xpath(response, trailerxpath).get()
         if trailer:
             trailer = re.search('\'(.*.mp4)\'', trailer).group(1)
             if trailer:
