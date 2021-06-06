@@ -9,21 +9,22 @@ class PornprosSpider(BaseSceneScraper):
     network = 'pornpros'
 
     start_urls = [
-        "https://pornpros.com/",
-        'https://tiny4k.com/',
-        "https://povd.com/",
-        "https://passion-hd.com/",
+        "https://anal4k.com/",
         "https://castingcouch-x.com/",
-        "https://exotic4k.com/",
-        "https://puremature.com/",
-        "https://fantasyhd.com/",
-        "https://holed.com/",
         "https://cum4k.com/",
+        "https://exotic4k.com/",
+        "https://fantasyhd.com/",
+        "https://girlcum.com/",
+        "https://holed.com/",
         "https://lubed.com/",
         "https://myveryfirsttime.com/",
-        "https://girlcum.com/",
-        "https://spyfam.com/",
         "https://nannyspy.com/"
+        "https://passion-hd.com/",
+        "https://pornpros.com/",
+        "https://povd.com/",
+        "https://puremature.com/",
+        "https://spyfam.com/",
+        'https://tiny4k.com/',
     ]
 
     selector_map = {

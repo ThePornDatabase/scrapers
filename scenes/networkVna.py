@@ -10,36 +10,49 @@ class VnaNetworkSpider(BaseSceneScraper):
     network = 'vna'
 
     start_urls = [
+        'https://alexlegend.com',
         'https://www.allanalallthetime.com',
-        'https://kimberleelive.com',
-        'https://shandafay.com',
-        'https://sarajay.com',
+        'https://angelinacastrolive.com',
         'https://carmenvalentina.com',
         'https://charleechaselive.com',
-        'https://gabbyquinteros.com',
-        'https://angelinacastrolive.com',
-        'https://juliaannlive.com',
-        'https://sunnylanelive.com',
-        'https://pumaswedexxx.com',
-        'https://sophiedeelive.com',
-        'https://itscleolive.com',
-        'https://maggiegreenlive.com',
-        'https://tashareign.com',
-        'https://jelenajensen.com',
-        'https://pennypaxlive.com',
-        'https://alexlegend.com',
-        'https://sexmywife.com',
-        'https://rubberdoll.net',
-        'https://fuckedfeet.com',
-        'https://ninakayy.com',
-        'https://romemajor.com',
-        'https://siripornstar.com',
-        'https://kink305.com',
         'https://foxxedup.com',
-        'https://kendrajames.com',
-        'https://povmania.com',
+        'https://fuckedfeet.com',
+        'https://gabbyquinteros.com',
         'https://girlgirlmania.com',
+        'https://itscleolive.com',
+        'https://jelenajensen.com',
+        'https://juliaannlive.com',
+        'https://kaylapaigelive.com',
+        'https://kendrajames.com',
+        'https://kimberleelive.com',
+        'https://kink305.com',
+        'https://maggiegreenlive.com',
+        'https://maxinex.com',
+        'https://ninakayy.com',
+        'https://pennypaxlive.com',
+        'https://povmania.com',
+        'https://pumaswedexxx.com',
+        'https://romemajor.com',
+        'https://rubberdoll.net',
+        'https://sarajay.com',
+        'https://sexmywife.com',
+        'https://shandafay.com',
+        'https://siripornstar.com',
+        'https://sophiedeelive.com',
+        'https://sunnylanelive.com',
+        'https://tashareign.com',
+        'https://vickyathome.com',
         'https://womenbyjuliaann.com',
+        
+        # Invalid VNA Sites, here for reference
+        # Can't be scraped for various reasons...  Locked, no pagination, no video page, etc
+        # ~ https://bobbiedenlive.com
+        # ~ https://deauxmalive.com
+        # ~ https://nataliastarr.com
+        # ~ https://nikkibenz.com
+        # ~ https://rachelstormsxxx.com
+        # ~ https://samanthagrace.com
+        
     ]
 
     selector_map = {
@@ -85,3 +98,9 @@ class VnaNetworkSpider(BaseSceneScraper):
             performers.append('Mandy Tyler')
 
         return performers
+        
+    def get_next_page_url(self, base, page):
+        if "vickyathome" in base:
+            return self.format_url(base, "/milf-videos/page/%s" % page)        
+        else:
+            return self.format_url(base, self.get_selector_map('pagination') % page)        
