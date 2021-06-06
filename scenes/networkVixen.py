@@ -140,38 +140,38 @@ query getFilteredVideos(
 ) {
     findVideos(
         input: {
-        filter: $filter
-        order: $order
-        first: $first
-        skip: $skip
-        site: $site
+            filter: $filter
+            order: $order
+            first: $first
+            skip: $skip
+            site: $site
         }
     ) {
         edges {
-        node {
-            id: uuid
-            videoId
-            slug
-            title
-            description
-            site
-            releaseDate
-            tags
-            models {
-                name
+            node {
+                id: uuid
+                videoId
                 slug
-            }
-            previews {
-                poster {
-                    ...PreviewInfo
+                title
+                description
+                site
+                releaseDate
+                tags
+                models {
+                    name
+                    slug
+                }
+                previews {
+                    poster {
+                        ...PreviewInfo
+                    }
+                }
+                images {
+                    poster {
+                        ...ImageInfo
+                    }
                 }
             }
-            images {
-                poster {
-                    ...ImageInfo
-                }
-            }
-        }
         }
         pageInfo {
             hasNextPage
@@ -198,4 +198,4 @@ fragment PreviewInfo on Preview {
     height
     type
 }
-            '''
+'''
