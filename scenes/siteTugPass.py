@@ -11,7 +11,23 @@ class TugPassSpider(BaseSceneScraper):
     network = "TugPass"
 
     start_urls = [
-        'https://www.tugpass.com'
+        # ~ 'https://www.tugpass.com',
+        'https://www.familylust.com'
+        
+        #  Network sub-sites for reference
+        # 'https://www.clubtug.com',
+        # 'https://www.cumblastcity.com',
+        # 'https://www.ebonytugs.com',
+        # 'https://www.edgequeens.com',
+        # 'https://www.finishhim.com',
+        # 'https://www.meanmassage.com',
+        # 'https://www.mylked.com',
+        # 'https://www.over40handjobs.com',
+        # 'https://www.petite18.com',
+        # 'https://www.seemomsuck.com',
+        # 'https://www.shadyspa.com',
+        # 'https://www.teasepov.com',
+        # 'https://www.teentugs.com'        
     ]
 
     selector_map = {
