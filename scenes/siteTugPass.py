@@ -11,8 +11,7 @@ class TugPassSpider(BaseSceneScraper):
     network = "TugPass"
 
     start_urls = [
-        # ~ 'https://www.tugpass.com',
-        'https://www.familylust.com'
+        'https://www.tugpass.com',
         
         #  Network sub-sites for reference
         # 'https://www.clubtug.com',
