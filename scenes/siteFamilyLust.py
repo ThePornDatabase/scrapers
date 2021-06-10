@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -10,6 +10,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class FamilyLustSpider(BaseSceneScraper):
     name = 'FamilyLust'
     network = "TugPass"
+    max_pages = 25
 
     start_urls = [
         'https://www.familylust.com'
@@ -34,6 +35,10 @@ class FamilyLustSpider(BaseSceneScraper):
 
         for child in parentxpath:
             date = child.xpath("./h4/text()").get()
+            date = date.replace("Date: ","")
+            if date[-1] == ",":
+                date = date[:-1].strip()
+            date = dateparser.parse(date).isoformat()
             site = "Family Lust"
 
             scene = child.xpath("./h3/a/@href").get()
@@ -50,8 +55,10 @@ class FamilyLustSpider(BaseSceneScraper):
     def get_image(self, response):
         image = self.process_xpath(
             response, self.get_selector_map('image')).get()
-        image = "https://www.familylust.com/" + image
-        return self.format_link(response, image)
-
+        if image:
+            image = "https://www.familylust.com/" + image
+            return self.format_link(response, image)
+        return ''
+        
     def get_parent(self, response):
         return "Family Lust"
