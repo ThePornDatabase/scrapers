@@ -59,7 +59,7 @@ class TopWebModelsSpider(BaseSceneScraper):
             item['description'] = re.sub('<[^<]+?>', '', item['description']).strip()
             item['image'] = jsonentry['thumb']
             item['id'] = jsonentry['id']
-            item['trailer'] = jsonentry['trailer']
+            item['trailer'] = ''
             urltext = re.sub(r'[^A-Za-z0-9 ]+', '', jsonentry['title']).lower()
             urltext = urltext.replace("  "," ")
             urltext = urltext.replace(" ","-")
