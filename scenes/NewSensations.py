@@ -15,6 +15,13 @@ class NewSensationsSpider(BaseSceneScraper):
         # Here for reference so we don't double scrape:
         # -------------------------------
         # https://familyxxx.com
+        # https://hotwifexxx.com
+        # https://parodypass.com
+        # https://stretchedoutsnatch.com
+        # https://tabutales.com
+        # https://talesfromtheedge.com
+        # https://thelesbianexperience.com
+        
     ]
 
     selector_map = {
@@ -30,8 +37,7 @@ class NewSensationsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css(
-            ".updatesBlock .videoBlock h4 a::attr(href)").getall()
+        scenes = response.xpath('//div[@class="captions"]/h4/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
@@ -60,8 +66,6 @@ class NewSensationsSpider(BaseSceneScraper):
                 return "Tabu Tales"
             if "stretchedoutsnatch" in taglist.lower():
                 return "Stretched Out Snatch"
-            if "talesfromtheedge" in taglist.lower():
-                return "Tales From the Edge"
             if "talesfromtheedge" in taglist.lower():
                 return "Tales From the Edge"
             if "parody" in taglist.lower():
