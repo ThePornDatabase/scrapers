@@ -6,7 +6,7 @@ import dateparser
 from datetime import datetime
 
 
-class HotGuysFuckSpider(BaseSceneScraper):
+class HotMilfsFuckSpider(BaseSceneScraper):
     name = 'HotMilfsFuck'
     network = "Hot Milfs Fuck"
     parent = "Hot Milfs Fuck"
