@@ -34,11 +34,13 @@ class SexMexSpider(BaseSceneScraper):
             date = scene.xpath('./div/div/p[@class="scene-date"]/text()').get()
             date = dateparser.parse(date.strip()).isoformat()
             title = scene.xpath('./div/div/h5/a/text()').get()
+            title = title.title()
             if " . " in title:
                 title = re.search('^(.*)\\ \\.\\ ', title).group(1).strip()
             description = scene.xpath(
                 './div/div/p[@class="scene-descr"]/text()').get()
             image = scene.xpath('./div/a/img/@src').get()
+            image = image.replace(" ", "%20")
             if "transform.php" in image or "url=" in image:
                 image = re.search('url=(.*)', image).group(1)
             performers = scene.xpath(
@@ -61,3 +63,6 @@ class SexMexSpider(BaseSceneScraper):
                     trailer = "https://sexmex.xxx/" + trailer
                 return trailer
         return ''
+        
+    def get_site(self, response):
+        return "SexMex"
