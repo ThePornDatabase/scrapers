@@ -58,6 +58,8 @@ class TopWebModelsSpider(BaseSceneScraper):
             item['description'] = jsonentry['description']
             item['description'] = re.sub('<[^<]+?>', '', item['description']).strip()
             item['image'] = jsonentry['thumb']
+            if not isinstance(item['image'], str):
+                item['image'] = ''
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             urltext = re.sub(r'[^A-Za-z0-9 ]+', '', jsonentry['title']).lower()
