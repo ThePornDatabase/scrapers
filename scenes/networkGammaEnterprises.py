@@ -108,13 +108,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # Network Sites
         ##############################
-        'https://www.21sextreme.com',
+        # ~ 'https://www.21sextreme.com',
         # 'https://www.lustygrandmas.com',
         # 'https://www.teachmefisting.com',
         # 'https://www.trannyfrombrazil.com',
 
 
-        'https://www.blowpass.com',
+        # ~ 'https://www.blowpass.com',
         # 'https://www.1000facials.com',
         # 'https://www.immorallive.com',
         # 'https://www.mommyblowsbest.com',
@@ -122,7 +122,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.throated.com',
 
 
-        'https://www.famedigital.com',
+        # ~ 'https://www.famedigital.com',
         # 'https://www.devilsfilm.com',
         # 'https://www.ebonycafe.com',
         # 'https://www.givemeteens.com',
@@ -136,11 +136,11 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.webmature.com',
         # 'https://www.whiteghetto.com',
 
-        'https://www.fantasymassage.com',
+        # ~ 'https://www.fantasymassage.com',
         # 'https://www.allgirlmassage.com',
         # 'https://www.nurumassage.com',
 
-        'https://www.xempire.com',
+        # ~ 'https://www.xempire.com',
         # 'https://www.allblackx.com/',
         # 'https://www.darkx.com/',
         # 'https://www.eroticaX.com/',
@@ -319,27 +319,20 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_image(self, response):
-        image = self.process_xpath(
-            response, self.get_selector_map('image')).get()
-
-        matches = [
-            'bskow',
-            'footsiebabes',
-            'burningangel',
-            'devilsgangbangs',
-            'hothouse',
-            'tsfactor',
-            'lewood',
-            'maledigital',
-            'squirtingorgies',
-            'tittycreampies']
-        if any(x in response.url for x in matches):
-            image = response.xpath(
-                '//script[contains(text(),"picPreview")]').get()
+        image = response.xpath(
+            '//script[contains(text(),"picPreview")]').get()
+        if image:
             image = re.search(
                 'picPreview\":\"(.*?)\",',
                 image).group(1).strip()
             image = image.replace('\\', '')
+            
+        if not image:
+            image = self.process_xpath(
+                response, self.get_selector_map('image')).get()       
+                
+        if re.search('jpg\?', image):
+            image = re.search('(.*jpg)\?', image).group(1)
 
         if image is not None:
             return self.format_link(response, image)
