@@ -56,6 +56,8 @@ class BangSpider(BaseSceneScraper):
         item['id'] = json['_id']
 
         json = json['_source']
+        # ~ print ("   ")
+        # ~ print(f'JSON: {json}')
 
         if 'preview' in json:
             item['trailer'] = 'https://i.bang.com/v/%s/%s/preview720.mp4' % (
@@ -64,7 +66,7 @@ class BangSpider(BaseSceneScraper):
             item['trailer'] = ''
 
         item['site'] = json['studio']['name'].title()
-        if item['site'].lower().strip() == 'bang! originals':
+        if item['site'].lower().strip() == 'bang! originals' or item['site'].lower().strip() == 'bang originals':
             item['site'] = json['series']['name'].title()
 
         item['title'] = json['name']
@@ -81,7 +83,10 @@ class BangSpider(BaseSceneScraper):
         item['network'] = 'Bang'
         item['parent'] = 'Bang'
 
-        return item
+        if item['title']:
+            return item
+        else:
+            return None
 
     def get_elastic_payload(self, per_page, offset: int = 0):
         return {
