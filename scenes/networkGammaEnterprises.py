@@ -319,27 +319,20 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_image(self, response):
-        image = self.process_xpath(
-            response, self.get_selector_map('image')).get()
-
-        matches = [
-            'bskow',
-            'footsiebabes',
-            'burningangel',
-            'devilsgangbangs',
-            'hothouse',
-            'tsfactor',
-            'lewood',
-            'maledigital',
-            'squirtingorgies',
-            'tittycreampies']
-        if any(x in response.url for x in matches):
-            image = response.xpath(
-                '//script[contains(text(),"picPreview")]').get()
+        image = response.xpath(
+            '//script[contains(text(),"picPreview")]').get()
+        if image:
             image = re.search(
                 'picPreview\":\"(.*?)\",',
                 image).group(1).strip()
             image = image.replace('\\', '')
+            
+        if not image:
+            image = self.process_xpath(
+                response, self.get_selector_map('image')).get()       
+                
+        if re.search('jpg\?', image):
+            image = re.search('(.*jpg)\?', image).group(1)
 
         if image is not None:
             return self.format_link(response, image)

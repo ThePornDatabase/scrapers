@@ -17,7 +17,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://brattysis.com/video/gallery",
         "https://daddyslilangel.com/video/gallery",
         "https://deeplush.com/video/gallery",
-        "https://detentiaongirls.com/video/gallery",
+        "https://detentiongirls.com/video/gallery",
         "https://driverxxx.com/video/gallery",
         "https://familyswap.xxx/video/gallery",
         "https://momsteachsex.com/video/gallery",
