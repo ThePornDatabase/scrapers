@@ -33,7 +33,7 @@ def match_site(argument):
         'deepthroatfrenzy':'Deepthroat Frenzy',
         'devilsfilm':'Devils Film',
         'devilstgirls':'Devils T-Girls',
-        'dpfanatics':'DPFanatics',
+        # 'dpfanatics':'DPFanatics', Pulled from Gamma
         'evilangel':'Evil Angel',
         'footsiebabes':'Footsie Babes',
         'gapeland':'Gapeland',
@@ -48,7 +48,7 @@ def match_site(argument):
         'marcusmojo':'Marcus Mojo',
         'masonwyler':'Mason Wyler',
         'modeltime':'Model Time',
-        'mommysgirl':'Mommys Girl',
+        # 'mommysgirl':'Mommys Girl', Pulled from Gamma
         'momsonmoms':'Moms on Moms',
         'nextdoorbuddies':'Nextdoor Buddies',
         'nextdoorcasting':'Nextdoor Casting',
@@ -59,7 +59,7 @@ def match_site(argument):
         'nextdoorraw':'Nextdoor Raw',
         'nextdoorstudios':'Nextdoor Studios',
         'nextdoortwink':'Nextdoor Twink',
-        'nudefightclub':'Nude Fight Club',
+        # 'nudefightclub':'Nude Fight Club', Pulled from Gamma
         'oldyounglesbianlove':'Old Young Lesbian Love',
         'oralexperiment':'Oral Experiment',
         'pixandvideo':'Pix And Video',
@@ -72,6 +72,7 @@ def match_site(argument):
         'sweetsophiemoone':'Sweet Sophie Moon',
         'tommydxxx':'Tommy D XXX',
         'transfixed':'Transfixed',
+        'TransgressiveFilms':'Transgressive Films',
         'truelesbian.com':'TrueLesbian.com',
         'trystanbull':'Trystan Bull',   
         'webyoung':'Web Young',
@@ -98,7 +99,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.nextdoorstudios.com',
         'https://www.transfixed.com',
         'https://www.wicked.com',
-        'https://www.zerotolerance.com',
+        # ~ 'https://www.zerotolerance.com',
     ]
 
     image_sizes = [
@@ -168,8 +169,12 @@ class AdultTimeAPISpider(BaseSceneScraper):
             item['image'] = ''
             for size in self.image_sizes:
                 if size in scene['pictures']:
-                    item['image'] = 'https://images-fame.gammacdn.com/movies/' + \
-                                    scene['pictures'][size]
+                    if 'zerotolerance' in referrerurl:
+                        item['image'] = 'https://transform.gammacdn.com/movies' + \
+                                        scene['pictures'][size]
+                    else:
+                        item['image'] = 'https://images-fame.gammacdn.com/movies' + \
+                                        scene['pictures'][size]
                     break
 
             item['trailer'] = ''
@@ -196,33 +201,44 @@ class AdultTimeAPISpider(BaseSceneScraper):
             item['performers'] = list(
                 map(lambda x: x['name'], scene['actors']))
             item['tags'] = list(map(lambda x: x['name'], scene['categories']))
+            item['tags'] = list(filter(None, item['tags']))
+            
             item['site'] = scene['sitename']
             item['site'] = match_site(item['site'])
             item['network'] = self.network
             if '21sextury' in referrerurl:
                 item['parent'] = "21Sextury"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'clubinfernodungeon' in referrerurl:
                 item['parent'] = "Club Inferno Dungeon"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'evilangel' in referrerurl:
                 item['parent'] = "Evil Angel"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'genderx' in referrerurl:
                 item['parent'] = "Gender X"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'girlsway' in referrerurl:
                 item['parent'] = "Girlsway"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'modeltime' in referrerurl:
                 item['parent'] = "Model Time"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'nextdoorstudios' in referrerurl:
                 item['parent'] = "Next Door Studios"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'transfixed' in referrerurl:
                 item['parent'] = "Transfixed"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'wicked' in referrerurl:
                 item['parent'] = "Wicked"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'zerotolerance' in referrerurl:
                 item['parent'] = "Zero Tolerance"
-            item['url'] = self.format_url(response.meta['url'],
-                                          '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(
-                                              scene['clip_id']))
-            if "evilangelpartner" not in item['site']:
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
+
+            matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
+            if not any(x in item['site'] for x in matches):
                 yield item
 
     def call_algolia(self, page, token, referrer):
@@ -235,7 +251,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
             'Referer': self.get_next_page_url(referrer, page)
         }
         if '21sextury' in referrer:
-            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22categories.name%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3A21sextury%22%2C%22availableOnSite%3Aanalteenangels%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Aalettaoceanempire%22%2C%22availableOnSite%3Aassholefever%22%2C%22availableOnSite%3Adpfanatics%22%2C%22availableOnSite%3Afootsiebabes%22%2C%22availableOnSite%3Anudefightclub%22%2C%22availableOnSite%3Aanalqueenalysa%22%2C%22availableOnSite%3Ablueangellive%22%2C%22availableOnSite%3Abuttplays%22%2C%22availableOnSite%3Acheatingwhorewives%22%2C%22availableOnSite%3Aclubsandy%22%2C%22availableOnSite%3Acutiesgalore%22%2C%22availableOnSite%3Adeepthroatfrenzy%22%2C%22availableOnSite%3Agapeland%22%2C%22availableOnSite%3Ahotmilfclub%22%2C%22availableOnSite%3Aletsplaylez%22%2C%22availableOnSite%3Aonlyswallows%22%2C%22availableOnSite%3Apixandvideo%22%2C%22availableOnSite%3Asexwithkathianobili%22%2C%22availableOnSite%3Asweetsophiemoone%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22availableOnSite%3A21sextury%22%2C%22availableOnSite%3Aanalteenangels%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Aalettaoceanempire%22%2C%22availableOnSite%3Aassholefever%22%2C%22availableOnSite%3Adpfanatics%22%2C%22availableOnSite%3Afootsiebabes%22%2C%22availableOnSite%3Anudefightclub%22%2C%22availableOnSite%3Aanalqueenalysa%22%2C%22availableOnSite%3Ablueangellive%22%2C%22availableOnSite%3Abuttplays%22%2C%22availableOnSite%3Acheatingwhorewives%22%2C%22availableOnSite%3Aclubsandy%22%2C%22availableOnSite%3Acutiesgalore%22%2C%22availableOnSite%3Adeepthroatfrenzy%22%2C%22availableOnSite%3Agapeland%22%2C%22availableOnSite%3Ahotmilfclub%22%2C%22availableOnSite%3Aletsplaylez%22%2C%22availableOnSite%3Aonlyswallows%22%2C%22availableOnSite%3Apixandvideo%22%2C%22availableOnSite%3Asexwithkathianobili%22%2C%22availableOnSite%3Asweetsophiemoone%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"}]}'
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22categories.name%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3A21sextury%22%2C%22availableOnSite%3Aanalteenangels%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Aalettaoceanempire%22%2C%22availableOnSite%3Aassholefever%22%2C%22availableOnSite%3Afootsiebabes%22%2C%22availableOnSite%3Aanalqueenalysa%22%2C%22availableOnSite%3Ablueangellive%22%2C%22availableOnSite%3Abuttplays%22%2C%22availableOnSite%3Acheatingwhorewives%22%2C%22availableOnSite%3Aclubsandy%22%2C%22availableOnSite%3Acutiesgalore%22%2C%22availableOnSite%3Adeepthroatfrenzy%22%2C%22availableOnSite%3Agapeland%22%2C%22availableOnSite%3Ahotmilfclub%22%2C%22availableOnSite%3Aletsplaylez%22%2C%22availableOnSite%3Aonlyswallows%22%2C%22availableOnSite%3Apixandvideo%22%2C%22availableOnSite%3Asexwithkathianobili%22%2C%22availableOnSite%3Asweetsophiemoone%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22availableOnSite%3A21sextury%22%2C%22availableOnSite%3Aanalteenangels%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Aalettaoceanempire%22%2C%22availableOnSite%3Aassholefever%22%2C%22availableOnSite%3Afootsiebabes%22%2C%22availableOnSite%3Aanalqueenalysa%22%2C%22availableOnSite%3Ablueangellive%22%2C%22availableOnSite%3Abuttplays%22%2C%22availableOnSite%3Acheatingwhorewives%22%2C%22availableOnSite%3Aclubsandy%22%2C%22availableOnSite%3Acutiesgalore%22%2C%22availableOnSite%3Adeepthroatfrenzy%22%2C%22availableOnSite%3Agapeland%22%2C%22availableOnSite%3Ahotmilfclub%22%2C%22availableOnSite%3Aletsplaylez%22%2C%22availableOnSite%3Aonlyswallows%22%2C%22availableOnSite%3Apixandvideo%22%2C%22availableOnSite%3Asexwithkathianobili%22%2C%22availableOnSite%3Asweetsophiemoone%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"}]}'
         if 'evilangel' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=100&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&facets=%5B%22categories.name%22%2C%22directors.name%22%2C%22actors.name%22%2C%22serie_name%22%2C%22length_range_15min%22%2C%22download_sizes%22%2C%22bisex%22%2C%22shemale%22%2C%22upcoming%22%2C%22lesbian%22%5D&tagFilters=&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=lesbian&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=shemale&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=bisex&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%5D"}]}'
         if 'genderx' in referrer:
