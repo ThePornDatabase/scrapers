@@ -173,7 +173,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.cumshotoasis.com',
         'https://www.currycreampie.com',
         'https://www.devilsgangbangs.com',
-        'https://www.dpfanatics.com',
+        # 'https://www.dpfanatics.com', (Part of AdulttimeAPI Scraper now)
         'https://www.falconstudios.com',
         'https://www.footsiebabes.com',
         'https://www.gapingangels.com',
@@ -193,9 +193,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.maledigital.com',
         'https://www.maskurbate.com',
         'https://www.milkingtable.com',
-        'https://www.mommysgirl.com',
+        # 'https://www.mommysgirl.com', (Part of AdulttimeAPI Scraper now)
         'https://www.nachovidalhardcore.com',
-        'https://www.nudefightclub.com',
+        # 'https://www.nudefightclub.com', (Part of AdulttimeAPI Scraper now)
         'https://www.outofthefamily.com',
         'https://www.pantypops.com',
         'https://www.povblowjobs.com',
