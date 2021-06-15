@@ -99,7 +99,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.nextdoorstudios.com',
         'https://www.transfixed.com',
         'https://www.wicked.com',
-        # ~ 'https://www.zerotolerance.com',
+        'https://www.zerotolerance.com',
     ]
 
     image_sizes = [
@@ -169,12 +169,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             item['image'] = ''
             for size in self.image_sizes:
                 if size in scene['pictures']:
-                    if 'zerotolerance' in referrerurl:
-                        item['image'] = 'https://transform.gammacdn.com/movies' + \
-                                        scene['pictures'][size]
-                    else:
-                        item['image'] = 'https://images-fame.gammacdn.com/movies' + \
-                                        scene['pictures'][size]
+                    item['image'] = 'https://images-fame.gammacdn.com/movies' + \
+                                    scene['pictures'][size]
                     break
 
             item['trailer'] = ''
@@ -237,7 +233,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['parent'] = "Zero Tolerance"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
 
-            matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
+            matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub', 'puretaboo']
             if not any(x in item['site'] for x in matches):
                 yield item
 

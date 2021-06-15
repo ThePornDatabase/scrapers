@@ -536,11 +536,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             selector = '/en/videos/xempire/latest/%s'
 
         returnurl = selector % page
-        
-        # ~ if page == 1:
-            # ~ matches = ['footsiebabes', 'dpfanatics']
-            # ~ if any(x in base for x in matches):
-                # ~ returnurl = '/en/videos'
 
         return self.format_url(base, returnurl)
 
