@@ -256,7 +256,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        print(f'Response URL: {response.url}')
         
         selectors = [
             "//div[@class='content']/ul[@class='sceneList']/li[contains(@class,'scene')]//a[contains(@class,'imgLink')]/@href",
@@ -320,8 +319,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             jsonlde = {}
             for obj in jslde:
                 jsonlde.update(obj)
-
-            # ~ print (f'JSONLDE: {jsonlde}')
 
             item = SceneItem()
 
@@ -435,7 +432,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             super().parse_scene(response)
 
     def get_next_page_url(self, base, page):
-        print (f'Current Page: {page}')
         selector = '/en/videos/AllCategories/0/%s'
 
         if '21naturals' in base:
@@ -617,11 +613,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if not date:
             date = response.xpath(
                 '//div[@class="updatedDate"]/b/following-sibling::text()').get()
-            print (f"Date4: {date}")
                 
         if not date:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
-            print (f"Date5: {date}")
     
         return dateparser.parse(date.strip()).isoformat()
 
