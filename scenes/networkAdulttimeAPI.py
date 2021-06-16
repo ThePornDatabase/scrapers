@@ -35,6 +35,7 @@ def match_site(argument):
         'devilstgirls':'Devils T-Girls',
         # 'dpfanatics':'DPFanatics', Pulled from Gamma
         'evilangel':'Evil Angel',
+        'femalesubmission':'Female Submission',
         'footsiebabes':'Footsie Babes',
         'gapeland':'Gapeland',
         'genderx':'Gender X',
@@ -63,6 +64,7 @@ def match_site(argument):
         'oldyounglesbianlove':'Old Young Lesbian Love',
         'oralexperiment':'Oral Experiment',
         'pixandvideo':'Pix And Video',
+        'puretaboo':'Pure Taboo',
         'roddaily':'Rod Daily',
         'samuelotoole':'Samuel Otoole',
         'sextapelesbians':'Sextape Lesbians',
@@ -97,6 +99,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.girlsway.com',
         'https://www.modeltime.com',
         'https://www.nextdoorstudios.com',
+        'https://www.puretaboo.com',
         'https://www.transfixed.com',
         'https://www.wicked.com',
         'https://www.zerotolerance.com',
@@ -223,6 +226,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if 'nextdoorstudios' in referrerurl:
                 item['parent'] = "Next Door Studios"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'puretaboo' in referrerurl:
+                item['parent'] = "Pure Taboo"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'transfixed' in referrerurl:
                 item['parent'] = "Transfixed"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
@@ -233,7 +239,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['parent'] = "Zero Tolerance"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
 
-            matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub', 'puretaboo']
+            matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
             if not any(x in item['site'] for x in matches):
                 yield item
 
@@ -260,6 +266,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22studio_name%22%2C%22categories.name%22%2C%22actors.name%22%2C%22download_sizes%22%2C%22length_range_15min%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming"}]}'
         if 'nextdoorstudios' in referrer:
             jbody = '{"requests":[{"indexName":"nextdoorstudios_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Anextdoorstudios%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20categories.category_id%3A4631%20AND%20NOT%20site_id%3A107%20AND%20NOT%20serie_name%3A%22Member%20Compilations%22&facets=%5B%22categories.name%22%2C%22actors.name%22%2C%22sitename%22%2C%22length_range_15min%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"nextdoorstudios_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Anextdoorstudios%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20categories.category_id%3A4631%20AND%20NOT%20site_id%3A107%20AND%20NOT%20serie_name%3A%22Member%20Compilations%22&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming"}]}'
+        if 'puretaboo' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22categories.name%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3Apuretaboo%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22availableOnSite%3Apuretaboo%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"}]}'
         if 'transfixed' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_rating_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22categories.name%22%2C%22availableOnSite%22%2C%22content_tags%22%2C%22upcoming%22%2C%22sitename%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22content_tags%3Atrans%22%5D%2C%5B%22availableOnSite%3Adevilsfilm%22%2C%22availableOnSite%3Aburningangel%22%2C%22availableOnSite%3Apuretaboo%22%2C%22availableOnSite%3Atransfixed%22%2C%22availableOnSite%3Awelikegirls%22%2C%22availableOnSite%3Amodeltime%22%2C%22availableOnSite%3ABeingTrans247%22%2C%22availableOnSite%3ATransgressiveFilms%22%5D%5D"},{"indexName":"all_scenes_rating_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22content_tags%3Atrans%22%5D%2C%5B%22availableOnSite%3Adevilsfilm%22%2C%22availableOnSite%3Aburningangel%22%2C%22availableOnSite%3Apuretaboo%22%2C%22availableOnSite%3Atransfixed%22%2C%22availableOnSite%3Awelikegirls%22%2C%22availableOnSite%3Amodeltime%22%2C%22availableOnSite%3ABeingTrans247%22%2C%22availableOnSite%3ATransgressiveFilms%22%5D%5D"},{"indexName":"all_scenes_rating_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=content_tags&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3Adevilsfilm%22%2C%22availableOnSite%3Aburningangel%22%2C%22availableOnSite%3Apuretaboo%22%2C%22availableOnSite%3Atransfixed%22%2C%22availableOnSite%3Awelikegirls%22%2C%22availableOnSite%3Amodeltime%22%2C%22availableOnSite%3ABeingTrans247%22%2C%22availableOnSite%3ATransgressiveFilms%22%5D%5D"},{"indexName":"all_scenes_rating_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22content_tags%3Atrans%22%5D%5D"}]}'
         if 'wicked' in referrer:

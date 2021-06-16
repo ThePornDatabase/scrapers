@@ -32,7 +32,7 @@ class PuffySpider(BaseSceneScraper):
         'title': "//h2[@class='title']/span/text()",
         'description': "//section[@class='downloads']//div[@class='show_more']/text()",
         'date': "//section[contains(@class, 'downloads2')]/dl[1]/dt[2]/span/text()",
-        'image': "//video[1]/@poster | //meta[@property='og:image']/@content",
+        'image': "//div[@id='videoplayer']//video/@poster",
         'performers': "//section[contains(@class, 'downloads2')]/dl[1]/dd[1]//a/text()",
         'tags': "//p[@class='tags']/a[contains(@href,'tag')]/text()",
         'external_id': 'videos/(.+)/?$',
@@ -62,3 +62,15 @@ class PuffySpider(BaseSceneScraper):
             if tags:
                 return list(map(lambda x: x.strip().title(), tags))
         return []
+
+    def get_image(self, response):
+        image = self.process_xpath(response, self.get_selector_map('image')).get()
+        if not image:
+            image = response.xpath('//meta[@property="og:image"]/@content').get()
+        if not image:
+            image = response.xpath('//video[1]/@poster').get()
+            
+            
+        if image:
+            return self.format_link(response, image)
+        return ''
