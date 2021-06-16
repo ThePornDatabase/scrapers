@@ -1,25 +1,7 @@
 import scrapy
-from io import StringIO
-from html.parser import HTMLParser
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class MLStripper(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.reset()
-        self.strict = False
-        self.convert_charrefs= True
-        self.text = StringIO()
-    def handle_data(self, d):
-        self.text.write(d)
-    def get_data(self):
-        return self.text.getvalue()
-        
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
-    
+
 class LegalPornoSpider(BaseSceneScraper):
     name = 'LegalPorno'
     network = 'Legal Porno'
@@ -30,7 +12,8 @@ class LegalPornoSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': "//h1[@class='watchpage-title']",
+        'title': "//h1[@class='watchpage-title']//text()",
+        'description': '//div[@class="scene-description__row" and contains(., "Description")]//following-sibling::dd/text()',
         'date': "//span[@class='scene-description__detail']//a[1]/text()",
         'performers': "//div[@class='scene-description__row']//dd//a[contains(@href, '/model/') and not(contains(@href, 'forum'))]/text()",
         'tags': "//div[@class='scene-description__row']//dd//a[contains(@href, '/niche/')]/text()",
@@ -57,9 +40,12 @@ class LegalPornoSpider(BaseSceneScraper):
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
     def get_title(self, response):
-        title = self.process_xpath(
-            response, self.get_selector_map('title')).get().strip()
+        title = ''
+        for part in self.process_xpath(response, self.get_selector_map('title')).getall():
+            title += ' ' + part.strip()
+
         if title:
-            title = strip_tags(title).strip()
+            title = ' '.join(title.split())
             return title
+
         return ''
