@@ -159,9 +159,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.menover30.com',
 
 
-        # ~ ##############################
-        # ~ # Standalone Sites
-        # ~ ##############################
+        ##############################
+        # Standalone Sites
+        ##############################
         'https://www.21naturals.com',
         'https://www.activeduty.com',
         'https://www.bigfatcreampie.com',
@@ -173,7 +173,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.cumshotoasis.com',
         'https://www.currycreampie.com',
         'https://www.devilsgangbangs.com',
-        'https://www.dpfanatics.com',
+        'https://www.dpfanatics.com', 
         'https://www.falconstudios.com',
         'https://www.footsiebabes.com',
         'https://www.gapingangels.com',
@@ -193,7 +193,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.maledigital.com',
         'https://www.maskurbate.com',
         'https://www.milkingtable.com',
-        'https://www.mommysgirl.com',
+        'https://www.mommysgirl.com', 
         'https://www.nachovidalhardcore.com',
         'https://www.nudefightclub.com',
         'https://www.outofthefamily.com',
@@ -216,42 +216,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.analacrobats.com' -> page links go to signup page
         # 'https://www.adulttime.com' -> No videos listed on site
         # 'https://www.bisexdigital.com' -> page links go to signup page
-        # 'https://www.clubinfernodungeon.com' -> Require API
-        # 'https://www.fistingcentral.com' -> Requires javsascript/API
-        # 'https://www.genderx.com' -> Requires javsascript/API
         # 'https://www.grandpasfuckteens.com' -> page links go to signup page
         # 'https://www.lust.com' -> page links go to signup page
         # 'https://www.squirtinglesbian.com' -> page links go to signup page
         # 'https://www.girlcore.com' -> Part of AdultTime API
-        # 'https://www.girlsway.com' -> Part of AdultTime API
-        # 'https://www.modeltime.com' -> Part of AdultTime API
         # 'https://www.puretaboo.com' -> Part of AdultTime API
         # 'https://www.shapeofbeauty.com' -> Part of AdultTime API
         # 'https://www.transexualangel.com' -> Part of AdultTime API (Previously "www.sheplayswithhercock.com"
-        # 'https://www.transfixed.com' -> Part of AdultTime API
-        # 'https://www.zerotolerance.com' -> Part of AdultTime API
-        ##
-        # 'https://www.nextdoorstudios.com' -> Requires javsascript/API, includes following sites:
-        # 'https://www.AustinWilde.com',
-        # 'https://www.CodyCummings.com',
-        # 'https://www.MarcusMojo.com',
-        # 'https://www.MasonWyler.com',
-        # 'https://www.NextDoorBuddies.com',
-        # 'https://www.NextDoorCasting.com',
-        # 'https://www.NextDoorEbony.com',
-        # 'https://www.NextDoorHookups.com',
-        # 'https://www.NextDoorMale.com',
-        # 'https://www.NextDoorRaw.com',
-        # 'https://www.NextDoorStudios.com',
-        # 'https://www.NextDoorTwink.com',
-        # 'https://www.RodDaily.com',
-        # 'https://www.SamuelO'Toole.com',
-        # 'https://www.StagCollective.com',
-        # 'https://www.StrokeThatDick.com',
-        # 'https://www.TommyDXXX.com',
-        # 'https://www.TrystanBull.com',
-        ##
-        # 'https://www.evilangel.com' -> Requires API.  Includes the following:
         # 'https://www.cockchokingsluts.com',
         # 'https://www.johnleslie.com',
 
@@ -271,7 +242,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.sunnyleone.com/'
         # 'https://www.tsplayground.com/'
         # 'https://www.vivid.com/'
-        # 'https://www.wicked.com/'
     ]
 
     selector_map = {
@@ -286,6 +256,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        
         selectors = [
             "//div[@class='content']/ul[@class='sceneList']/li[contains(@class,'scene')]//a[contains(@class,'imgLink')]/@href",
             "//ul[@class='sceneList']/li[contains(@class,'sceneItem')]//a[contains(@class,'imgLink')]/@href",
@@ -338,8 +309,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             return self.format_link(response, image)
 
     def parse_scene(self, response):
-
         data = response.css('script:contains("dataLayer =")::text').get()
+        data2 = response.xpath('//script[contains(text(),\'ScenePlayerId = "player"\')]').get()
+        
         if len(chompjs.parse_js_object(data)):
             json_data = chompjs.parse_js_object(data)[0]
 
@@ -400,6 +372,14 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 
             if not item['date']:
                 item['date'] = self.get_date(response)
+                
+            if data2:
+                date2 = re.search('sceneReleaseDate\":\"(\d{4}-\d{2}-\d{2})', data2)
+                if date2:
+                    date2 = date2.group(1)
+                    date2 = dateparser.parse(date2.strip()).isoformat()
+                    if item['date'] and date2 > item['date']:
+                        item['date'] = date2
 
             if 'image' in response.meta:
                 item['image'] = response.meta['image']
@@ -482,6 +462,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if 'devilsfilm' in base:
             selector = '/en/scenes/AllCategories/0/%s'
 
+        if 'dpfanatics' in base:
+            selector = '/en/videos/All-Categories/0/All-Pornstars/0/latest/%s'
+
         if 'falconstudios' in base:
             selector = '/en/videos/latest/All+Categories/0/All+Models/0/All+Dvds/0/Falcon+Studios//%s'
 
@@ -548,7 +531,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if 'xempire' in base:
             selector = '/en/videos/xempire/latest/%s'
 
-        return self.format_url(base, selector % page)
+        returnurl = selector % page
+
+        return self.format_url(base, returnurl)
 
     def get_site(self, response):
 
@@ -628,11 +613,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if not date:
             date = response.xpath(
                 '//div[@class="updatedDate"]/b/following-sibling::text()').get()
-            print (f"Date4: {date}")
                 
         if not date:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
-            print (f"Date5: {date}")
     
         return dateparser.parse(date.strip()).isoformat()
 

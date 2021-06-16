@@ -4,6 +4,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 import re
 import dateparser
 from datetime import datetime
+from urllib.parse import urlparse
 
 
 class NomadMediaSpider(BaseSceneScraper):
@@ -46,3 +47,15 @@ class NomadMediaSpider(BaseSceneScraper):
 
         if image is not None:
             return self.format_link(response, image)
+
+
+    def get_trailer(self, response):
+        parsed_uri = urlparse(response.url)
+        domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
+        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
+            trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
+            if trailer:
+                if trailer[0] == "/":
+                    trailer = domain + trailer
+                return trailer
+        return ''

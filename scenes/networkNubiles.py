@@ -29,7 +29,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://nubiles.net/video/gallery",
         "https://nubileset.com/video/gallery",
         "https://nubilesunscripted.com/video/gallery",
-        "https://petitdehdporn.com/video/gallery",
+        "https://petitehdporn.com/video/gallery",
         "https://petiteballerinasfucked.com/video/gallery",
         "https://princesscum.com/video/gallery",
         "https://stepsiblingscaught.com/video/gallery",
@@ -73,3 +73,20 @@ class NubilesSpider(BaseSceneScraper):
         page = (page - 1) * 10
         return self.format_url(
             base, self.get_selector_map('pagination') % page)
+            
+    def get_description(self, response):
+        if 'description' not in self.get_selector_map():
+            return ''
+
+        description = self.process_xpath(
+            response, self.get_selector_map('description')).get()
+
+        if not description or not len(description.strip()):
+            description = response.xpath('//div[contains(@class,"content-pane-column")]/div/p/text()').getall()
+            if description:
+                description = " ".join(description)
+
+        if description is not None:
+            return description.replace('Description:', '').strip()
+            
+        return ""            

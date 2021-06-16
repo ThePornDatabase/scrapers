@@ -11,6 +11,16 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
     network = 'Chastity Babes'
     parent = 'Chastity Babes'
 
+    custom_settings = {
+        'CONCURRENT_REQUESTS': '1',
+        'ITEM_PIPELINES': {
+            'tpdb.pipelines.TpdbApiScenePipeline': 400,
+        },
+        'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+        }
+    }    
+
     start_urls = [
         'https://www.chastitybabes.com/'
     ]
