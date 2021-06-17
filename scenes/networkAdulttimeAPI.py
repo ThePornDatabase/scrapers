@@ -11,8 +11,39 @@ from tpdb.items import SceneItem
 #          as a guest user in an incognito browser
 
 
-def match_site(argument):
-    match = {
+class AdultTimeAPISpider(BaseSceneScraper):
+    name = 'AdultTimeAPI'
+    network = 'Gamma Enterprises'
+
+    start_urls = [
+        'https://freetour.adulttime.com/en/login',
+    ]
+
+    image_sizes = [
+        '1920x1080',
+        '960x544',
+        '638x360',
+        '201x147',
+        '406x296',
+        '307x224'
+    ]
+
+    trailer_sizes = [
+        '1080p',
+        '720p',
+        '4k',
+        '540p',
+        '480p',
+        '360p',
+        '240p',
+        '160p'
+    ]
+
+    selector_map = {
+        'external_id': '',
+    }
+
+    sitelist = {
         '21sextury': '21Sextury',
         'adulttime': 'AdultTime',
         'alettaoceanempire': 'Aletta Ocean Empire',
@@ -82,51 +113,11 @@ def match_site(argument):
         'wicked': 'Wicked',
         'zerotolerance': 'Zero Tolerance',
     }
-    return match.get(argument, argument)
 
+    excludes_list = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
 
-class AdultTimeAPISpider(BaseSceneScraper):
-    name = 'AdulttimeAPI'
-    network = 'Gamma Enterprises'
-
-    start_urls = [
-        'https://www.21sextury.com',
-        'https://www.clubinfernodungeon.com',
-        'https://www.evilangel.com',
-        'https://www.genderx.com',
-        'https://www.girlsway.com',
-        'https://www.modeltime.com',
-        'https://www.nextdoorstudios.com',
-        'https://www.puretaboo.com',
-        'https://www.transfixed.com',
-        'https://www.wicked.com',
-        'https://www.zerotolerance.com',
-    ]
-
-    image_sizes = [
-        '1920x1080',
-        '960x544',
-        '638x360',
-        '201x147',
-        '406x296',
-        '307x224'
-    ]
-
-    trailer_sizes = [
-        '1080p',
-        '720p',
-        '4k',
-        '540p',
-        '480p',
-        '360p',
-        '240p',
-        '160p'
-    ]
-
-    selector_map = {
-        'external_id': '(\\d+)$',
-        'pagination': '/en/videos?page=%s'
-    }
+    sites = ''
+    excludes = ''
 
     def start_requests(self):
         if not hasattr(self, 'start_urls'):
@@ -135,31 +126,32 @@ class AdultTimeAPISpider(BaseSceneScraper):
         if not self.start_urls:
             raise AttributeError('start_urls selector missing')
 
+        self.sites = ' OR '.join(['sitename:"%s"' % key for key in self.sitelist])
+        self.excludes = ' OR NOT'.join(['sitename:"%s"' % key for key in self.excludes_list])
+
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, 1), callback=self.parse_token,
+            yield scrapy.Request(url=link, callback=self.parse_token,
                                  meta={'page': 0, 'url': link})
 
     def parse_token(self, response):
         match = re.search(r'\"apiKey\":\"(.*?)\"', response.text)
         token = match.group(1)
-        return self.call_algolia(0, token, response.meta['url'])
+        return self.call_algolia(0, token, response.meta['url'], self.sites, self.excludes)
 
     def parse(self, response, **kwargs):
-        if response.status == 200:
-            scenes = self.get_scenes(response)
-            count = 0
-            for scene in scenes:
-                count += 1
-                yield scene
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
 
-            if count:
-                if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    next_page = response.meta['page'] + 1
-                    yield self.call_algolia(next_page, response.meta['token'], response.meta['url'])
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                next_page = response.meta['page'] + 1
+                yield self.call_algolia(next_page, response.meta['token'], response.meta['url'], self.sites, self.excludes)
 
     def get_scenes(self, response):
         # ~ print(response.json()['results'])
-        referrer_url = response.meta["url"]
         for scene in response.json()['results'][0]['hits']:
             item = SceneItem()
 
@@ -187,70 +179,37 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if dateparser.parse(scene['release_date']):
                 item['date'] = dateparser.parse(scene['release_date']).isoformat()
             else:
-                date = "1970-01-01"
+                date = '1970-01-01'
                 item['date'] = dateparser.parse(date).isoformat()
-            item['performers'] = list(
-                map(lambda x: x['name'], scene['actors']))
+
+            item['performers'] = list(map(lambda x: x['name'], scene['actors']))
             item['tags'] = list(map(lambda x: x['name'], scene['categories']))
             item['tags'] = list(filter(None, item['tags']))
 
-            item['site'] = scene['sitename']
-            item['site'] = match_site(item['site'])
+            item['site'] = self.sitelist[scene['sitename']] if scene['sitename'] in self.sitelist else scene['sitename']
             item['network'] = self.network
+            item['parent'] = scene['studio_name']
+            item['url'] = None
 
-            if '21sextury' in referrer_url:
-                item['parent'] = "21Sextury"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'clubinfernodungeon' in referrer_url:
-                item['parent'] = "Club Inferno Dungeon"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'evilangel' in referrer_url:
-                item['parent'] = "Evil Angel"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'genderx' in referrer_url:
-                item['parent'] = "Gender X"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'girlsway' in referrer_url:
-                item['parent'] = "Girlsway"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'modeltime' in referrer_url:
-                item['parent'] = "Model Time"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'nextdoorstudios' in referrer_url:
-                item['parent'] = "Next Door Studios"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'puretaboo' in referrer_url:
-                item['parent'] = "Pure Taboo"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'transfixed' in referrer_url:
-                item['parent'] = "Transfixed"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'wicked' in referrer_url:
-                item['parent'] = "Wicked"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
-            if 'zerotolerance' in referrer_url:
-                item['parent'] = "Zero Tolerance"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            yield item
 
-            matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
-            if not any(x in item['site'] for x in matches):
-                yield item
-
-    def call_algolia(self, page, token, referrer):
+    def call_algolia(self, page, token, referrer, sites, excludes):
         # ~ print (f'Page: {page}        Token: {token}     Referrer: {referrer}')
         # ~ algolia_url = 'https://tsmkfa364q-dsn.algolia.net/1/indexes/*/queries?x-algolia-application-id=TSMKFA364Q&x-algolia-api-key=%s' % token
         algolia_url = 'https://tsmkfa364q-dsn.algolia.net/1/indexes/*/queries?x-algolia-application-id=TSMKFA364Q&x-algolia-api-key=' + token
 
         headers = {
             'Content-Type': 'application/json',
-            'Referer': self.get_next_page_url(referrer, page),
+            'Referer': referrer,
         }
 
         body = {
             'requests': [
                 {
                     'indexName': 'all_scenes',
-                    'params': 'filters=upcoming=0',
+                    'params': 'filters=upcoming=0 AND (%s) AND (NOT %s)' % (sites, excludes),
+                    'page': page,
+                    'hitsPerPage': 100
                 }
             ]
         }
