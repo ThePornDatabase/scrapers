@@ -1,0 +1,68 @@
+import re
+
+import scrapy
+import json
+
+from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
+
+class BJRawSpider(BaseSceneScraper):
+    name = 'BJRaw'
+    network = 'BJ Raw'
+    parent = 'BJ Raw'
+
+    start_urls = [
+        'https://www.bjraw.com'
+    ]
+
+    selector_map = {
+        'title': "",
+        'description': "",
+        'date': "",
+        'performers': "",
+        'tags': "",
+        'external_id': '',
+        'image': '',
+        'trailer': '',
+        'pagination': '/tour/videos?page=%s'
+    }
+
+
+    def get_scenes(self, response):
+        global json
+        responseresult = response.xpath('//script[contains(text(),"window.__DATA__")]/text()').get()
+        responsedata = re.search('__DATA__\ =\ (.*)',responseresult).group(1)
+        jsondata = json.loads(responsedata)
+        data = jsondata['videos']['items']
+        for jsonentry in data:
+            item = SceneItem()
+            item['title'] = jsonentry['title']
+            item['description'] = jsonentry['description']
+            item['description'] = re.sub('<[^<]+?>', '', item['description']).strip()
+            item['image'] = jsonentry['trailer']['poster']
+            if not isinstance(item['image'], str):
+                item['image'] = ''
+            item['id'] = jsonentry['id']
+            item['trailer'] = jsonentry['trailer']['src']
+            urltext = re.sub(r'[^A-Za-z0-9 ]+', '', jsonentry['title']).lower()
+            urltext = urltext.replace("  "," ")
+            urltext = urltext.replace(" ","-")
+            urltext = "https://www.bjraw.com/tour/videos/" + str(jsonentry['id']) + "/" + urltext
+            item['url'] = urltext
+            item['date'] = jsonentry['release_date']
+            item['site'] = "BJ Raw"
+            item['parent'] = "BJ Raw"
+            item['network'] = "BJ Raw"
+
+            item['performers'] = []
+            for model in jsonentry['models']:
+                item['performers'].append(model['name'])
+                
+            item['tags'] = []
+
+            if self.debug:
+                print(item)
+            else:
+                yield item
+                
+            item.clear()
