@@ -18,7 +18,7 @@ def match_site(argument):
     return match.get(argument, "Puffy Network")
 
 
-class PuffySpider(BaseSceneScraper):
+class FetishNetworkAltSpider(BaseSceneScraper):
     name = 'FetishNetworkAlt'
     network = "Fetish Network"
     parent = "Fetish Network"

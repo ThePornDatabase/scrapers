@@ -6,7 +6,7 @@ import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class VIP4KSpider(BaseSceneScraper):
+class VIP4KPagedSpider(BaseSceneScraper):
     name = 'VIP4KPaged'
     network = 'VIP 4K'
     parent = 'VIP 4K'
