@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-class FetishNetworkPagedSpider(BaseSceneScraper):
+class TeenCoreClubSpider(BaseSceneScraper):
     name = 'TeenCoreClub'
     network = 'Teen Core Club'
     parent = 'Teen Core Club'
