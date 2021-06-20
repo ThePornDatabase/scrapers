@@ -104,9 +104,6 @@ class InsexSitesSpider(BaseSceneScraper):
             if meta['baseurl']:
                 scene = meta['baseurl'] + scene.strip()
             if re.search(self.get_selector_map('external_id'), scene):
-                externid = re.search(self.get_selector_map('external_id'), scene).group(1)
-                externid = externid.strip()
-                meta['externid'] = externid
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                
 
     def get_site(self, response):
@@ -156,11 +153,3 @@ class InsexSitesSpider(BaseSceneScraper):
             if trailer:
                 return trailer
         return ''
-
-
-    def get_url(self, response):
-        meta = response.meta
-        baseurl = meta['baseurl']
-        externid = meta['externid']
-        url = baseurl + "play.php?id=" + externid
-        return url
