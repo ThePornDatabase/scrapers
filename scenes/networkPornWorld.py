@@ -83,6 +83,11 @@ class PornWorldScraper(BaseSceneScraper):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if not image:
             image = response.xpath('//div[@class="video-box"]/div/img/@src').get()
+        if not image:
+            image = response.xpath('//div[contains(@class,"video-join-box")]/img/@src').get()
         if image:
             image = image.strip()
+        if not image:
+            image = ''
+        
         return self.format_link(response, image)
