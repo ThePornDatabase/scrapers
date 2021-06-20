@@ -26,7 +26,7 @@ class FTVGirlsScraper(BaseSceneScraper):
         'image': '//img[@id="Magazine"]/@src',
         'performers': '//div[@id="BioHeader"]/h1/text()',
         'tags': "",
-        'external_id': 'update\/.*?(\d{1,4})',
+        'external_id': 'update\/(.*).html',
         'trailer': '//a[@class="jackbox"]/@href',
         'pagination': '/updates-%s.html'
     }
@@ -81,7 +81,8 @@ class FTVGirlsScraper(BaseSceneScraper):
         performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
         x=0
         for performer in performers:
-            performer = performer.replace("'s Statistics", "").strip() + " (" + measurements[x].strip() + ")"
+            name_measurements = re.sub('\W+','', measurements[x].strip())
+            performer = performer.replace("'s Statistics", "").strip() +"  "+ name_measurements
             x =x + 1
             performerlist.append(performer)
 
