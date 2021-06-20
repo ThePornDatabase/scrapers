@@ -10,12 +10,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 def match_site(argument):
     match = {
         'brutalpov': "Brutal POV",
-        'Simplyanal': "Simply Anal",
-        'Weliketosuck': "We Like to Suck",
-        'Wetandpissy': "Wet and Pissy",
-        'Wetandpuffy': "Wet and Puffy",
     }
-    return match.get(argument, "Puffy Network")
+    return match.get(argument, argument)
 
 
 class FetishNetworkAltSpider(BaseSceneScraper):
@@ -40,7 +36,6 @@ class FetishNetworkAltSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        print (f'RepsonseURL: {response.url}')
         if "brutalpov" in response.url:
             scenes_list = response.xpath('//div[@class="date-img-wrapper"]/a/@href').getall()
             scenes = ["http://www.brutalpov.com/t2/" + listitem for listitem in scenes_list]
@@ -59,10 +54,11 @@ class FetishNetworkAltSpider(BaseSceneScraper):
                 site = re.search('(.*) Videos', site).group(1)
                 if site: 
                         site = site.strip()
-            site = match_site(site)
             
         if not site:
             site = tldextract.extract(response.url).domain
+        if site:
+            site = match_site(site)
             
         return site      
 
@@ -90,7 +86,6 @@ class FetishNetworkAltSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
-        print (f'Image: {image}')
         if not image:
             image = response.xpath('//video[contains(@id,"my-video")]/@poster').get()
             

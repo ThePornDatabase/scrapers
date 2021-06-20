@@ -6,6 +6,7 @@ from extruct.jsonld import JsonLdExtractor
 import tldextract
 import re
 import dateparser
+import json
 
 
 def match_site(argument):
@@ -309,9 +310,12 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             return self.format_link(response, image)
 
     def parse_scene(self, response):
+        global json
         data = response.css('script:contains("dataLayer =")::text').get()
         data2 = response.xpath('//script[contains(text(),\'ScenePlayerId = "player"\')]').get()
-        
+        data3 = json.loads(response.xpath('//script[@type="application/ld+json"]/text()').get())
+        data3 = data3[0]
+
         if len(chompjs.parse_js_object(data)):
             json_data = chompjs.parse_js_object(data)[0]
 
@@ -343,7 +347,8 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
             if 'site' in response.meta:
                 item['site'] = response.meta['site']
-
+            elif 'productionCompany' in data3:
+                item['site'] = data3['productionCompany']['name']
             elif 'siteName_pretty' in json_data:
                 item['site'] = json_data['siteName_pretty']
             elif 'siteName' in json_data:
