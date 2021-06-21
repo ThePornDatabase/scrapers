@@ -39,7 +39,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             meta = {}
             if scene.css('p>span::text').get():
                 text = scene.css('p>span::text').get().strip().split('|')
-                if len(text) is 2:
+                if len(text) == 2:
                     meta['site'] = text[0].strip()
             yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
