@@ -66,3 +66,6 @@ class PutaLocuraSpider(BaseSceneScraper):
 
     def get_performers(self, response):
         return []
+
+    def get_tags(self, response):
+        return ["Spanish"]
