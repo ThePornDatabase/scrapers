@@ -4,7 +4,7 @@ import datetime
 import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
+from scrapy.http import FormRequest
 
 class FrolicMeSpider(BaseSceneScraper):
     name = 'FrolicMe'
@@ -27,13 +27,27 @@ class FrolicMeSpider(BaseSceneScraper):
         'pagination': '/publications/page/%s/'
     }
 
-    cookies = {'av_passed': '1626837105.55b2e19f5ebf33afac1ab1ddde5ec97d3e182ac493da162d1be723cffc66aea1fb7217c3c7'}
+
+    def start_requests(self):
+        frmheaders = {}
+        frmheaders['Content-Type'] = 'application/x-www-form-urlencoded'
+        frmdata = {"dob": "1995-05-09", "country": "RU"}
+        url = "https://www.frolicme.com/wp-json/frolic/v1/verify"
+        yield FormRequest(url, headers=frmheaders, formdata=frmdata)      
+
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page),
+                                 callback=self.parse,
+                                 meta={'page': self.page},
+                                 headers=self.headers,
+                                 cookies=self.cookies)
+
 
     def get_scenes(self, response):
         scenes = response.xpath('//article[contains(@class,"cpt_films")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, cookies=self.cookies)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
         return "FrolicMe"
@@ -64,3 +78,4 @@ class FrolicMeSpider(BaseSceneScraper):
                 return date.strip()
 
         return datetime.now().isoformat()
+
