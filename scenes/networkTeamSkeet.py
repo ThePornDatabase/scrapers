@@ -18,12 +18,14 @@ link_to_info = {
     "SLM-organic-b75inmn9fu": {
         "site": "Sis Loves Me",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "FS-organic-1rstmyhj44": {
         "site": "Family Strokes",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "ts-elastic-d5cat0jl5o": {
         "site": "Team Skeet",
@@ -34,92 +36,110 @@ link_to_info = {
     "mylf-organic-2uxkybtwvv": {
         "site": "MYLF",
         "navText": videos_nav_text,
-        "contentText": videos_content_text
+        "contentText": videos_content_text,
+        "v2": False
     },
     "FOS-organic-n5oaginage": {
         "site": "Foster Tapes",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "DSW-organic-dfangeym88": {
         "site": "Daughter Swap",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "DC-organic-w8xs8e0dv3": {
         "site": "Dad Crush",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "MSL-organic-ws9h564all": {
         "site": "ShopLyfter MYLF",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "SHL-organic-driobt7t0f": {
         "site": "ShopLyfter",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "PVM-organic-rg7wwuc7uh": {
         "site": "PervMom",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "TMZ-organic-958spxinbs": {
         "site": "Thickumz",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "LAS-organic-whlghevsfs": {
         "site": "Little Asians",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "BFFS-organic-7o68xoev0j": {
         "site": "BFFs",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "TLBC-organic-w8bw4yp9io": {
         "site": "Teens Love Black Cocks",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "BCG-organic-dhed18vuav": {
         "site": "Black Valley Girls",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "organic-fuf-eiBei5In": {
         "site": "Freeuse Fantasy",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "Organic-pna-OongoaF1": {
         "site": "PervNana",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "organic-Baepha2v-1": {
         "site": "Not My Grandpa",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "organic-mylfdom-ieH7cuos": {
         "site": "MYLFDom",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "organic-1-goide6Xo": {
         "site": "BBC Paradise",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     },
     "organic-alm-Od3Iqu9I": {
         "site": "Anal Mom",
         "navText": movies_nav_text,
-        "contentText": movies_content_text
+        "contentText": movies_content_text,
+        "v2": False
     }
 }
 
@@ -178,12 +198,20 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             url=format_nav_url(linkName, start, limit, is_v2)
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'site': siteInfo['site']},
+                                 meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
     def parse(self, response, **kwargs):
+        meta = response.meta
+        highwater = ""
         limit = 250
+        if not meta['is_v2']:
+            scene_list = json.loads(response.body)
+            if scene_list:
+                for key, scene in scene_list.items():
+                    if key > highwater:
+                        highwater = key
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -195,7 +223,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']),
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], highwater),
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
@@ -278,13 +306,16 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                         yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=response.meta)
 
 
-    def get_next_page_url(self, base, page):
+    def get_next_page_url(self, base, page, highwater):
         limit = 250
         if 'store2' in base:
             start = str(250 * (page-1))
             is_v2 = True
         else:
             is_v2 = False
-            start = 'aaaaabka'
+            if highwater:
+                start = highwater
+            else:
+                start = 'aaaaabka'
         linkName = get_site_link_text(base, is_v2)
         return format_nav_url(linkName, start, limit, is_v2)
