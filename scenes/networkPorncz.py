@@ -50,7 +50,7 @@ class PornCZSpider(BaseSceneScraper):
     ]
 
     headers = {
-        'x-requested-with': 'XMLHttpRequest'
+        'X-Requested-With': 'XMLHttpRequest'
     }
 
     cookies = {
@@ -68,10 +68,6 @@ class PornCZSpider(BaseSceneScraper):
         'external_id': r'\/(\d+)$',
         'trailer': '//meta[@property="og:video"]/@content',
         'pagination': '/en/new-videos?do=next&_=%s'
-    }
-
-    headers = {
-        'X-Requested-With': 'XMLHttpRequest',
     }
 
     def start_requests(self):
