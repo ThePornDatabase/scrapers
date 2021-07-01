@@ -1,9 +1,7 @@
-import dateparser
 import scrapy
 import time
-import datetime
+import time
 import re
-import tldextract
 
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -12,7 +10,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class PornCZSpider(BaseSceneScraper):
     name = 'PornCZ'
     network = 'PornCZ'
-    parent = "PornCZ"
+    parent = 'PornCZ'
 
     start_urls = [
         'https://www.porncz.com'
@@ -48,25 +46,26 @@ class PornCZSpider(BaseSceneScraper):
         # 'https://www.sexwithmuslims.com',
         # 'https://www.susanayn.com',
         # 'https://www.teenfrombohemia.com',
-        # 'https://www.vrporncz.com'        
+        # 'https://www.vrporncz.com',
     ]
-    
-    headers =  {
-        'x-requested-with': 'XMLHttpRequest'
+
+    headers = {
+        'X-Requested-With': 'XMLHttpRequest'
     }
 
     cookies = {
         'age-verified': '1',
     }
-    
+
     selector_map = {
         'title': '//div[@class="heading-detail"]/h1/text()',
         'description': '//div[@class="heading-detail"]/p/text()',
-        'performers': '//div[contains(text(),"Actors")]/a/text()',
+        'performers': '//div[contains(text(), "Actors")]/a/text()',
         'date': '//meta[@property="video:release_date"]/@content',
+        'date_formats': ['%d.%m.%Y'],
         'image': '//meta[@property="og:image"]/@content',
-        'tags': '//div[contains(text(),"Genres")]/a/text()',
-        'external_id': '\/(\d+)$',
+        'tags': '//div[contains(text(), "Genres")]/a/text()',
+        'external_id': r'\/(\d+)$',
         'trailer': '//meta[@property="og:video"]/@content',
         'pagination': '/en/new-videos?do=next&_=%s'
     }
@@ -79,11 +78,11 @@ class PornCZSpider(BaseSceneScraper):
             raise AttributeError('start_urls selector missing')
 
         for link in self.start_urls:
-            yield scrapy.Request(url="https://www.porncz.com/en/new-videos",
+            yield scrapy.Request(url=self.get_next_page_url(link, '/en/new-videos'),
                                  callback=self.parse,
                                  meta={'page': 0},
-                                 headers={'x-requested-with':'XMLHttpRequest'}, cookies=self.cookies)
-                                 
+                                 headers=self.headers, cookies=self.cookies)
+
     def parse(self, response, **kwargs):
         count = 0
         if response.meta['page']:
@@ -91,34 +90,32 @@ class PornCZSpider(BaseSceneScraper):
             for scene in scenes:
                 count += 1
                 yield scene
+
         if count or not response.meta['page']:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
-                timetext = datetime.datetime.utcnow().strftime("%H%M%S%f")
-                yield scrapy.Request(url=self.get_next_page_url(response.url, timetext),
+                timestamp = str(int(time.time()))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, timestamp),
                                      callback=self.parse,
                                      meta=meta,
-                                     headers={'x-requested-with':'XMLHttpRequest'}, cookies=self.cookies)                      
-                                 
-    def get_scenes(self, response):
-        jsondata = response.json();
-        jsondata = jsondata['snippets']
-        jsondata = jsondata['snippet-videosGrid-videoItemsAppend']
-        scenes = re.findall('a\ href=\"(.*)\"',jsondata)
-        for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)        
+                                     headers=self.headers, cookies=self.cookies)
 
+    def get_scenes(self, response):
+        jsondata = response.json()
+        jsondata = jsondata['snippets']['snippet-videosGrid-videoItemsAppend']
+
+        scenes = re.findall(r'a\ href=\"(.*)\"', jsondata)
+        for scene in scenes:
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_next_page_url(self, base, page):
         url = self.format_url(base, self.get_selector_map('pagination') % page)
         return url
 
     def get_site(self, response):
-        site = response.xpath('//a[contains(@class,"logo")]/img/@alt').get()
+        site = response.xpath('//a[contains(@class, "logo")]/img/@alt').get()
         if site:
             return site.strip().title()
         else:
-            return tldextract.extract(response.url).domain
-        
-        
+            return super().get_site(response)
