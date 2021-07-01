@@ -163,7 +163,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # Standalone Sites
         ##############################
-        # ~ 'https://www.21naturals.com',
+        'https://www.21naturals.com',
         'https://www.activeduty.com',
         'https://www.bigfatcreampie.com',
         'https://www.bskow.com',
