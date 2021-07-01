@@ -30,3 +30,12 @@ class PenthouseSpider(BaseSceneScraper):
         scenes = response.xpath('//a[@data-track="SCENE_LINK"]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta={'site': 'Penthouse Gold'})
+
+
+    def get_title(self, response):
+        title = self.process_xpath(
+            response, self.get_selector_map('title')).get()
+        title = title.replace("Video - ", "")
+        if title:
+            return title.strip().title()
+        return ''
