@@ -312,7 +312,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
     def parse_scene(self, response):
         global json
         data = response.css('script:contains("dataLayer =")::text').get()
-        data2 = response.xpath('//script[contains(text(),\'ScenePlayerId = "player"\')]').get()
+        data2 = response.xpath('//script[contains(text(),\'ScenePlayerId = "player"\')]|//script[contains(text(),\'ScenePlayerId = "scenePlayer"\')]').get()
         data3 = json.loads(response.xpath('//script[@type="application/ld+json"]/text()').get())
         data3 = data3[0]
 
