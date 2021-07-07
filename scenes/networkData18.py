@@ -57,6 +57,18 @@ class Data18Spider(BaseSceneScraper):
         # ~ ['http://www.data18.com', '/sites/dogfart/the_minion/content.html/p=%s', 'The Minion', 'Dogfart Network', 'Dogfart Network'],
         # ~ ['http://www.data18.com', '/sites/dogfart/wife_writing/content.html/p=%s', 'Wife Writing', 'Dogfart Network', 'Dogfart Network'],
         
+        # ~ ['http://www.data18.com', '/sites/bangbros/ho_in_headlights/content.html/p=%s', 'Ho in Headlights', 'Bang Bros', 'Bang Bros'],
+        # ~ ['http://www.data18.com', '/sites/bangbros/moms_anal_adventure/content.html/p=%s', 'Moms Anal Adventure', 'Bang Bros', 'Bang Bros'],
+        # ~ ['http://www.data18.com', '/sites/bangbros/spring_break_spycam/content.html/p=%s', 'Spring Break Spycam', 'Bang Bros', 'Bang Bros'],
+        
+        # ~ ['http://www.data18.com', '/sites/msp/bang_a_midget/content.html/p=%s', 'Bang a Midget', 'Wankz', 'Wankz'],
+        # ~ ['http://www.data18.com', '/sites/msp/chocolate_sistas/content.html/p=%s', 'Chocolate Sistas', 'Wankz', 'Wankz'],
+        # ~ ['http://www.data18.com', '/sites/msp/dp_latinas/content.html/p=%s', 'DP Latinas', 'Wankz', 'Wankz'],
+        # ~ ['http://www.data18.com', '/sites/msp/fucking_machine_1000/content.html/p=%s', 'Fucking Machine 1000', 'Wankz', 'Wankz'],
+        # ~ ['http://www.data18.com', '/sites/msp/tv/content.html/p=%s', 'Porncom TV', 'Wankz', 'Wankz'],
+        
+        # ~ ['http://www.data18.com', '/sites/screwbox/content.html/p=%s', 'Screwbox', 'Screwbox', 'Screwbox'],
+        
         # ~ ['http://www.data18.com', '/sites/arp/content.html/p=%s', 'ScrapeSites', 'All Reality Pass', 'All Reality Pass'],
             #############################
             #  Included Sites in Network
@@ -94,6 +106,41 @@ class Data18Spider(BaseSceneScraper):
             # Tinys Black Adventures
             # Tits Ass And Ammo
             # Xxx Proposal
+        
+        # ~ ['http://www.data18.com', '/sites/pp/content.html/p=%s', 'ScrapeSites', 'Premium Pass', 'Premium Pass'],
+            #############################
+            #  Included Sites in Network
+            #############################
+            # Alanah Rae Official Site
+            # Aleksa Nicole Official Site
+            # Alexis Texas Official Site
+            # Amy Brooke Official Site
+            # Ann Marie Rios Official Site
+            # Audrey Bitoni Official Site
+            # Blowbanged
+            # Brandy Talore Official Site
+            # Breanne Benson Official Site
+            # Chanel Preston Official Site
+            # Diamond Foxxx Official Site
+            # Eva Angelina Official Site
+            # Gina Lynn Official Site
+            # Her First Milf
+            # Housewives Adventures
+            # Jenna Haze Official Site
+            # Kagney Linn Karter Official Site
+            # Katsuni Official Site
+            # Lexi Belle Official Site
+            # Marie Mccray Official Site
+            # Monique Alexander Official Site
+            # Phoenix Marie Official Site
+            # Sara Stone Official Site
+            # Sarah Vandella Official Site
+            # Shawna Lenee Official Site
+            # Sindee Jennings Official Site
+            # Sybian Solos
+            # Tasha Reign Official Site
+            # Tori Black Official Site
+            # Tory Lane Official Site        
         
         # ~ ['http://www.data18.com', '/sites/rg/content.html/p=%s', 'ScrapeSites', 'Reality Gang', 'SexyHub'],
             #############################
