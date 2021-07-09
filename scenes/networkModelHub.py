@@ -32,6 +32,7 @@ class ModelHubScraper(BaseSceneScraper):
         'Taylor Noir',
         'Via Hub',
         'Xev Bellringer',
+        'Yinyleon'
     ]
 
     selector_map = {
