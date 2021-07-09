@@ -24,6 +24,7 @@ class ModelHubScraper(BaseSceneScraper):
         'Mini Diva',
         'MissArianaxxx',
         'Miss Banana',
+        'Misslexa',
         'Morgpie',
         'Purple Bitch',
         'Reislin',
