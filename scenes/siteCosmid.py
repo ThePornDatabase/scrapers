@@ -93,13 +93,20 @@ class CosmidFullImportSpider(BaseSceneScraper):
             image = scene.xpath('.//div[contains(@class,"videothumb")]/img/@src').get()
             if image:
                 image = image.replace('//','/').strip()
+                image = image.replace('#id#','').strip()
                 image = "https://cosmid.net" + image
                 item['image'] = image.strip()
+            else:
+                item['image'] = ''
                 
             trailer = scene.xpath('.//div[contains(@class,"videothumb")]/video/source/@src').get()
             if trailer:
                 trailer = "https://cosmid.net" + trailer.strip()
+                trailer = trailer.replace(" ", "%20")
+                trailer = trailer.replace('#id#','').strip()
                 item['trailer'] = trailer.strip()
+            else:
+                item['trailer'] = ''
 
             externalid = title.replace("_","-").strip().lower()
             externalid = externalid.replace("  ", " ")
