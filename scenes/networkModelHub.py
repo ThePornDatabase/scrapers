@@ -30,6 +30,7 @@ class ModelHubScraper(BaseSceneScraper):
         'Shaiden Rogue',
         'Spring Blooms',
         'Taylor Noir',
+        'Yinyleon',
         'Via Hub',
         'Xev Bellringer',
         'Yinyleon'
