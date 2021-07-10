@@ -58,3 +58,11 @@ class PinkLabelSpider(BaseSceneScraper):
         for data in metadata:
             if data["@type"] == "WebPage":
                 return dateparser.parse(data["datePublished"]).isoformat()
+
+    def parse_scene(self, response):
+        '''Override studio with correct value'''
+        for item in super().parse_scene(response):
+            studio = response.xpath('//a[contains(@href,"/studio/")]/text()')[0].get()
+            item["parent"] = studio
+            item["network"] = studio
+            yield item
