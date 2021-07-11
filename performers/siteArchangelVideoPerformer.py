@@ -19,8 +19,8 @@ class ArchangelVideoPerformerSpider(BasePerformerScraper):
     }
 
     name = 'ArchangelVideoPerformer'
-    network = "Archangel"
-    parent = "Archangel"
+    network = "Arch Angel"
+    parent = "Arch Angel"
 
     start_urls = [
         'https://www.archangelvideo.com'
@@ -33,7 +33,7 @@ class ArchangelVideoPerformerSpider(BasePerformerScraper):
                 performer = "https://www.archangelvideo.com/tour/" + performer
             yield scrapy.Request(
                 url=self.format_link(response, performer),
-                callback=self.parse_performer, meta={'site':'Archangel'}
+                callback=self.parse_performer, meta={'site':'Arch Angel'}
             )
 
     def get_gender(self, response):

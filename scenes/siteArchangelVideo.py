@@ -32,9 +32,9 @@ class ArchangelVideoSpider(BaseSceneScraper):
         scenelist = []
         for scene in scenes:
             item = SceneItem()
-            item['site'] = "Archangel"
-            item['parent'] = "Archangel"
-            item['network'] = "Archangel"
+            item['site'] = "Arch Angel"
+            item['parent'] = "Arch Angel"
+            item['network'] = "Arch Angel"
             title = scene.xpath('.//h3/a/text()').get()
             if title:
                 item['title'] = string.capwords(title.strip())
@@ -49,7 +49,7 @@ class ArchangelVideoSpider(BaseSceneScraper):
             else:
                 item['date'] = "1970-01-01T00:00:00"            
 
-            performers = scene.xpath('./div[@class="item-info"]//a[contains(@href,"/models/")]/text()').getall()
+            performers = scene.xpath('./div[@class="item-info"]//a[contains(@href,"/models/") or contains(@href,"sets.php")]/text()').getall()
             if len(performers):
                 item['performers'] = list(map(lambda x: x.strip().title(), performers))
             else:
