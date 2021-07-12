@@ -48,7 +48,8 @@ class IFeelMyselfSpider(BaseSceneScraper):
         tags = [t.replace(";", "") for t in tags if t != '']
         enhanced_tags = response.xpath('//table[@class="news_tag_line"]//td/div/span/span[1]/text()').getall()
         fulltags = tags + enhanced_tags
-        fulltags.remove('HD')
+        if "HD" in fulltags:
+            fulltags.remove('HD')
         fulltags = list(map(lambda x: x.strip().title(), fulltags))
         return fulltags
         
