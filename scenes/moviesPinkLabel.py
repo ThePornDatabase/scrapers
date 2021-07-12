@@ -3,14 +3,16 @@ import scrapy
 import json
 import re
 import scrapy
+import string
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 import dateparser
 
 class PinkLabelSpider(BaseSceneScraper):
     name = 'PinkLabel'
-    network = 'Pink Label'
-    parent = 'Pink Label'
+    network = "PinkLabel"
+    parent = "PinkLabel"
 
     selector_map = {
         'external_id': 'film\\/(.+)\\/',
@@ -25,6 +27,22 @@ class PinkLabelSpider(BaseSceneScraper):
 
     def start_requests(self):
         yield scrapy.Request(url="https://pinklabel.tv/on-demand/studios/", callback=self.get_studios, headers=self.headers, cookies=self.cookies)
+
+
+    def get_title(self, response):
+        title = self.process_xpath(
+            response, self.get_selector_map('title')).get()
+        if title:
+            return string.capwords(title.strip())
+        return ''
+
+    def get_tags(self, response):
+        if self.get_selector_map('tags'):
+            tags = self.process_xpath(
+                response, self.get_selector_map('tags')).getall()
+            if tags:
+                return list(map(lambda x: x.strip().title(), tags))
+        return []
 
     def get_studios(self, response):
         '''Request each individual studio page'''
@@ -63,6 +81,7 @@ class PinkLabelSpider(BaseSceneScraper):
         '''Override studio with correct value'''
         for item in super().parse_scene(response):
             studio = response.xpath('//a[contains(@href,"/studio/")]/text()')[0].get()
-            item["parent"] = studio
-            item["network"] = studio
+            item["parent"] = "PinkLabel"
+            item["network"] = "PinkLabel"
+            item["site"] = studio
             yield item
