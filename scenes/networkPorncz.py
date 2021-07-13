@@ -1,6 +1,7 @@
 import scrapy
 import time
-import time
+import datetime
+import dateparser
 import re
 
 
@@ -119,3 +120,14 @@ class PornCZSpider(BaseSceneScraper):
             return site.strip().title()
         else:
             return super().get_site(response)
+
+    def get_date(self, response):
+        date = self.process_xpath(response, self.get_selector_map('date')).get()
+        date = datetime.datetime.strptime(date, "%d.%m.%Y").strftime("%Y-%m-%d")
+        return dateparser.parse(date.strip()).isoformat()
+
+    def get_network(self, response):
+        return "Porn CZ"
+
+    def get_parent(self, response):
+        return "Porn CZ"

@@ -12,6 +12,8 @@ class CumPerfectionSpider(BaseSceneScraper):
         'http://cum-fun.com'
     ]
 
+    page=7
+
     selector_map = {
         'title': '//span[contains(@class,"title_bar")]/text()',
         'description': '//span[@class="update_description"]/text()',
@@ -32,13 +34,14 @@ class CumPerfectionSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_trailer(self, response):
-        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
-            trailer = self.process_xpath(
-                response, self.get_selector_map('trailer')).get()
+        trailer = self.process_xpath(
+            response, self.get_selector_map('trailer')).get()
+        if trailer:
+            trailer = re.search('path:\"(.*.mp4)\"', trailer)
             if trailer:
-                trailer = re.search('path:\"(.*.mp4)\"', trailer).group(1)
-                if trailer:
-                    trailer = "http://www.cum-fun.com/" + trailer
+                trailer = trailer.group(1)
+                trailer = trailer.replace(" ", "%20")
+                trailer = "http://www.cum-fun.com/" + trailer
                 return trailer
         return ''
 
@@ -46,10 +49,12 @@ class CumPerfectionSpider(BaseSceneScraper):
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
-            image = re.search('thumbnail:\"(.*.jpg)\"', image).group(1)
+            image = re.search('thumbnail:\"(.*.jpg)\"', image)
             if image:
+                image = image.group(1)
+                image = image.replace(" ", "%20")
                 image = "http://www.cum-fun.com/" + image
-            return self.format_link(response, image)
+                return self.format_link(response, image)
         return ''
 
 
