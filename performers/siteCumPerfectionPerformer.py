@@ -30,8 +30,7 @@ class CumPerfectionPerformerSpider(BasePerformerScraper):
         for performer in performers:
             yield scrapy.Request(
                 url=self.format_link(response, performer),
-                callback=self.parse_performer, meta={'site':'Arch Angel'}
-            )
+                callback=self.parse_performer)
 
     def get_gender(self, response):
         return "Female"
