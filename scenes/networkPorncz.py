@@ -125,3 +125,9 @@ class PornCZSpider(BaseSceneScraper):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         date = datetime.datetime.strptime(date, "%d.%m.%Y").strftime("%Y-%m-%d")
         return dateparser.parse(date.strip()).isoformat()
+
+    def get_network(self, response):
+        return "Porn CZ"
+
+    def get_parent(self, response):
+        return "Porn CZ"
