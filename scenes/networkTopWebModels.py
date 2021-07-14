@@ -2,6 +2,7 @@ import re
 
 import scrapy
 import json
+import string
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -74,11 +75,23 @@ class TopWebModelsSpider(BaseSceneScraper):
 
             item['performers'] = []
             for model in jsonentry['models']:
-                item['performers'].append(model['name'])
+                if " and " in model['name'].lower():
+                    modellist = model['name'].split(" and ")
+                    if modellist:
+                        for model in modellist:
+                            item['performers'].append(model.title())
+                if " & " in model['name'].lower():
+                    modellist = model['name'].split(" & ")
+                    if modellist:
+                        for model in modellist:
+                            item['performers'].append(model.title())
+                else:
+                    item['performers'].append(model['name'])
                 
             item['tags'] = []
             for tags in jsonentry['tags']:
-                item['tags'].append(tags['name'].title())
+                if "scott's picks" not in tags['name'].lower():
+                    item['tags'].append(string.capwords(tags['name']))
 
             if self.debug:
                 print(item)
