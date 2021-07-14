@@ -51,6 +51,7 @@ class SecretFriendsSpider(BaseSceneScraper):
         'title': '//h3/text()',
         'description': '//div[@class="top-5"]/text()',
         'date': '//span[contains(text(),"Published")]/b/text()',
+        'date_formats': ['%Y.%m.%d'],        
         'image': '//video/@poster',
         'performers': '//div[contains(text(),"Performer")]/text()',
         'tags': '//span[contains(text(),"Niches")]/following-sibling::a/text()',
