@@ -1,16 +1,34 @@
 import re
 import scrapy
 import tldextract
+import string
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 
 def match_site(argument):
     match = {
-        'hussiepass': "Hussie Pass",
-        'povpornstars': "POV Pornstars",
-        'seehimfuck': "See Him Fuck",
-
+        '18tokyo': 'Japanese Teens',
+        'analnippon': 'Anal Nippon',
+        'bigtitstokyo': 'Big Tits Tokyo',
+        'bukkakenow': 'Bukkake Now',
+        'japaneseflashers': 'Japanese Flashers',
+        'japanesematures': 'Japanese Matures',
+        'japaneseslurp': 'Japanese Slurp',
+        'jcosplay': 'Japanese Cosplay',
+        'jpmilfs': 'JP Milfs',
+        'jpnurse': 'JP Nurse',
+        'jpshavers': 'Shaved Pussy',
+        'jpteacher': 'Japanese Teacher',
+        'jschoolgirls': 'Japanese School Girls',
+        'myracequeens': 'My Race Queens',
+        'ocreampies': 'O Creampies',
+        'officesexjp': 'Japanese Office Sex',
+        'outdoorjp': 'Outdoor JP',
+        'povjp': 'POVJP',
+        'tokyobang': 'Tokyo Bang',
+        'wierdjapan': 'Weird Japan',
     }
     return match.get(argument, '')
 
@@ -20,18 +38,38 @@ class networkAllJapanesePassSpider(BaseSceneScraper):
     parent = "All Japanese Pass"
 
     start_urls = [
+        'https://18tokyo.com',
+        'https://analnippon.com',
+        'https://bigtitstokyo.com',
         'https://bukkakenow.com',
+        'https://japaneseflashers.com',
+        'https://japanesematures.com',
+        'https://japaneseslurp.com',
+        'https://jcosplay.com',
+        'https://jpmilfs.com',
+        'https://jpnurse.com',
+        'https://jpshavers.com',
+        'https://jpteacher.com',
+        'https://jschoolgirls.com',
+        'https://myracequeens.com',
+        'https://ocreampies.com',
+        'https://officesexjp.com',
+        'https://outdoorjp.com',
+        'https://povjp.com',
+        'https://tokyobang.com',
+        # ~ #'https://wierdjapan.com',  #Requires Membership
     ]
 
     selector_map = {
-        'title': '//div[contains(@class,"videoDetails")]/h3/text()',
-        'description': '//div[contains(@class,"videoDetails")]/p/text()',
-        'date': '//div[contains(@class,"videoInfo")]/p/span[contains(text(),"Added")]/following-sibling::text()',
-        'image': '//meta[@property="og:image"]/@content',
-        'performers': '//li[@class="update_models"]/a/text()',
-        'tags': '//div[contains(@class,"featuring")]/ul/li/a[contains(@href,"/categories/")]/text()',
+        'title': '//span[@class="b-breadcrumb-text"]/text()',
+        'description': '//p[@itemprop="description"]/text()',
+        'date': '//div[contains(text(),"Added")]/following-sibling::div[1]/text()',
+        'date_formats': ['%d %b %Y'],
+        'image': '//div[@class="b-player-body"]/div/img/@src',
+        'performers': '//p[@itemprop="actor"]/a/span/text()',
+        'tags': '//p[@class="b-video-info__text"]/a[contains(@href,"/category/") or contains(@href,"/tag/")]/text()',
         'external_id': '.*\/(.*?)$',
-        'trailer': '//script[contains(text(),"video_content")]',
+        'trailer': '',
         'pagination': '/videos/newest/%s'
     }
 
@@ -41,19 +79,13 @@ class networkAllJapanesePassSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_trailer(self, response):
-        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
-            trailer = self.process_xpath(
-                response, self.get_selector_map('trailer')).get()
-            if trailer:
-                base = re.search(
-                    r'^http[s]*:\/\/[\w\.]*',
-                    response.url).group()
-                trailer = base + \
-                    re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
-                return trailer
-        return ''
+    def get_title(self, response):
+        title = response.xpath(self.get_selector_map('title')).get()
+        if title:
+            title = string.capwords(title)
+            return title.strip()
 
+        return None
         
     def get_site(self, response):
         parsed_uri = tldextract.extract(response.url)
@@ -63,3 +95,25 @@ class networkAllJapanesePassSpider(BaseSceneScraper):
             site = tldextract.extract(response.url).domain
             
         return site
+
+
+    def get_tags(self, response):
+        if self.get_selector_map('tags'):
+            tags = self.process_xpath(response, self.get_selector_map('tags'))
+            if tags:
+                return list(map(lambda x: x.strip().title(), tags.getall()))
+
+        return []
+
+    def get_performers(self, response):
+        performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
+        if performers:
+            if "Japanese AV Model" in performers:
+                performers.remove("Japanese AV Model")
+            if "Unknown Model" in performers:
+                performers.remove("Unknown Model")
+            if "Amateur" in performers:
+                performers.remove("Amateur")
+            return list(map(lambda x: x.strip(), performers))
+
+        return []
