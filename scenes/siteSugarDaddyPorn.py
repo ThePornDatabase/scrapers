@@ -47,3 +47,14 @@ class SugarDaddyPornSpider(BaseSceneScraper):
                 return title.strip()
 
         return None
+
+    def get_image(self, response):
+        image = self.process_xpath(response, self.get_selector_map('image'))
+        if image:
+            image = self.get_from_regex(image.get(), 're_image')
+
+            if image:
+                image = image.replace(" ","%20")
+                return self.format_link(response, image)
+
+        return None
