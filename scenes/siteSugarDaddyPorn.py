@@ -1,5 +1,7 @@
 import dateparser
 import scrapy
+import re
+import string
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -30,3 +32,18 @@ class SugarDaddyPornSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="models-video"]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+
+    def get_title(self, response):
+        title = self.process_xpath(response, self.get_selector_map('title')).get()
+        if title:
+            if re.search('rating: \d{1,2}\/\d{1,2} ', title.lower()):
+                titlebare = re.search('rating: \d{1,2}\/\d{1,2} (.*)', title.lower()).group(1)
+                if titlebare:
+                    titlebare = string.capwords(titlebare)
+                    title = titlebare.strip()
+                
+            if title:
+                return title.strip()
+
+        return None
