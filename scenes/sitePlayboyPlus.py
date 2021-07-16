@@ -37,14 +37,6 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
             scene = "https://www.playboyplus.com" + scene.replace("\\","")
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_tags(self, response):
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(response, self.get_selector_map('tags'))
-            if tags:
-                return list(map(lambda x: x.replace(",","").strip().title(), tags.getall()))
-        return []
-
         
     def get_site(self, response):
         return "Playboy Plus"

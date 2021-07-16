@@ -140,7 +140,19 @@ link_to_info = {
         "navText": movies_nav_text,
         "contentText": movies_content_text,
         "v2": False
-    }
+    },
+    "organic-Freeusemilf-uug2tohT": {
+        "site": "Free Use MILF",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
+    "organic-momswap-chie0Ge5": {
+        "site": "Mom Swap",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
 }
 
 
