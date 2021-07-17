@@ -128,7 +128,6 @@ class LustCinemaSpider(BaseSceneScraper):
     def get_network(self, response):
         return self.get_parent(response)
 
-
     def get_date(self, response):
         metadata = self.get_metadata(response)
         return dateparser.parse(metadata["release_date"]).isoformat()
@@ -136,11 +135,5 @@ class LustCinemaSpider(BaseSceneScraper):
     def get_performers(self, response):
         performers = response.xpath(self.selector_map["performers"]).getall()
         return [bytes(p, "utf-8").decode("unicode-escape").strip() for p in performers]
-
-    # def parse_scene(self, response):
-    #     item = SceneItem()
-    #     item["title"] = self.get_title(response)
-    #     item["description"] = self.get_description()
-    #     item["site"] =
 
 
