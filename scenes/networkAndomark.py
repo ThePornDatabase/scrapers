@@ -2,6 +2,7 @@ import dateparser
 import scrapy
 import re
 import tldextract
+import string
 from urllib.parse import urlparse
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -37,6 +38,7 @@ def match_site(argument):
         'sheseducedme': "She Seduced Me",
         'sofiemariexxx': "Sofie Marie",
         'tabooadventures': "Taboo Adventures",
+        'thejerkoffmembers': "The Jerk Off Games",
         'vanillapov': "Vanilla POV",
         'willtilexxx': "Will Tile",
         'xxxcellentadventures': "XXXCellent Adventures",
@@ -66,6 +68,7 @@ class AndomarkSpider(BaseSceneScraper):
                        # ~ }
 
     start_urls = [
+        'http://sexykarenxxx.com',
         'https://ariellynn.com',
         'https://behindtheporno.com',
         'https://bigboobiesclub.com',
@@ -78,31 +81,31 @@ class AndomarkSpider(BaseSceneScraper):
         'https://chocolatepov.com',
         'https://furrychicks.elxcomplete.com',
         'https://hollyhotwife.elxcomplete.com',
-        'https://www.houseofyre.com',
         'https://internationalnudes.com',
         'https://johnnygoodluck.com',
         'https://laurenphillips.com',
-        'https://www.meanawolf.com',
-        'https://www.minkaxxx.com',
         'https://oldsexygrannies.com',
         'https://ravenswallowzxxx.com',
         'https://reidmylips.elxcomplete.com',
         'https://rionkingxxx.com',
         'https://seanmichaelsxxx.com',
         'https://secretsusan.com',
-        'http://sexykarenxxx.com',
         'https://sheseducedme.com',
         'https://sofiemariexxx.com',
         'https://tabooadventures.elxcomplete.com',
         'https://vanillapov.com',
         'https://willtilexxx.com',
+        'https://www.houseofyre.com',
+        'https://www.meanawolf.com',
+        'https://www.minkaxxx.com',
+        'https://www.thejerkoffmembers.com',
         'https://xxxcellentadventures.com',
         'https://younggunsxxx.com',
         'https://yummybikinimodel.com',
+        # ~ #'https://yummygirl.com'  #screwed up, left in for list completion. Videos on other sites  
         'https://yummygirlz.elxcomplete.com',
         'https://yummypinkxxx.elxcomplete.com',
         'https://yummypornclub.elxcomplete.com',
-        # ~ #'https://yummygirl.com'  #screwed up, left in for list completion. Videos on other sites  
         'https://yummywomen.elxcomplete.com',
     ]
 
@@ -135,6 +138,8 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/tour/categories/movies_%s_d.html'
         elif 'sexykaren' in base:
             selector = '/tour2/categories/movies_%s_d.html'
+        elif 'thejerkoff' in base:
+            selector = '/categories/movies_%s_d.html'
         else:
             selector = '/categories/movies_%s_d.html'
 
@@ -204,7 +209,7 @@ class AndomarkSpider(BaseSceneScraper):
                 title = re.search('^(.*)\ -\ ', title).group(1)
             else:
                 title = ''
-        
+        title = string.capwords(title)
         return title.strip()
         
                 
@@ -238,7 +243,7 @@ class AndomarkSpider(BaseSceneScraper):
             if not image:
                 return ''
 
-        return self.format_link(response, image)      
+        return self.format_link(response, image.replace(" ","%20")) 
         
     def get_tags(self, response):
         if 'minkaxxx' in response.url or 'sexykaren' in response.url:
@@ -253,7 +258,7 @@ class AndomarkSpider(BaseSceneScraper):
             tags = response.xpath('//span[@class="tour_update_tags"]/a/text()').getall()
         
         if tags:
-            return list(map(lambda x: x.strip().title(), tags))
+            return list(map(lambda x: x.replace("-", "").strip().title(), tags))
         return []
 
         
