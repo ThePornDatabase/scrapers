@@ -17,6 +17,7 @@ class SinematicaSpider(BaseSceneScraper):
         'title': '//h1[@class="title"]/text()',
         'description': '//div[@class="mediaMeta"]/h2/text()',
         'date': '//span[@class="posted_on"]/i[contains(@class, "calendar")]/following-sibling::text()',
+        'date_formats': ['%b %d, %Y'],
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '//div[@class="feat"]/a/text()',
         'tags': "",

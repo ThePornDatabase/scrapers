@@ -40,6 +40,9 @@ class SugarDaddyPornSpider(BaseSceneScraper):
             if re.search('rating: \d{1,2}\/\d{1,2} ', title.lower()):
                 titlebare = re.search('rating: \d{1,2}\/\d{1,2} (.*)', title.lower()).group(1)
                 if titlebare:
+                    if re.search('^ - ', title.lower()):
+                        titlebare = re.search('^ - (.*)', title.lower()).group(1)                   
+                if titlebare:
                     titlebare = string.capwords(titlebare)
                     title = titlebare.strip()
                 
