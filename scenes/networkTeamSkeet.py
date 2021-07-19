@@ -123,7 +123,7 @@ link_to_info = {
         "contentText": movies_content_text,
         "v2": False
     },
-    "organic-mylfdom-ieH7cuos": {
+    "organic-mylfdom-ieH7cuos%20": {
         "site": "MYLFDom",
         "navText": movies_nav_text,
         "contentText": movies_content_text,
@@ -140,7 +140,19 @@ link_to_info = {
         "navText": movies_nav_text,
         "contentText": movies_content_text,
         "v2": False
-    }
+    },
+    "organic-Freeusemilf-uug2tohT": {
+        "site": "Free Use MILF",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
+    "organic-momswap-chie0Ge5%20": {
+        "site": "Mom Swap",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
 }
 
 

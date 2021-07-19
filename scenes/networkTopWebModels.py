@@ -61,6 +61,8 @@ class TopWebModelsSpider(BaseSceneScraper):
             item['image'] = jsonentry['thumb']
             if not isinstance(item['image'], str):
                 item['image'] = ''
+            else:
+                item['image'] = item['image'].replace(" ", "%20")
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             urltext = re.sub(r'[^A-Za-z0-9 ]+', '', jsonentry['title']).lower()
