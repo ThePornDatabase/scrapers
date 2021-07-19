@@ -36,20 +36,27 @@ class HotMilfsFuckSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_image(self, response):
-        image = self.process_xpath(
-            response, self.get_selector_map('image')).get()
-        image = "https://www.hotmilfsfuck.com/" + \
-            re.search('poster=\"(.*.jpg)\"', image).group(1).strip()
-
-        return self.format_link(response, image)
+        image = self.process_xpath(response, self.get_selector_map('image')).get()
+        if image:
+            image_re = re.search('poster=\"(.*.jpg)\"', image).group(1)
+            if image_re:
+                image = "https://www.hotmilfsfuck.com/" +  image_re.strip()
+        if not image:
+            image = response.xpath('//div[@class="player-window-play"]/following-sibling::img/@src0_1x').get()
+            
+        if image:
+            return self.format_link(response, image.strip())
+        else:
+            return ''
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(
                 response, self.get_selector_map('trailer')).get()
-            trailer = "https://www.hotmilfsfuck.com/" + \
-                re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
-            return trailer
+            if trailer:
+                trailer = "https://www.hotmilfsfuck.com/" + \
+                    re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
+                return trailer
         return ''
 
     def get_description(self, response):
