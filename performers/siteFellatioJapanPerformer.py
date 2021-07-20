@@ -5,6 +5,9 @@ from dateutil.relativedelta import relativedelta
 import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
+# This scraper pulls from the actress pages instead of the index, since date isn't on
+# the index pages.  So you might want to set it torun weekly instead of daily, since
+# it pulls all of them
 
 def get_birthday_from_age(age):
     age = int(age.strip())
