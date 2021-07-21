@@ -19,9 +19,9 @@ class networkWowNetworkPerformerSpider(BasePerformerScraper):
 
     start_urls = [
         'https://www.18onlygirlsblog.com/',
-        # ~ 'https://www.ultrafilms.xxx/',
-        # ~ 'https://www.wowgirlsblog.com/',
-        # ~ 'https://www.wowpornblog.com/',
+        'https://www.ultrafilms.xxx/',
+        'https://www.wowgirlsblog.com/',
+        'https://www.wowpornblog.com/',
     ]
 
     def get_performers(self, response):
