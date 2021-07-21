@@ -53,11 +53,15 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
 
 
     def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image'))
+        image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
-            image = self.get_from_regex(image.get(), 're_image')
-            if image:
-                image = image.replace(" ","%20")
-                return self.format_link(response, image)
-
-        return None
+            # ~ imagelist = re.findall('(https:\/\/.*?)\s\d{2,5}w',image)
+            imagelist = re.findall('(https:\/\/.*?.jpg)',image)
+            if len(imagelist):
+                image = imagelist[0]
+            
+        if image:
+            image = image.replace(" ","%20")
+            return self.format_link(response, image)
+        else:
+            return ''

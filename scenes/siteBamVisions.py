@@ -49,5 +49,6 @@ class siteBAMVisionsSpider(BaseSceneScraper):
             trailer = re.search('video\ src=\"(.*.mp4)\"',trailer).group(1)
             if trailer:
                 trailer = "https://tour.bamvisions.com/" + trailer
+                trailer = trailer.replace(" ","%20")
                 return self.format_link(response, trailer)
         return ''    
