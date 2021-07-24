@@ -15,17 +15,50 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
         'astrology': '//strong[contains(text(),"Sign")]/following-sibling::text()',
         'eyecolor': '//strong[contains(text(),"Eye")]/following-sibling::text()',
         'birthplace': '//strong[contains(text(),"From")]/following-sibling::text()',
-        'pagination': '/tour/models/%s/latest/?g=f',
         'external_id': 'models\/(.*).html'
+    }
+
+    url = 'http://www.brickyates.com/'
+    
+    paginations = {
+        '/tour/models/%s/latest/?g=f',
+        '/tour/models/%s/latest/?g=m',
     }
 
     name = 'BrickYatesPerformer'
     network = "Brick Yates"
 
-    start_urls = [
-        'http://www.brickyates.com/'
-    ]
+    def start_requests(self):
+        for pagination in self.paginations:
+            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination),
+                                 callback=self.parse,
+                                 meta={
+                'page': self.page, 'pagination': pagination},
+                headers=self.headers,
+                cookies=self.cookies)
 
+    def parse(self, response, **kwargs):
+        if response.status == 200:
+            performers = self.get_performers(response)
+            count = 0
+            for performer in performers:
+                count += 1
+                yield performer
+
+                if count:
+                    if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                        meta = response.meta
+                        meta['page'] = meta['page'] + 1
+                        print('NEXT PAGE: ' + str(meta['page']))
+                        yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']),
+                                             callback=self.parse,
+                                             meta=meta,
+                                             headers=self.headers,
+                                             cookies=self.cookies)
+
+
+    def get_next_page_url(self, url, page, pagination):
+        return self.format_url(url, pagination % page)
 
     def get_name(self, response):
         name = self.process_xpath(response, self.get_selector_map('name')).get().strip()
@@ -33,15 +66,20 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
         return name
         
     def get_performers(self, response):
+        meta = response.meta
         performers = response.xpath('//div[@class="item-portrait"]/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(
                 url=self.format_link(response, performer),
-                callback=self.parse_performer
+                callback=self.parse_performer, meta=meta
             )
 
     def get_gender(self, response):
-        return "Female"
+        meta = response.meta
+        if 'g=m' in meta['pagination']:
+            return "Male"
+        else:
+            return "Female"
 
     def get_cupsize(self, response):
         if 'cupsize' in self.selector_map:
