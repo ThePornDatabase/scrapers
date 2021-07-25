@@ -18,7 +18,7 @@ class siteHollyRandallSpider(BaseSceneScraper):
         'description': '//h3[contains(text(),"description")]/following-sibling::p/text()',
         'date': '//p[contains(text(),"Added")]/text()[contains(.,"Added")]',
         'date_formats': ['%B %d, %Y'],
-        'image': '//img[contains(@class,"update_thumb")]/@src0_4x',
+        'image': '//img[contains(@class,"update_thumb")]/@src0_1x',
         'performers': '//p/a[contains(@href,"/models")]/text()',
         'tags': '//ul[@class="tags"]/li/a/text()',
         'external_id': '.*\/(.*).html',
@@ -36,12 +36,6 @@ class siteHollyRandallSpider(BaseSceneScraper):
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image'))
         if not image:
-            image = response.xpath('//img[contains(@class,"update_thumb")]/@src0_3x')
-        if not image:
-            image = response.xpath('//img[contains(@class,"update_thumb")]/@src0_2x')
-        if not image:
-            image = response.xpath('//img[contains(@class,"update_thumb")]/@src0_1x')
-        if not image:
             image = response.xpath('//img[contains(@class,"update_thumb")]/@src')
         if image:
             image = self.get_from_regex(image.get(), 're_image')
@@ -50,7 +44,7 @@ class siteHollyRandallSpider(BaseSceneScraper):
                 if re.search('\/(p\d+.jpg)', image):
                     return ''
                 image = self.format_link(response, image)
-                return image.replace(" ", "%20")
+                return image.replace(" ", "%20").replace('content//', 'content/')
 
         return None
 
