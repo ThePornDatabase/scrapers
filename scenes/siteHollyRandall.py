@@ -48,7 +48,7 @@ class siteHollyRandallSpider(BaseSceneScraper):
 
             if image:
                 if re.search('\/(p\d+.jpg)', image):
-                    image = ''
+                    return ''
                 image = self.format_link(response, image)
                 return image.replace(" ", "%20")
 
