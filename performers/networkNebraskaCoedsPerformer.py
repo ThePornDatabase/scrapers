@@ -49,7 +49,7 @@ class networkNebraskaCoedsPornstarSpider(BasePerformerScraper):
                 if "sets.php" in url:
                     uri = urlparse(response.url)
                     base = uri.scheme + "://" + uri.netloc
-                    item['url'] = base + "/" + url.strip()                    
+                    url = base + "/" + url.strip()                    
                 item['url'] = url.strip()
                 
             item['network'] = 'Nebraska Coeds'
