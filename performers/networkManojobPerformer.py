@@ -23,7 +23,7 @@ class networkManojobPerformerSpider(BasePerformerScraper):
     network = "Manojob"
 
     start_urls = [
-        'https://www.manojob.com'
+        'https://www.finishesthejob.com'
     ]
 
     def get_performers(self, response):
