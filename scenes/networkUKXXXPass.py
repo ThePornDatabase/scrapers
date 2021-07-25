@@ -100,9 +100,9 @@ class networkUKXXXPassSpider(BaseSceneScraper):
             if image:
                 uri = urlparse(response.url)
                 base = uri.scheme + "://" + uri.netloc
-                item['image'] = base + image.strip().replace(" ","%20")
+                item['image'] = base + image.strip().replace(" ","").replace("\t","")
             else:
-                item['image'] = []            
+                item['image'] = ''       
             
             
             trailer = scene.xpath('.//div[@class="update_image"]/a/@onclick').get()
@@ -110,7 +110,12 @@ class networkUKXXXPassSpider(BaseSceneScraper):
                 trailer = re.search('tload\(\'(.*\.mp4|.*\.m4v)', trailer)
                 if trailer:
                     trailer = trailer.group(1)
-                    item['trailer'] = trailer.strip().replace(" ","%20")
+                    if "http" not in trailer:
+                        uri = urlparse(response.url)
+                        base = uri.scheme + "://" + uri.netloc
+                    else:
+                        base = ''
+                    item['trailer'] = base + trailer.strip().replace(" ","").replace("\t","")
             else:
                 item['trailer'] = ''         
 
