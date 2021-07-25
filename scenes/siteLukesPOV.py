@@ -23,7 +23,7 @@ class siteLukesPOVSpider(BaseSceneScraper):
         'tags': '',
         'external_id': '.*\/(.*?)\/',
         'trailer': '//center/div[1]/@data-item',
-        're_trailer': 'src\":\"(http.*?mp4)',
+        're_trailer': 'src\":\"(http.*?(?:mp4|mov))',
         'pagination': '/pov-blowjob-videos/page/%s/'
     }
 
