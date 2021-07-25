@@ -54,7 +54,6 @@ class networkMentalPassSpider(BaseSceneScraper):
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     url = self.get_next_page_url(meta['url'], meta['page'], meta['pagination'], meta['items'])
-                    print(f'Url2: {url}')
                     yield scrapy.Request(url,
                                          callback=self.parse,
                                          meta=meta,
