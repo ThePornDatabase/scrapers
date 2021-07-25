@@ -159,6 +159,12 @@ link_to_info = {
         "contentText": movies_content_text,
         "v2": False
     },
+    "organic-doc-utei5Mai": {
+        "site": "Perv Doctor",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
 }
 
 
