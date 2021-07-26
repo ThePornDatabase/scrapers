@@ -37,7 +37,7 @@ class ExposedWhoresSpider(BaseSceneScraper):
             if trailer:
                 trailer = re.search('tload\(\'(.*)\'\)', trailer).group(1)
                 if trailer:
-                    trailer = "https://www.philavise.com" + trailer
+                    trailer = "https://exposedwhores.com" + trailer
                     return trailer
         return ''
 
