@@ -23,7 +23,7 @@ class networkManyVidsSpider(BaseSceneScraper):
         'date': '//div[@class="mb-1"]/span[2]/text()',
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '',
-        'tags': '//a[contains(@href,"?category")]//text()',
+        'tags': '//script[contains(text(),"tagListApp")]/text()',
         'external_id': '',
         'trailer': '',
         'pagination': ''
@@ -41,19 +41,35 @@ class networkManyVidsSpider(BaseSceneScraper):
     def start_requests(self):
         url = "https://www.manyvids.com/Profile/1001216419/YouthLust/Store/Videos/"
         yield scrapy.Request(url,
+                     callback=self.get_taglist,
+                     headers=self.headers,
+                     cookies=self.cookies)     
+                     
+    def get_taglist(self, response):
+        meta=response.meta
+        url = "https://d3e1078hs60k37.cloudfront.net/site_files/json/vid_categories.json"
+        yield scrapy.Request(url,
                      callback=self.start_requests2,
                      headers=self.headers,
-                     cookies=self.cookies)        
+                     cookies=self.cookies, meta=meta)     
 
     def start_requests2(self, response):
+        meta=response.meta
+        taglist = json.loads(response.text)
+        meta['taglist'] = taglist
+       
         for link in self.start_urls:
+            meta['page'] = self.page
+            meta['pagination'] = link[1]
+            meta['site'] = link[2]
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination':link[1], 'site':link[2]},
+                                 meta=meta,
                                  headers=self.headers,
                                  cookies=self.cookies)
 
     def parse(self, response, **kwargs):
+        meta = response.meta
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -61,7 +77,6 @@ class networkManyVidsSpider(BaseSceneScraper):
             yield scene
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
                 meta['page'] = meta['page'] + 1
                 pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))
@@ -76,11 +91,11 @@ class networkManyVidsSpider(BaseSceneScraper):
         return self.format_url(base, pagination % offset)                                
 
     def get_scenes(self, response):
+        meta = response.meta
         global json
         jsondata = json.loads(response.text)
         data = jsondata['result']['content']['items']
         for jsonentry in data:
-            meta = response.meta
             scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\","")
             if jsonentry['preview']['videoPreview']:
                 meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\","").replace(" ","%20")
@@ -94,6 +109,19 @@ class networkManyVidsSpider(BaseSceneScraper):
 
     def get_date(self, response):
         meta=response.meta
+        imagestring = response.xpath('//meta[@name="twitter:image"]/@content').get()
+        if imagestring:
+            imagestring = re.search('.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
+            if imagestring:
+                imagestring = imagestring.group(1)
+                imagestring = imagestring[:8]
+                if imagestring and "386D43BC" <= imagestring <= "83AA7EBC":
+                    imagedate = int(imagestring, 16)
+                    date = datetime.utcfromtimestamp(imagedate).isoformat()
+                    return date
+                
+        # If no valid image string available to pull date from
+        print(f'Guessing date for: {response.url}')
         page = int(meta['page'])
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if date:
@@ -160,6 +188,10 @@ class networkManyVidsSpider(BaseSceneScraper):
 
 
     def get_performers(self, response):
+        meta = response.meta
+        if meta['site'] == "Lana Rain":
+            return ['Lana Rain']
+        
         return []
         
     def get_site(self, response):
@@ -175,4 +207,27 @@ class networkManyVidsSpider(BaseSceneScraper):
             return meta['site']
         else:
             return "ManyVids"
+        
+    def get_network(self, response):
+        return "ManyVids"
             
+
+    def get_tags(self, response):
+        meta = response.meta
+        taglist = meta['taglist']
+        if self.get_selector_map('tags'):
+            tags = self.process_xpath(response, self.get_selector_map('tags')).get()
+            if tags:
+                tags = re.search('\"(.*)\"', tags).group(1)
+                if tags:
+                    tags = tags.split(",")
+                    scenetags = []
+                    for tag in tags:
+                        for alltags in taglist:
+                            if alltags['id'] == tag:
+                                scenetags.append(alltags['label'])
+                                break
+            if scenetags:
+                return list(map(lambda x: x.strip().title(), scenetags))
+
+        return []            
