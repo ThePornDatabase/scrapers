@@ -14,6 +14,7 @@ class networkManyVidsSpider(BaseSceneScraper):
 
     start_urls = [
         ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'YouthLust'],
+        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Lana Rain'],
     ]
     
     selector_map = {
@@ -82,10 +83,10 @@ class networkManyVidsSpider(BaseSceneScraper):
             meta = response.meta
             scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\","")
             if jsonentry['preview']['videoPreview']:
-                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\","")
+                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\","").replace(" ","%20")
             meta['id'] = jsonentry['id']
             meta['title'] = jsonentry['title']
-            if scene:
+            if scene and meta['id']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                   
 
 
