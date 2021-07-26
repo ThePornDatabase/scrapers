@@ -50,3 +50,15 @@ class ExposedWhoresSpider(BaseSceneScraper):
         if description is not None:
             return description.replace('\r\n', '  ').strip()
         return ""
+
+
+    def get_image(self, response):
+        image = self.process_xpath(response, self.get_selector_map('image')).get()
+        if image:
+            image = self.get_from_regex(image, 're_image')
+
+            if image:
+                image = "https://exposedwhores.com/new-tour/" + image
+                return image.replace(" ", "%20")
+
+        return None
