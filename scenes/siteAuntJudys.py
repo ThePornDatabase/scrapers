@@ -57,8 +57,9 @@ class siteAuntJudysSpider(BaseSceneScraper):
             trailer = self.process_xpath(response, self.get_selector_map('trailer'))
             if trailer:
                 trailer = self.get_from_regex(trailer.get(), 're_trailer')
-                trailer = "https://www.auntjudys.com" + trailer.replace(" ", "%20")
-                return trailer
+                if trailer:
+                    trailer = "https://www.auntjudys.com" + trailer.replace(" ", "%20")
+                    return trailer
 
         return ''
 
