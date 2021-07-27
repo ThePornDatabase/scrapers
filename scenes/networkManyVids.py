@@ -14,11 +14,11 @@ class networkManyVidsSpider(BaseSceneScraper):
 
     start_urls = [
         ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'YouthLust'],
-        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Lana Rain'],
+        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Manyvids: Lana Rain'],
         ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'MySweetApple'],
-        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Jack and Jill'],
-        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Dirty Princess'],
-        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Cattie'],
+        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Manyvids: Jack and Jill'],
+        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Manyvids: Dirty Princess'],
+        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Manyvids: Cattie'],
     ]
     
     selector_map = {
@@ -228,19 +228,19 @@ class networkManyVidsSpider(BaseSceneScraper):
         if meta['site']:
             return meta['site']
         else:
-            return "ManyVids"
+            return "Manyvids"
         
     def get_parent(self, response):
         meta = response.meta
         if meta['site']:
-            if "ManyVids" in meta['site']:
-                return "ManyVids"
+            if "Manyvids" in meta['site']:
+                return "Manyvids"
             return meta['site']
         else:
-            return "ManyVids"
+            return "Manyvids"
         
     def get_network(self, response):
-        return "ManyVids"
+        return "Manyvids"
             
 
     def get_tags(self, response):
