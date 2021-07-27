@@ -15,6 +15,10 @@ class networkManyVidsSpider(BaseSceneScraper):
     start_urls = [
         ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'YouthLust'],
         ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Lana Rain'],
+        ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'MySweetApple'],
+        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Jack and Jill'],
+        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Dirty Princess'],
+        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Cattie'],
     ]
     
     selector_map = {
@@ -114,14 +118,18 @@ class networkManyVidsSpider(BaseSceneScraper):
             imagestring = re.search('.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
             if imagestring:
                 imagestring = imagestring.group(1)
-                imagestring = imagestring[:8]
-                if imagestring and "386D43BC" <= imagestring <= "83AA7EBC":
-                    imagedate = int(imagestring, 16)
+                imagestringhex = imagestring[:8]
+                if imagestringhex and "386D43BC" <= imagestringhex <= "83AA7EBC":
+                    imagedate = int(imagestringhex, 16)
                     date = datetime.utcfromtimestamp(imagedate).isoformat()
                     return date
+                if imagestring and 946684860 <= int(imagestring) <= 2208988860:
+                    date = datetime.utcfromtimestamp(int(imagestring)).isoformat()
+                    return date
+
                 
         # If no valid image string available to pull date from
-        print(f'Guessing date for: {response.url}')
+        #print(f'Guessing date for: {response.url}')
         page = int(meta['page'])
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if date:
@@ -141,41 +149,60 @@ class networkManyVidsSpider(BaseSceneScraper):
                 today = datetime.now().strftime('%m%d')
                 year = datetime.now().strftime('%Y')
                 scenedate = str(month) + str(day)
-                if page >= 1 and page <= 5:
-                    if scenedate <= today:
-                        scenedate = scenedate + year
-                    else:
-                        scenedate = scenedate + str(int(year)-1)
+                
+                sceneid = re.search('Video\/(\d+)\/', response.url).group(1)
+                if sceneid:
+                    sceneid = int(sceneid)
+                    if sceneid > 2462280:
+                        scenedate = scenedate + "2021"
+                    if 1657000 <= sceneid <= 2462279:
+                        scenedate = scenedate + "2020"                
+                    if 1014000 <= sceneid <= 1656999:
+                        scenedate = scenedate + "2019"                
+                    if 600000 <= sceneid <= 1013999:
+                        scenedate = scenedate + "2018"
+                    if sceneid < 599999:
+                        scenedate = scenedate + "2017"
+                else:
+                    if page >= 1 and page <= 5:
+                        if scenedate <= today:
+                            scenedate = scenedate + year
+                        else:
+                            scenedate = scenedate + str(int(year)-1)
+                            
+                    if page >= 6 and page <= 7:
+                        if scenedate <= today:
+                            scenedate = scenedate + str(int(year)-1)
+                        else:
+                            scenedate = scenedate + str(int(year)-2)
+                            
+                    if page == 8:
+                        if scenedate <= today:
+                            scenedate = scenedate + str(int(year)-2)
+                        else:
+                            scenedate = scenedate + str(int(year)-3)
+                            
+                    if page == 9:
+                        if scenedate <= today:
+                            scenedate = scenedate + str(int(year)-3)
+                        else:
+                            scenedate = scenedate + str(int(year)-4)
+                            
+                    if page == 10:
+                        if scenedate <= today:
+                            scenedate = scenedate + str(int(year)-4)
+                        else:
+                            scenedate = scenedate + str(int(year)-5)
+                            
+                    if page > 10:
+                        if scenedate <= today:
+                            scenedate = scenedate + str(int(year)-5)
+                        else:
+                            scenedate = scenedate + str(int(year)-6)
+                            
                         
-                if page >= 6 and page <= 7:
-                    if scenedate <= today:
-                        scenedate = scenedate + str(int(year)-1)
-                    else:
-                        scenedate = scenedate + str(int(year)-2)
-                        
-                if page == 8:
-                    if scenedate <= today:
-                        scenedate = scenedate + str(int(year)-2)
-                    else:
-                        scenedate = scenedate + str(int(year)-3)
-                        
-                if page == 9:
-                    if scenedate <= today:
-                        scenedate = scenedate + str(int(year)-3)
-                    else:
-                        scenedate = scenedate + str(int(year)-4)
-                        
-                if page == 10:
-                    if scenedate <= today:
-                        scenedate = scenedate + str(int(year)-4)
-                    else:
-                        scenedate = scenedate + str(int(year)-5)
-                        
-                if page > 10:
-                    if scenedate <= today:
-                        scenedate = scenedate + str(int(year)-5)
-                    else:
-                        scenedate = scenedate + str(int(year)-6)
+
+                
                         
 
             if len(scenedate)>2:
@@ -191,6 +218,8 @@ class networkManyVidsSpider(BaseSceneScraper):
         meta = response.meta
         if meta['site'] == "Lana Rain":
             return ['Lana Rain']
+        if meta['site'] == "Cattie":
+            return ['Cattie Candescent']
         
         return []
         
