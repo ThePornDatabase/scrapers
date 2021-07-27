@@ -14,11 +14,11 @@ class networkManyVidsSpider(BaseSceneScraper):
 
     start_urls = [
         ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'YouthLust'],
-        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Lana Rain'],
+        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Lana Rain'],
         ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'MySweetApple'],
-        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Jack and Jill'],
-        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Dirty Princess'],
-        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'Cattie'],
+        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Jack and Jill'],
+        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Dirty Princess'],
+        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=60feafe6b5b83856828183', 'ManyVids: Cattie'],
     ]
     
     selector_map = {
@@ -233,6 +233,8 @@ class networkManyVidsSpider(BaseSceneScraper):
     def get_parent(self, response):
         meta = response.meta
         if meta['site']:
+            if "ManyVids" in meta['site']:
+                return "ManyVids"
             return meta['site']
         else:
             return "ManyVids"
@@ -256,6 +258,8 @@ class networkManyVidsSpider(BaseSceneScraper):
                             if alltags['id'] == tag:
                                 scenetags.append(alltags['label'])
                                 break
+            if meta['site'] and "ManyVids" in meta['site']:
+                scenetags.append("ManyVids")
             if scenetags:
                 return list(map(lambda x: x.strip().title(), scenetags))
 
