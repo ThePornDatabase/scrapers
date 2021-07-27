@@ -29,9 +29,9 @@ class networkAdultCentroSpider(BaseSceneScraper):
     # ~ }
     sites = {
         'https://aussiefellatioqueens.com',
-        # ~ 'https://www.mylifeinmiami.com',
-        # ~ 'https://cospimps.com',
-        # ~ 'https://jerkoffwithme.com',
+        'https://www.mylifeinmiami.com',
+        'https://cospimps.com',
+        'https://jerkoffwithme.com',
     }
 
     selector_map = {
