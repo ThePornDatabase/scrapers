@@ -310,14 +310,20 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 image_xpath = response.xpath('//meta[@name="twitter:image"]/@content').get()
                 if image_xpath:
                     image = image_xpath.strip()
+                else:
+                    image = image.replace("https://transform.gammacdn.com/","https://images02-openlife.gammacdn.com/")
             return self.format_link(response, image)
 
     def parse_scene(self, response):
         global json
         data = response.css('script:contains("dataLayer =")::text').get()
         data2 = response.xpath('//script[contains(text(),\'ScenePlayerId = "player"\')]|//script[contains(text(),\'ScenePlayerId = "scenePlayer"\')]').get()
-        data3 = json.loads(response.xpath('//script[@type="application/ld+json"]/text()').get())
-        data3 = data3[0]
+        data3 = response.xpath('//script[@type="application/ld+json"]/text()').get()
+        if data3:
+            data3 = json.loads(data3)
+            data3 = data3[0]
+        else:
+            data3 = []
 
         if len(chompjs.parse_js_object(data)):
             json_data = chompjs.parse_js_object(data)[0]
@@ -625,7 +631,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if not date:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
     
-        return dateparser.parse(date.strip(), date-formats=['%m-%d-%Y','%Y-%m-%d']).isoformat()
+        return dateparser.parse(date.strip(), date_formats=['%m-%d-%Y','%Y-%m-%d']).isoformat()
 
     def get_title(self, response):
         title = self.process_xpath(
