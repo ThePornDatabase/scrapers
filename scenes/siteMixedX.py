@@ -2,21 +2,21 @@ import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-### Uses Elevated-X CMS
 
-class siteGirlsFuckGirlsSpider(BaseSceneScraper):
-    name = 'GirlsFuckGirls'
-    network = 'Girls Fuck Girls'
+
+class siteMixedXSpider(BaseSceneScraper):
+    name = 'MixedX'
+    network = 'Mixed X'
 
     start_urls = [
-        'https://girlsfuckgirls.com',
+        'https://mixedx.com',
     ]
 
     selector_map = {
         'title': '//div[contains(@class, "videoDetails")]//h3/text()',
         'description': '//div[contains(@class, "videoDetails")]//p/text()',
         'performers': '//div[contains(@class, "featuring") and contains(., "Featuring")]//following-sibling::li/a/text()',
-        'date': '//div[contains(@class, "videoInfo")]//following-sibling::p[contains(., "Date")]/text()',
+        'date': '',
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//div[contains(@class,"featuring")]/ul/li/a[contains(@href,"categories")]/text()',
         'external_id': '\/trailers\/(.*).html',
@@ -26,15 +26,15 @@ class siteGirlsFuckGirlsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = self.process_xpath(response, '//div[@class="item-thumb"]/a/@href').getall()
+        scenes = self.process_xpath(response, '//div[@class="item-thumb"]/div/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        return "Girls Fuck Girls"
+        return "Mixed X"
    
     def get_parent(self, response):
-        return "Girls Fuck Girls"
+        return "Mixed X"
 
 
     def get_date(self, response):
@@ -54,6 +54,6 @@ class siteGirlsFuckGirlsSpider(BaseSceneScraper):
             trailer = self.process_xpath(response, self.get_selector_map('trailer'))
             if trailer:
                 trailer = self.get_from_regex(trailer.get(), 're_trailer')
-                return "https://girlsfuckgirls.com" + trailer.replace(" ", "%20")
+                return "https://mixedx.com" + trailer.replace(" ", "%20")
 
         return ''
