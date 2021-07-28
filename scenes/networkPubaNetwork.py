@@ -168,7 +168,9 @@ class networkPubaNetworkSpider(BaseSceneScraper):
         item = SceneItem()
 
         item['title'] = string.capwords(html.unescape(meta['title']))
+        item['title'] = item['title'].replace("&amp;", "&")
         item['description'] = html.unescape(meta['title'])
+        item['description'] = item['description'].replace("&amp;", "&")
         item['performers'] = self.get_performers(response)
         item['id'] = meta['id']
         item['site'] = meta['site']
