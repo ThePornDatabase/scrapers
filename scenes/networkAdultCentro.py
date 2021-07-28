@@ -21,10 +21,17 @@ class networkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
     site = ''
 
+    # ~ sites = {
+        # ~ 'aussiefellatioqueens': 'https://aussiefellatioqueens.com',
+        # ~ 'mylifeinmiami': 'https://www.mylifeinmiami.com',
+        # ~ 'cospimps': 'https://cospimps.com',
+        # ~ 'jerkoffwithme': 'https://jerkoffwithme.com',
+    # ~ }
     sites = {
-        'mylifeinmiami': 'https://www.mylifeinmiami.com',
-        'cospimps': 'https://cospimps.com',
-        'jerkoffwithme': 'https://jerkoffwithme.com',
+        'https://aussiefellatioqueens.com',
+        'https://www.mylifeinmiami.com',
+        'https://cospimps.com',
+        'https://jerkoffwithme.com',
     }
 
     selector_map = {
@@ -40,16 +47,17 @@ class networkAdultCentroSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        link = ''
-        if self.site:
-            if self.site in self.sites:
-                link = self.sites[self.site]
+        # ~ link = ''
+        # ~ if self.site:
+            # ~ if self.site in self.sites:
+                # ~ link = self.sites[self.site]
         
-        if not link:
-            print(f'Scraper requires a site with -a site=xxxxx flag.')
-            print(f'Current available options are {self.sites}')
-            self.crawler.engine.close_spider(self, reason='No Site Selected')
-        else:
+        # ~ if not link:
+            # ~ print(f'Scraper requires a site with -a site=xxxxx flag.')
+            # ~ print(f'Current available options are {self.sites}')
+            # ~ self.crawler.engine.close_spider(self, reason='No Site Selected')
+        # ~ else:
+        for link in self.sites:
             yield scrapy.Request(link + '/videos/', callback=self.start_requests_2, meta={'link':link})
 
     def start_requests_2(self, response):
@@ -103,6 +111,8 @@ class networkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "jerkoff" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "aussiefellatio" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
         return self.format_url(base, page_url.format(page))
 
     def get_scenes(self, response):
@@ -120,7 +130,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             # ~ print(json_formatted_str)  
             if "miami" in response.url:
                 scene_id = scene['_typedParams']['id']
-            if "cospimps" in response.url or "jerkoff" in response.url:
+            if "cospimps" in response.url or "jerkoff" in response.url or "aussiefellatio" in response.url:
                 scene_id = scene['id']
             scene_url = self.format_url(response.url, '/sapi/' + meta['token'] + '/content.load?_method=content.load&tz=-4&filter[id][fields][0]=id&filter[id][values][0]=%s&limit=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[preset]=scene' % scene_id)
             yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
@@ -159,17 +169,25 @@ class networkAdultCentroSpider(BaseSceneScraper):
             tags = data['tags']['collection']
             for tag in tags:
                 tagname = tags[tag]['alias'].strip().title()
-                if tagname:
+                if tagname and "Model - " not in tagname:
                     item['tags'].append(tagname)
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url']
-        if "miami" in response.url:
+        if "miami" in response.url or "aussiefellatio" in response.url:
             item['trailer'] = data['_resources']['hoverPreview']
         if "cospimps" in response.url:
             item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
         if "jerkoff" in response.url:
             item['trailer'] = ''
+            
+        if "aussiefellatio" in response.url:
+            item['site'] = 'Aussie Fellatio Queens'
+            item['parent'] = 'Aussie Fellatio Queens'
+            item['network'] = 'Aussie Fellatio Queens'
+            modelurl = "https://aussiefellatioqueens.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
             
         if "jerkoff" in response.url:
             item['site'] = 'Jerk Off With Me'
