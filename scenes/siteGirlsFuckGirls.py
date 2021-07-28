@@ -2,7 +2,7 @@ import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
+### Uses Elevated-X CMS
 
 class siteGirlsFuckGirlsSpider(BaseSceneScraper):
     name = 'GirlsFuckGirls'
