@@ -275,7 +275,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             scenes = response.xpath(' | '.join(selectors)).getall()
 
         for scene in scenes:
-
             if "fantasymassage" in response.url:
                 site = scene.xpath(
                     './/div[@class="tlcSourceSite"]/span/a/text()').get().strip()
@@ -307,6 +306,10 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             image = re.search('(.*jpg)\?', image).group(1)
 
         if image is not None:
+            if "transform" in image:
+                image_xpath = response.xpath('//meta[@name="twitter:image"]/@content').get()
+                if image_xpath:
+                    image = image_xpath.strip()
             return self.format_link(response, image)
 
     def parse_scene(self, response):
@@ -365,9 +368,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             if 'date' in response.meta:
                 item['date'] = response.meta['date']
             elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['dateCreated']:
-                item['date'] = dateparser.parse(jsonlde['dateCreated']).isoformat()
+                item['date'] = dateparser.parse(jsonlde['dateCreated'],date_formats=['%Y-%m-%d']).isoformat()
             elif 'datePublished' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['datePublished']:
-                item['date'] = dateparser.parse(jsonlde['datePublished']).isoformat()
+                item['date'] = dateparser.parse(jsonlde['datePublished'],date_formats=['%Y-%m-%d']).isoformat()
             elif 'nudefightclub' in response.url:
                 date = response.xpath(
                     '//div[@class="updatedDate"]/b/following-sibling::text()').get()
@@ -382,7 +385,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 date2 = re.search('sceneReleaseDate\":\"(\d{4}-\d{2}-\d{2})', data2)
                 if date2:
                     date2 = date2.group(1)
-                    date2 = dateparser.parse(date2.strip()).isoformat()
+                    date2 = dateparser.parse(date2.strip(),date_formats=['%Y-%m-%d']).isoformat()
                     if item['date'] and date2 > item['date']:
                         item['date'] = date2
 
@@ -622,7 +625,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if not date:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
     
-        return dateparser.parse(date.strip()).isoformat()
+        return dateparser.parse(date.strip(), date-formats=['%m-%d-%Y','%Y-%m-%d']).isoformat()
 
     def get_title(self, response):
         title = self.process_xpath(
