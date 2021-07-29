@@ -118,3 +118,11 @@ class PefectGonzoSpider(BaseSceneScraper):
         else:
             return "Perfect Gonzo"
             
+
+    def get_url(self, response):
+        if '?nats' in response.url:
+            url = re.search('(.*)\?nats',response.url).group(1)
+        else:
+            url = response.url
+            
+        return url
