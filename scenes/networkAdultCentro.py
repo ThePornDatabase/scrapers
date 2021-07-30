@@ -19,18 +19,12 @@ from tpdb.items import SceneItem
 
 class networkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
-    site = ''
 
-    # ~ sites = {
-        # ~ 'aussiefellatioqueens': 'https://aussiefellatioqueens.com',
-        # ~ 'mylifeinmiami': 'https://www.mylifeinmiami.com',
-        # ~ 'cospimps': 'https://cospimps.com',
-        # ~ 'jerkoffwithme': 'https://jerkoffwithme.com',
-    # ~ }
     sites = {
         'https://aussiefellatioqueens.com',
         'https://www.mylifeinmiami.com',
         'https://cospimps.com',
+        'https://daddyscowgirl.com',
         'https://jerkoffwithme.com',
     }
 
@@ -113,6 +107,8 @@ class networkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "aussiefellatio" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "daddyscowgirl" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         return self.format_url(base, page_url.format(page))
 
     def get_scenes(self, response):
@@ -130,7 +126,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             # ~ print(json_formatted_str)  
             if "miami" in response.url:
                 scene_id = scene['_typedParams']['id']
-            if "cospimps" in response.url or "jerkoff" in response.url or "aussiefellatio" in response.url:
+            if "cospimps" in response.url or "jerkoff" in response.url or "aussiefellatio" in response.url or "daddyscowgirl" in response.url:
                 scene_id = scene['id']
             scene_url = self.format_url(response.url, '/sapi/' + meta['token'] + '/content.load?_method=content.load&tz=-4&filter[id][fields][0]=id&filter[id][values][0]=%s&limit=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[preset]=scene' % scene_id)
             yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
@@ -165,7 +161,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
                 performername = performers[performer]['alias'].strip().title()
                 if performername:
                     item['performers'].append(performername)
-        else:
+        elif "daddyscowgirl" not in response.url:
             tags = data['tags']['collection']
             for tag in tags:
                 tagname = tags[tag]['alias'].strip().title()
@@ -174,7 +170,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url']
-        if "miami" in response.url or "aussiefellatio" in response.url:
+        if "miami" in response.url or "aussiefellatio" in response.url or "daddyscowgirl" in response.url:
             item['trailer'] = data['_resources']['hoverPreview']
         if "cospimps" in response.url:
             item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
@@ -199,6 +195,13 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['site'] = 'My Life In Miami'
             item['parent'] = 'My Life In Miami'
             item['network'] = 'My Life In Miami'
+            item['performers'] = []
+            yield item
+            
+        if "daddyscowgirl" in response.url:
+            item['site'] = 'Daddys Cowgirl'
+            item['parent'] = 'Daddys Cowgirl'
+            item['network'] = 'Daddys Cowgirl'
             item['performers'] = []
             yield item
             
