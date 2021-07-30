@@ -165,6 +165,12 @@ link_to_info = {
         "contentText": movies_content_text,
         "v2": False
     },
+    "organic-shm-iev4iCh6": {
+        "site": "Stay Home MILF",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
 }
 
 
