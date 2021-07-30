@@ -5,6 +5,10 @@ from urllib.parse import urlparse
 import html
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+# Purely manual scraper...  save html from Fit18 index page into a text file
+# then point to it with "-a input='/FullPath/To/filename.txt" to import
+# (or obviously "-a input='c:\FullPath\To\filename.txt" on Windows)
+
 
 class siteFit18Spider(BaseSceneScraper):
     name = 'Fit18'
