@@ -26,6 +26,8 @@ class networkAdultCentroSpider(BaseSceneScraper):
         'https://cospimps.com',
         'https://daddyscowgirl.com',
         'https://jerkoffwithme.com',
+        'https://realagent.xxx',
+        'https://facialcasting.com',
     }
 
     selector_map = {
@@ -109,6 +111,11 @@ class networkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
         if "daddyscowgirl" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "realagent" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=extra&transitParameters[preset]=videos'
+        if "facialcasting" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+            
         return self.format_url(base, page_url.format(page))
 
     def get_scenes(self, response):
@@ -126,7 +133,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             # ~ print(json_formatted_str)  
             if "miami" in response.url:
                 scene_id = scene['_typedParams']['id']
-            if "cospimps" in response.url or "jerkoff" in response.url or "aussiefellatio" in response.url or "daddyscowgirl" in response.url:
+            else:
                 scene_id = scene['id']
             scene_url = self.format_url(response.url, '/sapi/' + meta['token'] + '/content.load?_method=content.load&tz=-4&filter[id][fields][0]=id&filter[id][values][0]=%s&limit=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[preset]=scene' % scene_id)
             yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
@@ -170,13 +177,16 @@ class networkAdultCentroSpider(BaseSceneScraper):
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url']
-        if "miami" in response.url or "aussiefellatio" in response.url or "daddyscowgirl" in response.url:
-            item['trailer'] = data['_resources']['hoverPreview']
+
         if "cospimps" in response.url:
             item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
-        if "jerkoff" in response.url:
+        if "facialcasting" in response.url:
+            item['trailer'] = "https://facialcasting.com/api/download/{}/hd1080/stream".format(item['id'])
+        elif "jerkoff" in response.url:
             item['trailer'] = ''
-            
+        else:
+            item['trailer'] = data['_resources']['hoverPreview']
+                        
         if "aussiefellatio" in response.url:
             item['site'] = 'Aussie Fellatio Queens'
             item['parent'] = 'Aussie Fellatio Queens'
@@ -205,11 +215,26 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = []
             yield item
             
+        if "realagent" in response.url:
+            item['site'] = 'Real Agent'
+            item['parent'] = 'Real Agent'
+            item['network'] = 'Real Agent'
+            item['performers'] = []
+            yield item
+            
         if "cospimps" in response.url:
             item['site'] = 'Cospimps'
             item['parent'] = 'Cospimps'
             item['network'] = 'Cospimps'
             modelurl = "https://cospimps.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "facialcasting" in response.url:
+            item['site'] = 'Facial Casting'
+            item['parent'] = 'Facial Casting'
+            item['network'] = 'Facial Casting'
+            modelurl = "https://facialcasting.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
