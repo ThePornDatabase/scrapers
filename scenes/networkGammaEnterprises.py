@@ -194,7 +194,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.maledigital.com',
         'https://www.maskurbate.com',
         'https://www.milkingtable.com',
-        'https://www.mommysgirl.com', 
+        # 'https://www.mommysgirl.com', Part of Adulttime API now
         'https://www.nachovidalhardcore.com',
         'https://www.nudefightclub.com',
         'https://www.outofthefamily.com',
