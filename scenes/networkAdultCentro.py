@@ -28,6 +28,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
         'https://dillionation.com',
         'https://katie71.com',
         'https://peghim.com',
+        'https://cleagaultier-official.com',
         'https://danidaniels.com',
         'https://santalatina.com',
         'https://porntugal.com',
@@ -155,6 +156,8 @@ class networkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[totalCount]=1&transitParameters[preset]=videos&transitParameters[v1]=OBoiu4zYsP'
         if "svenskaporrfilmer" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "cleagaultier" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
             
         return self.format_url(base, page_url.format(page))
 
@@ -280,6 +283,14 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
             item['performers'] = []
+            yield item
+            
+        if "cleagaultier" in response.url:
+            item['site'] = 'Clea Gaultier'
+            item['parent'] = 'Clea Gaultier'
+            item['network'] = 'Clea Gaultier'
+            item['performers'] = ['Clea Gaultier']
+            item['tags'] = []
             yield item
             
         if "realagent" in response.url:
