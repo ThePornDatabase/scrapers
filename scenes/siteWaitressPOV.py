@@ -20,7 +20,7 @@ class siteWaitressPOVSpider(BaseSceneScraper):
         'image': '//video/@poster',
         'performers': '//div[contains(@class,"details-list starring")]/div[contains(text(),"Starring")]/following-sibling::div/text()',
         'tags': '//div[contains(@class,"details-list categories")]/div[contains(text(),"Categories")]/following-sibling::div/text()',
-        'external_id': 'lid=(\d+)',
+        'external_id': '.*\/(.*?)\/.*?$',
         'trailer': '',
         'pagination': '/t2/show.php?a=2213_%s'
     }
