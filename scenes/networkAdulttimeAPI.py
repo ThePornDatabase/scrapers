@@ -25,6 +25,7 @@ def match_site(argument):
         'assholefever':'Asshole Fever',
         'austinwilde':'Austin Wilde',
         'biphoria':'BiPhoria',
+        'bethecuck':'Be The Cuck',
         'blueangellive':'Blue Angel Live',
         'burningangel':'Burning Angel',
         'buttplays':'Buttplays',
@@ -43,9 +44,11 @@ def match_site(argument):
         'gapeland':'Gapeland',
         'genderx':'Gender X',
         'girlcore':'Girlcore',
+        'girlsunderarrest':'Girls Under Arrest',
         'girlstryanal':'Girls Try Anal',
         'girlsway':'Girlsway',
         'hotmilfclub':'Hot MILF Club',
+        'isthisreal':'Is This Real',
         'lesbianfactor':'Lesbian Factor',
         'letsplaylez':'Lets Play Lez',
         'lezcuties':'Lez Cuties',
@@ -70,6 +73,7 @@ def match_site(argument):
         'puretaboo':'Pure Taboo',
         'roddaily':'Rod Daily',
         'samuelotoole':'Samuel Otoole',
+        'sistertrick':'Sister Trick',
         'sextapelesbians':'Sextape Lesbians',
         'sexwithkathianobili':'Sex With Kathia Nobili',
         'stagcollectivesolos':'Stag Collective Solos',
@@ -77,6 +81,7 @@ def match_site(argument):
         'sweetsophiemoone':'Sweet Sophie Moon',
         'tommydxxx':'Tommy D XXX',
         'transfixed':'Transfixed',
+        'trickyspa':'Tricky Spa',
         'TransgressiveFilms':'Transgressive Films',
         'truelesbian.com':'TrueLesbian.com',
         'trystanbull':'Trystan Bull',   
@@ -103,6 +108,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.evilangel.com',
         'https://www.genderx.com',
         'https://www.girlsway.com',
+        'https://www.isthisreal.com',
         'https://www.modeltime.com',
         'https://www.mommysgirl.com',
         'https://www.nextdoorstudios.com',
@@ -147,6 +153,13 @@ class AdultTimeAPISpider(BaseSceneScraper):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, 1), callback=self.parse_token,
                                  meta={'page': 0, 'url': link})
+
+
+    def get_next_page_url(self, base, page):
+        if "isthisreal" in base:
+            pagination = '/en/videos/page/%s'
+            
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def parse_token(self, response):
         match = re.search(r'\"apiKey\":\"(.*?)\"', response.text)
@@ -239,6 +252,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if 'modeltime' in referrerurl:
                 item['parent'] = "Model Time"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'isthisreal' in referrerurl:
+                item['parent'] = "Is This Real"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'mommysgirl' in referrerurl:
                 item['parent'] = "Mommys Girl"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
@@ -285,6 +301,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Agenderx%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20site_id%3A428&facets=%5B%22categories.name%22%2C%22actors.name%22%2C%22serie_name%22%2C%22length_range_15min%22%2C%22download_sizes%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Agenderx%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20site_id%3A428&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming"}]}'
         if 'girlsway' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22categories.name%22%2C%22availableOnSite%22%2C%22upcoming%22%2C%22sitename%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3Alesbianfactor%22%2C%22availableOnSite%3Aallgirlmassage%22%2C%22availableOnSite%3Awebyoung%22%2C%22availableOnSite%3Agirlsway%22%2C%22availableOnSite%3Asextapelesbians%22%2C%22availableOnSite%3Agirlstryanal%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Asquirtinglesbian%22%2C%22availableOnSite%3Aoldyounglesbianlove%22%2C%22availableOnSite%3Agirlcore%22%2C%22availableOnSite%3Awelikegirls%22%2C%22availableOnSite%3Alesbianrevenge%22%2C%22availableOnSite%3Amomsonmoms%22%2C%22availableOnSite%3Awheretheboysarent%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22availableOnSite%3Alesbianfactor%22%2C%22availableOnSite%3Aallgirlmassage%22%2C%22availableOnSite%3Awebyoung%22%2C%22availableOnSite%3Agirlsway%22%2C%22availableOnSite%3Asextapelesbians%22%2C%22availableOnSite%3Agirlstryanal%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Asquirtinglesbian%22%2C%22availableOnSite%3Aoldyounglesbianlove%22%2C%22availableOnSite%3Agirlcore%22%2C%22availableOnSite%3Awelikegirls%22%2C%22availableOnSite%3Alesbianrevenge%22%2C%22availableOnSite%3Amomsonmoms%22%2C%22availableOnSite%3Awheretheboysarent%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"}]}'
+        if 'isthisreal' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facets=%5B%22availableOnSite%22%2C%22sitename%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3Atrickyspa%22%2C%22availableOnSite%3Asextapelesbians%22%2C%22availableOnSite%3Agirlsunderarrest%22%2C%22availableOnSite%3Abethecuck%22%2C%22availableOnSite%3Asistertrick%22%2C%22availableOnSite%3Aisthisreal%22%5D%5D"},{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&hitsPerPage=1&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite"}]}'
         if 'modeltime' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3Amodeltime%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22availableOnSite%3Amodeltime%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"}]}'
         if 'mommysgirl' in referrer:
