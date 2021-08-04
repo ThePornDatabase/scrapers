@@ -133,7 +133,7 @@ class networkDaGFsSpider(BaseSceneScraper):
                 
         if not image or re.search('\/(p\d{1,2}\.jpg)', image):
             if meta['imageback']:
-                return meta['imageback'].strip()
+                return meta['imageback'].strip().replace(" ", "%20")
         else:
             return image.replace(" ", "%20")
 
