@@ -11,6 +11,10 @@ class DorcelClubSpider(BaseSceneScraper):
     start_urls = [
         'https://www.dorcelclub.com'
     ]
+    
+    headers = {
+        'Accept-Language': 'en-US,en',
+    }
 
     selector_map = {
         'title': '//h1/text()',
@@ -25,12 +29,12 @@ class DorcelClubSpider(BaseSceneScraper):
     }
 
     cookies = {
-        'dorcelclub': '0nr9fu12gpqns760pfnjdmnrkn',
-        'u': '608cd90e153f5ac560e',
+        'dorcelclub': 'c11g8qtdog2p7bhvf6ngr03iam',
+        'u': '6106b2e6adfab1e2538',
         'disclaimer2': 'xx'
     }
 
     def get_scenes(self, response):
         scenes = response.css('div.scene a.thumb::attr(href)').getall()
         for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), cookies=self.cookies, callback=self.parse_scene)
+            yield scrapy.Request(url=self.format_link(response, scene), cookies=self.cookies, callback=self.parse_scene, headers=self.headers)

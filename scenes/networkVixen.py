@@ -74,7 +74,7 @@ class VixenScraper(BaseSceneScraper):
 
         scene['id'] = data['id']
         scene['title'] = data['title']
-        scene['description'] = data['description']
+        scene['description'] = data['description'] if 'description' in data else ''
 
         site = data['site']
         if site.upper() in self.sites:
@@ -92,8 +92,9 @@ class VixenScraper(BaseSceneScraper):
             scene['performers'].append(model['name'])
 
         scene['tags'] = []
-        for tag in data['tags']:
-            scene['tags'].append(tag)
+        if data['tags']:
+            for tag in data['tags']:
+                scene['tags'].append(tag)
 
         largest = 0
         for image in data['images']['poster']:
@@ -153,7 +154,6 @@ query getFilteredVideos(
                 videoId
                 slug
                 title
-                description
                 site
                 releaseDate
                 tags

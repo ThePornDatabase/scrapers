@@ -194,7 +194,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.maledigital.com',
         'https://www.maskurbate.com',
         'https://www.milkingtable.com',
-        'https://www.mommysgirl.com', 
+        # 'https://www.mommysgirl.com', Part of Adulttime API now
         'https://www.nachovidalhardcore.com',
         'https://www.nudefightclub.com',
         'https://www.outofthefamily.com',
@@ -256,8 +256,33 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'trailer': '',
     }
 
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            totalpages = re.search('\"nbPages\":(\d+)', response.text)
+            if totalpages:
+                totalpages = int(totalpages.group(1))
+            else:
+                totalpages = 99999
+                
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages and response.meta['page'] <= totalpages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                url=self.get_next_page_url(response.url, meta['page'])
+                print('NEXT PAGE: ' + str(meta['page']) + "     (" + url + ")")
+                yield scrapy.Request(url,
+                                     callback=self.parse,
+                                     meta=meta,
+                                     headers=self.headers,
+                                     cookies=self.cookies)
+
     def get_scenes(self, response):
-        
         selectors = [
             "//div[@class='content']/ul[@class='sceneList']/li[contains(@class,'scene')]//a[contains(@class,'imgLink')]/@href",
             "//ul[@class='sceneList']/li[contains(@class,'sceneItem')]//a[contains(@class,'imgLink')]/@href",

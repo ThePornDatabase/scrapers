@@ -56,7 +56,8 @@ class NubilesSpider(BaseSceneScraper):
             if re.search('video\\/watch', link) is not None:
                 meta = {
                     'title': scene.css('.title a::text').get().strip(),
-                    'date': dateparser.parse(scene.css('.date::text').extract_first()).isoformat()
+                    'date': dateparser.parse(scene.css('.date::text').extract_first()).isoformat(),
+                    'site': scene.xpath('.//a[@class="site-link"]/text()').get().strip()
                 }
 
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)

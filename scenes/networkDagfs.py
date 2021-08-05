@@ -8,8 +8,12 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 def match_site(argument):
     match = {
+        'brokenbabes': "Broken Babes",
+        'brokenteens': "Broken Teens",
+        'brutalclips': "Brutal Clips",
         'bustygfsexposed': "Busty GFs Exposed",
         'dagfs': "dagfs",
+        'fhuta': "Fuck Her Up The Ass",
         'frenchgfs': "French GFs",
         'realasianexposed': "Real Asian Exposed",
         'realblackexposed': 'Real Black Exposed',
@@ -26,8 +30,12 @@ class networkDaGFsSpider(BaseSceneScraper):
     network = 'dagfs'
 
     start_urls = [
+        'https://brokenbabes.com',
+        'https://brokenteens.com',
+        'https://brutalclips.com',
         'https://bustygfsexposed.com',
         'https://dagfs.com',
+        'https://fhuta.com',
         'https://frenchgfs.com',
         'https://realasianexposed.com',
         'https://realblackexposed.com',
@@ -125,7 +133,7 @@ class networkDaGFsSpider(BaseSceneScraper):
                 
         if not image or re.search('\/(p\d{1,2}\.jpg)', image):
             if meta['imageback']:
-                return meta['imageback'].strip()
+                return meta['imageback'].strip().replace(" ", "%20")
         else:
             return image.replace(" ", "%20")
 

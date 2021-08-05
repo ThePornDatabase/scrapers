@@ -7,7 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class SubmissiveXSpider(BaseSceneScraper):
     name = 'SubmissiveX'
     network = 'Submissive X'
-    parent = 'Submissive X'
+
 
     start_urls = [
         'https://submissivex.com/',
@@ -32,5 +32,8 @@ class SubmissiveXSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
+        return "Submissive X"
+
+    def get_parent(self, response):
         return "Submissive X"
         

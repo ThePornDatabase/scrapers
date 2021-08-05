@@ -12,26 +12,33 @@ import time
 from datetime import datetime
 from tpdb.items import SceneItem
 
-# AdultCentro won't allow concurrent requests to multiple sites from what I cane tell
-# So you'll have to call this one at a time with a '-a site=xxxxxxx' flag
-# Site should equal one of the available keys
-
-
 class networkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
-    site = ''
 
-    # ~ sites = {
-        # ~ 'aussiefellatioqueens': 'https://aussiefellatioqueens.com',
-        # ~ 'mylifeinmiami': 'https://www.mylifeinmiami.com',
-        # ~ 'cospimps': 'https://cospimps.com',
-        # ~ 'jerkoffwithme': 'https://jerkoffwithme.com',
-    # ~ }
     sites = {
         'https://aussiefellatioqueens.com',
         'https://www.mylifeinmiami.com',
         'https://cospimps.com',
+        'https://daddyscowgirl.com',
         'https://jerkoffwithme.com',
+        'https://realagent.xxx',
+        'https://facialcasting.com',
+        'https://fallinlovia.com',
+        'https://bigjohnnyxxx.com',
+        'https://dillionation.com',
+        'https://katie71.com',
+        'https://peghim.com',
+        'https://cleagaultier-official.com',
+        'https://danidaniels.com',
+        'https://santalatina.com',
+        'https://porntugal.com',
+        'https://trinitystclair.com',
+        'https://aussiexxxhookups.com',
+        'https://svenskaporrfilmer.net',
+        'https://ninnworx.com',
+        'https://therealscarletred.com',
+        'https://psychohenessy.com',
+        'https://natashanice.com',
     }
 
     selector_map = {
@@ -113,6 +120,45 @@ class networkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "aussiefellatio" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "daddyscowgirl" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "realagent" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=extra&transitParameters[preset]=videos'
+        if "facialcasting" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "fallinlovia" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "bigjohnnyxxx" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "dillionation" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "natashanice" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=natashahomemade&transitParameters[preset]=videos'
+        if "katie71" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "peghim" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "danidaniels" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[socialParams]=likes&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "santalatina" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "psychohenessy" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "ninnworx" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[socialParams]=likes&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "therealscarletred" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[socialParams]=likes&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "porntugal" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if "trinitystclair" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "aussiexxxhookups" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[totalCount]=1&transitParameters[preset]=videos&transitParameters[v1]=OBoiu4zYsP'
+        if "svenskaporrfilmer" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "cleagaultier" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+            
         return self.format_url(base, page_url.format(page))
 
     def get_scenes(self, response):
@@ -121,16 +167,10 @@ class networkAdultCentroSpider(BaseSceneScraper):
         jsondata = json.loads(response.text)
         jsondata = jsondata['response']['collection']
 
-        # ~ json_formatted_str = json.dumps(jsondata, indent=2)
-        # ~ print(json_formatted_str)      
-        # ~ print(response.text)  
-
         for scene in jsondata:
-            # ~ json_formatted_str = json.dumps(scene, indent=2)
-            # ~ print(json_formatted_str)  
             if "miami" in response.url:
                 scene_id = scene['_typedParams']['id']
-            if "cospimps" in response.url or "jerkoff" in response.url or "aussiefellatio" in response.url:
+            else:
                 scene_id = scene['id']
             scene_url = self.format_url(response.url, '/sapi/' + meta['token'] + '/content.load?_method=content.load&tz=-4&filter[id][fields][0]=id&filter[id][values][0]=%s&limit=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[preset]=scene' % scene_id)
             yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
@@ -147,9 +187,6 @@ class networkAdultCentroSpider(BaseSceneScraper):
         except:
             print(f'JSON Data: {jsondata}')
 
-        # ~ json_formatted_str = json.dumps(data, indent=2)
-        # ~ print(json_formatted_str)        
-
         data = data['response']['collection'][0]
 
         item['id'] = data['id']
@@ -157,15 +194,20 @@ class networkAdultCentroSpider(BaseSceneScraper):
         item['description'] = html.unescape(data['description'].strip())
         item['date'] = dateparser.parse(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
 
-        item['performers'] = []
+        if "fallinlovia" in response.url:
+            item['performers'] = ['Eva Lovia']
+        else:
+            item['performers'] = []
+            
         item['tags'] = []
-        if "jerkoff" in response.url:
+        
+        if "jerkoff" in response.url or "dillionation" in response.url:
             performers = data['tags']['collection']
             for performer in performers:
                 performername = performers[performer]['alias'].strip().title()
                 if performername:
                     item['performers'].append(performername)
-        else:
+        elif "daddyscowgirl" not in response.url and "fallinlovia" not in response.url:
             tags = data['tags']['collection']
             for tag in tags:
                 tagname = tags[tag]['alias'].strip().title()
@@ -174,18 +216,40 @@ class networkAdultCentroSpider(BaseSceneScraper):
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url']
-        if "miami" in response.url or "aussiefellatio" in response.url:
-            item['trailer'] = data['_resources']['hoverPreview']
+
         if "cospimps" in response.url:
             item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
-        if "jerkoff" in response.url:
+        if "facialcasting" in response.url:
+            item['trailer'] = "https://facialcasting.com/api/download/{}/hd1080/stream".format(item['id'])
+        elif "jerkoff" in response.url:
             item['trailer'] = ''
+        else:
+            item['trailer'] = data['_resources']['hoverPreview']
             
+        if not item['trailer']:
+            item['trailer'] = ''
+                        
         if "aussiefellatio" in response.url:
             item['site'] = 'Aussie Fellatio Queens'
             item['parent'] = 'Aussie Fellatio Queens'
             item['network'] = 'Aussie Fellatio Queens'
             modelurl = "https://aussiefellatioqueens.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+                        
+        if "aussiexxxhookups" in response.url:
+            item['site'] = 'Aussie XXX Hookups'
+            item['parent'] = 'Aussie XXX Hookups'
+            item['network'] = 'Aussie XXX Hookups'
+            modelurl = "https://aussiexxxhookups.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+                        
+        if "svenskaporrfilmer" in response.url:
+            item['site'] = 'Svenska Porrfilmer'
+            item['parent'] = 'Svenska Porrfilmer'
+            item['network'] = 'Svenska Porrfilmer'
+            modelurl = "https://svenskaporrfilmer.net/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
             
@@ -195,6 +259,18 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['network'] = 'Jerk Off With Me'
             yield item
             
+        if "fallinlovia" in response.url:
+            item['site'] = 'Fall in Lovia'
+            item['parent'] = 'Fall in Lovia'
+            item['network'] = 'Fall in Lovia'
+            yield item
+            
+        if "dillionation" in response.url:
+            item['site'] = 'Dillion Harper'
+            item['parent'] = 'Dillion Harper'
+            item['network'] = 'Dillion Harper'
+            yield item
+            
         if "miami" in response.url:
             item['site'] = 'My Life In Miami'
             item['parent'] = 'My Life In Miami'
@@ -202,11 +278,124 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = []
             yield item
             
+        if "daddyscowgirl" in response.url:
+            item['site'] = 'Daddys Cowgirl'
+            item['parent'] = 'Daddys Cowgirl'
+            item['network'] = 'Daddys Cowgirl'
+            item['performers'] = []
+            yield item
+            
+        if "cleagaultier" in response.url:
+            item['site'] = 'Clea Gaultier'
+            item['parent'] = 'Clea Gaultier'
+            item['network'] = 'Clea Gaultier'
+            item['performers'] = ['Clea Gaultier']
+            item['tags'] = []
+            yield item
+            
+        if "realagent" in response.url:
+            item['site'] = 'Real Agent'
+            item['parent'] = 'Real Agent'
+            item['network'] = 'Real Agent'
+            item['performers'] = []
+            yield item
+            
+        if "trinitystclair" in response.url:
+            item['site'] = 'Trinity St Clair'
+            item['parent'] = 'Trinity St Clair'
+            item['network'] = 'Trinity St Clair'
+            modelurl = "https://trinitystclair.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "psychohenessy" in response.url:
+            item['site'] = 'Psycho Henessy'
+            item['parent'] = 'Psycho Henessy'
+            item['network'] = 'Psycho Henessy'
+            modelurl = "https://psychohenessy.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "porntugal" in response.url:
+            item['site'] = 'Porntugal'
+            item['parent'] = 'Porntugal'
+            item['network'] = 'Porntugal'
+            modelurl = "https://porntugal.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "ninnworx" in response.url:
+            item['site'] = 'Ninn Worx'
+            item['parent'] = 'Ninn Worx'
+            item['network'] = 'Ninn Worx'
+            modelurl = "https://ninnworx.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "therealscarletred" in response.url:
+            item['site'] = 'Scarlet Red'
+            item['parent'] = 'Scarlet Red'
+            item['network'] = 'Scarlet Red'
+            modelurl = "https://therealscarletred.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "santalatina" in response.url:
+            item['site'] = 'Santa Latina'
+            item['parent'] = 'Santa Latina'
+            item['network'] = 'Santa Latina'
+            item['performers'] = []
+            yield item
+            
+        if "bigjohnnyxxx" in response.url:
+            item['site'] = 'Big Johnny XXX'
+            item['parent'] = 'Big Johnny XXX'
+            item['network'] = 'Big Johnny XXX'
+            item['performers'] = []
+            yield item
+            
+        if "danidaniels" in response.url:
+            item['site'] = 'Dani Daniels'
+            item['parent'] = 'Dani Daniels'
+            item['network'] = 'Dani Daniels'
+            item['performers'] = ['Dani Daniels']
+            item['tags'] = []
+            yield item
+            
+        if "peghim" in response.url:
+            item['site'] = 'PegHim'
+            item['parent'] = 'PegHim'
+            item['network'] = 'PegHim'
+            item['performers'] = []
+            yield item
+            
+        if "katie71" in response.url:
+            item['site'] = 'Katie71'
+            item['parent'] = 'Katie71'
+            item['network'] = 'Katie71'
+            item['performers'] = ['Katie71']
+            yield item
+            
+        if "natashanice" in response.url:
+            item['site'] = 'Natasha Nice'
+            item['parent'] = 'Natasha Nice'
+            item['network'] = 'Natasha Nice'
+            item['performers'] = ['Natasha Nice']
+            yield item
+            
         if "cospimps" in response.url:
             item['site'] = 'Cospimps'
             item['parent'] = 'Cospimps'
             item['network'] = 'Cospimps'
             modelurl = "https://cospimps.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            
+        if "facialcasting" in response.url:
+            item['site'] = 'Facial Casting'
+            item['parent'] = 'Facial Casting'
+            item['network'] = 'Facial Casting'
+            modelurl = "https://facialcasting.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
@@ -221,5 +410,14 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = performers
         else:
             item['performers'] = []
+        
+        if "psychohenessy" in response.url:
+            item['performers'].append('Henessy')
+        
+        if "therealscarletred" in response.url:
+            item['performers'].append('Scarlet Red')
+        
+        if "trinitystclair" in response.url:
+            item['performers'].append('Trinity St Clair')
         
         yield item

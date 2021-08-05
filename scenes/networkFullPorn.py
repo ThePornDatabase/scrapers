@@ -35,24 +35,25 @@ class FullPornNetworkSpider(BaseSceneScraper):
     name = 'FullPorn'
     network = 'Full Porn Network'
 
+    # Recently several of the sites have put their scene info behind paywalls
     start_urls = [
-        'https://analbbc.com',
+        # ~ 'https://analbbc.com',
         'https://analized.com',
-        'https://analviolation.com',
+        # ~ 'https://analviolation.com',
         'https://baddaddypov.com',
         'https://downtofuckdating.com/',
         'https://dtfsluts.com',
         'https://girlfaction.com',
-        'https://hergape.com',
-        'https://homemadeanalwhores.com',
+        # ~ 'https://hergape.com',
+        # ~ 'https://homemadeanalwhores.com',
         'https://jamesdeen.com',
         'https://mugfucked.com',
         'https://onlyprince.com',
         'https://pervertgallery.com',
         'https://povperverts.net',
-        'https://teenageanalsluts.com',
+        # ~ 'https://teenageanalsluts.com',
         'https://twistedvisual.com',
-        'https://yourmomdoesanal.com',
+        # ~ 'https://yourmomdoesanal.com',
         'https://yourmomdoesporn.com',
     ]
 
@@ -87,7 +88,7 @@ class FullPornNetworkSpider(BaseSceneScraper):
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
         if trailer:
-            return domain + trailer
+            return (domain + trailer).replace(" ","%20")
         
         return ''
         
