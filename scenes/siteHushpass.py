@@ -38,5 +38,5 @@ class HushpassSpider(BaseSceneScraper):
             if trailer:
                 trailer = "https://hushpass.com" + \
                     re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
-                return trailer
+                return trailer.replace(" ", "%20")
         return ''
