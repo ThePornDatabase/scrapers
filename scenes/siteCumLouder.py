@@ -1,6 +1,5 @@
 import re
 
-import dateparser
 import scrapy
 from dateutil.relativedelta import relativedelta
 import dateparser
