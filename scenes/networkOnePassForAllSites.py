@@ -5,6 +5,37 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+# ~ Sites included in this network:
+# ~ "18 Virgin Sex"
+# ~ "Creampied Sweeties"
+# ~ "Daddies And Darlings"
+# ~ "Dirty Ass 2 Mouth"
+# ~ "Dirty Daddys Girls"
+# ~ "Dirty Home Vids"
+# ~ "Do My Wife Slut"
+# ~ "Drilled Mouths"
+# ~ "Frisky Baby Sitters"
+# ~ "Horny In Hospital"
+# ~ "I Fucked Her Finally"
+# ~ "Lovely Teen Land"
+# ~ "Milfs On Sticks"
+# ~ "Mommies Do Bunnies"
+# ~ "Old Goes Young"
+# ~ "Old Young Anal"
+# ~ "Shabby Virgins"
+# ~ "She Made Us Lesbians"
+# ~ "Spoiled Virgins"
+# ~ "Strapon Service"
+# ~ "Tricky Old Teacher"
+# ~ "Wild Young Honeys"
+# ~ "Young Anal Tryouts"
+# ~ "Young And Banged"
+# ~ "Young Cum Gulpers"
+# ~ "Young Lesbians Portal"
+# ~ "Young Models Casting"
+# ~ "Young Porn Home Video"
+
+
 
 class OnePassForAllSitesSpider(BaseSceneScraper):
     name = 'OnePassForAllSites'
@@ -40,6 +71,8 @@ class OnePassForAllSitesSpider(BaseSceneScraper):
     def get_image(self, response):
         image = self.process_xpath(
             response, self.get_selector_map('image')).get()
+        if not image:
+            image = response.xpath('//div[@class="movie-wrapper"]/div[@id="join"]/@data-poster').get()
         if not image:
             image = "http://1passforallsites.com/media/thumbs/movie_tn.jpg"
 
