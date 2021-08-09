@@ -8,8 +8,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class OrgasmAbuseSpider(BaseSceneScraper):
     name = 'OrgasmAbuse'
     network = 'Orgasm Abuse'
-    parent = 'Orgasm Abuse'
-    site = 'Orgasm Abuse'
+
 
     start_urls = [
         'https://www.orgasmabuse.com/'
@@ -60,5 +59,12 @@ class OrgasmAbuseSpider(BaseSceneScraper):
         if image:
             image = re.search('url\(\/\/(.*.jpe?g)', image).group(1)
             if image:
-                return image
-        return self.format_link(response, image)
+                return "https://" + image.strip()
+        return ''
+
+    def get_site(self, response):
+        return "Orgasm Abuse"
+        
+    def get_parent(self, response):
+        return "Orgasm Abuse"
+        
