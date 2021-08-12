@@ -84,7 +84,7 @@ def match_site(argument):
         'transfixed':'Transfixed',
         'trickyspa':'Tricky Spa',
         'TransgressiveFilms':'Transgressive Films',
-        'truelesbian.com':'TrueLesbian.com',
+        'truelesbian.com':'True Lesbian',
         'trystanbull':'Trystan Bull',   
         'webyoung':'Web Young',
         'welikegirls':'We Like Girls',
