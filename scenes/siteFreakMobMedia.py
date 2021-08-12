@@ -1,0 +1,39 @@
+import scrapy
+import re
+
+from tpdb.BaseSceneScraper import BaseSceneScraper
+
+
+class siteFreakMobMediaSpider(BaseSceneScraper):
+    name = 'FreakMobMedia'
+    network = 'Freak Mob Media'
+
+
+    start_urls = [
+        'https://www.freakmobmedia.com/',
+    ]
+
+    selector_map = {
+        'title': '//div[@class="title"]/div[@class="heading"]/h3[not(contains(text(),"Suggestions"))]/text()',
+        'description': '//div[@class="description"]/text()',
+        'date': '//meta[@property="article:published_time"]/@content',
+        'image': '//meta[@property="og:image"]/@content',
+        'performers': '//span[@class="meta-info" and contains(text(),"Model")]/following-sibling::a/text()',
+        'tags': '//div[@class="post-info"]//a/text()',
+        'external_id': '.*\/(.*?)\/',
+        'trailer': '//script[contains(text(),"var jw")]/text()',
+        're_trailer': '.*(https.*?\.(?:mp4|mov)).*',
+        'pagination': '/page/%s/'
+    }
+
+    def get_scenes(self, response):
+        scenes = response.xpath('//div[@class="itemsarea"]/div[@class="item"]/div[@class="item-thumb"]/a/@href').getall()
+        for scene in scenes:
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+    def get_site(self, response):
+        return "Freak Mob Media"
+
+    def get_parent(self, response):
+        return "Freak Mob Media"
