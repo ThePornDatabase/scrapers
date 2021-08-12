@@ -22,7 +22,7 @@ class siteFreakMobMediaSpider(BaseSceneScraper):
         'tags': '//div[@class="post-info"]//a/text()',
         'external_id': '.*\/(.*?)\/',
         'trailer': '//script[contains(text(),"var jw")]/text()',
-        're_trailer': '.*(https.*?\.(?:mp4|mov)).*',
+        're_trailer': '.*(http.*?\.(?:mp4|mov)).*',
         'pagination': '/page/%s/'
     }
 
@@ -37,3 +37,14 @@ class siteFreakMobMediaSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Freak Mob Media"
+
+    def get_trailer(self, response):
+        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
+            trailer = self.process_xpath(response, self.get_selector_map('trailer'))
+            if trailer:
+                trailer = self.get_from_regex(trailer.get(), 're_trailer')
+                if trailer:
+                    trailer = trailer.replace("www. freakmobmedia", "www.freakmobmedia").replace("///","//").replace("////","//")
+                    return trailer.replace(" ", "%20")
+
+        return ''
