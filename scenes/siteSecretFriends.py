@@ -15,7 +15,7 @@ class SecretFriendsSpider(BaseSceneScraper):
     # newer updates
 
     paginations = [
-        '/portal/videos?q=&website=4Kcfnm&niche=&page=2#page-%s',
+        '/portal/videos?q=&website=4Kcfnm&niche=&page=%s',
         '/portal/videos?q=&website=BBvideo&niche=&page=%s',
         '/portal/videos?q=&website=BeautyAndTheSenior&niche=&page=%s',
         '/portal/videos?q=&website=ClubBangBoys&niche=&page=%s',

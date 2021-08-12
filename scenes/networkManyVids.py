@@ -26,6 +26,7 @@ class networkManyVidsSpider(BaseSceneScraper):
         ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Jay Bank Presents'],
         ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Undercover Sluts'],
         ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Submissive Teen POV'],
+        ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Sloppy Toppy'],
     ]
     
     selector_map = {

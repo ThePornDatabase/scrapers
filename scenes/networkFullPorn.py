@@ -13,6 +13,12 @@ def match_site(argument):
         'analized': 'Analized',
         'analviolation': 'Anal Violation',
         'baddaddypov': 'Bad Daddy POV',
+        'badfamilypov': 'Bad Family POV',
+        'badmommypov': 'Bad Mommy POV',
+        'mommyjoi': 'Mommy JOI',
+        'badsisterpov': 'Bad Sister POV',
+        'sisterjoi': 'Sister JOI',
+        'daughterjoi': 'Daughter JOI',
         'downtofuckdating': 'DTF Dating',
         'dtfsluts': 'DTF Sluts',
         'girlfaction': 'Girl Faction',
@@ -37,23 +43,24 @@ class FullPornNetworkSpider(BaseSceneScraper):
 
     # Recently several of the sites have put their scene info behind paywalls
     start_urls = [
-        # ~ 'https://analbbc.com',
+        #'https://analbbc.com',
         'https://analized.com',
-        # ~ 'https://analviolation.com',
-        'https://baddaddypov.com',
+        #'https://analviolation.com',
+        #'https://baddaddypov.com',
+        'https://badfamilypov.com',
         'https://downtofuckdating.com/',
         'https://dtfsluts.com',
         'https://girlfaction.com',
-        # ~ 'https://hergape.com',
-        # ~ 'https://homemadeanalwhores.com',
+        #'https://hergape.com',
+        #'https://homemadeanalwhores.com',
         'https://jamesdeen.com',
         'https://mugfucked.com',
         'https://onlyprince.com',
         'https://pervertgallery.com',
         'https://povperverts.net',
-        # ~ 'https://teenageanalsluts.com',
+        #'https://teenageanalsluts.com',
         'https://twistedvisual.com',
-        # ~ 'https://yourmomdoesanal.com',
+        #'https://yourmomdoesanal.com',
         'https://yourmomdoesporn.com',
     ]
 
@@ -93,6 +100,27 @@ class FullPornNetworkSpider(BaseSceneScraper):
         return ''
         
     def get_site(self, response):
+        if "badfamily" in response.url:
+            trailerstring = response.xpath('//video/source/@src').get()
+            if trailerstring:
+                trailerstring = trailerstring.lower()
+                trailerstring = re.search('upload\/(.*)\/', trailerstring)
+                if trailerstring:
+                    trailerstring = trailerstring.group(1)
+                    if "bdp_joi" in trailerstring:
+                        return "Daughter JOI"
+                    if "bdp_" in trailerstring:
+                        return "Bad Daddy POV"
+                    if "bmp_joi" in trailerstring:
+                        return "Mommy JOI"
+                    if "bmp_" in trailerstring:
+                        return "Bad Mommy POV"
+                    if "bbpov_joi" in trailerstring:
+                        return "Sister JOI"
+                    if "bbpov_" in trailerstring:
+                        return "Bad Sister POV"
+                
+        
         parsed_uri = tldextract.extract(response.url)
         if parsed_uri.domain == "elxcomplete":
             domain = parsed_uri.subdomain
