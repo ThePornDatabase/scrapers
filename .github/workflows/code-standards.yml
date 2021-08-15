@@ -1,4 +1,4 @@
-name: 'Submodule Notify Parent'
+name: 'Code Standards'
 
 on:
   pull_request:
