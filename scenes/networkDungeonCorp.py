@@ -50,7 +50,7 @@ class networkDungeonCorpSpider(BaseSceneScraper):
             else:
                 pagelimit = int(self.limit_pages) * 10
         for line in javascript.split("\r\n"):
-            if "<td>" in line.lower() and "javascript" not in line.lower() and "updates.html" not in line.lower():
+            if "<td>" in line.lower() and "javascript" not in line.lower() and "updates.html" not in line.lower() and "http://join." not in line.lower():
                 counter += 1
                 if counter <= pagelimit:
 
@@ -69,7 +69,7 @@ class networkDungeonCorpSpider(BaseSceneScraper):
                         meta['date'] = dateparser.parse(date, date_formats=['%m.%d.%Y']).isoformat()
                         performers = line_sel.xpath('//span[@class="modelname"]/text()').get()
                         if "and" in performers.lower():
-                            performers = performers.split("and")
+                            performers = performers.split(" and ")
                         else:
                             performers = [performers]
                         meta['performers'] = list(map(lambda x: x.replace("  "," ").strip(), performers))
@@ -114,8 +114,11 @@ class networkDungeonCorpSpider(BaseSceneScraper):
         if image:
             image = image.get()
             image = image.replace("..","")
-            if image == "vidt1.jpg" or image == "vidt.jpg":
-                image = response.url.replace("index.html","") + image
+            if "vidt1.jpg" in image:
+                image = response.url.replace("index.html","vidt1.jpg").replace("index.php","vidt1.jpg")
+            if "vidt.jpg" in image:
+                image = response.url.replace("index.html","vidt.jpg").replace("index.php","vidt.jpg")
+                
             image = self.format_link(response, image)
             return image.replace(" ", "%20")
         else:
