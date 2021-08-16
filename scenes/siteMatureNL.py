@@ -68,6 +68,8 @@ class siteMatureNLSpider(BaseSceneScraper):
             image = response.xpath('//div[@class="box-cnt"]//a[@class="mfp-image"]/@href')
             if image:
                 image = image.get().strip()
+            else:
+                image = ''
                     
         return image
         
