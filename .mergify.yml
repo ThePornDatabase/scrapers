@@ -1,0 +1,45 @@
+pull_request_rules: 
+  - name: automatic update for PR
+    conditions:
+      - base=main
+      - -merged
+      - -closed
+      - check-success=Code Standards
+    actions:
+      update:
+
+  - name: update pr and assign
+    conditions:
+      - base=main
+      - -merged
+      - -closed
+      - check-success=Code Standards
+      - label!=conflict
+    actions:
+      assign:
+        add_users:
+          - chalupabatman69
+      update:
+
+  - name: warn on conflicts
+    conditions:
+      - conflict
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: "@{{author}} this pull request is now in conflict 😩"
+      label:
+        add:
+          - conflict
+      assign:
+        remove_users:
+          - chalupabatman69
+
+  - name: remove conflict label if not needed
+    conditions:
+      - -conflict
+    actions:
+      label:
+        remove:
+          - conflict
