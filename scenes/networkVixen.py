@@ -13,12 +13,12 @@ class VixenScraper(BaseSceneScraper):
     network = 'vixen'
 
     start_urls = [
-        # ~ 'https://www.vixen.com',
-        # ~ 'https://www.blacked.com',
-        # ~ 'https://www.tushy.com',
-        # ~ 'https://www.blackedraw.com',
-        # ~ 'https://www.tushyraw.com',
-        # ~ 'https://www.deeper.com',
+        'https://www.vixen.com',
+        'https://www.blacked.com',
+        'https://www.tushy.com',
+        'https://www.blackedraw.com',
+        'https://www.tushyraw.com',
+        'https://www.deeper.com',
         'https://www.slayed.com',
     ]
 
