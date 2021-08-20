@@ -57,8 +57,20 @@ class NubilesSpider(BaseSceneScraper):
                 meta = {
                     'title': scene.css('.title a::text').get().strip(),
                     'date': dateparser.parse(scene.css('.date::text').extract_first()).isoformat(),
-                    'site': scene.xpath('.//a[@class="site-link"]/text()').get().strip()
                 }
+                if "brattysis" in response.url:
+                    meta['site'] = "Bratty Sis"
+                elif "anilos" in response.url:
+                    meta['site'] = "Anilos"
+                elif "deeplush" in response.url:
+                    meta['site'] = "Deep Lush"
+                elif "nfbusty" in response.url:
+                    meta['site'] = "NF Busty"
+                elif "nubiles.net" in response.url:
+                    meta['site'] = "Nubiles"
+                else:
+                    meta['site'] = scene.xpath('.//a[@class="site-link"]/text()').get().strip()
+                    
 
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
