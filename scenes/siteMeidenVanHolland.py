@@ -4,6 +4,8 @@ import json
 import codecs
 import html
 import dateparser
+from tpdb.items import SceneItem
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 def match_tag(argument):
@@ -177,4 +179,71 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Meiden Van Holland"
+        
+        
+    def parse_scene(self, response):
+        item = SceneItem()
+
+        if 'title' in response.meta and response.meta['title']:
+            item['title'] = response.meta['title']
+        else:
+            item['title'] = self.get_title(response)
+
+        if 'description' in response.meta:
+            item['description'] = response.meta['description']
+        else:
+            item['description'] = self.get_description(response)
+
+        if 'site' in response.meta:
+            item['site'] = response.meta['site']
+        else:
+            item['site'] = self.get_site(response)
+
+        if 'date' in response.meta:
+            item['date'] = response.meta['date']
+        else:
+            item['date'] = self.get_date(response)
+
+        if 'image' in response.meta:
+            item['image'] = response.meta['image']
+        else:
+            item['image'] = self.get_image(response)
+
+        if 'performers' in response.meta:
+            item['performers'] = response.meta['performers']
+        else:
+            item['performers'] = self.get_performers(response)
+
+        if 'tags' in response.meta:
+            item['tags'] = response.meta['tags']
+        else:
+            item['tags'] = self.get_tags(response)
+
+        if 'id' in response.meta:
+            item['id'] = response.meta['id']
+        else:
+            item['id'] = self.get_id(response)
+
+        if 'trailer' in response.meta:
+            item['trailer'] = response.meta['trailer']
+        else:
+            item['trailer'] = self.get_trailer(response)
+
+        item['url'] = self.get_url(response)
+
+        if hasattr(self, 'network'):
+            item['network'] = self.network
+        else:
+            item['network'] = self.get_network(response)
+
+        if hasattr(self, 'parent'):
+            item['parent'] = self.parent
+        else:
+            item['parent'] = self.get_parent(response)
+
+        if item['title'] and item['id']:
+            if self.debug:
+                print(item)
+            else:
+                yield item        
         
