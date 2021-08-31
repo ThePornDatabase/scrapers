@@ -51,6 +51,17 @@ class networkTwoWebMediaSpider(BaseSceneScraper):
          title = super().get_title(response)
          title =  re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
          return string.capwords(title).replace("  ", " ")
+    
+    def get_image(self, response):
+        imageurl = super().get_image(response)
+        if not imageurl:
+            image = response.xpath('//div[contains(@class,"wpfp_custom_background")]/@style')
+            if image:
+                image = image.get()
+                image = re.search('.*(http.*?\.jpg).*', image)
+                if image:
+                    imageurl = image.group(1)
+        return imageurl.strip()
 
     def get_site(self, response):
         site = super().get_site(response)
