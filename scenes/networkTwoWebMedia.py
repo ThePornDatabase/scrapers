@@ -2,6 +2,7 @@ import scrapy
 import re
 import dateparser
 import string
+import html
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class networkTwoWebMediaSpider(BaseSceneScraper):
@@ -48,9 +49,15 @@ class networkTwoWebMediaSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date})
 
     def get_title(self, response):
-         title = super().get_title(response)
-         title =  re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
-         return string.capwords(title).replace("  ", " ")
+        title = self.process_xpath(response, self.get_selector_map('title'))
+        if title:
+            title = self.get_from_regex(title.get(), 're_title')
+        title = title.replace("'", "")        
+        title = title.replace(u"\u2019", "")
+        title = title.replace(" & ", " and ")
+        title = re.sub(r'&#\d+;', '', title)
+        title =  re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
+        return string.capwords(html.unescape(title.strip())).replace("  ", " ")
     
     def get_image(self, response):
         imageurl = super().get_image(response)
