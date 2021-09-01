@@ -45,7 +45,7 @@ class siteAmericanPornstarSpider(BasePerformerScraper):
             item['ethnicity'] = ''
             item['eyecolor'] = ''
             item['fakeboobs'] = ''
-            item['gender'] = ''
+            item['gender'] = 'Female'
             item['haircolor'] = ''
             item['height'] = ''
             item['measurements'] = ''
