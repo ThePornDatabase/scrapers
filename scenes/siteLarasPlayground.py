@@ -1,4 +1,3 @@
-import scrapy
 import string
 import html
 import dateparser
@@ -8,6 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 class sitLarasPlaygroundSpider(BaseSceneScraper):
+
     name = 'LarasPlayground'
     network = 'Laras Playground'
     max_pages = 35
@@ -33,13 +33,16 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
         if response.meta['page'] < self.max_pages:
             for scene in scenes:
                 item = SceneItem()
-                title = scene.xpath(r'./div/div[@class="serie_tekst"]/strong/text()').get()
+                title = scene.xpath(r'./div/div[@class="serie_tekst"]'
+                                    '/strong/text()').get()
                 if title:
                     item['title'] = html.unescape(string.capwords(title))
                 else:
                     item['title'] = ''
 
-                description = scene.xpath(r'./div/div[@class="serie_tekst"]/strong/following-sibling::text()').get()
+                description = scene.xpath(r'./div/div[@class="serie_tekst"]'
+                                        '/strong/following-sibling::text()'
+                                        ).get()
                 if description:
                     item['description'] = html.unescape(description)
                 else:
@@ -49,7 +52,9 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
                 item['tags'] = []
                 item['date'] = dateparser.parse('today').isoformat()
 
-                image = scene.xpath(r'./div/div[@class="serie_pic01"]/img/@src').get()
+                image = scene.xpath(
+                            r'./div/div[@class="serie_pic01"]/img/@src'
+                            ).get()
                 if image:
                     item['image'] = image.strip()
                 else:

@@ -43,7 +43,7 @@ class siteMatureNLSpider(BaseSceneScraper):
 
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene),
-                                callback=self.parse_scene)
+                                     callback=self.parse_scene)
 
     def get_site(self, response):
         return "Mature NL"
@@ -80,7 +80,7 @@ class siteMatureNLSpider(BaseSceneScraper):
             date = date.get()
         if not date or not re.search(r'(\d{1,2}-\d{1,2}-\d{4})', date):
             date = response.xpath(
-                    r'//div[@class="container update-bg-container"]' 
+                    r'//div[@class="container update-bg-container"]'
                     '/div[@class="box"][1]/div[@class="box-cnt"]/div[1]')
             if date:
                 date = date.get()
@@ -96,9 +96,9 @@ class siteMatureNLSpider(BaseSceneScraper):
     def get_title(self, response):
         title = super().get_title(response)
         if "watch this scene exclusively" in title.lower():
-            newtitle = response.xpath(r'//div[@class="box-cnt"]' 
-                    '//div[@class="grid-tile-model"]' 
-                    '/div[@class="name"]/span/text()')
+            newtitle = response.xpath(r'//div[@class="box-cnt"]'
+                                      '//div[@class="grid-tile-model"]'
+                                      '/div[@class="name"]/span/text()')
             if newtitle:
                 newtitle = newtitle.getall()
                 newtitle = " and ".join(newtitle)
