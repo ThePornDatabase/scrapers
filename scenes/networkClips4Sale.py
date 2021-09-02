@@ -41,6 +41,9 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Watch Me Audition', 'Watch Me Audition', '/studio/80069/watch-me-audition/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Jerky Girls', 'Jerky Girls', '/studio/2511/jerky-girls/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Mind Under Master', 'Mind Under Master', '/studio/118498/mind-under-master/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Xev Bellringer', 'Xev Bellringer', '/studio/75701/xev-bellringer/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Jerky Wives', 'Jerky Wives', '/studio/28671/jerky-wives-/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Bareback Studios', 'Bareback Studios', '/studio/35625/bare-back-studios/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -132,16 +135,22 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("wmv", "")
             title = title.replace(" xxx", "")
             title = title.replace(" mp4", "")
+            title = title.replace("(.mp4)", "")
             title = title.replace("(hd)", "")
             title = title.replace("(1080)", "")
             title = title.replace("(1080hd)", "")
             title = title.replace("(1080 )", "")
             title = title.replace(" 1080", "")
             title = title.replace("(4k)", "")
+            title = title.replace(" 4k", "")
+            title = title.replace("(hd-)", "")
+            title = title.replace("hd-", "")
+            title = title.replace("(hd-4k)", "")
             title = title.replace(" optimum", "")
             title = title.replace("1080p", "")
             title = title.replace("1080p", "")
             title = title.replace("720p", "")
+            title = title.replace("()", "")
             # ~ title = title.replace(" - ", "")
             if re.match(r'.*\(.*? discounted\)', title):
                 title = re.sub(r'(.*)\(.*? discounted\)(.*)', r'\1 \2', title)

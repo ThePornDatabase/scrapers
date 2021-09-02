@@ -35,6 +35,7 @@ def match_site(argument):
         'currycreampie': "Curry Creampie",
         'darkx': "DarkX",
         'devilsgangbangs': "Devils Gangbangs",
+        'devilstgirls': "Devils TGirls",
         'dpfanatics': "DPFanatics",
         'dylanlucas': "Dylan Lucas",
         'eroticax': "EroticaX",
@@ -174,6 +175,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.cumshotoasis.com',
         'https://www.currycreampie.com',
         'https://www.devilsgangbangs.com',
+        'https://www.devilstgirls.com',
         'https://www.dpfanatics.com', 
         'https://www.falconstudios.com',
         'https://www.footsiebabes.com',
@@ -500,6 +502,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'devilsfilm' in base:
             selector = '/en/scenes/AllCategories/0/%s'
+
+        if 'devilstgirls' in base:
+            selector = '/en/videos/updates/%s/All/0/Actor/0'
 
         if 'dpfanatics' in base:
             selector = '/en/videos/All-Categories/0/All-Pornstars/0/latest/%s'
