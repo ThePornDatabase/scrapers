@@ -23,4 +23,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           filter_mode: file
           fail_on_error: true
-          flake8_args: "--ignore=E305,E501,E722"
+          flake8_args: "--ignore E305,E501,E722"
