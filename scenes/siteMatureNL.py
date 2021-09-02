@@ -18,9 +18,9 @@ class siteMatureNLSpider(BaseSceneScraper):
         'date_formats': [r'%d-%m-%Y'],
         'image': r'//span[@id="spnPageUpdateTrailer"]//img/@data-src',
         'performers':
-            r'//div[@class="box-cnt"]//div[@class="grid-tile-model"]' \
+            r'//div[@class="box-cnt"]//div[@class="grid-tile-model"]'
             '/div[@class="name"]/span/text()',
-        'tags': r'//div[@class="box-cnt"]' \
+        'tags': r'//div[@class="box-cnt"]'
             '//a[contains(@href, "/niche/")]/text()',
         'external_id': r'update\/(\d+)\/',
         'trailer': r'//script[contains(text(),"showTrailer")]/text()',
@@ -43,7 +43,7 @@ class siteMatureNLSpider(BaseSceneScraper):
 
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene),
-                            callback=self.parse_scene)
+                                callback=self.parse_scene)
 
     def get_site(self, response):
         return "Mature NL"
