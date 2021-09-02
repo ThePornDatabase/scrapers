@@ -25,7 +25,7 @@ class siteMatureNLSpider(BaseSceneScraper):
         'external_id': r'update\/(\d+)\/',
         'trailer': r'//script[contains(text(),"showTrailer")]/text()',
         're_trailer': r'\"(http.*?\.mp4)\"',
-        'pagination': r'/en/updates/%s'
+        'pagination': '/en/updates/%s'
     }
 
     def get_scenes(self, response):

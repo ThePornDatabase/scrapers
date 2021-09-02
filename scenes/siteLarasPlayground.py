@@ -1,7 +1,7 @@
 import scrapy
 import string
 import html
-import dateparser 
+import dateparser
 import re
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -11,21 +11,20 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
     name = 'LarasPlayground'
     network = 'Laras Playground'
     max_pages = 35
-    
+
     start_urls = [
         'https://www.larasplayground.com'
     ]
 
-
     selector_map = {
-        'title': '//h1[contains(@class, "title")]/text()',
-        'description': '//p[contains(@class, "description")]/text()',
-        'performers': '//span[contains(@class,"models")]/a/text()',
-        'date': '//div[contains(@class, "date")]/text()',
-        'image': '//meta[@property="og:image"]/@content',
-        'tags': '//div[contains(@class, "video-tags")]/a/text()',
+        'title': r'//h1[contains(@class, "title")]/text()',
+        'description': r'//p[contains(@class, "description")]/text()',
+        'performers': r'//span[contains(@class,"models")]/a/text()',
+        'date': r'//div[contains(@class, "date")]/text()',
+        'image': r'//meta[@property="og:image"]/@content',
+        'tags': r'//div[contains(@class, "video-tags")]/a/text()',
         'trailer': '',
-        'external_id': 'trailers/(.*)\.html',
+        'external_id': r'trailers/(.*)\.html',
         'pagination': '/index.php?page=%s'
     }
 
@@ -34,13 +33,12 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
         if response.meta['page'] < self.max_pages:
             for scene in scenes:
                 item = SceneItem()
-                
                 title = scene.xpath('./div/div[@class="serie_tekst"]/strong/text()').get()
                 if title:
                     item['title'] = html.unescape(string.capwords(title))
                 else:
                     item['title'] = ''
-                
+
                 description = scene.xpath('./div/div[@class="serie_tekst"]/strong/following-sibling::text()').get()
                 if description:
                     item['description'] = html.unescape(description)
@@ -50,7 +48,7 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
                 item['performers'] = ['Lara Latex']
                 item['tags'] = []
                 item['date'] = dateparser.parse('today').isoformat()
-                
+
                 image = scene.xpath('./div/div[@class="serie_pic01"]/img/@src').get()
                 if image:
                     item['image'] = image.strip()
