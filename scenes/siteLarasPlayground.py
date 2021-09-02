@@ -17,12 +17,12 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': r'//h1[contains(@class, "title")]/text()',
-        'description': r'//p[contains(@class, "description")]/text()',
-        'performers': r'//span[contains(@class,"models")]/a/text()',
-        'date': r'//div[contains(@class, "date")]/text()',
-        'image': r'//meta[@property="og:image"]/@content',
-        'tags': r'//div[contains(@class, "video-tags")]/a/text()',
+        'title': '//h1[contains(@class, "title")]/text()',
+        'description': '//p[contains(@class, "description")]/text()',
+        'performers': '//span[contains(@class,"models")]/a/text()',
+        'date': '//div[contains(@class, "date")]/text()',
+        'image': '//meta[@property="og:image"]/@content',
+        'tags': '//div[contains(@class, "video-tags")]/a/text()',
         'trailer': '',
         'external_id': r'trailers/(.*)\.html',
         'pagination': '/index.php?page=%s'

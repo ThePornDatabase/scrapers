@@ -11,19 +11,19 @@ class siteMatureNLSpider(BaseSceneScraper):
         'https://www.mature.nl',
     ]
     selector_map = {
-        'title': r'//h1/text()',
-        'description': r'//meta[@name="description"]/@content',
-        'date': r'//div[@class="box-cnt"]/div[@class="mar-t"][1]/text()[1]',
+        'title': '//h1/text()',
+        'description': '//meta[@name="description"]/@content',
+        'date': '//div[@class="box-cnt"]/div[@class="mar-t"][1]/text()[1]',
         're_date': r'(\d{1,2}-\d{1,2}-\d{4})',
-        'date_formats': [r'%d-%m-%Y'],
-        'image': r'//span[@id="spnPageUpdateTrailer"]//img/@data-src',
+        'date_formats': ['%d-%m-%Y'],
+        'image': '//span[@id="spnPageUpdateTrailer"]//img/@data-src',
         'performers':
-            r'//div[@class="box-cnt"]//div[@class="grid-tile-model"]'
+            '//div[@class="box-cnt"]//div[@class="grid-tile-model"]'
             '/div[@class="name"]/span/text()',
-        'tags': r'//div[@class="box-cnt"]'
+        'tags': '//div[@class="box-cnt"]'
             '//a[contains(@href, "/niche/")]/text()',
         'external_id': r'update\/(\d+)\/',
-        'trailer': r'//script[contains(text(),"showTrailer")]/text()',
+        'trailer': '//script[contains(text(),"showTrailer")]/text()',
         're_trailer': r'\"(http.*?\.mp4)\"',
         'pagination': '/en/updates/%s'
     }

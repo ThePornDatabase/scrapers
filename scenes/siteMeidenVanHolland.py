@@ -48,16 +48,16 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
     }
 
     selector_map = {
-        'title': r'//script[contains(text(),"NUXT")]/text()',
-        're_title': r'video:\{title:\"(.*?)\"',
-        'description': r'//script[contains(text(),"NUXT")]/text()',
+        'title': '//script[contains(text(),"NUXT")]/text()',
+        're_title': 'video:\{title:\"(.*?)\"',
+        'description': '//script[contains(text(),"NUXT")]/text()',
         're_description': r'description:\"(.*?)\"',
-        'date': r'//script[contains(text(),"NUXT")]/text()',
+        'date': '//script[contains(text(),"NUXT")]/text()',
         're_date': r'pivot_data:\{active_from:\"(\d{4}-\d{2}-\d{2})',
-        'image': r'//meta[@name="og:image"]/@content',
-        'performers': r'//script[contains(text(),"NUXT")]/text()',
+        'image': '//meta[@name="og:image"]/@content',
+        'performers': '//script[contains(text(),"NUXT")]/text()',
         're_performers': r'models:\[(.*?)\]',
-        'tags': r'//script[contains(text(),"NUXT")]/text()',
+        'tags': '//script[contains(text(),"NUXT")]/text()',
         'external_id': r'sexfilms\/(.*)',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html#'

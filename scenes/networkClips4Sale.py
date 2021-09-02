@@ -55,7 +55,7 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '',
         'tags': '//span[@class="relatedCatLinks"]/span/a/text()',
-        'external_id': 'studio\/.*\/(\d+)\/',
+        'external_id': r'studio\/.*\/(\d+)\/',
         'trailer': '',
         'pagination': '/studio/37354/babes-in-trouble/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/'
     }
@@ -72,13 +72,12 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             meta['get_performers'] = site[4]
             meta['search_string'] = site[5]
             meta['page'] = self.page
-            
+
             yield scrapy.Request(url=self.get_next_page_url(link, self.page, meta['pagination']),
                                  callback=self.parse,
                                  meta=meta,
                                  headers=self.headers,
                                  cookies=self.cookies)
-                                 
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -96,11 +95,10 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)             
-                                     
+                                     cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
-        url = self.format_url(base, pagination % page)                                                        
+        url = self.format_url(base, pagination % page)
         return url
 
     def get_scenes(self, response):
@@ -167,7 +165,6 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             title = string.capwords(title)
             return title.strip()
         return ''
-
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -258,10 +255,7 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
                     
                 return performers
 
-
         return []
-                
-                
 
     def get_description(self, response):
         desc_rows = self.process_xpath(response, self.get_selector_map('description')).getall()
@@ -276,8 +270,6 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
 
         return ''                
 
-
-
     def get_site(self, response):
         meta = response.meta
         if meta['site']:
@@ -285,14 +277,12 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             
         return tldextract.extract(response.url).domain
 
-
     def get_parent(self, response):
         meta = response.meta
         if meta['parent']:
             return meta['parent']
             
         return tldextract.extract(response.url).domain
-
 
     def get_network(self, response):
         meta = response.meta
