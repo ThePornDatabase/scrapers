@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 import html
 import string
 import scrapy
@@ -10,7 +9,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class siteBabesInTroubleSpider(BaseSceneScraper):
     name = 'Clips4Sale'
-    
+
     sites = [
         ['Clips4Sale', 'Primal', 'Primal\'s Custom XXX', '/studio/107990/primals-custom-videos/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Primal', 'Primal\'s Girls Grappling', '/studio/46940/primal-s-girl-s-grappling/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
@@ -173,7 +172,7 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             if tags:
                 return list(map(lambda x: x.strip().title(), tags))
         return []
-        
+
     def get_performers(self,response):
         meta = response.meta
         if meta['get_performers']:
@@ -183,29 +182,29 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             if title:
                 if re.match(r'^\w+ \w+ in .*', title.lower()):
                     title = re.sub(r'^(\w+ \w+) in (.*)', r'\1 - \2', title.lower())
-                    
+
                 if re.match(r'^\w+ \w+ - .*', title):
                     performers = re.search(r'^(\w+ \w+) - .*', title).group(1)
                     performers = [performers]
-                    
+
                 if re.match(r'^\w+ \w+ & \w+ \w+ - .*', title):
                     performers = re.search(r'^(\w+ \w+ & \w+ \w+) - .*', title).group(1)
                     performers = performers.split("&")
-                    
+
                 if re.match(r'^\w+ \w+ and \w+ \w+ - .*', title.lower()):
                     title = title.lower()
                     performers = re.search(r'^(\w+ \w+ and \w+ \w+) - .*', title).group(1)
                     performers = performers.split("and")
-                    
+
                 if re.match(r'^\w+ \w+ & \w+ \w+ in .*', title):
                     performers = re.search(r'^(\w+ \w+ & \w+ \w+) in .*', title).group(1)
                     performers = performers.split("&")
-                    
+
                 if re.match(r'^\w+ \w+ and \w+ \w+ in .*', title.lower()):
                     title = title.lower()
                     performers = re.search(r'^(\w+ \w+ and \w+ \w+) in .*', title).group(1)
                     performers = performers.split("and")
-            
+
             if performers:
                 performers = list(map(lambda x: x.strip().title(), performers))
                 if "Wonder Woman" in performers:
@@ -252,7 +251,7 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
                         performers.remove(performer)
                 if "" in performers:
                     performers.remove("")
-                    
+
                 return performers
 
         return []
@@ -267,26 +266,22 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
                         if not re.search('(\d{3,4}\*\d{3,4})', desc):
                             description = description + " " + desc.strip()
             return html.unescape(description.strip())
-
         return ''                
 
     def get_site(self, response):
         meta = response.meta
         if meta['site']:
             return meta['site']
-            
         return tldextract.extract(response.url).domain
 
     def get_parent(self, response):
         meta = response.meta
         if meta['parent']:
             return meta['parent']
-            
         return tldextract.extract(response.url).domain
 
     def get_network(self, response):
         meta = response.meta
         if meta['network']:
             return meta['network']
-            
         return tldextract.extract(response.url).domain
