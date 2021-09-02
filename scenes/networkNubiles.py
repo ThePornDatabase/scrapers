@@ -40,7 +40,8 @@ class NubilesSpider(BaseSceneScraper):
         'title': '//*[contains(@class, "content-pane-title")]/h2/text()',
         'description': '.row .collapse::text',
         'date': '//span[@class="date"]/text()',
-        'image': '//video/@poster | //img[@class="fake-video-player-cover"]/@src',
+        'image': '//video/@poster | '
+                 '//img[@class="fake-video-player-cover"]/@src',
         'performers': '//a[@class="content-pane-performer model"]/text()',
         'tags': '//*[@class="categories"]//a/text()',
         'external_id': '(\\d+)',
@@ -55,7 +56,9 @@ class NubilesSpider(BaseSceneScraper):
             if re.search('video\\/watch', link) is not None:
                 meta = {
                     'title': scene.css('.title a::text').get().strip(),
-                    'date': dateparser.parse(scene.css('.date::text').extract_first()).isoformat(),
+                    'date': dateparser.parse(
+                                scene.css('.date::text')
+                                .extract_first()).isoformat(),
                 }
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
@@ -68,8 +71,12 @@ class NubilesSpider(BaseSceneScraper):
                 elif "nubiles.net" in response.url:
                     meta['site'] = "Nubiles"
                 else:
-                    meta['site'] = scene.xpath('.//a[@class="site-link"]/text()').get().strip()
-                yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
+                    meta['site'] = scene.xpath(
+                                './/a[@class="site-link"]/text()'
+                                ).get().strip()
+                yield scrapy.Request(
+                                url=self.format_link(response, link)
+                                , callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         site = response.xpath(
@@ -90,7 +97,10 @@ class NubilesSpider(BaseSceneScraper):
         description = self.process_xpath(
             response, self.get_selector_map('description')).get()
         if not description or not len(description.strip()):
-            description = response.xpath('//div[contains(@class,"content-pane-column")]/div/p/text()').getall()
+            description = response.xpath(
+                            '//div[contains(@class,'
+                            '"content-pane-column")]/div/p/text()'
+                            ).getall()
             if description:
                 description = " ".join(description)
         if description is not None:
