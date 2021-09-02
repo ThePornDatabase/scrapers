@@ -1,5 +1,4 @@
 import re
-
 import dateparser
 import scrapy
 
@@ -70,8 +69,6 @@ class NubilesSpider(BaseSceneScraper):
                     meta['site'] = "Nubiles"
                 else:
                     meta['site'] = scene.xpath('.//a[@class="site-link"]/text()').get().strip()
-                    
-
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
@@ -86,20 +83,16 @@ class NubilesSpider(BaseSceneScraper):
         page = (page - 1) * 10
         return self.format_url(
             base, self.get_selector_map('pagination') % page)
-            
+
     def get_description(self, response):
         if 'description' not in self.get_selector_map():
             return ''
-
         description = self.process_xpath(
             response, self.get_selector_map('description')).get()
-
         if not description or not len(description.strip()):
             description = response.xpath('//div[contains(@class,"content-pane-column")]/div/p/text()').getall()
             if description:
                 description = " ".join(description)
-
         if description is not None:
             return description.replace('Description:', '').strip()
-            
-        return ""            
+        return ""
