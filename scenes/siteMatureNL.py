@@ -80,7 +80,7 @@ class siteMatureNLSpider(BaseSceneScraper):
             date = date.get()
         if not date or not re.search(r'(\d{1,2}-\d{1,2}-\d{4})', date):
             date = response.xpath(
-                    r'//div[@class="container update-bg-container"]'\
+                    r'//div[@class="container update-bg-container"]' \
                     '/div[@class="box"][1]/div[@class="box-cnt"]/div[1]')
             if date:
                 date = date.get()
