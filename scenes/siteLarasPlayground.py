@@ -29,17 +29,17 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="serie"]')
+        scenes = response.xpath(r'//div[@class="serie"]')
         if response.meta['page'] < self.max_pages:
             for scene in scenes:
                 item = SceneItem()
-                title = scene.xpath('./div/div[@class="serie_tekst"]/strong/text()').get()
+                title = scene.xpath(r'./div/div[@class="serie_tekst"]/strong/text()').get()
                 if title:
                     item['title'] = html.unescape(string.capwords(title))
                 else:
                     item['title'] = ''
 
-                description = scene.xpath('./div/div[@class="serie_tekst"]/strong/following-sibling::text()').get()
+                description = scene.xpath(r'./div/div[@class="serie_tekst"]/strong/following-sibling::text()').get()
                 if description:
                     item['description'] = html.unescape(description)
                 else:
@@ -49,7 +49,7 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
                 item['tags'] = []
                 item['date'] = dateparser.parse('today').isoformat()
 
-                image = scene.xpath('./div/div[@class="serie_pic01"]/img/@src').get()
+                image = scene.xpath(r'./div/div[@class="serie_pic01"]/img/@src').get()
                 if image:
                     item['image'] = image.strip()
                 else:
@@ -60,7 +60,7 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
                 item['parent'] = "Laras Playground"
                 item['network'] = "Laras Playground"
 
-                extern_id = re.search('.*\/(\d+)\/.*?\.jpg', item['image'])
+                extern_id = re.search(r'.*\/(\d+)\/.*?\.jpg', item['image'])
                 if extern_id:
                     item['id'] = extern_id.group(1).strip()
 
