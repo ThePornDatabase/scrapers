@@ -75,8 +75,8 @@ class NubilesSpider(BaseSceneScraper):
                                 './/a[@class="site-link"]/text()'
                                 ).get().strip()
                 yield scrapy.Request(
-                                url=self.format_link(response, link)
-                                , callback=self.parse_scene, meta=meta)
+                                url=self.format_link(response, link),
+                                callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         site = response.xpath(

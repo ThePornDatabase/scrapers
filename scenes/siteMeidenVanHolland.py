@@ -1,12 +1,12 @@
 import scrapy
 import re
-import json
 import codecs
 import html
 import dateparser
 from tpdb.items import SceneItem
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+
 
 def match_tag(argument):
     match = {
@@ -32,40 +32,40 @@ def match_tag(argument):
     }
     return match.get(argument, '')
 
+
 class siteMedienVanHolldandSpider(BaseSceneScraper):
     name = 'MeidenVanHolland'
     network = 'Meiden Van Holland'
 
-
     base_url = 'https://meidenvanholland.nl'
-    
+
     headers_json = {
         'accept': 'application/json, text/plain, */*',
-        'credentials': 'Syserauth 1-5d73b3eb1647d9e91a9d7280777c4aefe4d25efa1367f5bc5bd03121415038ac-6128070c',
+        'credentials': 'Syserauth 1-5d73b3eb1647d9e91a9d7280777c4aef'
+                        'e4d25efa1367f5bc5bd03121415038ac-6128070c',
         'origin': 'https://meidenvanholland.nl',
         'referer': 'https://meidenvanholland.nl',
     }
 
     selector_map = {
-        'title': '//script[contains(text(),"NUXT")]/text()',
-        're_title': 'video:\{title:\"(.*?)\"',
-        'description': '//script[contains(text(),"NUXT")]/text()',
-        're_description': 'description:\"(.*?)\"',
-        'date': '//script[contains(text(),"NUXT")]/text()',
-        're_date': 'pivot_data:\{active_from:\"(\d{4}-\d{2}-\d{2})',
-        'image': '//meta[@name="og:image"]/@content',
-        'performers': '//script[contains(text(),"NUXT")]/text()',
-        're_performers': 'models:\[(.*?)\]',
-        'tags': '//script[contains(text(),"NUXT")]/text()',
-        'external_id': 'sexfilms\/(.*)',
+        'title': r'//script[contains(text(),"NUXT")]/text()',
+        're_title': r'video:\{title:\"(.*?)\"',
+        'description': r'//script[contains(text(),"NUXT")]/text()',
+        're_description': r'description:\"(.*?)\"',
+        'date': r'//script[contains(text(),"NUXT")]/text()',
+        're_date': r'pivot_data:\{active_from:\"(\d{4}-\d{2}-\d{2})',
+        'image': r'//meta[@name="og:image"]/@content',
+        'performers': r'//script[contains(text(),"NUXT")]/text()',
+        're_performers': r'models:\[(.*?)\]',
+        'tags': r'//script[contains(text(),"NUXT")]/text()',
+        'external_id': r'sexfilms\/(.*)',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html#'
     }
-    
+
     def get_next_page_url(self, base, page):
         url = "https://api.sysero.nl/videos?page={}&count=20&include=images:types(thumb):limit(1|0),products,categories&filter[status]=published&filter[products]=1%2C2&filter[types]=video&sort[recommended_at]=DESC&frontend=1"
         return self.format_url(base, url.format(page))
-        
 
     def start_requests(self):
         yield scrapy.Request(url=self.get_next_page_url(self.base_url, self.page),
@@ -73,14 +73,13 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                              meta={'page': self.page},
                              headers=self.headers_json,
                              cookies=self.cookies)
-    
+
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
             count += 1
             yield scene
-
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta = response.meta
@@ -101,7 +100,6 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                 scene_url = "https://meidenvanholland.nl/sexfilms/" + jsonentry['attributes']['slug']
                 yield scrapy.Request(url=self.format_link(response, scene_url), callback=self.parse_scene)
 
-
     def get_performers(self, response):
         performers = self.process_xpath(response, self.get_selector_map('performers'))
         if performers:
@@ -111,10 +109,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                 performers = performers.group(1)
                 performers = re.findall('title:\"(.*?)\"', performers)
                 return list(map(lambda x: x.strip(), performers))
-
         return []
-    
-
 
     def get_tags(self, response):
         tags = self.process_xpath(response, self.get_selector_map('tags'))
@@ -130,9 +125,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                     if found_tag:
                         tags2.append(found_tag)
                 return list(map(lambda x: x.strip().title(), tags2))
-
         return []
-    
 
     def get_description(self, response):
         if 'description' not in self.get_selector_map():
@@ -150,9 +143,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                 description = re.sub('<[^<]+?>', '', description).strip()
                 description = re.sub('[^a-zA-Z0-9\-_ \.\?\!]','', description)
                 return html.unescape(description.strip())
-
         return ''
-        
 
     def get_date(self, response):
         datestring = self.process_xpath(response, self.get_selector_map('date'))
@@ -169,18 +160,14 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                 return dateparser.parse(date).isoformat()
             else:
                 return dateparser.parse('today').isoformat()
-
         return None
-        
-                
 
     def get_site(self, response):
         return "Meiden Van Holland"
 
     def get_parent(self, response):
         return "Meiden Van Holland"
-        
-        
+
     def parse_scene(self, response):
         item = SceneItem()
 
@@ -245,5 +232,4 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
             if self.debug:
                 print(item)
             else:
-                yield item        
-        
+                yield item

@@ -6,8 +6,8 @@ import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-class sitLarasPlaygroundSpider(BaseSceneScraper):
 
+class sitLarasPlaygroundSpider(BaseSceneScraper):
     name = 'LarasPlayground'
     network = 'Laras Playground'
     max_pages = 35
@@ -41,8 +41,8 @@ class sitLarasPlaygroundSpider(BaseSceneScraper):
                     item['title'] = ''
 
                 description = scene.xpath(r'./div/div[@class="serie_tekst"]'
-                                        '/strong/following-sibling::text()'
-                                        ).get()
+                                          '/strong/following-sibling::text()'
+                                          ).get()
                 if description:
                     item['description'] = html.unescape(description)
                 else:
