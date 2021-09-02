@@ -42,7 +42,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
     headers_json = {
         'accept': 'application/json, text/plain, */*',
         'credentials': 'Syserauth 1-5d73b3eb1647d9e91a9d7280777c4aef'
-                        'e4d25efa1367f5bc5bd03121415038ac-6128070c',
+                       'e4d25efa1367f5bc5bd03121415038ac-6128070c',
         'origin': 'https://meidenvanholland.nl',
         'referer': 'https://meidenvanholland.nl',
     }
@@ -64,11 +64,15 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page):
-        url = "https://api.sysero.nl/videos?page={}&count=20&include=images:types(thumb):limit(1|0),products,categories&filter[status]=published&filter[products]=1%2C2&filter[types]=video&sort[recommended_at]=DESC&frontend=1"
+        url = "https://api.sysero.nl/videos?page={}&count=20&include=images"
+              ":types(thumb):limit(1|0),products,categories&filter[status]="
+              "published&filter[products]=1%2C2&filter[types]=video&sort"
+              "[recommended_at]=DESC&frontend=1"
         return self.format_url(base, url.format(page))
 
     def start_requests(self):
-        yield scrapy.Request(url=self.get_next_page_url(self.base_url, self.page),
+        yield scrapy.Request(url=self.get_next_page_url(
+                             self.base_url, self.page),
                              callback=self.parse,
                              meta={'page': self.page},
                              headers=self.headers_json,
@@ -81,15 +85,17 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
             count += 1
             yield scene
         if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+            if 'page' in response.meta and response.meta['page'] 
+                                           < self.limit_pages:
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']),
+                yield scrapy.Request(url=self.get_next_page_url(
+                                     response.url, meta['page']),
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers_json,
-                                     cookies=self.cookies)                             
+                                     cookies=self.cookies)
 
     def get_scenes(self, response):
         global json
@@ -97,14 +103,19 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         data = jsondata['data']
         for jsonentry in data:
             if jsonentry['attributes']['slug']:
-                scene_url = "https://meidenvanholland.nl/sexfilms/" + jsonentry['attributes']['slug']
-                yield scrapy.Request(url=self.format_link(response, scene_url), callback=self.parse_scene)
+                scene_url = "https://meidenvanholland.nl/sexfilms/" 
+                            + jsonentry['attributes']['slug']
+                yield scrapy.Request(url=self.format_link(response, scene_url),
+                                     callback=self.parse_scene)
 
     def get_performers(self, response):
-        performers = self.process_xpath(response, self.get_selector_map('performers'))
+        performers = self.process_xpath(response, 
+                                        self.get_selector_map('performers'))
         if performers:
             performers = performers.get()
-            performers = re.search(',models:\[(.*id:\".*?)\],preroll', performers)
+            performers = re.search(
+                                ',models:\[(.*id:\".*?)\],preroll',
+                                performers)
             if performers:
                 performers = performers.group(1)
                 performers = re.findall('title:\"(.*?)\"', performers)
@@ -131,9 +142,11 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         if 'description' not in self.get_selector_map():
             return ''
 
-        description = self.process_xpath(response, self.get_selector_map('description'))
+        description = self.process_xpath(response, 
+                                         self.get_selector_map('description'))
         if description:
-            description = self.get_from_regex(description.get(), 're_description')
+            description = self.get_from_regex(description.get(), 
+                                              're_description')
 
             if description:
                 try:
