@@ -2,6 +2,7 @@ import scrapy
 import re
 import codecs
 import html
+import json
 import dateparser
 from tpdb.items import SceneItem
 
@@ -64,7 +65,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page):
-        url = 'https://api.sysero.nl/videos?page={}&count=20&include=images'
+        url = 'https://api.sysero.nl/videos?page={}&count=20&include=images' \
             ':types(thumb):limit(1|0),products,categories&filter' \
             '[status]=published&filter[products]=1%2C2&filter[types]' \
             '=video&sort[recommended_at]=DESC&frontend=1'
