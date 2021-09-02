@@ -65,9 +65,9 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page):
         url = 'https://api.sysero.nl/videos?page={}&count=20&include=images'
-                ':types(thumb):limit(1|0),products,categories&filter' \
-                '[status]=published&filter[products]=1%2C2&filter[types]' \
-                '=video&sort[recommended_at]=DESC&frontend=1'
+              ':types(thumb):limit(1|0),products,categories&filter' \
+              '[status]=published&filter[products]=1%2C2&filter[types]' \
+              '=video&sort[recommended_at]=DESC&frontend=1'
         return self.format_url(base, url.format(page))
 
     def start_requests(self):
@@ -86,7 +86,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
             yield scene
         if count:
             if 'page' in response.meta \
-                and response.meta['page'] < self.limit_pages:
+                    and response.meta['page'] < self.limit_pages:
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
