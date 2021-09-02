@@ -110,7 +110,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                                      callback=self.parse_scene)
 
     def get_performers(self, response):
-        performers = self.process_xpath(response, 
+        performers = self.process_xpath(response,
                                         self.get_selector_map('performers'))
         if performers:
             performers = performers.get()
@@ -155,17 +155,20 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                 except Exception:
                     description = re.sub(r'\\u00\d[a-fA-F]', '', description)
                 description = re.sub(r'<[^<]+?>', '', description).strip()
-                description = re.sub(r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
+                description = re.sub(
+                                r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
                 return html.unescape(description.strip())
         return ''
 
     def get_date(self, response):
-        datestring = self.process_xpath(response, self.get_selector_map('date'))
+        datestring = self.process_xpath(
+                        response, self.get_selector_map('date'))
         if datestring:
             datestring = datestring.get()
             date = self.get_from_regex(datestring, 're_date')
             if not date:
-                date = re.search(r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
+                date = re.search(
+                            r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
                 if date:
                     date = date.group(1)
                 
