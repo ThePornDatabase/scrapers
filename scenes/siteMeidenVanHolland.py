@@ -65,9 +65,9 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page):
         url = 'https://api.sysero.nl/videos?page={}&count=20&include=images'
-              ':types(thumb):limit(1|0),products,categories&filter' \
-              '[status]=published&filter[products]=1%2C2&filter[types]' \
-              '=video&sort[recommended_at]=DESC&frontend=1'
+            ':types(thumb):limit(1|0),products,categories&filter' \
+            '[status]=published&filter[products]=1%2C2&filter[types]' \
+            '=video&sort[recommended_at]=DESC&frontend=1'
         return self.format_url(base, url.format(page))
 
     def start_requests(self):
@@ -103,7 +103,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         data = jsondata['data']
         for jsonentry in data:
             if jsonentry['attributes']['slug']:
-                scene_url = "https://meidenvanholland.nl/sexfilms/" 
+                scene_url = "https://meidenvanholland.nl/sexfilms/" \
                             + jsonentry['attributes']['slug']
                 yield scrapy.Request(url=self.format_link(response, scene_url),
                                      callback=self.parse_scene)
@@ -114,7 +114,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         if performers:
             performers = performers.get()
             performers = re.search(
-                                ',models:\[(.*id:\".*?)\],preroll',
+                                r',models:\[(.*id:\".*?)\],preroll',
                                 performers)
             if performers:
                 performers = performers.group(1)
@@ -126,10 +126,10 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         tags = self.process_xpath(response, self.get_selector_map('tags'))
         if tags:
             tags = tags.get()
-            tags = re.search(',categories:\[(.*?)\],products', tags)
+            tags = re.search(r',categories:\[(.*?)\],products', tags)
             if tags:
                 tags = tags.group(1)
-                tags = re.findall('name:\"(.*?)\"', tags)
+                tags = re.findall(r'name:\"(.*?)\"', tags)
                 tags2 = ['European']
                 for tag in tags:
                     found_tag = match_tag(tag.lower())
@@ -142,19 +142,19 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         if 'description' not in self.get_selector_map():
             return ''
 
-        description = self.process_xpath(response, 
+        description = self.process_xpath(response,
                                          self.get_selector_map('description'))
         if description:
-            description = self.get_from_regex(description.get(), 
+            description = self.get_from_regex(description.get(),
                                               're_description')
 
             if description:
                 try:
                     description = codecs.decode(description, 'unicode-escape')
-                except:
-                    description = re.sub(r'\\u00\d[a-fA-F]','', description)
-                description = re.sub('<[^<]+?>', '', description).strip()
-                description = re.sub('[^a-zA-Z0-9\-_ \.\?\!]','', description)
+                except Exception:
+                    description = re.sub(r'\\u00\d[a-fA-F]', '', description)
+                description = re.sub(r'<[^<]+?>', '', description).strip()
+                description = re.sub(r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
                 return html.unescape(description.strip())
         return ''
 
@@ -164,7 +164,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
             datestring = datestring.get()
             date = self.get_from_regex(datestring, 're_date')
             if not date:
-                date = re.search('active_from=\"(\d{4}-\d{2}-\d{2})',datestring)
+                date = re.search(r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
                 if date:
                     date = date.group(1)
                 
