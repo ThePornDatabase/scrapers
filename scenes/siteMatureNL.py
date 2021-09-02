@@ -18,9 +18,9 @@ class siteMatureNLSpider(BaseSceneScraper):
         'date_formats': [r'%d-%m-%Y'],
         'image': r'//span[@id="spnPageUpdateTrailer"]//img/@data-src',
         'performers': 
-            r'//div[@class="box-cnt"]//div[@class="grid-tile-model"]'\
+            r'//div[@class="box-cnt"]//div[@class="grid-tile-model"]' \
             '/div[@class="name"]/span/text()',
-        'tags': r'//div[@class="box-cnt"]'\
+        'tags': r'//div[@class="box-cnt"]' \
             '//a[contains(@href, "/niche/")]/text()',
         'external_id': r'update\/(\d+)\/',
         'trailer': r'//script[contains(text(),"showTrailer")]/text()',
@@ -29,7 +29,8 @@ class siteMatureNLSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(r'//div[@class="grid-item"]/div/a/@href').getall()
+        scenes = response.xpath(
+            r'//div[@class="grid-item"]/div/a/@href').getall()
         for scene in scenes:
             if "/update/" in scene:
                 try:
@@ -38,8 +39,7 @@ class siteMatureNLSpider(BaseSceneScraper):
                     print(scene)
             if "upid=" in scene:
                 sceneid = re.search('upid=(\d+)', scene).group(1)
-
-            scene = "https://www.mature.nl/en/update/" + sceneid.strip()+ "/"
+            scene = "https://www.mature.nl/en/update/" + sceneid.strip() + "/"
 
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), 
@@ -51,7 +51,7 @@ class siteMatureNLSpider(BaseSceneScraper):
     def get_parent(self, response):
         return "Mature NL"
 
-    def get_performers (self, response):
+    def get_performers(self, response):
         performers = super().get_performers(response)
         if performers:
             for i in range(len(performers)):
@@ -61,7 +61,7 @@ class siteMatureNLSpider(BaseSceneScraper):
                 performer = performer.strip()
                 performers[i] = performer
         return performers
-        
+
     def get_image(self, response):
         image = super().get_image(response)
         if not image:
@@ -73,7 +73,7 @@ class siteMatureNLSpider(BaseSceneScraper):
             else:
                 image = ''
         return image
-        
+
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date'))
         if date:
@@ -90,13 +90,15 @@ class siteMatureNLSpider(BaseSceneScraper):
                 date_formats = self.get_selector_map('date_formats')
             else:
                 None
-            return dateparser.parse(date, date_formats=date_formats).isoformat()
-            
+            return dateparser.parse(
+                    date, date_formats=date_formats).isoformat()
+
     def get_title(self, response):
         title = super().get_title(response)
         if "watch this scene exclusively" in title.lower():
-            newtitle = response.xpath(r'//div[@class="box-cnt"]'\
-                    '//div[@class="grid-tile-model"]/div[@class="name"]/span/text()')
+            newtitle = response.xpath(r'//div[@class="box-cnt"]' \
+                    '//div[@class="grid-tile-model"]' \
+                    '/div[@class="name"]/span/text()')
             if newtitle:
                 newtitle = newtitle.getall()
                 newtitle = " and ".join(newtitle)
