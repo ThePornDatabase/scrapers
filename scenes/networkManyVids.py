@@ -227,6 +227,8 @@ class networkManyVidsSpider(BaseSceneScraper):
         meta = response.meta
         if meta['site'] == "Lana Rain":
             return ['Lana Rain']
+        if meta['site'] == "Natalia Grey":
+            return ['Natalia Grey']
         if meta['site'] == "Cattie":
             return ['Cattie Candescent']
         
