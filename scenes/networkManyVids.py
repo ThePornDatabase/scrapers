@@ -13,20 +13,21 @@ class networkManyVidsSpider(BaseSceneScraper):
     name = 'ManyVids'
 
     start_urls = [
-        ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'YouthLust'],
-        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Lana Rain'],
-        ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'MySweetApple'],
-        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Jack and Jill'],
-        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Dirty Princess'],
-        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Cattie'],
-        ['https://www.manyvids.com', '/api/model/1000286888/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'A Taboo Fantasy'],
-        ['https://www.manyvids.com', '/api/model/694469/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Adult Candy Store'],
-        ['https://www.manyvids.com', '/api/model/1000159044/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Fuck Club'],
-        ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'IXXVICOM'],
-        ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Jay Bank Presents'],
-        ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Undercover Sluts'],
-        ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Submissive Teen POV'],
-        ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Sloppy Toppy'],
+        ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'YouthLust'],
+        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Lana Rain'],
+        ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'MySweetApple'],
+        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Jack and Jill'],
+        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Dirty Princess'],
+        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Cattie'],
+        ['https://www.manyvids.com', '/api/model/1000286888/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'A Taboo Fantasy'],
+        ['https://www.manyvids.com', '/api/model/694469/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Adult Candy Store'],
+        ['https://www.manyvids.com', '/api/model/1000159044/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Fuck Club'],
+        ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'IXXVICOM'],
+        ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Jay Bank Presents'],
+        ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Undercover Sluts'],
+        ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Submissive Teen POV'],
+        ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Sloppy Toppy'],
+        ['https://www.manyvids.com', '/api/model/69353/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Natalia Grey'],
     ]
     
     selector_map = {
@@ -46,7 +47,7 @@ class networkManyVidsSpider(BaseSceneScraper):
     }
 
     cookies =  {
-        'PHPSESSID': 'fte5t9jjgk389919ge2jtanjhp8d3bafvk61vc2h'
+        'PHPSESSID': 'Gt0EnShhEqG1es8v47BwPGkxuUapp5WFvLV09xXD'
     }
     
 
