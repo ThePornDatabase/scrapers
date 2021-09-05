@@ -1,11 +1,10 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
+import scrapy
+
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
-class networkTwoWebMediaSpider(BasePerformerScraper):
+
+class NetworkTwoWebMediaSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h1[@class="page_title"]/text()',
         'image': '//div[@class="wpb_wrapper"]/a/@data-src|//div[@class="wpb_wrapper"]/a/@href',
@@ -16,7 +15,7 @@ class networkTwoWebMediaSpider(BasePerformerScraper):
         'eyecolor': '//h5/strong[contains(text(),"Eyes")]/following-sibling::text()',
         'haircolor': '//h5/strong[contains(text(),"Hair")]/following-sibling::text()',
         'bio': '//div[@class="post_excerpt"]/p/text()',
-        'external_id': 'models\/(.*).html',
+        'external_id': r'models\/(.*).html',
         'pagination': '/modelentry/page/%s/'
     }
 
@@ -55,7 +54,7 @@ class networkTwoWebMediaSpider(BasePerformerScraper):
 
     def get_cupsize(self, response):
         cupsize = super().get_cupsize(response)
-        cupsize = re.search('(\w) .*', cupsize)
+        cupsize = re.search(r'(\w) .*', cupsize)
         if cupsize:
             return cupsize.group(1).strip().upper()
-        return ''   
+        return ''

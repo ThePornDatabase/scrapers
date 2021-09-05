@@ -1,12 +1,13 @@
-import scrapy
+import re
+import json
+import dateparser
+import tldextract
 from chompjs import chompjs
+from extruct.jsonld import JsonLdExtractor
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-from extruct.jsonld import JsonLdExtractor
-import tldextract
-import re
-import dateparser
-import json
 
 
 def match_site(argument):
@@ -176,7 +177,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.currycreampie.com',
         'https://www.devilsgangbangs.com',
         'https://www.devilstgirls.com',
-        'https://www.dpfanatics.com', 
+        'https://www.dpfanatics.com',
         'https://www.falconstudios.com',
         'https://www.footsiebabes.com',
         'https://www.gapingangels.com',
@@ -215,7 +216,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.tsfactor.com',
 
 
-        #####  API or Comments
+        #  API or Comments
         # 'https://www.analacrobats.com' -> page links go to signup page
         # 'https://www.adulttime.com' -> No videos listed on site
         # 'https://www.bisexdigital.com' -> page links go to signup page
@@ -258,7 +259,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'trailer': '',
     }
 
-
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
         count = 0
@@ -267,16 +267,16 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             yield scene
 
         if count:
-            totalpages = re.search('\"nbPages\":(\d+)', response.text)
+            totalpages = re.search(r'\"nbPages\":(\d+)', response.text)
             if totalpages:
                 totalpages = int(totalpages.group(1))
             else:
                 totalpages = 99999
-                
+
             if 'page' in response.meta and response.meta['page'] < self.limit_pages and response.meta['page'] <= totalpages:
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
-                url=self.get_next_page_url(response.url, meta['page'])
+                url = self.get_next_page_url(response.url, meta['page'])
                 print('NEXT PAGE: ' + str(meta['page']) + "     (" + url + ")")
                 yield scrapy.Request(url,
                                      callback=self.parse,
@@ -311,8 +311,8 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                     './following-sibling::p[@class="fromSite"]/a/strong/text()').get().strip()
                 scene = scene.xpath('./a[1]/@href').get().strip()
 
-            if "fantasymassage" in response.url or "blowpass" in response.url or "xempire" in response.url  or "pridestudios" in response.url and site:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': site.lower().replace(".com","")})
+            if "fantasymassage" in response.url or "blowpass" in response.url or "xempire" in response.url or "pridestudios" in response.url and site:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': site.lower().replace(".com", "")})
             else:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
@@ -324,13 +324,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 'picPreview\":\"(.*?)\",',
                 image).group(1).strip()
             image = image.replace('\\', '')
-            
+
         if not image:
             image = self.process_xpath(
-                response, self.get_selector_map('image')).get()       
-                
-        if re.search('jpg\?', image):
-            image = re.search('(.*jpg)\?', image).group(1)
+                response, self.get_selector_map('image')).get()
+
+        if re.search(r'jpg\?', image):
+            image = re.search(r'(.*jpg)\?', image).group(1)
 
         if image is not None:
             if "transform" in image:
@@ -338,11 +338,10 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 if image_xpath:
                     image = image_xpath.strip()
                 else:
-                    image = image.replace("https://transform.gammacdn.com/","https://images02-openlife.gammacdn.com/")
+                    image = image.replace("https://transform.gammacdn.com/", "https://images02-openlife.gammacdn.com/")
             return self.format_link(response, image)
 
     def parse_scene(self, response):
-        global json
         data = response.css('script:contains("dataLayer =")::text').get()
         data2 = response.xpath('//script[contains(text(),\'ScenePlayerId = "player"\')]|//script[contains(text(),\'ScenePlayerId = "scenePlayer"\')]').get()
         data3 = response.xpath('//script[@type="application/ld+json"]/text()').get()
@@ -368,7 +367,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 item['title'] = json_data['sceneDetails']['sceneTitle']
             else:
                 item['title'] = self.get_title(response)
-            
+
             if item['title']:
                 if ", scene #01" in item['title'].lower():
                     item['title'] = item['title'].replace(", Scene #01", "").replace(", scene #01", "")
@@ -380,7 +379,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             else:
                 item['description'] = self.get_description(response)
 
-
             if 'site' in response.meta:
                 item['site'] = response.meta['site']
             elif 'productionCompany' in data3:
@@ -389,36 +387,34 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 item['site'] = json_data['siteName_pretty']
             elif 'siteName' in json_data:
                 item['site'] = json_data['siteName']
-                    
+
             if item['site']:
                 item['site'] = match_site(item['site'])
 
             if not item['site']:
                 item['site'] = self.get_site(response)
-            
-                
 
             if 'date' in response.meta:
                 item['date'] = response.meta['date']
             elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['dateCreated']:
-                item['date'] = dateparser.parse(jsonlde['dateCreated'],date_formats=['%Y-%m-%d']).isoformat()
+                item['date'] = dateparser.parse(jsonlde['dateCreated'], date_formats=['%Y-%m-%d']).isoformat()
             elif 'datePublished' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['datePublished']:
-                item['date'] = dateparser.parse(jsonlde['datePublished'],date_formats=['%Y-%m-%d']).isoformat()
+                item['date'] = dateparser.parse(jsonlde['datePublished'], date_formats=['%Y-%m-%d']).isoformat()
             elif 'nudefightclub' in response.url:
                 date = response.xpath(
                     '//div[@class="updatedDate"]/b/following-sibling::text()').get()
                 item['date'] = dateparser.parse(date.strip()).isoformat()
             else:
                 item['date'] = self.get_date(response)
-                
+
             if not item['date']:
                 item['date'] = self.get_date(response)
-                
+
             if data2:
-                date2 = re.search('sceneReleaseDate\":\"(\d{4}-\d{2}-\d{2})', data2)
+                date2 = re.search(r'sceneReleaseDate\":\"(\d{4}-\d{2}-\d{2})', data2)
                 if date2:
                     date2 = date2.group(1)
-                    date2 = dateparser.parse(date2.strip(),date_formats=['%Y-%m-%d']).isoformat()
+                    date2 = dateparser.parse(date2.strip(), date_formats=['%Y-%m-%d']).isoformat()
                     if item['date'] and date2 > item['date']:
                         item['date'] = date2
 
@@ -468,7 +464,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 print(item)
             else:
                 return item
-                
         else:
             super().parse_scene(response)
 
@@ -576,7 +571,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             selector = '/en/videos/xempire/latest/%s'
 
         returnurl = selector % page
-
         return self.format_url(base, returnurl)
 
     def get_site(self, response):
@@ -630,38 +624,36 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         else:
             date = self.process_xpath(response, self.get_selector_map('date')).getall()
             if len(date) > 1:
-                for daterow in date: 
-                    datetemp=""
+                for daterow in date:
+                    datetemp = ""
                     daterow.replace('Released:', '').replace('Added:', '').rstrip().strip()
                     if re.match('(\\d{4}-\\d{2}-\\d{2})', daterow):
                         datetemp = re.search('(\\d{4}-\\d{2}-\\d{2})', daterow).group(1).strip()
                     elif re.match('(\\d{2}-\\d{2}-\\d{4})', daterow):
                         datetemp = re.search('(\\d{2}-\\d{2}-\\d{4})', daterow).group(1).strip()
                     if not datetemp:
-                        date = datetemp.strip()            
+                        date = datetemp.strip()
 
         matches = ['21sextreme']
         if not date or any(x in response.url for x in matches):
             date = response.xpath(
                 '//script[contains(text(),"sceneReleaseDate")]').getall()
             if len(date) > 1:
-                for daterow in date: 
+                for daterow in date:
                     datetemp = re.search('sceneReleaseDate\":\"(\\d{4}-\\d{2}-\\d{2})', daterow)
                     if datetemp:
                         datetemp = datetemp.group(1)
                         if datetemp:
-                            date = datetemp.strip()   
-                            
-
+                            date = datetemp.strip()
 
         if not date:
             date = response.xpath(
                 '//div[@class="updatedDate"]/b/following-sibling::text()').get()
-                
+
         if not date:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
-    
-        return dateparser.parse(date.strip(), date_formats=['%m-%d-%Y','%Y-%m-%d']).isoformat()
+
+        return dateparser.parse(date.strip(), date_formats=['%m-%d-%Y', '%Y-%m-%d']).isoformat()
 
     def get_title(self, response):
         title = self.process_xpath(
@@ -720,7 +712,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                         tags = tag.split(",")
                     else:
                         tags = [tag]
-                    
+
         elif 'nachovidalhardcore' in response.url:
             return []
         else:
@@ -747,7 +739,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         tld = tldextract.extract(response.url).domain
         parent = match_site(tld)
-        
+
         if "girlstryanal" in response.url or "webyoung" in response.url:
             return "Girlsway"
 
