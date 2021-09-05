@@ -59,7 +59,7 @@ class CherryPimpsSpider(BaseSceneScraper):
                             '| ./a/@href'
             scene = scene.xpath(urlxpath).get()
             yield scrapy.Request(
-                url=scene, callback=self.parse_scene, meta={'site':site})
+                url=scene, callback=self.parse_scene, meta={'site': site})
 
     def get_date(self, response):
         selector = '//div[@class="info-block_data"]//p[@class="text"]/text() '\
@@ -78,5 +78,4 @@ class CherryPimpsSpider(BaseSceneScraper):
         meta = response.meta
         if meta['site']:
             return meta['site']
-        else:
-            return super().get_parent(response)
+        return super().get_parent(response)

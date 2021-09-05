@@ -1,11 +1,11 @@
-import scrapy
 import re
 import dateparser
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class siteSinsLifeSpider(BaseSceneScraper):
+class SiteSinsLifeSpider(BaseSceneScraper):
     name = 'SinsLife'
     network = 'Sins Life'
 
@@ -20,13 +20,13 @@ class siteSinsLifeSpider(BaseSceneScraper):
         'image': '',
         'performers': '',
         'tags': '',
-        'external_id': '.*\/(.*?)\/$',
+        'external_id': r'.*\/(.*?)\/$',
         'trailer': '',
         'pagination': '/tour/categories/movies/%s/latest/'
     }
 
     def get_scenes(self, response):
-        SceneList = []
+        scenelist = []
         scenes = response.xpath('//div[@class="item "]')
         for scene in scenes:
             item = SceneItem()
@@ -43,8 +43,8 @@ class siteSinsLifeSpider(BaseSceneScraper):
             if title:
                 item['title'] = title.strip()
                 externalid = re.sub('[^a-zA-Z0-9-]', '', item['title'])
-                item['id'] = externalid.lower().strip().replace(" ","-")
-                
+                item['id'] = externalid.lower().strip().replace(" ", "-")
+
             item['url'] = response.url
 
             description = scene.xpath('.//div[@class="item-meta"]/div/text()').getall()
@@ -63,8 +63,7 @@ class siteSinsLifeSpider(BaseSceneScraper):
                 item['image'] = image.strip()
 
             if item['id'] and item['title'] and item['date']:
-                SceneList.append(item.copy())
+                scenelist.append(item.copy())
                 item.clear()
 
-        return SceneList
-
+        return scenelist

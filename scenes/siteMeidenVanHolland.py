@@ -1,9 +1,9 @@
-import scrapy
 import re
 import codecs
 import html
 import json
 import dateparser
+import scrapy
 from tpdb.items import SceneItem
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -50,7 +50,7 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//script[contains(text(),"NUXT")]/text()',
-        're_title': 'video:\{title:\"(.*?)\"',
+        're_title': r'video:\{title:\"(.*?)\"',
         'description': '//script[contains(text(),"NUXT")]/text()',
         're_description': r'description:\"(.*?)\"',
         'date': '//script[contains(text(),"NUXT")]/text()',
@@ -99,7 +99,6 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def get_scenes(self, response):
-        global json
         jsondata = json.loads(response.text)
         data = jsondata['data']
         for jsonentry in data:
@@ -171,12 +170,10 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                             r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
                 if date:
                     date = date.group(1)
-                
 
             if date:
                 return dateparser.parse(date).isoformat()
-            else:
-                return dateparser.parse('today').isoformat()
+            return dateparser.parse('today').isoformat()
         return None
 
     def get_site(self, response):

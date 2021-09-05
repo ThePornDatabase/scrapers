@@ -1,13 +1,13 @@
 import string
 import html
-import dateparser
 import re
+import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class sitLarasPlaygroundSpider(BaseSceneScraper):
+class SiteLarasPlaygroundSpider(BaseSceneScraper):
     name = 'LarasPlayground'
     network = 'Laras Playground'
     max_pages = 35

@@ -1,10 +1,12 @@
-import scrapy
 import re
-import dateparser
 from datetime import datetime, timedelta
+import dateparser
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class siteFightingDollsSpider(BaseSceneScraper):
+
+class SiteFightingDollsSpider(BaseSceneScraper):
     name = 'FightingDolls'
     network = 'Fighting Dolls'
 
@@ -20,7 +22,7 @@ class siteFightingDollsSpider(BaseSceneScraper):
         'image': '//div[@id="sample"]/img/@src',
         'performers': '//div[@class="grid-x"]/div/div/div/h3/a/text()',
         'tags': '//div[@class="categories"]/a/text()',
-        'external_id': '.*\/(.*?)\/',
+        'external_id': r'.*\/(.*?)\/',
         'trailer': '',
         'pagination': ''
     }
@@ -34,28 +36,26 @@ class siteFightingDollsSpider(BaseSceneScraper):
     def get_site(self, response):
         if "trib-dolls" in response.url:
             return "Trib Dolls"
-        else:
-            return "Fighting Dolls"
+        return "Fighting Dolls"
 
     def get_parent(self, response):
         if "trib-dolls" in response.url:
             return "Trib Dolls"
-        else:
-            return "Fighting Dolls"
+        return "Fighting Dolls"
 
     def get_next_page_url(self, base, page):
         if "fighting-dolls" in base:
             pagination = '/all-fighting-dolls-videos/%s/'
         if "trib-dolls" in base:
             pagination = '/all-trib-dolls-videos/%s/'
-        page = str(int(page)-1)
+        page = str(int(page) - 1)
         return self.format_url(base, pagination % page)
 
     def get_date(self, response):
         date = response.xpath('//div[@class="categories"]/text()').getall()
         if date:
             date = "".join(date)
-            date = re.search('(\d+) day', date)
+            date = re.search(r'(\d+) day', date)
             if date:
                 daysago = int(date.group(1))
                 date = datetime.now() - timedelta(days=daysago)

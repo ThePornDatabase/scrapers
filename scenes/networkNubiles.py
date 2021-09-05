@@ -57,8 +57,8 @@ class NubilesSpider(BaseSceneScraper):
                 meta = {
                     'title': scene.css('.title a::text').get().strip(),
                     'date': dateparser.parse(
-                                scene.css('.date::text')
-                                .extract_first()).isoformat(),
+                        scene.css('.date::text')
+                        .extract_first()).isoformat(),
                 }
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
@@ -72,11 +72,11 @@ class NubilesSpider(BaseSceneScraper):
                     meta['site'] = "Nubiles"
                 else:
                     meta['site'] = scene.xpath(
-                                './/a[@class="site-link"]/text()'
-                                ).get().strip()
+                        './/a[@class="site-link"]/text()'
+                        ).get().strip()
                 yield scrapy.Request(
-                                url=self.format_link(response, link),
-                                callback=self.parse_scene, meta=meta)
+                    url=self.format_link(response, link),
+                    callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         site = response.xpath(
@@ -96,11 +96,11 @@ class NubilesSpider(BaseSceneScraper):
             return ''
         description = self.process_xpath(
             response, self.get_selector_map('description')).get()
-        if not description or not len(description.strip()):
+        if not description or (description and len(description.strip())):
             description = response.xpath(
-                            '//div[contains(@class,'
-                            '"content-pane-column")]/div/p/text()'
-                            ).getall()
+                '//div[contains(@class,'
+                '"content-pane-column")]/div/p/text()'
+                ).getall()
             if description:
                 description = " ".join(description)
         if description is not None:
