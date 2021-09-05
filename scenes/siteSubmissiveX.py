@@ -1,13 +1,12 @@
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SubmissiveXSpider(BaseSceneScraper):
+class SiteSubmissiveXSpider(BaseSceneScraper):
     name = 'SubmissiveX'
     network = 'Submissive X'
-
 
     start_urls = [
         'https://submissivex.com/',
@@ -20,7 +19,7 @@ class SubmissiveXSpider(BaseSceneScraper):
         'image': '//span[@class="model_update_thumb"]/img/@src',
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': 'updates\/(.*).html',
+        'external_id': r'updates\/(.*).html',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html#'
     }
@@ -36,4 +35,3 @@ class SubmissiveXSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Submissive X"
-        

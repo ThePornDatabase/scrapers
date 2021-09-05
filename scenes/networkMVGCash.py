@@ -1,7 +1,9 @@
-import scrapy
 import re
 import dateparser
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
+
 
 def match_site(argument):
     match = {
@@ -14,7 +16,8 @@ def match_site(argument):
     }
     return match.get(argument, argument)
 
-class networkMVGCashSpider(BaseSceneScraper):
+
+class NetworkMVGCashSpider(BaseSceneScraper):
     name = 'MVGCash'
     network = 'MVG Cash'
 
@@ -31,11 +34,11 @@ class networkMVGCashSpider(BaseSceneScraper):
         'title': '//h1/text()',
         'description': '//span[contains(text(),"Description")]/following-sibling::text()',
         'date': '//p[@class="date"]/text()',
-        're_date': '(\d{2}\/\d{2}\/\d{4})',
+        're_date': r'(\d{2}\/\d{2}\/\d{4})',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[contains(text(),"Tags:")]/following-sibling::a/text()',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*\/(.*?).html',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html'
     }
@@ -55,7 +58,6 @@ class networkMVGCashSpider(BaseSceneScraper):
                     yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date})
                 else:
                     yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-                    
 
     def get_image(self, response):
         image = super().get_image(response)

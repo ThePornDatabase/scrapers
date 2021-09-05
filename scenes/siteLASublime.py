@@ -1,8 +1,10 @@
-import scrapy
 import re
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class siteLASublimeSpider(BaseSceneScraper):
+
+class SiteLASublimeSpider(BaseSceneScraper):
     name = 'LASublime'
     network = 'MVG Cash'
 
@@ -19,7 +21,7 @@ class siteLASublimeSpider(BaseSceneScraper):
         're_image': '.*\'(http.*?\').*',
         'performers': '//strong[contains(text(),"Actors")]/following-sibling::a/i/following-sibling::text()',
         'tags': '//strong[contains(text(),"Categories")]/following-sibling::a/i/following-sibling::text()',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*\/(.*?).html',
         'trailer': '',
         'pagination': '/tour/categories/movies_%s_d.html'
     }
@@ -32,7 +34,7 @@ class siteLASublimeSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = super().get_image(response)
-        image = re.search('.*(\/content.*?\.jpg).*', image)
+        image = re.search(r'.*(\/content.*?\.jpg).*', image)
         if image:
             image = image.group(1)
             image = "https://tours.lasublimexxx.com/tour" + image.replace("-2x.", "-3x.")

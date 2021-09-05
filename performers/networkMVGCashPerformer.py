@@ -1,10 +1,10 @@
-import scrapy
 import html
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-class siteAmericanPornstarSpider(BasePerformerScraper):
+
+class SiteMVGCashPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[contains(@class,"model modelfeature")]//h3/a/text()',
         'image': '//div[contains(@class,"model modelfeature")]/div/a/img/@src0_1x',
@@ -52,5 +52,5 @@ class siteAmericanPornstarSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''                
+            item['weight'] = ''
             yield item

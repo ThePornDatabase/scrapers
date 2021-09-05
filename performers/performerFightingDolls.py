@@ -1,10 +1,12 @@
-import scrapy
 import html
 import re
+import scrapy
+
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-class siteFightingDollsPerformerSpider(BasePerformerScraper):
+
+class SiteFightingDollsPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[@class="update_details"]/a[1]/text()',
         'image': "//img/@src",
@@ -27,7 +29,7 @@ class siteFightingDollsPerformerSpider(BasePerformerScraper):
                                  meta={'page': self.page},
                                  headers=self.headers,
                                  cookies=self.cookies)
-                                 
+
     def get_gender(self, response):
         return 'Female'
 
@@ -35,7 +37,7 @@ class siteFightingDollsPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[@class="cell text-center"]')
         for performer in performers:
             item = PerformerItem()
-            
+
             name = performer.xpath('.//h4/a/text()').get()
             if name:
                 item['name'] = html.unescape(name.strip().title())
@@ -48,20 +50,20 @@ class siteFightingDollsPerformerSpider(BasePerformerScraper):
                     item['image'] = "https://www.trib-dolls.com" + image.strip()
             else:
                 item['image'] = ''
-                
+
             url = performer.xpath('./div[@class="photo"]/a/@href').get()
             if url:
                 if "fighting-dolls" in response.url:
                     item['url'] = "https://www.fighting-dolls.com" + url.strip()
                 if "trib-dolls" in response.url:
                     item['url'] = "https://www.trib-dolls.com" + url.strip()
-                
+
             item['network'] = 'Fighting Dolls'
 
             height = performer.xpath('.//li[contains(text(),"Height")]/text()')
             if height:
                 height = height.get()
-                height = re.search('(\d+ cm)', height)
+                height = re.search(r'(\d+ cm)', height)
                 if height:
                     height = height.group(1)
                     item['height'] = height.replace(" ", "")
@@ -71,13 +73,13 @@ class siteFightingDollsPerformerSpider(BasePerformerScraper):
             weight = performer.xpath('.//li[contains(text(),"Weight")]/text()')
             if weight:
                 weight = weight.get()
-                weight = re.search('(\d+ kg)', weight)
+                weight = re.search(r'(\d+ kg)', weight)
                 if weight:
                     weight = weight.group(1)
                     item['weight'] = weight.replace(" ", "")
                 else:
                     item['weight'] = ''
-            
+
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -92,5 +94,5 @@ class siteFightingDollsPerformerSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            
+
             yield item

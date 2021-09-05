@@ -1,11 +1,13 @@
-import scrapy
 import re
-import dateparser
 import string
 import html
+import dateparser
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class networkTwoWebMediaSpider(BaseSceneScraper):
+
+class NetworkTwoWebMediaSpider(BaseSceneScraper):
     name = 'TwoWebMedia'
     network = 'Two Web Media'
 
@@ -23,9 +25,9 @@ class networkTwoWebMediaSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[contains(@class,"meta_modelcategory")]/a/text()',
         'tags': '//span[contains(@class,"meta_videotag")]/a/text()',
-        'external_id': '.*\/(.*?)\/',
+        'external_id': r'.*\/(.*?)\/',
         'trailer': '//script[contains(text(),"jwplayer.key")]/text()',
-        're_trailer': '.*(http.*?\.mp4).*',
+        're_trailer': r'.*(http.*?\.mp4).*',
         'pagination': '/videoentry/page/%s/'
     }
 
@@ -52,20 +54,20 @@ class networkTwoWebMediaSpider(BaseSceneScraper):
         title = self.process_xpath(response, self.get_selector_map('title'))
         if title:
             title = self.get_from_regex(title.get(), 're_title')
-        title = title.replace("'", "")        
+        title = title.replace("'", "")
         title = title.replace(u"\u2019", "")
         title = title.replace(" & ", " and ")
         title = re.sub(r'&#\d+;', '', title)
-        title =  re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
+        title = re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
         return string.capwords(html.unescape(title.strip())).replace("  ", " ")
-    
+
     def get_image(self, response):
         imageurl = super().get_image(response)
         if not imageurl:
             image = response.xpath('//div[contains(@class,"wpfp_custom_background")]/@style')
             if image:
                 image = image.get()
-                image = re.search('.*(http.*?\.jpg).*', image)
+                image = re.search(r'.*(http.*?\.jpg).*', image)
                 if image:
                     imageurl = image.group(1)
         return imageurl.strip()
@@ -93,4 +95,3 @@ class networkTwoWebMediaSpider(BaseSceneScraper):
         if "upskirtjerk" in site:
             return "Upskirt Jerk"
         return site
-

@@ -1,12 +1,11 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import dateparser
+import scrapy
+
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class siteLASublimeSpider(BasePerformerScraper):
+class SiteLASublimeSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h1/a/text()',
         'image': '',
@@ -18,7 +17,7 @@ class siteLASublimeSpider(BasePerformerScraper):
         'tattoos': '//p[@class="lead"]/following-sibling::ul/li/strong[contains(text(),"Tattoos:")]/following-sibling::text()',
         'height': '//p[@class="lead"]/following-sibling::ul/li/strong[contains(text(),"Height:")]/following-sibling::text()',
         'pagination': '/tour/models/models_%s_d.html',
-        'external_id': 'model\/(.*)/'
+        'external_id': r'model\/(.*)/'
     }
 
     name = 'LASublimePerformer'
@@ -37,7 +36,7 @@ class siteLASublimeSpider(BasePerformerScraper):
             if image:
                 image = image.get()
                 if image:
-                    image = re.search('.*(\/tour.*?\.jpg).*', image)
+                    image = re.search(r'.*(\/tour.*?\.jpg).*', image)
                     if image:
                         image = image.group(1)
                         image = "https://tours.lasublimexxx.com" + image.strip()
@@ -54,7 +53,7 @@ class siteLASublimeSpider(BasePerformerScraper):
         if height:
             if "cm" in height:
                 return height
-            height = float(height.replace(",",".")) * 100
+            height = float(height.replace(",", ".")) * 100
             height = str(int(height)) + "cm"
             return height
         return ''
@@ -71,5 +70,4 @@ class siteLASublimeSpider(BasePerformerScraper):
         if birthday:
             birthday = dateparser.parse(birthday, date_formats=['%d/%m/%Y']).isoformat()
             return birthday
-        else:
-            return ''
+        return ''
