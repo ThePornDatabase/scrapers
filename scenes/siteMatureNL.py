@@ -1,10 +1,11 @@
-import scrapy
 import re
 import dateparser
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteMatureNLSpider(BaseSceneScraper):
+class SiteMatureNLSpider(BaseSceneScraper):
     name = 'MatureNL'
     network = 'Mature NL'
     start_urls = [
@@ -80,8 +81,8 @@ class siteMatureNLSpider(BaseSceneScraper):
             date = date.get()
         if not date or not re.search(r'(\d{1,2}-\d{1,2}-\d{4})', date):
             date = response.xpath(
-                    r'//div[@class="container update-bg-container"]'
-                    '/div[@class="box"][1]/div[@class="box-cnt"]/div[1]')
+                r'//div[@class="container update-bg-container"]'
+                '/div[@class="box"][1]/div[@class="box-cnt"]/div[1]')
             if date:
                 date = date.get()
         if date and re.search(r'(\d{1,2}-\d{1,2}-\d{4})', date):
@@ -91,7 +92,7 @@ class siteMatureNLSpider(BaseSceneScraper):
             else:
                 None
             return dateparser.parse(
-                    date, date_formats=date_formats).isoformat()
+                date, date_formats=date_formats).isoformat()
 
     def get_title(self, response):
         title = super().get_title(response)
