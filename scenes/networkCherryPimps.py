@@ -38,25 +38,25 @@ class CherryPimpsSpider(BaseSceneScraper):
         """
         if "cherrypimps" in response.url:
             scenexpath = '//div[contains(@class,"item-update") and ' \
-                        'not(contains(@class,"item-updates"))]'
+                'not(contains(@class,"item-updates"))]'
         if "wildoncam" in response.url or "cherryspot" in response.url:
             scenexpath = '//div[contains(@class,"video-thumb")]'
         scenes = response.xpath(scenexpath)
         for scene in scenes:
             site = scene.xpath(
-                    './/div[@class="item-sitename"]/a/text() | '
-                    './p[contains(@class, "text-thumb")]/a/@data-elx_site_name'
-                    )
+                './/div[@class="item-sitename"]/a/text() | '
+                './p[contains(@class, "text-thumb")]/a/@data-elx_site_name'
+            )
             if site:
                 site = site.get().strip()
             else:
                 site = False
             if "cherrypimps" in response.url:
                 urlxpath = './div[@class="item-footer"]/div' \
-                            '/div[@class="item-title"]/a/@href'
+                    '/div[@class="item-title"]/a/@href'
             else:
                 urlxpath = './div[contains(@class, "videothumb")]/a/@href' \
-                            '| ./a/@href'
+                    '| ./a/@href'
             scene = scene.xpath(urlxpath).get()
             yield scrapy.Request(
                 url=scene, callback=self.parse_scene, meta={'site': site})
