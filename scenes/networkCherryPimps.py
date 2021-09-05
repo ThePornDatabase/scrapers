@@ -9,15 +9,23 @@ class CherryPimpsSpider(BaseSceneScraper):
     network = 'Cherry Pimps'
 
     start_urls = [
-        'https://www.cherrypimps.com'
+        'https://www.cherrypimps.com',
+        'https://www.wildoncam.com',
+        'https://www.cherryspot.com',
     ]
 
     selector_map = {
         'title': '//*[@class="trailer-block_title"]/text() | //h1/text()',
-        'description': '//div[@class="info-block"]//p[@class="text"]/text() | //div[@class="update-info-block"]//p/text()',
-        'image': '//img[contains(@class, "update_thumb")]/@src | //img[contains(@class, "update_thumb")]/@src0_1x',
-        'performers': '//div[contains(@class, "model-list-item")]//a/span/text()',
-        'tags': "ul.tags a::text",
+        'description': '//div[@class="info-block"]//p[@class="text"]/text() | '
+                       '//div[@class="update-info-block"]//p/text()',
+        'image': '//img[contains(@class, "update_thumb")]/@src | '
+                 '//img[contains(@class, "update_thumb")]/@src0_1x',
+        'performers': '//div[contains(@class, "model-list-item")]'
+                      '//a/span/text() | '
+                      '//p[contains(text(), "Featuring")]/a/text()',
+        'tags': '//ul[@class="tags"]/li/a/text() | '
+                '//p[@class="text" and contains(text()'
+                ',"Categories")]/a/text()',
         'external_id': 'trailers/(.+)\\.html',
         'trailer': '',
         'pagination': '/categories/movies_%s.html'
@@ -28,16 +36,46 @@ class CherryPimpsSpider(BaseSceneScraper):
         @url https://cherrypimps.com/categories/movies.html
         @returns requests 10 50
         """
-        scenes = response.css(
-            "div.item-updates .item-thumb a::attr(href)").getall()
+        if "cherrypimps" in response.url:
+            scenexpath = '//div[contains(@class,"item-update") and ' \
+                'not(contains(@class,"item-updates"))]'
+        if "wildoncam" in response.url or "cherryspot" in response.url:
+            scenexpath = '//div[contains(@class,"video-thumb")]'
+        scenes = response.xpath(scenexpath)
         for scene in scenes:
-            yield scrapy.Request(url=scene, callback=self.parse_scene)
+            site = scene.xpath(
+                './/div[@class="item-sitename"]/a/text() | '
+                './p[contains(@class, "text-thumb")]/a/@data-elx_site_name'
+            )
+            if site:
+                site = site.get().strip()
+            else:
+                site = False
+            if "cherrypimps" in response.url:
+                urlxpath = './div[@class="item-footer"]/div' \
+                    '/div[@class="item-title"]/a/@href'
+            else:
+                urlxpath = './div[contains(@class, "videothumb")]/a/@href' \
+                    '| ./a/@href'
+            scene = scene.xpath(urlxpath).get()
+            yield scrapy.Request(
+                url=scene, callback=self.parse_scene, meta={'site': site})
 
     def get_date(self, response):
-        selector = '//div[@class="info-block_data"]//p[@class="text"]/text() | //div[@class="update-info-row"]/text()'
-        date = response.xpath(selector).extract()[1]
+        selector = '//div[@class="info-block_data"]//p[@class="text"]/text() '\
+                   '| //div[@class="update-info-row"]/text()'
+        if "wildoncam" in response.url or "cherryspot" in response.url:
+            date = response.xpath(selector).extract()[0]
+        else:
+            date = response.xpath(selector).extract()[1]
         date = date.split('|')[0].replace('Added', '').replace(':', '').strip()
         return dateparser.parse(date).isoformat()
 
     def get_site(self, response):
         return response.css('.series-item-logo::attr(title)').get().strip()
+
+    def get_parent(self, response):
+        meta = response.meta
+        if meta['site']:
+            return meta['site']
+        return super().get_parent(response)

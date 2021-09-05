@@ -1,23 +1,23 @@
 import re
-from datetime import datetime
 import html
 import string
+import tldextract
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
 # Yes, this site is a mess.
 
-class siteBabesInTroubleSpider(BaseSceneScraper):
+
+class SiteBabesInTroubleSpider(BaseSceneScraper):
     name = 'Clips4Sale'
-    
+
     sites = [
-        ['Clips4Sale', 'Primal', 'Primal\'s Custom XXX', '/studio/107990/primals-custom-videos/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
-        ['Clips4Sale', 'Primal', 'Primal\'s Girls Grappling', '/studio/46940/primal-s-girl-s-grappling/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
-        ['Clips4Sale', 'Primal', 'Primal\'s Mental Domination', '/studio/24134/primals-mental-domination/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
-        ['Clips4Sale', 'Primal', 'Primal\'s Handjobs', '/studio/41770/primal-s-handjobs/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
-        ['Clips4Sale', 'Primal', 'Primal\'s Dark Reflections', '/studio/98931/primals-dark-reflections/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
-        ['Clips4Sale', 'Primal', 'Primal\'s Disgraced Superheroines', '/studio/53607/primals-disgraced-superheroines/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/',False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Primal', 'Primal\'s Custom XXX', '/studio/107990/primals-custom-videos/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Primal', 'Primal\'s Girls Grappling', '/studio/46940/primal-s-girl-s-grappling/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Primal', 'Primal\'s Mental Domination', '/studio/24134/primals-mental-domination/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Primal', 'Primal\'s Handjobs', '/studio/41770/primal-s-handjobs/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Primal', 'Primal\'s Dark Reflections', '/studio/98931/primals-dark-reflections/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Primal', 'Primal\'s Disgraced Superheroines', '/studio/53607/primals-disgraced-superheroines/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Primal', 'Primal\'s Superheroine Shame', '/studio/50111/primal-s-superheroine-shame/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Primal', 'Primal\'s Women Entranced', '/studio/56163/primals-women-entranced/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Primal', 'Primal\'s Taboo Family Relations', '/studio/67653/primals-taboo-family-relations/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
@@ -41,6 +41,9 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Watch Me Audition', 'Watch Me Audition', '/studio/80069/watch-me-audition/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Jerky Girls', 'Jerky Girls', '/studio/2511/jerky-girls/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Mind Under Master', 'Mind Under Master', '/studio/118498/mind-under-master/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Xev Bellringer', 'Xev Bellringer', '/studio/75701/xev-bellringer/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Jerky Wives', 'Jerky Wives', '/studio/28671/jerky-wives-/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Bareback Studios', 'Bareback Studios', '/studio/35625/bare-back-studios/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -52,11 +55,10 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '',
         'tags': '//span[@class="relatedCatLinks"]/span/a/text()',
-        'external_id': 'studio\/.*\/(\d+)\/',
+        'external_id': r'studio\/.*\/(\d+)\/',
         'trailer': '',
         'pagination': '/studio/37354/babes-in-trouble/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/'
     }
-
 
     def start_requests(self):
         link = self.url
@@ -69,13 +71,12 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             meta['get_performers'] = site[4]
             meta['search_string'] = site[5]
             meta['page'] = self.page
-            
+
             yield scrapy.Request(url=self.get_next_page_url(link, self.page, meta['pagination']),
                                  callback=self.parse,
                                  meta=meta,
                                  headers=self.headers,
                                  cookies=self.cookies)
-                                 
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -93,11 +94,10 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)             
-                                     
+                                     cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
-        url = self.format_url(base, pagination % page)                                                        
+        url = self.format_url(base, pagination % page)
         return url
 
     def get_scenes(self, response):
@@ -112,7 +112,7 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             'external_id'), response.url, re.IGNORECASE)
         extern_id = search.group(1)
         if extern_id:
-            extern_id = extern_id.lower().replace("-wmv","")
+            extern_id = extern_id.lower().replace("-wmv", "")
         return extern_id.strip()
 
     def get_title(self, response):
@@ -132,16 +132,22 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("wmv", "")
             title = title.replace(" xxx", "")
             title = title.replace(" mp4", "")
+            title = title.replace("(.mp4)", "")
             title = title.replace("(hd)", "")
             title = title.replace("(1080)", "")
             title = title.replace("(1080hd)", "")
             title = title.replace("(1080 )", "")
             title = title.replace(" 1080", "")
             title = title.replace("(4k)", "")
+            title = title.replace(" 4k", "")
+            title = title.replace("(hd-)", "")
+            title = title.replace("hd-", "")
+            title = title.replace("(hd-4k)", "")
             title = title.replace(" optimum", "")
             title = title.replace("1080p", "")
             title = title.replace("1080p", "")
             title = title.replace("720p", "")
+            title = title.replace("()", "")
             # ~ title = title.replace(" - ", "")
             if re.match(r'.*\(.*? discounted\)', title):
                 title = re.sub(r'(.*)\(.*? discounted\)(.*)', r'\1 \2', title)
@@ -159,7 +165,6 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             return title.strip()
         return ''
 
-
     def get_tags(self, response):
         if self.get_selector_map('tags'):
             tags = self.process_xpath(
@@ -167,8 +172,8 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             if tags:
                 return list(map(lambda x: x.strip().title(), tags))
         return []
-        
-    def get_performers(self,response):
+
+    def get_performers(self, response):
         meta = response.meta
         if meta['get_performers']:
             performers = []
@@ -177,29 +182,29 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             if title:
                 if re.match(r'^\w+ \w+ in .*', title.lower()):
                     title = re.sub(r'^(\w+ \w+) in (.*)', r'\1 - \2', title.lower())
-                    
+
                 if re.match(r'^\w+ \w+ - .*', title):
                     performers = re.search(r'^(\w+ \w+) - .*', title).group(1)
                     performers = [performers]
-                    
+
                 if re.match(r'^\w+ \w+ & \w+ \w+ - .*', title):
                     performers = re.search(r'^(\w+ \w+ & \w+ \w+) - .*', title).group(1)
                     performers = performers.split("&")
-                    
+
                 if re.match(r'^\w+ \w+ and \w+ \w+ - .*', title.lower()):
                     title = title.lower()
                     performers = re.search(r'^(\w+ \w+ and \w+ \w+) - .*', title).group(1)
                     performers = performers.split("and")
-                    
+
                 if re.match(r'^\w+ \w+ & \w+ \w+ in .*', title):
                     performers = re.search(r'^(\w+ \w+ & \w+ \w+) in .*', title).group(1)
                     performers = performers.split("&")
-                    
+
                 if re.match(r'^\w+ \w+ and \w+ \w+ in .*', title.lower()):
                     title = title.lower()
                     performers = re.search(r'^(\w+ \w+ and \w+ \w+) in .*', title).group(1)
                     performers = performers.split("and")
-            
+
             if performers:
                 performers = list(map(lambda x: x.strip().title(), performers))
                 if "Wonder Woman" in performers:
@@ -246,13 +251,10 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
                         performers.remove(performer)
                 if "" in performers:
                     performers.remove("")
-                    
+
                 return performers
 
-
         return []
-                
-                
 
     def get_description(self, response):
         desc_rows = self.process_xpath(response, self.get_selector_map('description')).getall()
@@ -260,34 +262,26 @@ class siteBabesInTroubleSpider(BaseSceneScraper):
             description = ''
             for desc in desc_rows:
                 if "screen size" not in desc.lower() and "for mp4" not in desc.lower() and "for wmv" not in desc.lower() and "if you like this video" not in desc.lower():
-                    if not "this format is" in desc:
-                        if not re.search('(\d{3,4}\*\d{3,4})', desc):
+                    if "this format is" not in desc:
+                        if not re.search(r'(\d{3,4}\*\d{3,4})', desc):
                             description = description + " " + desc.strip()
             return html.unescape(description.strip())
-
-        return ''                
-
-
+        return ''
 
     def get_site(self, response):
         meta = response.meta
         if meta['site']:
             return meta['site']
-            
         return tldextract.extract(response.url).domain
-
 
     def get_parent(self, response):
         meta = response.meta
         if meta['parent']:
             return meta['parent']
-            
         return tldextract.extract(response.url).domain
-
 
     def get_network(self, response):
         meta = response.meta
         if meta['network']:
             return meta['network']
-            
         return tldextract.extract(response.url).domain

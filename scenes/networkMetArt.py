@@ -40,7 +40,9 @@ class MetArtNetworkSpider(BaseSceneScraper):
             yield scrapy.Request(
                 url=self.format_link(
                     response, '/api/movie?name=' + res.group(2) + '&date=' + res.group(1)),
-                callback=self.parse_scene)
+                callback=self.parse_scene,
+                headers=self.headers,
+                cookies=self.cookies)
 
     def parse_scene(self, response):
         movie = response.json()
@@ -61,6 +63,8 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
         if 'hustler' in response.url:
             item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']
+        elif 'lovehairy' in response.url:
+            item['image'] = 'https://cdn.metartnetwork.com/' + movie['siteUUID'] + movie['splashImagePath']
         else:
             item['image'] = self.format_link(response, item['image'])
 

@@ -1,34 +1,36 @@
-import scrapy
+"""
+Scraper for ManyVids network.
+"""
 import re
-import dateparser
-from datetime import datetime
-from time import strptime
-import tldextract
 import json
-from urllib.parse import urlparse
+from datetime import datetime
+import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class networkManyVidsSpider(BaseSceneScraper):
+
+class NetworkManyVidsSpider(BaseSceneScraper):
     name = 'ManyVids'
 
     start_urls = [
-        ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'YouthLust'],
-        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Lana Rain'],
-        ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'MySweetApple'],
-        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Jack and Jill'],
-        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Dirty Princess'],
-        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Manyvids: Cattie'],
-        ['https://www.manyvids.com', '/api/model/1000286888/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'A Taboo Fantasy'],
-        ['https://www.manyvids.com', '/api/model/694469/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Adult Candy Store'],
-        ['https://www.manyvids.com', '/api/model/1000159044/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Fuck Club'],
-        ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'IXXVICOM'],
-        ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Jay Bank Presents'],
-        ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Undercover Sluts'],
-        ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Submissive Teen POV'],
-        ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=61106aaee46f3011208327', 'Sloppy Toppy'],
+        ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'YouthLust'],
+        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Lana Rain'],
+        ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'MySweetApple'],
+        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Jack and Jill'],
+        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Dirty Princess'],
+        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Manyvids: Cattie'],
+        ['https://www.manyvids.com', '/api/model/1000286888/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'A Taboo Fantasy'],
+        ['https://www.manyvids.com', '/api/model/694469/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Adult Candy Store'],
+        ['https://www.manyvids.com', '/api/model/1000159044/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Fuck Club'],
+        ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'IXXVICOM'],
+        ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Jay Bank Presents'],
+        ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Undercover Sluts'],
+        ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Submissive Teen POV'],
+        ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Sloppy Toppy'],
+        ['https://www.manyvids.com', '/api/model/69353/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6133d7f085df1458636519', 'Natalia Grey'],
     ]
-    
+
     selector_map = {
         'title': '',
         'description': '//div[@class="desc-text"]/text()',
@@ -41,35 +43,34 @@ class networkManyVidsSpider(BaseSceneScraper):
         'pagination': ''
     }
 
-    headers =  {
+    headers = {
         'X-Requested-With': 'XMLHttpRequest'
     }
 
-    cookies =  {
-        'PHPSESSID': 'fte5t9jjgk389919ge2jtanjhp8d3bafvk61vc2h'
+    cookies = {
+        'PHPSESSID': 'Gt0EnShhEqG1es8v47BwPGkxuUapp5WFvLV09xXD'
     }
-    
 
     def start_requests(self):
         url = "https://www.manyvids.com/Profile/1001216419/YouthLust/Store/Videos/"
         yield scrapy.Request(url,
-                     callback=self.get_taglist,
-                     headers=self.headers,
-                     cookies=self.cookies)     
-                     
+                             callback=self.get_taglist,
+                             headers=self.headers,
+                             cookies=self.cookies)
+
     def get_taglist(self, response):
-        meta=response.meta
+        meta = response.meta
         url = "https://d3e1078hs60k37.cloudfront.net/site_files/json/vid_categories.json"
         yield scrapy.Request(url,
-                     callback=self.start_requests2,
-                     headers=self.headers,
-                     cookies=self.cookies, meta=meta)     
+                             callback=self.start_requests2,
+                             headers=self.headers,
+                             cookies=self.cookies, meta=meta)
 
     def start_requests2(self, response):
-        meta=response.meta
+        meta = response.meta
         taglist = json.loads(response.text)
         meta['taglist'] = taglist
-       
+
         for link in self.start_urls:
             meta['page'] = self.page
             meta['pagination'] = link[1]
@@ -80,7 +81,7 @@ class networkManyVidsSpider(BaseSceneScraper):
                                  headers=self.headers,
                                  cookies=self.cookies)
 
-    def parse(self, response, **kwargs):
+    def parse(self, response):
         meta = response.meta
         scenes = self.get_scenes(response)
         count = 0
@@ -99,31 +100,27 @@ class networkManyVidsSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
-        offset = str((int(page)-1)*30)
-        return self.format_url(base, pagination % offset)                                
+        offset = str((int(page) - 1) * 30)
+        return self.format_url(base, pagination % offset)
 
     def get_scenes(self, response):
         meta = response.meta
-        global json
         jsondata = json.loads(response.text)
         data = jsondata['result']['content']['items']
         for jsonentry in data:
-            scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\","")
+            scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\", "")
             if jsonentry['preview']['videoPreview']:
-                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\","").replace(" ","%20")
+                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
             meta['id'] = jsonentry['id']
             meta['title'] = jsonentry['title']
             if scene and meta['id']:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                   
-
-
-
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_date(self, response):
-        meta=response.meta
+        meta = response.meta
         imagestring = response.xpath('//meta[@name="twitter:image"]/@content').get()
         if imagestring:
-            imagestring = re.search('.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
+            imagestring = re.search(r'.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
             if imagestring:
                 imagestring = imagestring.group(1)
                 imagestringhex = imagestring[:8]
@@ -135,17 +132,16 @@ class networkManyVidsSpider(BaseSceneScraper):
                     date = datetime.utcfromtimestamp(int(imagestring)).isoformat()
                     return date
 
-                
         # If no valid image string available to pull date from
-        #print(f'Guessing date for: {response.url}')
+        # print(f'Guessing date for: {response.url}')
         page = int(meta['page'])
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if date:
             date = date.strip()
-            if re.search('([a-zA-Z]{3} \d{1,2})', date):
-                date = re.search('([a-zA-Z]{3} \d{1,2})', date).group(1)
+            if re.search(r'([a-zA-Z]{3} \d{1,2})', date):
+                date = re.search(r'([a-zA-Z]{3} \d{1,2})', date).group(1)
                 date = date.split(" ")
-                monthstring = datetime.strptime(date[0],'%b')
+                monthstring = datetime.strptime(date[0], '%b')
                 month = str(monthstring.month)
                 if len(month) == 1:
                     month = "0" + month
@@ -153,103 +149,94 @@ class networkManyVidsSpider(BaseSceneScraper):
                     day = "0" + date[1]
                 else:
                     day = date[1]
-                
+
                 today = datetime.now().strftime('%m%d')
                 year = datetime.now().strftime('%Y')
                 scenedate = str(month) + str(day)
-                
-                sceneid = re.search('Video\/(\d+)\/', response.url).group(1)
+
+                sceneid = re.search(r'Video\/(\d+)\/', response.url).group(1)
                 if sceneid:
                     sceneid = int(sceneid)
                     if sceneid > 2462280:
                         scenedate = scenedate + "2021"
                     if 1657000 <= sceneid <= 2462279:
-                        scenedate = scenedate + "2020"                
+                        scenedate = scenedate + "2020"
                     if 1014000 <= sceneid <= 1656999:
-                        scenedate = scenedate + "2019"                
+                        scenedate = scenedate + "2019"
                     if 600000 <= sceneid <= 1013999:
                         scenedate = scenedate + "2018"
                     if sceneid < 599999:
                         scenedate = scenedate + "2017"
                 else:
-                    if page >= 1 and page <= 5:
+                    if page in range(1, 5):
                         if scenedate <= today:
                             scenedate = scenedate + year
                         else:
-                            scenedate = scenedate + str(int(year)-1)
-                            
-                    if page >= 6 and page <= 7:
+                            scenedate = scenedate + str(int(year) - 1)
+
+                    if page in range(6, 7):
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-1)
+                            scenedate = scenedate + str(int(year) - 1)
                         else:
-                            scenedate = scenedate + str(int(year)-2)
-                            
+                            scenedate = scenedate + str(int(year) - 2)
+
                     if page == 8:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-2)
+                            scenedate = scenedate + str(int(year) - 2)
                         else:
-                            scenedate = scenedate + str(int(year)-3)
-                            
+                            scenedate = scenedate + str(int(year) - 3)
+
                     if page == 9:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-3)
+                            scenedate = scenedate + str(int(year) - 3)
                         else:
-                            scenedate = scenedate + str(int(year)-4)
-                            
+                            scenedate = scenedate + str(int(year) - 4)
+
                     if page == 10:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-4)
+                            scenedate = scenedate + str(int(year) - 4)
                         else:
-                            scenedate = scenedate + str(int(year)-5)
-                            
+                            scenedate = scenedate + str(int(year) - 5)
+
                     if page > 10:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-5)
+                            scenedate = scenedate + str(int(year) - 5)
                         else:
-                            scenedate = scenedate + str(int(year)-6)
-                            
-                        
+                            scenedate = scenedate + str(int(year) - 6)
 
-                
-                        
-
-            if len(scenedate)>2:
+            if len(scenedate) > 2:
                 try:
                     return dateparser.parse(scenedate, date_formats=['%m%d%Y']).isoformat()
-                except:
+                except Exception:
                     return dateparser.parse('today').isoformat()
-
         return None
-
 
     def get_performers(self, response):
         meta = response.meta
         if meta['site'] == "Lana Rain":
             return ['Lana Rain']
+        if meta['site'] == "Natalia Grey":
+            return ['Natalia Grey']
         if meta['site'] == "Cattie":
             return ['Cattie Candescent']
-        
         return []
-        
+
     def get_site(self, response):
         meta = response.meta
         if meta['site']:
             return meta['site']
-        else:
-            return "Manyvids"
-        
+        return "Manyvids"
+
     def get_parent(self, response):
         meta = response.meta
         if meta['site']:
             if "Manyvids" in meta['site']:
                 return "Manyvids"
             return meta['site']
-        else:
-            return "Manyvids"
-        
+        return "Manyvids"
+
     def get_network(self, response):
         return "Manyvids"
-            
 
     def get_tags(self, response):
         meta = response.meta
@@ -270,5 +257,4 @@ class networkManyVidsSpider(BaseSceneScraper):
                 scenetags.append("ManyVids")
             if scenetags:
                 return list(map(lambda x: x.strip().title(), scenetags))
-
-        return []            
+        return []

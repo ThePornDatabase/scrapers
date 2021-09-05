@@ -1,5 +1,4 @@
 import re
-
 import dateparser
 import scrapy
 
@@ -41,7 +40,8 @@ class NubilesSpider(BaseSceneScraper):
         'title': '//*[contains(@class, "content-pane-title")]/h2/text()',
         'description': '.row .collapse::text',
         'date': '//span[@class="date"]/text()',
-        'image': '//video/@poster | //img[@class="fake-video-player-cover"]/@src',
+        'image': '//video/@poster | '
+                 '//img[@class="fake-video-player-cover"]/@src',
         'performers': '//a[@class="content-pane-performer model"]/text()',
         'tags': '//*[@class="categories"]//a/text()',
         'external_id': '(\\d+)',
@@ -56,11 +56,28 @@ class NubilesSpider(BaseSceneScraper):
             if re.search('video\\/watch', link) is not None:
                 meta = {
                     'title': scene.css('.title a::text').get().strip(),
-                    'date': dateparser.parse(scene.css('.date::text').extract_first()).isoformat(),
-                    'site': scene.xpath('.//a[@class="site-link"]/text()').get().strip()
+                    'date': dateparser.parse(
+                        scene.css('.date::text')
+                        .extract_first()).isoformat(),
                 }
-
-                yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
+                if "brattysis" in response.url:
+                    meta['site'] = "Bratty Sis"
+                elif "anilos" in response.url:
+                    meta['site'] = "Anilos"
+                elif "deeplush" in response.url:
+                    meta['site'] = "Deep Lush"
+                elif "nfbusty" in response.url:
+                    meta['site'] = "NF Busty"
+                elif "nubiles.net" in response.url:
+                    meta['site'] = "Nubiles"
+                else:
+                    meta['site'] = scene.xpath(
+                        './/a[@class="site-link"]/text()'
+                    )
+                    meta['site'] = meta['site'].get().strip()
+                yield scrapy.Request(
+                    url=self.format_link(response, link),
+                    callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         site = response.xpath(
@@ -74,20 +91,20 @@ class NubilesSpider(BaseSceneScraper):
         page = (page - 1) * 10
         return self.format_url(
             base, self.get_selector_map('pagination') % page)
-            
+
     def get_description(self, response):
         if 'description' not in self.get_selector_map():
             return ''
-
         description = self.process_xpath(
             response, self.get_selector_map('description')).get()
-
-        if not description or not len(description.strip()):
-            description = response.xpath('//div[contains(@class,"content-pane-column")]/div/p/text()').getall()
+        if not description or (description and len(description.strip())):
+            description = response.xpath(
+                '//div[contains(@class,'
+                '"content-pane-column")]/div/p/text()'
+            )
+            description = description.getall()
             if description:
                 description = " ".join(description)
-
         if description is not None:
             return description.replace('Description:', '').strip()
-            
-        return ""            
+        return ""

@@ -19,6 +19,7 @@ class VixenScraper(BaseSceneScraper):
         'https://www.blackedraw.com',
         'https://www.tushyraw.com',
         'https://www.deeper.com',
+        'https://www.slayed.com',
     ]
 
     sites = {
@@ -28,6 +29,7 @@ class VixenScraper(BaseSceneScraper):
         'BLACKEDRAW': 'BlackedRaw',
         'TUSHYRAW': 'TushyRaw',
         'DEEPER': 'Deeper',
+        'SLAYED': 'Slayed',
     }
 
     selector_map = {
@@ -81,8 +83,8 @@ class VixenScraper(BaseSceneScraper):
             site = self.sites[site.upper()]
         scene['site'] = site
 
-        scene['network'] = self.network
-        scene['parent'] = self.get_parent(response)
+        scene['network'] = "Vixen"
+        scene['parent'] = site
 
         scene['date'] = dateparser.parse(data['releaseDate']).isoformat()
         scene['url'] = self.format_link(response, '/videos/' + data['slug'])
