@@ -34,7 +34,7 @@ def match_tag(argument):
     return match.get(argument, '')
 
 
-class siteMedienVanHolldandSpider(BaseSceneScraper):
+class SiteMedienVanHolldandSpider(BaseSceneScraper):
     name = 'MeidenVanHolland'
     network = 'Meiden Van Holland'
 
@@ -114,8 +114,8 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
         if performers:
             performers = performers.get()
             performers = re.search(
-                                r',models:\[(.*id:\".*?)\],preroll',
-                                performers)
+                r',models:\[(.*id:\".*?)\],preroll',
+                performers)
             if performers:
                 performers = performers.group(1)
                 performers = re.findall('title:\"(.*?)\"', performers)
@@ -155,19 +155,19 @@ class siteMedienVanHolldandSpider(BaseSceneScraper):
                     description = re.sub(r'\\u00\d[a-fA-F]', '', description)
                 description = re.sub(r'<[^<]+?>', '', description).strip()
                 description = re.sub(
-                                r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
+                    r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
                 return html.unescape(description.strip())
         return ''
 
     def get_date(self, response):
         datestring = self.process_xpath(
-                        response, self.get_selector_map('date'))
+            response, self.get_selector_map('date'))
         if datestring:
             datestring = datestring.get()
             date = self.get_from_regex(datestring, 're_date')
             if not date:
                 date = re.search(
-                            r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
+                    r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
                 if date:
                     date = date.group(1)
 

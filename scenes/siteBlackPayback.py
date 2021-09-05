@@ -1,11 +1,11 @@
-import scrapy
 import re
 import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteBlackPaybackSpider(BaseSceneScraper):
+class SiteBlackPaybackSpider(BaseSceneScraper):
     name = 'BlackPayback'
     network = 'Black Payback'
     max_pages = 15
@@ -19,10 +19,10 @@ class siteBlackPaybackSpider(BaseSceneScraper):
         'description': '//div[contains(@class,"videoDetails")]/p/text()',
         'date': '',
         'image': '//script[contains(text(),"video_content")]/text()',
-        're_image': 'poster=\"(.*?\.jpg)',
+        're_image': r'poster=\"(.*?\.jpg)',
         'performers': '',
         'tags': '//div[contains(@class,"featuring")]/ul/li/a/text()',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*\/(.*?).html',
         'trailer': '',
         'pagination': '/tour/updates/page_%s.html'
     }
@@ -38,9 +38,9 @@ class siteBlackPaybackSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Black Payback"
-        
+
     def get_date(self, response):
         return dateparser.parse('today').isoformat()
-        
+
     def get_performers(self, response):
         return []

@@ -73,7 +73,8 @@ class NubilesSpider(BaseSceneScraper):
                 else:
                     meta['site'] = scene.xpath(
                         './/a[@class="site-link"]/text()'
-                        ).get().strip()
+                    )
+                    meta['site'] = meta['site'].get().strip()
                 yield scrapy.Request(
                     url=self.format_link(response, link),
                     callback=self.parse_scene, meta=meta)
@@ -100,7 +101,8 @@ class NubilesSpider(BaseSceneScraper):
             description = response.xpath(
                 '//div[contains(@class,'
                 '"content-pane-column")]/div/p/text()'
-                ).getall()
+            )
+            description = description.getall()
             if description:
                 description = " ".join(description)
         if description is not None:

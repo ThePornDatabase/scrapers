@@ -10,7 +10,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class networkManyVidsSpider(BaseSceneScraper):
+class NetworkManyVidsSpider(BaseSceneScraper):
     name = 'ManyVids'
 
     start_urls = [
@@ -43,11 +43,11 @@ class networkManyVidsSpider(BaseSceneScraper):
         'pagination': ''
     }
 
-    headers =  {
+    headers = {
         'X-Requested-With': 'XMLHttpRequest'
     }
 
-    cookies =  {
+    cookies = {
         'PHPSESSID': 'Gt0EnShhEqG1es8v47BwPGkxuUapp5WFvLV09xXD'
     }
 
@@ -59,7 +59,7 @@ class networkManyVidsSpider(BaseSceneScraper):
                              cookies=self.cookies)
 
     def get_taglist(self, response):
-        meta=response.meta
+        meta = response.meta
         url = "https://d3e1078hs60k37.cloudfront.net/site_files/json/vid_categories.json"
         yield scrapy.Request(url,
                              callback=self.start_requests2,
@@ -67,7 +67,7 @@ class networkManyVidsSpider(BaseSceneScraper):
                              cookies=self.cookies, meta=meta)
 
     def start_requests2(self, response):
-        meta=response.meta
+        meta = response.meta
         taglist = json.loads(response.text)
         meta['taglist'] = taglist
 
@@ -100,7 +100,7 @@ class networkManyVidsSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
-        offset = str((int(page)-1)*30)
+        offset = str((int(page) - 1) * 30)
         return self.format_url(base, pagination % offset)
 
     def get_scenes(self, response):
@@ -108,16 +108,16 @@ class networkManyVidsSpider(BaseSceneScraper):
         jsondata = json.loads(response.text)
         data = jsondata['result']['content']['items']
         for jsonentry in data:
-            scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\","")
+            scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\", "")
             if jsonentry['preview']['videoPreview']:
-                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\","").replace(" ","%20")
+                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
             meta['id'] = jsonentry['id']
             meta['title'] = jsonentry['title']
             if scene and meta['id']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_date(self, response):
-        meta=response.meta
+        meta = response.meta
         imagestring = response.xpath('//meta[@name="twitter:image"]/@content').get()
         if imagestring:
             imagestring = re.search(r'.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
@@ -133,7 +133,7 @@ class networkManyVidsSpider(BaseSceneScraper):
                     return date
 
         # If no valid image string available to pull date from
-        #print(f'Guessing date for: {response.url}')
+        # print(f'Guessing date for: {response.url}')
         page = int(meta['page'])
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if date:
@@ -141,7 +141,7 @@ class networkManyVidsSpider(BaseSceneScraper):
             if re.search(r'([a-zA-Z]{3} \d{1,2})', date):
                 date = re.search(r'([a-zA-Z]{3} \d{1,2})', date).group(1)
                 date = date.split(" ")
-                monthstring = datetime.strptime(date[0],'%b')
+                monthstring = datetime.strptime(date[0], '%b')
                 month = str(monthstring.month)
                 if len(month) == 1:
                     month = "0" + month
@@ -172,39 +172,39 @@ class networkManyVidsSpider(BaseSceneScraper):
                         if scenedate <= today:
                             scenedate = scenedate + year
                         else:
-                            scenedate = scenedate + str(int(year)-1)
+                            scenedate = scenedate + str(int(year) - 1)
 
                     if page in range(6, 7):
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-1)
+                            scenedate = scenedate + str(int(year) - 1)
                         else:
-                            scenedate = scenedate + str(int(year)-2)
+                            scenedate = scenedate + str(int(year) - 2)
 
                     if page == 8:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-2)
+                            scenedate = scenedate + str(int(year) - 2)
                         else:
-                            scenedate = scenedate + str(int(year)-3)
+                            scenedate = scenedate + str(int(year) - 3)
 
                     if page == 9:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-3)
+                            scenedate = scenedate + str(int(year) - 3)
                         else:
-                            scenedate = scenedate + str(int(year)-4)
+                            scenedate = scenedate + str(int(year) - 4)
 
                     if page == 10:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-4)
+                            scenedate = scenedate + str(int(year) - 4)
                         else:
-                            scenedate = scenedate + str(int(year)-5)
+                            scenedate = scenedate + str(int(year) - 5)
 
                     if page > 10:
                         if scenedate <= today:
-                            scenedate = scenedate + str(int(year)-5)
+                            scenedate = scenedate + str(int(year) - 5)
                         else:
-                            scenedate = scenedate + str(int(year)-6)
+                            scenedate = scenedate + str(int(year) - 6)
 
-            if len(scenedate)>2:
+            if len(scenedate) > 2:
                 try:
                     return dateparser.parse(scenedate, date_formats=['%m%d%Y']).isoformat()
                 except Exception:

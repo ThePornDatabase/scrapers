@@ -40,9 +40,9 @@ class MetArtNetworkSpider(BaseSceneScraper):
             yield scrapy.Request(
                 url=self.format_link(
                     response, '/api/movie?name=' + res.group(2) + '&date=' + res.group(1)),
-                callback=self.parse_scene, 
-                headers = self.headers,
-                cookies = self.cookies)
+                callback=self.parse_scene,
+                headers=self.headers,
+                cookies=self.cookies)
 
     def parse_scene(self, response):
         movie = response.json()
