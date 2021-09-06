@@ -11,6 +11,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 def match_site(argument):
     match = {
         'ariellynn': "Ariel Lynn",
+        'ashley4k': "Ashley 4k",
         'behindtheporno': "Behind the Porno",
         'bigboobiesclub': "Big Boobies Club",
         'bigbouncybabes': "Big Bouncy Babes",
@@ -71,47 +72,48 @@ class AndomarkSpider(BaseSceneScraper):
     # ~ }
 
     start_urls = [
-        # ~ 'http://sexykarenxxx.com',
-        # ~ 'https://ariellynn.com',
-        # ~ 'https://behindtheporno.com',
-        # ~ 'https://bigboobiesclub.com',
-        # ~ 'https://bigbouncybabes.com',
-        # ~ 'https://bigtoyxxx.com',
-        # ~ 'https://bondagelegend.com',
-        # ~ 'https://bradsterling.elxcomplete.com',
-        # ~ 'https://britstudio.xxx',
-        # ~ 'https://brittanysbubbles.com',
-        # ~ 'https://chocolatepov.com',
-        # ~ 'https://furrychicks.elxcomplete.com',
-        # ~ 'https://hollyhotwife.elxcomplete.com',
-        # ~ 'https://internationalnudes.com',
-        # ~ 'https://johnnygoodluck.com',
-        # ~ 'https://laurenphillips.com',
-        # ~ 'https://oldsexygrannies.com',
-        # ~ 'https://ravenswallowzxxx.com',
-        # ~ 'https://reidmylips.elxcomplete.com',
-        # ~ 'https://rionkingxxx.com',
-        # ~ 'https://seanmichaelsxxx.com',
-        # ~ 'https://secretsusan.com',
-        # ~ 'https://sheseducedme.com',
+        'http://sexykarenxxx.com',
+        'https://ariellynn.com',
+        'https://ashley4k.com',
+        'https://behindtheporno.com',
+        'https://bigboobiesclub.com',
+        'https://bigbouncybabes.com',
+        'https://bigtoyxxx.com',
+        'https://bondagelegend.com',
+        'https://bradsterling.elxcomplete.com',
+        'https://britstudio.xxx',
+        'https://brittanysbubbles.com',
+        'https://chocolatepov.com',
+        'https://furrychicks.elxcomplete.com',
+        'https://hollyhotwife.elxcomplete.com',
+        'https://internationalnudes.com',
+        'https://johnnygoodluck.com',
+        'https://laurenphillips.com',
+        'https://oldsexygrannies.com',
+        'https://ravenswallowzxxx.com',
+        'https://reidmylips.elxcomplete.com',
+        'https://rionkingxxx.com',
+        'https://seanmichaelsxxx.com',
+        'https://secretsusan.com',
+        'https://sheseducedme.com',
         'https://shinybound.com',
         'https://www.shinysboundsluts.com',
-        # ~ 'https://sofiemariexxx.com',
-        # ~ 'https://tabooadventures.elxcomplete.com',
-        # ~ 'https://vanillapov.com',
-        # ~ 'https://willtilexxx.com',
-        # ~ 'https://www.houseofyre.com',
-        # ~ 'https://www.meanawolf.com',
-        # ~ 'https://www.minkaxxx.com',
-        # ~ 'https://www.thejerkoffmembers.com',
-        # ~ 'https://xxxcellentadventures.com',
-        # ~ 'https://younggunsxxx.com',
-        # ~ 'https://yummybikinimodel.com',
-        # 'https://yummygirl.com'  #screwed up, left in for list completion. Videos on other sites
-        # ~ 'https://yummygirlz.elxcomplete.com',
-        # ~ 'https://yummypinkxxx.elxcomplete.com',
-        # ~ 'https://yummypornclub.elxcomplete.com',
-        # ~ 'https://yummywomen.elxcomplete.com',
+        'https://sofiemariexxx.com',
+        'https://tabooadventures.elxcomplete.com',
+        'https://vanillapov.com',
+        'https://willtilexxx.com',
+        'https://www.houseofyre.com',
+        'https://www.meanawolf.com',
+        'https://www.minkaxxx.com',
+        'https://www.thejerkoffmembers.com',
+        'https://xxxcellentadventures.com',
+        'https://younggunsxxx.com',
+        'https://yummybikinimodel.com',
+        # ~ # 'https://yummygirl.com'  #screwed up, left in for list completion. Videos on other sites
+        'https://yummygirlz.elxcomplete.com',
+        'https://yummypinkxxx.elxcomplete.com',
+        'https://yummypornclub.elxcomplete.com',
+        'https://yummywomen.elxcomplete.com',
     ]
 
     selector_map = {
@@ -145,7 +147,7 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/tour2/categories/movies_%s_d.html'
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
-        elif 'shiny' in base:
+        elif 'shiny' in base or '4k' in base:
             selector = '/categories/updates_%s_d.html'
         else:
             selector = '/categories/movies_%s_d.html'
@@ -161,6 +163,8 @@ class AndomarkSpider(BaseSceneScraper):
             scenes = response.xpath('//div[@class="modelimg"]/a/@href').getall()
         elif 'sexykaren' in response.url:
             scenes = response.xpath('//div[@class="modeldata"]/h3/a/@href').getall()
+        elif '4k' in response.url:
+            scenes = response.xpath('//h5/a/@href').getall()
         else:
             scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
         for scene in scenes:
@@ -169,7 +173,7 @@ class AndomarkSpider(BaseSceneScraper):
 
     def get_trailer(self, response):
         trailerxpath = self.get_selector_map('trailer')
-        if 'laurenphillips' in response.url or 'shiny' in response.url:
+        if 'laurenphillips' in response.url or 'shiny' in response.url or '4k' in response.url:
             trailerxpath = '//div[@class="update_image"]/a[1]/@onclick'
         parsed_uri = urlparse(response.url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
