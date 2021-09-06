@@ -1,9 +1,9 @@
-import dateparser
-import scrapy
 import re
-import tldextract
 import string
 from urllib.parse import urlparse
+import dateparser
+import tldextract
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -36,6 +36,8 @@ def match_site(argument):
         'secretsusan': "Secret Susan",
         'sexykarenxxx': "Karen Fisher",
         'sheseducedme': "She Seduced Me",
+        'shinybound': "Shiny Bound",
+        'shinysboundsluts': "Shinys Bound Sluts",
         'sofiemariexxx': "Sofie Marie",
         'tabooadventures': "Taboo Adventures",
         'thejerkoffmembers': "The Jerk Off Games",
@@ -52,61 +54,64 @@ def match_site(argument):
     }
     return match.get(argument, '')
 
+
 class AndomarkSpider(BaseSceneScraper):
     name = 'Andomark'
     network = 'Andomark'
 
     # ~ custom_settings = {'CONCURRENT_REQUESTS': '2',
-                       # ~ 'AUTOTHROTTLE_ENABLED': 'True',
-                       # ~ 'AUTOTHROTTLE_DEBUG': 'False',
-                       # ~ 'ITEM_PIPELINES': {
-                           # ~ 'tpdb.pipelines.TpdbApiScenePipeline': 400,
-                       # ~ },
-                       # ~ 'DOWNLOADER_MIDDLEWARES': {
-                           # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-                       # ~ }
-                       # ~ }
+    # ~ 'AUTOTHROTTLE_ENABLED': 'True',
+    # ~ 'AUTOTHROTTLE_DEBUG': 'False',
+    # ~ 'ITEM_PIPELINES': {
+    # ~ 'tpdb.pipelines.TpdbApiScenePipeline': 400,
+    # ~ },
+    # ~ 'DOWNLOADER_MIDDLEWARES': {
+    # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+    # ~ }
+    # ~ }
 
     start_urls = [
-        'http://sexykarenxxx.com',
-        'https://ariellynn.com',
-        'https://behindtheporno.com',
-        'https://bigboobiesclub.com',
-        'https://bigbouncybabes.com',
-        'https://bigtoyxxx.com',
-        'https://bondagelegend.com',
-        'https://bradsterling.elxcomplete.com',
-        'https://britstudio.xxx',
-        'https://brittanysbubbles.com',
-        'https://chocolatepov.com',
-        'https://furrychicks.elxcomplete.com',
-        'https://hollyhotwife.elxcomplete.com',
-        'https://internationalnudes.com',
-        'https://johnnygoodluck.com',
-        'https://laurenphillips.com',
-        'https://oldsexygrannies.com',
-        'https://ravenswallowzxxx.com',
-        'https://reidmylips.elxcomplete.com',
-        'https://rionkingxxx.com',
-        'https://seanmichaelsxxx.com',
-        'https://secretsusan.com',
-        'https://sheseducedme.com',
-        'https://sofiemariexxx.com',
-        'https://tabooadventures.elxcomplete.com',
-        'https://vanillapov.com',
-        'https://willtilexxx.com',
-        'https://www.houseofyre.com',
-        'https://www.meanawolf.com',
-        'https://www.minkaxxx.com',
-        'https://www.thejerkoffmembers.com',
-        'https://xxxcellentadventures.com',
-        'https://younggunsxxx.com',
-        'https://yummybikinimodel.com',
-        # ~ #'https://yummygirl.com'  #screwed up, left in for list completion. Videos on other sites  
-        'https://yummygirlz.elxcomplete.com',
-        'https://yummypinkxxx.elxcomplete.com',
-        'https://yummypornclub.elxcomplete.com',
-        'https://yummywomen.elxcomplete.com',
+        # ~ 'http://sexykarenxxx.com',
+        # ~ 'https://ariellynn.com',
+        # ~ 'https://behindtheporno.com',
+        # ~ 'https://bigboobiesclub.com',
+        # ~ 'https://bigbouncybabes.com',
+        # ~ 'https://bigtoyxxx.com',
+        # ~ 'https://bondagelegend.com',
+        # ~ 'https://bradsterling.elxcomplete.com',
+        # ~ 'https://britstudio.xxx',
+        # ~ 'https://brittanysbubbles.com',
+        # ~ 'https://chocolatepov.com',
+        # ~ 'https://furrychicks.elxcomplete.com',
+        # ~ 'https://hollyhotwife.elxcomplete.com',
+        # ~ 'https://internationalnudes.com',
+        # ~ 'https://johnnygoodluck.com',
+        # ~ 'https://laurenphillips.com',
+        # ~ 'https://oldsexygrannies.com',
+        # ~ 'https://ravenswallowzxxx.com',
+        # ~ 'https://reidmylips.elxcomplete.com',
+        # ~ 'https://rionkingxxx.com',
+        # ~ 'https://seanmichaelsxxx.com',
+        # ~ 'https://secretsusan.com',
+        # ~ 'https://sheseducedme.com',
+        'https://shinybound.com',
+        'https://www.shinysboundsluts.com',
+        # ~ 'https://sofiemariexxx.com',
+        # ~ 'https://tabooadventures.elxcomplete.com',
+        # ~ 'https://vanillapov.com',
+        # ~ 'https://willtilexxx.com',
+        # ~ 'https://www.houseofyre.com',
+        # ~ 'https://www.meanawolf.com',
+        # ~ 'https://www.minkaxxx.com',
+        # ~ 'https://www.thejerkoffmembers.com',
+        # ~ 'https://xxxcellentadventures.com',
+        # ~ 'https://younggunsxxx.com',
+        # ~ 'https://yummybikinimodel.com',
+        # 'https://yummygirl.com'  #screwed up, left in for list completion. Videos on other sites
+        # ~ 'https://yummygirlz.elxcomplete.com',
+        # ~ 'https://yummypinkxxx.elxcomplete.com',
+        # ~ 'https://yummypornclub.elxcomplete.com',
+        # ~ 'https://yummywomen.elxcomplete.com',
     ]
 
     selector_map = {
@@ -116,13 +121,13 @@ class AndomarkSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': 'updates/(.+)\\.html',
+        'external_id': r'updates/(.+)\.html',
         'trailer': '//a[@class="update_image_big"]/@onclick',
         'pagination': '/categories/movies_%s_d.html'
     }
-    
+
     cookies = {
-        'SPSI':'1d516e4fb3be12e8c9f490625a3ae7b7',
+        'SPSI': '1d516e4fb3be12e8c9f490625a3ae7b7',
     }
 
     def get_next_page_url(self, base, page):
@@ -140,11 +145,13 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/tour2/categories/movies_%s_d.html'
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
+        elif 'shiny' in base:
+            selector = '/categories/updates_%s_d.html'
         else:
             selector = '/categories/movies_%s_d.html'
 
-        return self.format_url(base, selector % page)  
-            
+        return self.format_url(base, selector % page)
+
     def get_scenes(self, response):
         if 'britstudio' in response.url:
             scenes = response.xpath('//div[@class="update_details"]/div[contains(text(),"of video")]/../a[1]/@href').getall()
@@ -162,7 +169,7 @@ class AndomarkSpider(BaseSceneScraper):
 
     def get_trailer(self, response):
         trailerxpath = self.get_selector_map('trailer')
-        if 'laurenphillips' in response.url:
+        if 'laurenphillips' in response.url or 'shiny' in response.url:
             trailerxpath = '//div[@class="update_image"]/a[1]/@onclick'
         parsed_uri = urlparse(response.url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
@@ -171,9 +178,8 @@ class AndomarkSpider(BaseSceneScraper):
             trailer = re.search('\'(.*.mp4)\'', trailer).group(1)
             if trailer:
                 return domain + trailer
-        
-        return ''
 
+        return ''
 
     def get_date(self, response):
         if 'meanawolf' in response.url:
@@ -186,11 +192,10 @@ class AndomarkSpider(BaseSceneScraper):
                 date = response.xpath('//p[@class="date"]/text()').get()
             if date:
                 date = date.strip()
-                date = re.search('(\d{2}\/\d{2}\/\d{4})', date).group(1)
-
+                date = re.search(r'(\d{2}\/\d{2}\/\d{4})', date).group(1)
 
         if date:
-            return dateparser.parse(date).isoformat()      
+            return dateparser.parse(date).isoformat()
 
     def get_title(self, response):
         if 'minkaxxx' in response.url or 'sexykaren' in response.url:
@@ -201,18 +206,17 @@ class AndomarkSpider(BaseSceneScraper):
             titlesearch = '//h3/text()'
         else:
             titlesearch = '//span[@class="update_title"]/text()'
-                    
+
         title = response.xpath(titlesearch).get()
         if not title:
             title = response.xpath('//meta[@property="og:title"]/@content').get()
             if " - " in title:
-                title = re.search('^(.*)\ -\ ', title).group(1)
+                title = re.search(r'^(.*)\ -\ ', title).group(1)
             else:
                 title = ''
         title = string.capwords(title)
         return title.strip()
-        
-                
+
     def get_image(self, response):
         if 'minkaxxx' in response.url:
             imagesearch = '//div[@class="videoplayer"]/img/@src0_1x'
@@ -233,18 +237,18 @@ class AndomarkSpider(BaseSceneScraper):
             imagesearch = '//script[contains(text(),"useimage")]/text()'
             image = response.xpath(imagesearch).get()
             if image:
-                image = re.search('useimage\ =\ \"(.*?)\";', image).group(1)
+                image = re.search(r'useimage\ =\ \"(.*?)\";', image).group(1)
         else:
             imagesearch = '//meta[@property="og:image"]/@content'
             image = response.xpath(imagesearch).get()
-            
+
         if not image:
             image = response.xpath('//meta[@name="twitter:image"]/@content').get()
             if not image:
                 return ''
 
-        return self.format_link(response, image.replace(" ","%20")) 
-        
+        return self.format_link(response, image.replace(" ", "%20"))
+
     def get_tags(self, response):
         if 'minkaxxx' in response.url or 'sexykaren' in response.url:
             tagsearch = '//div[@class="videodetails"]/p/a/text()'
@@ -252,16 +256,20 @@ class AndomarkSpider(BaseSceneScraper):
             tagsearch = '//span[contains(text(),"TAGS:")]/following-sibling::a[contains(@href,"/categories/")]/text()'
         else:
             tagsearch = '//span[@class="update_tags"]/a/text()'
-                    
+
         tags = response.xpath(tagsearch).getall()
         if not tags:
             tags = response.xpath('//span[@class="tour_update_tags"]/a/text()').getall()
-        
+
         if tags:
+            if 'shinysboundsluts' in response.url:
+                tags.append('Trans')
+            if 'shinybound' in response.url:
+                tags.extend(['Bondage', 'Bondage / BDSM', 'Fetish'])
+            tags = list(set(tags))
             return list(map(lambda x: x.replace("-", "").strip().title(), tags))
         return []
 
-        
     def get_site(self, response):
         parsed_uri = tldextract.extract(response.url)
         if parsed_uri.domain == "elxcomplete":
@@ -271,9 +279,9 @@ class AndomarkSpider(BaseSceneScraper):
         site = match_site(domain)
         if not site:
             site = tldextract.extract(response.url).domain
-            
+
         return site
-        
+
     def get_parent(self, response):
         parsed_uri = tldextract.extract(response.url)
         if parsed_uri.domain == "elxcomplete":
@@ -283,19 +291,19 @@ class AndomarkSpider(BaseSceneScraper):
         parent = match_site(domain)
         if not parent:
             parent = tldextract.extract(response.url).domain
-            
+
         return parent
-        
+
     def get_id(self, response):
         if 'minkaxxx' in response.url or 'sexykaren' in response.url:
-            idsearch = 'trailers\/(.+)\\.html'
+            idsearch = r'trailers\/(.+)\.html'
         elif 'meanawolf' in response.url:
-            idsearch = 'scenes\/(.+)\\.html'
+            idsearch = r'scenes\/(.+)\.html'
         else:
-            idsearch = 'updates\/(.+)\\.html'
-            
+            idsearch = r'updates\/(.+)\.html'
+
         search = re.search(idsearch, response.url, re.IGNORECASE)
-        return search.group(1)        
+        return search.group(1)
 
     def get_performers(self, response):
         if 'minkaxxx' in response.url:
@@ -308,10 +316,10 @@ class AndomarkSpider(BaseSceneScraper):
             performersearch = '//span[contains(text(),"FEATURING:")]/following-sibling::a[contains(@href,"/models/")]/text()'
         else:
             performersearch = self.get_selector_map('performers')
-            
+
         performers = response.xpath(performersearch).getall()
         return list(map(lambda x: x.strip(), performers))
-        
+
     def get_description(self, response):
         if 'meanawolf' in response.url:
             description = response.xpath('//div[@class="trailerContent"]/p/text()').getall()
@@ -327,4 +335,4 @@ class AndomarkSpider(BaseSceneScraper):
 
         if description is not None:
             return description.replace('Description:', '').strip()
-        return ""        
+        return ""
