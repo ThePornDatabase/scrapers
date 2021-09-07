@@ -44,6 +44,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Xev Bellringer', 'Xev Bellringer', '/studio/75701/xev-bellringer/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Jerky Wives', 'Jerky Wives', '/studio/28671/jerky-wives-/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Bareback Studios', 'Bareback Studios', '/studio/35625/bare-back-studios/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Mandy Flores', 'Mandy Flores', '/studio/33729/mandy-flores/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -148,6 +149,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("1080p", "")
             title = title.replace("720p", "")
             title = title.replace("()", "")
+            title = title.replace("mf~", "")
             # ~ title = title.replace(" - ", "")
             if re.match(r'.*\(.*? discounted\)', title):
                 title = re.sub(r'(.*)\(.*? discounted\)(.*)', r'\1 \2', title)
@@ -253,6 +255,9 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
                     performers.remove("")
 
                 return performers
+
+        if meta['site'] == "Mandy Flores":
+            return ['Mandy Flores']
 
         return []
 
