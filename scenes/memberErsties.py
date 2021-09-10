@@ -3,8 +3,8 @@ import re
 from scrapy.http import FormRequest
 from slugify import slugify
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
 # Member site: call with "-a user=xxxxxxx -a password=xxxxxxxxx"
+
 
 class siteErstiesSpider(BaseSceneScraper):
     name = 'Ersties'
