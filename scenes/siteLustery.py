@@ -8,6 +8,7 @@ import re
 # Call with -a max_id=1000
 # This needs to be increased over time
 
+
 class LusterySpider(BaseSceneScraper):
     name = 'Lustery'
     network = 'Lustery'
@@ -55,7 +56,6 @@ class LusterySpider(BaseSceneScraper):
         if img_url is None:
             img_url = response.xpath('//div[@class="poster-with-video lazy-image"]/@data-src').get()
         timestamp = int(img_url.split("=")[1])
-
         return datetime.fromtimestamp(timestamp)
 
     def start_requests(self):
