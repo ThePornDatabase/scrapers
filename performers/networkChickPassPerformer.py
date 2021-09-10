@@ -12,6 +12,7 @@ class NetworkChickPassPerformerSpider(BasePerformerScraper):
         'birthplace': '//p[@class="model__stat"]/span[contains(text(), "Location")]/following-sibling::text()',
         'height': '//p[@class="model__stat"]/span[contains(text(), "Height")]/following-sibling::text()',
         'weight': '//p[@class="model__stat"]/span[contains(text(), "Weight")]/following-sibling::text()',
+        'astrology': '//p[@class="model__stat"]/span[contains(text(), "Astrological Sign")]/following-sibling::text()',
         'measurements': '//p[@class="model__stat"]/span[contains(text(), "Measurements")]/following-sibling::text()',
         'bio': '//div[@class="model_bio_info"]/text()',
         'pagination': '/tour1/categories/models_%s.html',
@@ -50,6 +51,10 @@ class NetworkChickPassPerformerSpider(BasePerformerScraper):
                     heightcm = str(round(((feet * 12) + inches) * 2.54)) + "cm"
                     return heightcm.strip()
         return ''
+
+    def get_weight(self, response):
+        weight = super().get_weight(response)
+        return weight.replace(" ", "")
 
     def get_cupsize(self, response):
         if 'measurements' in self.selector_map:
