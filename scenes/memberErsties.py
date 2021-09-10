@@ -98,8 +98,6 @@ class siteErstiesSpider(BaseSceneScraper):
         for performer in performers:
             if filter_performer(performer) in filter_s(self.get_title(response)):
                 in_title.append(performer)
-        if "Boat Party" in self.get_title(response):
-            breakpoint()
         if len(in_title) != 0:
             performers = in_title
 
