@@ -1,30 +1,22 @@
 import scrapy
 import re
-# import time
-import json
 from scrapy.http import FormRequest
-from scrapy import Selector
 from slugify import slugify
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
 # Member site: call with "-a user=xxxxxxx -a password=xxxxxxxxx"
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class siteErstiesSpider(BaseSceneScraper):
     name = 'Ersties'
     network = 'Ersties'
-
-
     start_urls = [
         'https://en.ersties.com/login.php',
     ]
-
     selector_map = {
         'image': '',
         'performers': '',
         'external_id': '',
         'description': '',
-        # 'pagination': 'https://en.ersties.com/videos?p=%s',
         'pagination': 'https://en.ersties.com/videos?p=%s',
         'date': '//p[@class="last-update"]/span//text()',
         'date_formats': ['%-d.%-m.%Y'],
@@ -48,7 +40,7 @@ class siteErstiesSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def _get_video_div(self, response):
-        return response.xpath('//div[@id="'+response.meta["video_id"]+'"]')
+        return response.xpath('//div[@id="' + response.meta["video_id"] + '"]')
 
     def get_description(self, response):
         description = ""
@@ -79,7 +71,6 @@ class siteErstiesSpider(BaseSceneScraper):
         performers = performers_str.split(",")
         if performers == ['']:
             performers = [response.xpath('//span[@class="model-name"]//text()').get()]
-
         performers = [re.sub(r'\([^)]*\)', '', p) for p in performers]
         performers = [p.strip() for p in performers]
 
@@ -100,7 +91,6 @@ class siteErstiesSpider(BaseSceneScraper):
                 in_title.append(performer)
         if len(in_title) != 0:
             performers = in_title
-
         return performers
 
     def get_tags(self, response):
