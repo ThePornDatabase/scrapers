@@ -1,7 +1,5 @@
 import scrapy
-from scrapy.selector import Selector
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 from datetime import datetime
 import re
 
@@ -47,7 +45,7 @@ class LusterySpider(BaseSceneScraper):
         return [p.strip() for p in couple.split("&")]
 
     def get_next_page_url(self, base, page):
-        return self.format_url(base, self.get_selector_map('pagination') % ((page-1) * 12))
+        return self.format_url(base, self.get_selector_map('pagination') % ((page - 1) * 12))
 
     def get_date(self, response):
         '''Date is not shown anywhere without logging in.
@@ -61,7 +59,7 @@ class LusterySpider(BaseSceneScraper):
     def start_requests(self):
         # Lustery doesn't allow you to see all pages without logging in.
         # Instead we guess at video ids up to maximum
-        self.download_delay = 0.25 # Important as they will block you
+        self.download_delay = 0.25  # Important as they will block you
         for url in self.start_urls:
             for video_id in range(30, int(self.max_id)):
                 yield scrapy.Request(
