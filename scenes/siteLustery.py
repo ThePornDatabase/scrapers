@@ -63,7 +63,7 @@ class LusterySpider(BaseSceneScraper):
         # Instead we guess at video ids up to maximum
         self.download_delay = 0.25 # Important as they will block you
         for url in self.start_urls:
-            for video_id in range(30, self.max_id):
+            for video_id in range(30, int(self.max_id)):
                 yield scrapy.Request(
                     cookies={},
                     url=url + "/video-preview/" + str(video_id),
