@@ -5,6 +5,9 @@ from tpdb.items import SceneItem
 from datetime import datetime
 import re
 
+# Call with -a max_id=1000
+# This needs to be increased over time
+
 class LusterySpider(BaseSceneScraper):
     name = 'Lustery'
     network = 'Lustery'
@@ -45,14 +48,6 @@ class LusterySpider(BaseSceneScraper):
     def get_next_page_url(self, base, page):
         return self.format_url(base, self.get_selector_map('pagination') % ((page-1) * 12))
 
-    # def get_scenes(self, response):
-    #     for scene in response.xpath("//a[contains(@href, '#video')]/@href").getall():
-    #         video_id = scene.split("-")[1]
-    #         yield scrapy.Request(
-    #             cookies={},
-    #             url=self.format_link(response, "/video-preview/" + video_id),
-    #             callback=self.parse_scene)
-
     def get_date(self, response):
         '''Date is not shown anywhere without logging in.
             Using the Unix timestamp of the poster image as the date'''
@@ -66,14 +61,10 @@ class LusterySpider(BaseSceneScraper):
     def start_requests(self):
         # Lustery doesn't allow you to see all pages without logging in.
         # Instead we guess at video ids up to maximum
-
-        MAX_ID = 1000 # This needs to be increased over time
-
         self.download_delay = 0.25 # Important as they will block you
         for url in self.start_urls:
-            for video_id in range(30, MAX_ID):
+            for video_id in range(30, self.max_id):
                 yield scrapy.Request(
                     cookies={},
                     url=url + "/video-preview/" + str(video_id),
                     callback=self.parse_scene)
-
