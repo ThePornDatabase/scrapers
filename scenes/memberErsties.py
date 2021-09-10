@@ -97,7 +97,6 @@ class siteErstiesSpider(BaseSceneScraper):
         return response.meta["tags"]
 
     def get_scenes(self, response):
-        print("get_scenes")
         for scene in response.xpath("//div[contains(@class,'video-item')]"):
             profile_page = scene.xpath(".//div/a/@href").get()
             video_id = scene.xpath('./@id').get()
