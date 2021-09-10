@@ -10,7 +10,7 @@ class SiteArtOfBlowjobSpider(BaseSceneScraper):
     network = 'Art of Blowjob'
 
     start_urls = [
-        'https://submissivex.com/',
+        'https://theartofblowjob.com/',
     ]
 
     selector_map = {
