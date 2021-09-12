@@ -27,12 +27,11 @@ class SiteArtOfBlowjobSpider(BaseSceneScraper):
 
     def start_requests(self):
         url = "https://www.theartofblowjob.com/display/updatelist/"
-        for link in self.start_urls:
-            yield scrapy.Request(url, callback=self.get_scenes,
-                                 meta={'page': self.page},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
-                                 
+        yield scrapy.Request(url, callback=self.get_scenes,
+                             meta={'page': self.page},
+                             headers=self.headers,
+                             cookies=self.cookies)
+
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="video-thumbnail"]/../../span/a/@href').getall()
         for scene in scenes:
