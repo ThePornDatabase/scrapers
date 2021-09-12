@@ -1,8 +1,6 @@
-import scrapy
 import re
 from datetime import datetime
-from tpdb.items import SceneItem
-import tldextract
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -26,11 +24,10 @@ class VIP4KSpider(BaseSceneScraper):
         'image': '//div[@class="player-item__block"]//img/@data-src | //div[@class="player_watch"]/img/@src',
         'performers': '//div[@class="player-item__about"]//div[@class="item-info__text"]/text()',
         'tags': "",
-        'external_id': 'videos\/(\d+)',
+        'external_id': r'videos\/(\d+)',
         'trailer': '//video/source/@src',
         'pagination': '/en/%s'
     }
-
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -38,7 +35,6 @@ class VIP4KSpider(BaseSceneScraper):
         for scene in scenes:
             count += 1
             yield scene
-        print (response.url)
         if count and "nothinghere" not in response.url:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta = response.meta
@@ -49,9 +45,9 @@ class VIP4KSpider(BaseSceneScraper):
                                      meta=meta,
                                      headers=self.headers,
                                      cookies=self.cookies)
-                                     
+
     def get_scenes(self, response):
-        scenes=[]
+        scenes = []
         if "black4k" in response.url:
             scenes = response.xpath('//div[@class="box_row"][1]//div[@class="thumb_wrap"]/a/@href').getall()
         if "daddy4k" in response.url:
@@ -67,15 +63,13 @@ class VIP4KSpider(BaseSceneScraper):
     def get_date(self, response):
         return datetime.now().isoformat()
 
-
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
             if image[:2] == "//":
-                image = "https:" + image            
+                image = "https:" + image
             return self.format_link(response, image)
-        return ''                
-
+        return ''
 
     def get_performers(self, response):
         if "fist4k" in response.url:
@@ -94,23 +88,21 @@ class VIP4KSpider(BaseSceneScraper):
             return []
         if performers:
             return [performer]
-        else:
-            return []
-            
+        return []
+
     def get_tags(self, response):
-        tags=[]
+        tags = []
         if "black4k" in response.url:
             tags = response.xpath('//div[@class="tag_line"]/a/span/text()').getall()
             tags = list(map(lambda x: x.strip().title(), tags))
-        if "daddy4k" in response.url or  "old4k" in response.url:
+        if "daddy4k" in response.url or "old4k" in response.url:
             tags = response.xpath('//a[@class="item_tag"]/span/text()').getall()
             tags = list(map(lambda x: x.strip().title(), tags))
-            
+
         if tags:
             return tags
-        else:
-            return []
-            
+        return []
+
     def get_trailer(self, response):
         return ''
 
@@ -121,11 +113,8 @@ class VIP4KSpider(BaseSceneScraper):
         search = search.zfill(4).strip()
 
         return search
-        
-
 
     def get_next_page_url(self, base, page):
-        print (f'Base: {base}')
         if "black4k" in base or "daddy4k" in base or "old4k" in base:
             if page == 1:
                 pagination = "/en/videos/publish"
@@ -136,8 +125,8 @@ class VIP4KSpider(BaseSceneScraper):
                 pagination = "/en/"
             else:
                 pagination = "/nothinghere/"
-        
+
         if not pagination:
             pagination = self.get_selector_map('pagination') % page
-        
-        return self.format_url(base, pagination)               
+
+        return self.format_url(base, pagination)

@@ -1,9 +1,9 @@
-import scrapy
 import re
 from datetime import datetime
-from tpdb.items import SceneItem
+import scrapy
 import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
 class VIP4KPagedSpider(BaseSceneScraper):
@@ -33,7 +33,6 @@ class VIP4KPagedSpider(BaseSceneScraper):
         'pagination': '/en/%s'
     }
 
-
     def parse(self, response, **kwargs):
         count = 0
         if "debt4k" in response.url:
@@ -61,7 +60,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
             item['url'] = response.url
             item['tags'] = ''
             description = ''
-            
+
             item['date'] = datetime.now().isoformat()
 
             if "debt4k" in response.url:
@@ -80,7 +79,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
                 performer = ''
             performer = performer.strip()
             item['performers'].append(performer)
-                            
+
             if "debt4k" in response.url:
                 title = scene.xpath('.//h2[contains(@class,"episode__title")]/text()').get()
             if "hunt4k" in response.url:
@@ -95,12 +94,12 @@ class VIP4KPagedSpider(BaseSceneScraper):
                 title = scene.xpath('.//div[@class="record__title"]/text()').get()
             if "tutor4k" in response.url:
                 title = scene.xpath('.//h2[contains(@class,"episode__title")]/text()').get()
-            
+
             title = title.strip().title()
-            item['id'] = re.sub('[^a-zA-Z0-9\-]','',title.replace(" ","-").lower())
+            item['id'] = re.sub(r'[^a-zA-Z0-9\-]', '', title.replace(" ", "-").lower())
             if performer and "law4k" not in response.url and "stuck4k" not in response.url and "shame4k" not in response.url and "tutor4k" not in response.url:
                 title = title + ": " + performer
-            
+
             item['title'] = title
 
             if "debt4k" in response.url:
@@ -120,11 +119,10 @@ class VIP4KPagedSpider(BaseSceneScraper):
                 description = scene.xpath('.//div[@class="episode__text"]/span[@class="episode__text-area"]/text()').get()
             if "tutor4k" in response.url:
                 description = scene.xpath('.//span[@class="episode-about__text text"]/text()').get()
-            
+
             if description:
                 item['description'] = description.strip()
 
-                
             if "debt4k" in response.url:
                 image = scene.xpath('.//div[@class="episode__player"]//img/@data-src').get()
             if "hunt4k" in response.url:
@@ -132,7 +130,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
             if "law4k" in response.url:
                 image = scene.xpath('.//div/span[contains(text(),"Punishment")]/../../../a/@style').get()
                 if image:
-                    image = re.search('url\((.*\.jpg)\)', image).group(1)
+                    image = re.search(r'url\((.*\.jpg)\)', image).group(1)
             if "loan4k" in response.url:
                 image = scene.xpath('.//div[@class="wrapper_player"]/img/@data-src').get()
             if "shame4k" in response.url:
@@ -141,15 +139,14 @@ class VIP4KPagedSpider(BaseSceneScraper):
                 image = scene.xpath('./div[@class="episode__img"]/a/img/@data-src').get()
             if "tutor4k" in response.url:
                 image = scene.xpath('./div[@class="episode__img"]/a/img/@data-src').get()
-                
+
             if image[:2] == "//":
                 image = "https:" + image
 
             item['image'] = image.strip()
-            item['site'] =  tldextract.extract(response.url).domain
+            item['site'] = tldextract.extract(response.url).domain
 
             yield item
-
 
         if count and ("hunt4k" in response.url and count > 1):
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:

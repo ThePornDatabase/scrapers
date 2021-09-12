@@ -12,7 +12,7 @@ class TugPassSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.tugpass.com',
-        
+
         #  Network sub-sites for reference
         # 'https://www.clubtug.com',
         # 'https://www.cumblastcity.com',
@@ -26,7 +26,7 @@ class TugPassSpider(BaseSceneScraper):
         # 'https://www.seemomsuck.com',
         # 'https://www.shadyspa.com',
         # 'https://www.teasepov.com',
-        # 'https://www.teentugs.com'        
+        # 'https://www.teentugs.com'
     ]
 
     selector_map = {

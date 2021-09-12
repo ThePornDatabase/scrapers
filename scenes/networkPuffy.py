@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -52,8 +51,7 @@ class PuffySpider(BaseSceneScraper):
         site = match_site(site)
         if site:
             return site.strip()
-        else:
-            return "Puffy Network"
+        return "Puffy Network"
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -69,8 +67,7 @@ class PuffySpider(BaseSceneScraper):
             image = response.xpath('//meta[@property="og:image"]/@content').get()
         if not image:
             image = response.xpath('//video[1]/@poster').get()
-            
-            
+
         if image:
             return self.format_link(response, image)
         return ''

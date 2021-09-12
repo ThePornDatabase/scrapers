@@ -1,7 +1,5 @@
 import re
-import dateparser
 import scrapy
-from urllib.parse import urlparse
 import tldextract
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -46,21 +44,19 @@ class FetishNetworkAltSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        parsed_uri = tldextract.extract(response.url)
-        domain = parsed_uri.domain
         site = response.xpath('//div[contains(@class,"bigtext-section")]/h3/span[contains(text(),"Videos")]/text()').get()
         if site:
             if "Videos" in site:
                 site = re.search('(.*) Videos', site).group(1)
-                if site: 
-                        site = site.strip()
-            
+                if site:
+                    site = site.strip()
+
         if not site:
             site = tldextract.extract(response.url).domain
         if site:
             site = match_site(site)
-            
-        return site      
+
+        return site
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -70,27 +66,24 @@ class FetishNetworkAltSpider(BaseSceneScraper):
                 return list(map(lambda x: x.strip().title(), tags))
         return []
 
-
     def get_next_page_url(self, base, page):
         if "brutalpov" in base:
             pagination = '/t2/show.php?a=2205_%s&nats=typein.4.106.275.0.0.0.0.0'
         else:
             pagination = '/t2/show.php?a=2074_%s'
-            
+
         return self.format_url(base, pagination % page)
-        
+
     def get_id(self, response):
-        search = re.search('\/(\d+)\/', response.url, re.IGNORECASE).group(1)
+        search = re.search(r'\/(\d+)\/', response.url, re.IGNORECASE).group(1)
         return search
-        
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if not image:
             image = response.xpath('//video[contains(@id,"my-video")]/@poster').get()
-            
+
         if image:
             image = "http://www.fetishnetwork.com/t2/" + image
             return self.format_link(response, image)
-        return ''        
-                
+        return ''

@@ -10,7 +10,7 @@ class NewSensationsSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.newsensations.com'
-        
+
         # Sites that are included in scrape, though site names aren't given for scraping
         # Here for reference so we don't double scrape:
         # -------------------------------
@@ -21,7 +21,6 @@ class NewSensationsSpider(BaseSceneScraper):
         # https://tabutales.com
         # https://talesfromtheedge.com
         # https://thelesbianexperience.com
-        
     ]
 
     selector_map = {
@@ -46,16 +45,13 @@ class NewSensationsSpider(BaseSceneScraper):
             '//div[@class="sceneDateP"]/span/text()').get().strip(',').strip()
         return dateparser.parse(date).isoformat()
 
-
     def get_tags(self, response):
         return []
-
-
 
     def get_site(self, response):
         if self.get_selector_map('tags'):
             taglist = self.process_xpath(response, self.get_selector_map('tags')).get()
-            taglist = taglist.replace(" ","")
+            taglist = taglist.replace(" ", "")
             if "hotwifexxx" in taglist.lower():
                 return "HotWifeXXX"
             if "thelesbianexperience" in taglist.lower():
@@ -70,4 +66,4 @@ class NewSensationsSpider(BaseSceneScraper):
                 return "Tales From the Edge"
             if "parody" in taglist.lower():
                 return "Parody Pass"
-            return "New Sensations"    
+            return "New Sensations"

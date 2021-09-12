@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlencode
-import dateparser
 import datetime
+import dateparser
 import scrapy
 from slugify import slugify
 from tldextract import tldextract

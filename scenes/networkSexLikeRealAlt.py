@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -17,15 +16,14 @@ class SexLikeRealAltSpider(BaseSceneScraper):
     selector_map = {
         'title': "//h1/text()",
         'description': "//div[@class='u-mt--three']/div[contains(@class,'u-lw')]/text()",
-        'date': "//div[@class='u-mt--three']//div[contains(text(),'Released')]/following-sibling::time/text()",
+        'date': "//div[@class='u-mt--three']//div[contains(text(),'Released')]/following-sibling::time/text() | //time/@datetime",
         'performers': "//ul[contains(@class,'scene-models')]/li/a/text()",
         'tags': "//meta[@property='video:tag']/@content",
-        'external_id': '-(\d+)',
+        'external_id': r'.*-(\d+).*?$',
         'image': '//meta[@property="og:image"]/@content',
         'trailer': '',
         'pagination': '/scenes?type=new&page=%s'
     }
-
 
     def get_scenes(self, response):
         scenes = response.xpath('//article/div/div/a/@href').getall()
@@ -37,8 +35,7 @@ class SexLikeRealAltSpider(BaseSceneScraper):
         site = response.xpath('//div[@class="u-block"]/span/a/span/text()').get()
         if site:
             return site.strip()
-        else:
-            return "Sex Like Real"
+        return "Sex Like Real"
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):

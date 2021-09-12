@@ -1,12 +1,12 @@
-import scrapy
 import re
-import dateparser
-import tldextract
 import json
 from urllib.parse import urlparse
+import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
 
 class TeenCoreClubSpider(BaseSceneScraper):
     name = 'TeenCoreClub'
@@ -97,19 +97,17 @@ class TeenCoreClubSpider(BaseSceneScraper):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination':link[1], 'site':link[2]},
+                                 meta={'page': self.page, 'pagination': link[1], 'site': link[2]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         count = 0
-        print (f'Response: {response.url}')
         scenes = self.parse_scenepage(response)
         if scenes:
             count = len(scenes)
             for scene in scenes:
                 yield scene
-                
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
@@ -127,38 +125,37 @@ class TeenCoreClubSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def parse_scenepage(self, response):
-        global json
-        itemlist=[]
+        itemlist = []
         meta = response.meta
-        
+
         parsed_uri = urlparse(response.url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         jsondata = json.loads(response.text)
         data = jsondata['data']
         for jsonentry in data:
             item = SceneItem()
-            
+
             item['performers'] = []
             for model in jsonentry['actors']:
-                model['name'] = model['name'].replace("+","&").strip()
+                model['name'] = model['name'].replace("+", "&").strip()
                 if "&" in model['name']:
                     models = model['name'].split("&")
                     for star in models:
                         item['performers'].append(star.strip().title())
                 else:
                     item['performers'].append(model['name'].title())
-            
+
             item['title'] = jsonentry['title_en']
             if len(re.findall(r'\w+', item['title'])) == 1 and len(item['performers']):
                 if len(item['performers']) > 1:
                     item['title'] = ", ".join(item['performers']) + " (" + item['title'] + ")"
                 else:
                     item['title'] = item['performers'][0] + " (" + item['title'] + ")"
-                    
+
             item['description'] = jsonentry['description_en']
             if not item['description']:
                 item['description'] = ''
-                
+
             item['image'] = jsonentry['screenshots'][0]
             if isinstance(item['image'], str):
                 item['image'] = "https:" + item['image']
@@ -173,13 +170,10 @@ class TeenCoreClubSpider(BaseSceneScraper):
             item['site'] = meta['site']
             item['parent'] = "Teen Core Club"
             item['network'] = "Teen Core Club"
-                
+
             item['tags'] = []
 
             itemlist.append(item.copy())
-                
+
             item.clear()
         return itemlist
-            
-                    
-

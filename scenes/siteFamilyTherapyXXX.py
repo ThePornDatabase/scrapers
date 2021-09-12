@@ -1,5 +1,5 @@
-import scrapy
 import re
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -13,7 +13,6 @@ class FamilyTherapyXXXSpider(BaseSceneScraper):
         'https://familytherapyxxx.com'
     ]
 
-
     selector_map = {
         'title': '//h1[@class="entry-title"]/text()',
         'description': '//div[@class="entry-content"]/p[1]/text()',
@@ -21,7 +20,7 @@ class FamilyTherapyXXXSpider(BaseSceneScraper):
         'date': '//span[@class="published"]/text()',
         # ~ 'image': '',
         'tags': '//p[@class="post-meta"]/a[contains(@rel,"category")]/text()',
-        'external_id': '\.com\/(.*)\/',
+        'external_id': r'\.com\/(.*)\/',
         'trailer': '//meta[@itemprop="contentUrl"]/@content',
         'pagination': '/page/%s'
     }
@@ -42,9 +41,9 @@ class FamilyTherapyXXXSpider(BaseSceneScraper):
         performers = self.process_xpath(
             response, self.get_selector_map('performers')).get()
         if performers:
-            performers = re.search('Starring(.*?)\*', performers).group(1)
+            performers = re.search(r'Starring(.*?)\*', performers).group(1)
             if performers:
-                performers = performers.replace("&amp;","&")
+                performers = performers.replace("&amp;", "&")
                 performers = performers.split("&")
                 return list(map(lambda x: x.strip(), performers))
         return []

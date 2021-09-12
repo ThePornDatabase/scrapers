@@ -1,6 +1,5 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -21,7 +20,7 @@ class PhilaviseSpider(BaseSceneScraper):
         'image': '//img[contains(@class,"large_update_thumb")]/@src',
         'performers': '//span[contains(@class,"tour_update_models")]/a/text()',
         'tags': '//span[contains(@class,"update_tags")]/a/text()',
-        'external_id': '\/updates\/(.+)\.html',
+        'external_id': r'\/updates\/(.+)\.html',
         'trailer': '//div[@class="update_image"]/a/@onclick',
         'pagination': '/categories/movies_%s_d.html'
     }
@@ -35,12 +34,11 @@ class PhilaviseSpider(BaseSceneScraper):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
             if trailer:
-                trailer = re.search('tload\(\'(.*)\'\)', trailer).group(1)
+                trailer = re.search(r'tload\(\'(.*)\'\)', trailer).group(1)
                 if trailer:
                     trailer = "https://www.philavise.com" + trailer
                     return trailer
         return ''
-
 
     def get_description(self, response):
 

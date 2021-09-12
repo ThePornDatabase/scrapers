@@ -13,7 +13,6 @@ class SpankmonsterSpider(BaseSceneScraper):
         'https://Spankmonster.com'
     ]
 
-
     selector_map = {
         'title': '//h1[@class="description"]/text()',
         'description': '//h1[@class="description"]/text()',
@@ -21,7 +20,7 @@ class SpankmonsterSpider(BaseSceneScraper):
         'date': '//div[@class="release-date"]/span[contains(text(),"Released")]/following-sibling::text()',
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//div[@class="tags"]/a/text()',
-        'external_id': '\/(\d+)\/',
+        'external_id': r'\/(\d+)\/',
         'trailer': '',
         'pagination': '/watch-newest-spank-monster-clips-and-scenes.html?page=%s&view=grid'
     }

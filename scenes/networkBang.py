@@ -46,9 +46,7 @@ class BangSpider(BaseSceneScraper):
                 meta={'page': next_page},
                 body=json.dumps(
                     self.get_elastic_payload(
-                        self.per_page,
-                        self.per_page *
-                        next_page))
+                        self.per_page, self.per_page * next_page))
             )
 
     def parse_scene(self, json):
@@ -85,8 +83,7 @@ class BangSpider(BaseSceneScraper):
 
         if item['title']:
             return item
-        else:
-            return None
+        return None
 
     def get_elastic_payload(self, per_page, offset: int = 0):
         return {

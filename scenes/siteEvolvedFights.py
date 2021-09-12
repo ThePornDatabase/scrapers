@@ -1,6 +1,5 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -52,10 +51,8 @@ class EvolvedFightsSpider(BaseSceneScraper):
                 response, self.get_selector_map('tags')).getall()
             return list(map(lambda x: x.strip().title(), tags))
         return []
-        
+
     def get_site(self, response):
         if "evolvedfightslez" in response.url:
             return "Evolved Fights Lesbian Edition"
-        else:
-            return "Evolved Fights"
-            
+        return "Evolved Fights"
