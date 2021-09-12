@@ -1,12 +1,9 @@
-from datetime import datetime
-import string
-import html
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteClassMediaSpider(BaseSceneScraper):
+class SiteClassMediaSpider(BaseSceneScraper):
     name = 'ClassLesbians'
     network = 'Class Media'
 
@@ -22,7 +19,7 @@ class siteClassMediaSpider(BaseSceneScraper):
         'performers': '//div[@class="main-info"]/p[@class="cast"]/a/text()',
         'image': '//div[@class="banner-video"]/img/@src',
         'tags': '',
-        'external_id': '.*\/(.*?)$',
+        'external_id': r'.*\/(.*?)$',
         'trailer': '',
         'pagination': '/videos/%s'
     }
@@ -31,9 +28,9 @@ class siteClassMediaSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="box new-videos-box"]/a[contains(@href,"/videos/")]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-        
+
     def get_site(self, response):
         return "Class Lesbians"
-        
+
     def get_parent(self, response):
         return "Class Lesbians"

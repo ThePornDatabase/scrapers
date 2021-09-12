@@ -65,6 +65,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['tags'] = data['issue_tags'].split(",")
             item['tags'] = list(map(str.strip, item['tags']))
             item['tags'] = list(map(str.capitalize, item['tags']))
+            item['tags'][:] = [x for x in item['tags'] if x]
             item['site'] = "Watch4Beauty"
             item['network'] = "Watch4Beauty"
             item['parent'] = "Watch4Beauty"
