@@ -1,11 +1,9 @@
-import dateparser
 import scrapy
-import re
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteBaberoticaSpider(BaseSceneScraper):
+class SiteBaberoticaSpider(BaseSceneScraper):
     name = 'Baberotica'
     network = 'AV Revenue'
     parent = 'Baberotica'
@@ -22,7 +20,7 @@ class siteBaberoticaSpider(BaseSceneScraper):
         'date': '//div[@class="container"]/meta[@itemprop="datePublished"]/@content',
         'image': '//div[@class="container"]/meta[@itemprop="thumbnailUrl"]/@content',
         'tags': '//div[@class="video-info"]/p/a[@itemprop="genre"]/text()',
-        'external_id': '.com\/(.*)\/',
+        'external_id': r'.com\/(.*)\/',
         'trailer': '//div[@class="container"]/meta[@itemprop="contentUrl"]/@content',
         'pagination': '/girls-masturbating/page/%s/'
     }
@@ -32,18 +30,16 @@ class siteBaberoticaSpider(BaseSceneScraper):
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': 'Baberotica'})
 
-
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
             image = "https:" + image
             return self.format_link(response, image)
         return ''
-        
 
     def get_trailer(self, response):
         trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
         if trailer:
             trailer = "https:" + trailer
             return self.format_link(response, trailer)
-        return ''    
+        return ''

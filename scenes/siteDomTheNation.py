@@ -1,8 +1,5 @@
-import dateparser
-import scrapy
-from scrapy.http import HtmlResponse
 import re
-from urllib.parse import urlparse
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

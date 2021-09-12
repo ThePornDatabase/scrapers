@@ -1,6 +1,6 @@
+import re
 import dateparser
 import scrapy
-import re
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -22,7 +22,7 @@ class FittingRoomSpider(BaseSceneScraper):
         'date': '',
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//meta[@property="article:tag"]/@content',
-        'external_id': 'videos\/(\d+)\/?',
+        'external_id': r'videos\/(\d+)\/?',
         'trailer': '//script[contains(text(),"video_url")]/text()',
         'pagination': '/videos/%s/'
     }
@@ -31,9 +31,9 @@ class FittingRoomSpider(BaseSceneScraper):
         scenes = response.xpath('//div[contains(@class,"thumb videos")]/a')
         for scene in scenes:
             date = scene.xpath('./div[@class="main-info"]/div/p/text()').get()
-            date = dateparser.parse(date.strip()).isoformat()            
+            date = dateparser.parse(date.strip()).isoformat()
             sceneurl = scene.xpath('./@href').get()
-            yield scrapy.Request(url=self.format_link(response, sceneurl), callback=self.parse_scene,  meta={'date': date})
+            yield scrapy.Request(url=self.format_link(response, sceneurl), callback=self.parse_scene, meta={'date': date})
 
     def get_description(self, response):
         return ''
@@ -43,7 +43,7 @@ class FittingRoomSpider(BaseSceneScraper):
             trailer = self.process_xpath(
                 response, self.get_selector_map('trailer')).get()
             if trailer:
-                trailer = re.search('video_url:\ .*?(https:\/\/www\.fitting.*?\.mp4)', trailer).group(1)
+                trailer = re.search(r'video_url:\ .*?(https:\/\/www\.fitting.*?\.mp4)', trailer).group(1)
                 if trailer:
                     return trailer
         return ''

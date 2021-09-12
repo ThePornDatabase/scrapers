@@ -1,6 +1,5 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -19,7 +18,7 @@ class AmateurAllureSpider(BaseSceneScraper):
         'title': '//span[@class="title_bar_hilite"]/text()',
         'date': '//div[@class="cell update_date"]/text()',
         'description': '//span[@class="update_description"]/text()',
-        'image': '', #images not on site
+        'image': '',  # images not on site
         'performers': '//span[@class="update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
         'external_id': 'scenes/(.+)\\.html',
@@ -38,12 +37,11 @@ class AmateurAllureSpider(BaseSceneScraper):
     def get_trailer(self, response):
         trailer = response.xpath('//script[contains(text(),".mp4")]').get()
         if trailer:
-            trailer = re.search('\"(\/tour.*720(?:.{1,4})?.mp4)\"', trailer).group(1)
+            trailer = re.search(r'\"(\/tour.*720(?:.{1,4})?.mp4)\"', trailer).group(1)
             if trailer:
                 return "https://www.amateurallure.com/" + trailer
-        
-        return ''
-        
-    def get_site(self, response):
-        return "Amateur Allure"        
 
+        return ''
+
+    def get_site(self, response):
+        return "Amateur Allure"

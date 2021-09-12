@@ -1,6 +1,5 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -50,5 +49,4 @@ class NaughtyAmericaSpider(BaseSceneScraper):
             '//div[@class="scene-info"]/a[contains(@class,"site-title")]/text()').get()
         if site:
             return site.strip()
-        else:
-            return super.get_site(response)
+        return super.get_site(response)

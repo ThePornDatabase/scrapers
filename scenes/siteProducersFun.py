@@ -1,6 +1,4 @@
 import re
-
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -53,16 +51,14 @@ class ProducersFunSpider(BaseSceneScraper):
 
         if trailer:
             return trailer
-        else:
-            return ''
+        return ''
 
     def get_description(self, response):
         description = response.xpath(
             '//div[@class="shadow video-details"]/p[not(@class="video-date") and not(@class="video-tags")][1]/text()').get()
         if description:
             return description.strip()
-        else:
-            return ''
+        return ''
 
     def get_performers(self, response):
         performers = response.xpath('//h1/text()').get()
@@ -72,5 +68,4 @@ class ProducersFunSpider(BaseSceneScraper):
 
         if performers and "Volume" not in performers and "Compilation" not in performers:
             return [performers]
-        else:
-            return ''
+        return ''

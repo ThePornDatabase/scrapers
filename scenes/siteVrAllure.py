@@ -1,8 +1,7 @@
+import re
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-import re
-import dateparser
 
 
 class VrAllureSpider(BaseSceneScraper):
