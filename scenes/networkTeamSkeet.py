@@ -33,11 +33,11 @@ link_to_info = {
         "contentText": v2_videos_content_text,
         "v2": True
     },
-    "mylf-organic-2uxkybtwvv": {
+    "mylf-elastic-hka5k7vyuw": {
         "site": "MYLF",
-        "navText": videos_nav_text,
-        "contentText": videos_content_text,
-        "v2": False
+        "navText": v2_videos_content_text,
+        "contentText": v2_videos_content_text,
+        "v2": True
     },
     "FOS-organic-n5oaginage": {
         "site": "Foster Tapes",
