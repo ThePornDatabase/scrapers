@@ -1,11 +1,8 @@
+import re
 import dateparser
 import scrapy
-import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-
-# Note: Images and Trailers include expiry tokens.  Only useful for time
-# of import
 
 class AbbyWintersSpider(BaseSceneScraper):
 

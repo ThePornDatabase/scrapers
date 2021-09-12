@@ -1,12 +1,8 @@
-# Fixed old sites to scrape historical
-
 import re
-
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from datetime import datetime
-import dateparser
 
 
 class PornWorldScraper(BaseSceneScraper):
@@ -38,7 +34,7 @@ class PornWorldScraper(BaseSceneScraper):
         for scene in scenes:
             performerlist = scene.xpath('./div/div[@class="featuring"]/a/text()').getall()
             if performerlist:
-                performers = [j.strip() for j in performerlist] 
+                performers = [j.strip() for j in performerlist]
             scene = scene.xpath('./div[@class="videoPic"]/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 if performers:

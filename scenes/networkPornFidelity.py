@@ -3,7 +3,6 @@ import re
 import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
 
 

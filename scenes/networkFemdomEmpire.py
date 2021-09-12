@@ -1,4 +1,3 @@
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -20,7 +19,7 @@ class FemdomEmpireSpider(BaseSceneScraper):
         'date': '//div[contains(@class, "videoInfo")]//following-sibling::p[contains(., "Date")]/text()',
         'image': '//a[@class="fake_trailer"]//img/@src0_1x',
         'tags': '//div[contains(@class,"featuring")]/ul/li/a[contains(@href,"categories")]/text()',
-        'external_id': '\/trailers\/(.*).html',
+        'external_id': r'\/trailers\/(.*).html',
         'trailer': '',
         'pagination': '/tour/categories/movies/%s/latest/',
     }
@@ -44,5 +43,5 @@ class FemdomEmpireSpider(BaseSceneScraper):
             site = "Feminized"
         if site:
             return site
-            
+
         return super().get_site(response)
