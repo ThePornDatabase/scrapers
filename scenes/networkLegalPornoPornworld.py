@@ -56,8 +56,8 @@ class LegalPornoSpider(BaseSceneScraper):
         description = self.process_xpath(response, self.get_selector_map('description'))
         if description:
             description = " ".join(description.getall()).replace("...", "").replace("  ", " ").strip()
-            description = re.sub(u'\u0096',u"\u0027", description)
-            description = re.sub(u'\u0092',u"\u0027", description)
+            description = re.sub(u'\u0096', u"\u0027", description)
+            description = re.sub(u'\u0092', u"\u0027", description)
             return description
         return ''
 

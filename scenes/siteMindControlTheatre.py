@@ -1,4 +1,3 @@
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
