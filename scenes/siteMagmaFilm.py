@@ -37,8 +37,3 @@ class MagmaFilmNetworkSpider(BaseSceneScraper):
     def get_date(self, response):
         date = '1970-01-01'
         return dateparser.parse(date).isoformat()
-
-    def get_tags(self, response):
-        tags = super().get_tags(response)
-        tags[:] = [x for x in tags if x]
-        return tags
