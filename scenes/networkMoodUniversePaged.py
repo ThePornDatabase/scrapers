@@ -62,7 +62,6 @@ class NetworkMoodUniversePagedSpider(BaseSceneScraper):
         else:
             xpath = '//h2[contains(@id,"newestmovie") or contains(@id,"featuremovies") or contains(@id,"classics")]/following-sibling::div'
 
-
         scenes = response.xpath(xpath)
         for scene in scenes:
             item = SceneItem()
