@@ -116,3 +116,12 @@ class LegalPornoPerformerSpider(BasePerformerScraper):
         if "white skin" in tags or "pale white skin" in tags:
             return "Caucasian"
         return ''
+
+
+    def get_next_page_url(self, base, page):
+        if "analvids" in base:
+            pagination = '/model/list/sort/release/pageNumber/%s'
+        if "pornworld" in base:
+            pagination = '/models/sort/release/page/%s/'
+
+        return self.format_url(base, pagination % page)
