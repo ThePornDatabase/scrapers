@@ -42,7 +42,7 @@ class LegalPornoPerformerSpider(BasePerformerScraper):
     def get_name(self, response):
         name = self.process_xpath(response, self.get_selector_map('name')).get()
         if not name:
-            name = re.search(r'\d+\/(.*)$', response.url).group(1)
+            name = re.search(r'\d+/(.*)$', response.url).group(1)
             name = name.replace("_", " ").title()
 
         return name.strip()
@@ -116,7 +116,6 @@ class LegalPornoPerformerSpider(BasePerformerScraper):
         if "white skin" in tags or "pale white skin" in tags:
             return "Caucasian"
         return ''
-
 
     def get_next_page_url(self, base, page):
         if "analvids" in base:
