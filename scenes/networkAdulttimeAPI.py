@@ -1,99 +1,97 @@
-import json
 import re
-from urllib.parse import urlencode
-import datetime
 import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-### NOTE!   This scraper _ONLY_ pulls scenes from AdultTime sites with publicly available video index pages.
-###         It will not pull any scenes or images that are unavailable if you simply go to the specific site
-###         as a guest user in an incognito browser
+# NOTE!   This scraper _ONLY_ pulls scenes from AdultTime sites with publicly available video index pages.
+#         It will not pull any scenes or images that are unavailable if you simply go to the specific site
+#         as a guest user in an incognito browser
+
 
 def match_site(argument):
     match = {
-        '21sextury':'21Sextury',
-        'addicted2girls':'Addicted2Girls',
-        'adulttime':'AdultTime',
-        'agentredgirl':'Agent Red Girl',
-        'alettaoceanempire':'Aletta Ocean Empire',
-        'allgirlmassage':'All Girl Massage',
-        'analqueenalysa':'Anal Queen Alysa',
-        'analteenangels':'Anal Teen Angels',
-        'assholefever':'Asshole Fever',
-        'austinwilde':'Austin Wilde',
-        'biphoria':'BiPhoria',
-        'bethecuck':'Be The Cuck',
-        'blueangellive':'Blue Angel Live',
-        'burningangel':'Burning Angel',
-        'buttplays':'Buttplays',
-        'cheatingwhorewives':'Cheating Whore Wives',
-        'clubinfernodungeon':'Club Inferno Dungeon',
-        'clubsandy':'Club Sandy',
-        'codycummings':'Cody Cummings',
-        'cutiesgalore':'Cuties Galore',
-        'deepthroatfrenzy':'Deepthroat Frenzy',
-        'devilsfilm':'Devils Film',
-        'devilstgirls':'Devils T-Girls',
-        # 'dpfanatics':'DPFanatics', Pulled from Gamma
-        'evilangel':'Evil Angel',
-        'femalesubmission':'Female Submission',
-        'footsiebabes':'Footsie Babes',
-        'gapeland':'Gapeland',
-        'genderx':'Gender X',
-        'girlcore':'Girlcore',
-        'girlsunderarrest':'Girls Under Arrest',
-        'girlstryanal':'Girls Try Anal',
-        'girlsway':'Girlsway',
-        'hotmilfclub':'Hot MILF Club',
-        'isthisreal':'Is This Real',
-        'lesbianfactor':'Lesbian Factor',
-        'letsplaylez':'Lets Play Lez',
-        'lezcuties':'Lez Cuties',
-        'marcusmojo':'Marcus Mojo',
-        'masonwyler':'Mason Wyler',
-        'modeltime':'Model Time',
-        'mommysgirl':'Mommys Girl',
-        'momsonmoms':'Moms on Moms',
-        'nextdoorbuddies':'Nextdoor Buddies',
-        'nextdoorcasting':'Nextdoor Casting',
-        'nextdoorhomemade':'Nextdoor Homemade',
-        'nextdoorhookups':'Nextdoor Hookups',
-        'nextdoormale':'Nextdoor Male',
-        'nextdoororiginals':'Nextdoor Originals',
-        'nextdoorraw':'Nextdoor Raw',
-        'nextdoorstudios':'Nextdoor Studios',
-        'nextdoortwink':'Nextdoor Twink',
-        # 'nudefightclub':'Nude Fight Club', Pulled from Gamma
-        'oldyounglesbianlove':'Old Young Lesbian Love',
-        'oralexperiment':'Oral Experiment',
-        'pixandvideo':'Pix And Video',
-        'puretaboo':'Pure Taboo',
-        'roddaily':'Rod Daily',
-        'samuelotoole':'Samuel Otoole',
-        'sistertrick':'Sister Trick',
-        'sextapelesbians':'Sextape Lesbians',
-        'sexwithkathianobili':'Sex With Kathia Nobili',
-        'stagcollectivesolos':'Stag Collective Solos',
-        'strokethatdick':'Stroke That Dick',
-        'sweetsophiemoone':'Sweet Sophie Moon',
-        'tabooheat':'Taboo Heat',
-        'tommydxxx':'Tommy D XXX',
-        'transfixed':'Transfixed',
-        'trickyspa':'Tricky Spa',
-        'TransgressiveFilms':'Transgressive Films',
-        'truelesbian.com':'True Lesbian',
-        'trystanbull':'Trystan Bull',   
-        'webyoung':'Web Young',
-        'welikegirls':'We Like Girls',
-        'wheretheboysarent':'Where the Boys Arent',
-        'wicked':'Wicked',
-        'zerotolerance':'Zero Tolerance',     
+        '21sextury': '21Sextury',
+        'addicted2girls': 'Addicted2Girls',
+        'adulttime': 'AdultTime',
+        'agentredgirl': 'Agent Red Girl',
+        'alettaoceanempire': 'Aletta Ocean Empire',
+        'allgirlmassage': 'All Girl Massage',
+        'analqueenalysa': 'Anal Queen Alysa',
+        'analteenangels': 'Anal Teen Angels',
+        'assholefever': 'Asshole Fever',
+        'austinwilde': 'Austin Wilde',
+        'biphoria': 'BiPhoria',
+        'bethecuck': 'Be The Cuck',
+        'blueangellive': 'Blue Angel Live',
+        'burningangel': 'Burning Angel',
+        'buttplays': 'Buttplays',
+        'cheatingwhorewives': 'Cheating Whore Wives',
+        'clubinfernodungeon': 'Club Inferno Dungeon',
+        'clubsandy': 'Club Sandy',
+        'codycummings': 'Cody Cummings',
+        'cutiesgalore': 'Cuties Galore',
+        'deepthroatfrenzy': 'Deepthroat Frenzy',
+        'diabolic': 'Diabolic',
+        'devilsfilm': 'Devils Film',
+        'devilstgirls': 'Devils T-Girls',
+        # 'dpfanatics': 'DPFanatics', Pulled from Gamma
+        'evilangel': 'Evil Angel',
+        'femalesubmission': 'Female Submission',
+        'footsiebabes': 'Footsie Babes',
+        'gapeland': 'Gapeland',
+        'genderx': 'Gender X',
+        'girlcore': 'Girlcore',
+        'girlsunderarrest': 'Girls Under Arrest',
+        'girlstryanal': 'Girls Try Anal',
+        'girlsway': 'Girlsway',
+        'hotmilfclub': 'Hot MILF Club',
+        'isthisreal': 'Is This Real',
+        'lesbianfactor': 'Lesbian Factor',
+        'letsplaylez': 'Lets Play Lez',
+        'lezcuties': 'Lez Cuties',
+        'marcusmojo': 'Marcus Mojo',
+        'masonwyler': 'Mason Wyler',
+        'modeltime': 'Model Time',
+        'mommysgirl': 'Mommys Girl',
+        'momsonmoms': 'Moms on Moms',
+        'nextdoorbuddies': 'Nextdoor Buddies',
+        'nextdoorcasting': 'Nextdoor Casting',
+        'nextdoorhomemade': 'Nextdoor Homemade',
+        'nextdoorhookups': 'Nextdoor Hookups',
+        'nextdoormale': 'Nextdoor Male',
+        'nextdoororiginals': 'Nextdoor Originals',
+        'nextdoorraw': 'Nextdoor Raw',
+        'nextdoorstudios': 'Nextdoor Studios',
+        'nextdoortwink': 'Nextdoor Twink',
+        # 'nudefightclub': 'Nude Fight Club', Pulled from Gamma
+        'oldyounglesbianlove': 'Old Young Lesbian Love',
+        'oralexperiment': 'Oral Experiment',
+        'pixandvideo': 'Pix And Video',
+        'puretaboo': 'Pure Taboo',
+        'roddaily': 'Rod Daily',
+        'samuelotoole': 'Samuel Otoole',
+        'sistertrick': 'Sister Trick',
+        'sextapelesbians': 'Sextape Lesbians',
+        'sexwithkathianobili': 'Sex With Kathia Nobili',
+        'stagcollectivesolos': 'Stag Collective Solos',
+        'strokethatdick': 'Stroke That Dick',
+        'sweetsophiemoone': 'Sweet Sophie Moon',
+        'tabooheat': 'Taboo Heat',
+        'tommydxxx': 'Tommy D XXX',
+        'transfixed': 'Transfixed',
+        'trickyspa': 'Tricky Spa',
+        'TransgressiveFilms': 'Transgressive Films',
+        'truelesbian.com': 'True Lesbian',
+        'trystanbull': 'Trystan Bull',
+        'webyoung': 'Web Young',
+        'welikegirls': 'We Like Girls',
+        'wheretheboysarent': 'Where the Boys Arent',
+        'wicked': 'Wicked',
+        'zerotolerance': 'Zero Tolerance',
     }
     return match.get(argument, argument)
-
 
 
 class AdultTimeAPISpider(BaseSceneScraper):
@@ -106,6 +104,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         # ~ ## 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
         'https://www.biphoria.com',
         'https://www.clubinfernodungeon.com',
+        'https://www.diabolic.com',
         'https://www.evilangel.com',
         'https://www.genderx.com',
         'https://www.girlsway.com',
@@ -156,12 +155,12 @@ class AdultTimeAPISpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, 1), callback=self.parse_token,
                                  meta={'page': 0, 'url': link})
 
-
     def get_next_page_url(self, base, page):
         if "isthisreal" in base:
             pagination = '/en/videos/page/%s'
-            
-        return self.format_url(base, self.get_selector_map('pagination') % page)
+        else:
+            pagination = self.get_selector_map('pagination')
+        return self.format_url(base, pagination % page)
 
     def parse_token(self, response):
         match = re.search(r'\"apiKey\":\"(.*?)\"', response.text)
@@ -190,7 +189,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 continue
 
             item = SceneItem()
-            
+
             item['image'] = ''
             for size in self.image_sizes:
                 if size in scene['pictures']:
@@ -203,8 +202,6 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 if size in scene['trailers']:
                     item['trailer'] = scene['trailers'][size]
                     break
-            
-            
 
             item['id'] = scene['objectID'].split('-')[0]
 
@@ -223,7 +220,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 map(lambda x: x['name'], scene['actors']))
             item['tags'] = list(map(lambda x: x['name'], scene['categories']))
             item['tags'] = list(filter(None, item['tags']))
-            
+
             item['site'] = scene['sitename']
             item['site'] = match_site(item['site'])
             item['network'] = self.network
@@ -238,6 +235,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'biphoria' in referrerurl:
                 item['parent'] = "BiPhoria"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'diabolic' in referrerurl:
+                item['parent'] = "Diabolic"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'clubinfernodungeon' in referrerurl:
                 item['parent'] = "Club Inferno Dungeon"
@@ -302,6 +302,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming"}]}'
         if 'evilangel' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=100&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&facets=%5B%22categories.name%22%2C%22directors.name%22%2C%22actors.name%22%2C%22serie_name%22%2C%22length_range_15min%22%2C%22download_sizes%22%2C%22bisex%22%2C%22shemale%22%2C%22upcoming%22%2C%22lesbian%22%5D&tagFilters=&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=lesbian&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=shemale&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=bisex&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%5D"}]}'
+        if 'diabolic' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Adiabolic%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&analytics=false&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Adiabolic%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&clickAnalytics=false&facets=upcoming"}]}'
         if 'genderx' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Agenderx%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20site_id%3A428&facets=%5B%22categories.name%22%2C%22actors.name%22%2C%22serie_name%22%2C%22length_range_15min%22%2C%22download_sizes%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Agenderx%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20site_id%3A428&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming"}]}'
         if 'girlsway' in referrer:
