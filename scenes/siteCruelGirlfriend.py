@@ -1,7 +1,7 @@
 import re
 import string
-import dateparser
 import html
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -53,10 +53,7 @@ class SiteCruelGirlfriendSpider(BaseSceneScraper):
             scene = scene.xpath('./div[contains(@class,"LatestUpdate-Pink")]/div/a/@href').get()
             scene = self.format_link(response, scene)
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene),
-                                    callback=self.parse_scene,
-                                    meta={'title': title, 'date': date, 'performers': performers}
-                                    )
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'title': title, 'date': date, 'performers': performers})
 
     def get_site(self, response):
         return "Cruel Girlfriend"
