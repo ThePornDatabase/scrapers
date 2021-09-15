@@ -20,7 +20,6 @@ class SiteDigitalDesireSpider(BasePerformerScraper):
     ]
 
     def get_performers(self, response):
-        print(response.url)
         performers = response.xpath('//div[@class="update_details"]')
         for performer in performers:
             item = PerformerItem()
@@ -30,7 +29,6 @@ class SiteDigitalDesireSpider(BasePerformerScraper):
                 item['name'] = html.unescape(name.strip().title())
 
             image = performer.xpath('.//a/img/@src0_1x').get()
-            print(image)
             if image:
                 item['image'] = "https:" + image.replace(" ", "%20")
             else:
