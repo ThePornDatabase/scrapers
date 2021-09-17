@@ -1,91 +1,85 @@
-import scrapy
-import re
+import json
 import dateparser
-from urllib.parse import urlparse
-import html
+from scrapy.http import Request
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Purely manual scraper...  save html from Fit18 index page into a text file
-# then point to it with "-a input='/FullPath/To/filename.txt" to import
-# (or obviously "-a input='c:\FullPath\To\filename.txt" on Windows)
+from tpdb.items import SceneItem
 
 
-class siteFit18Spider(BaseSceneScraper):
+class SiteFit18Spider(BaseSceneScraper):
     name = 'Fit18'
-    network = 'Fit18'
-    parent = 'Fit18'
 
-    start_urls = [
-        'https://www.fit18.com',
-    ]
+    headers = {
+        "Content-Type": "application/json",
+        "apollographql-client-name": "fit18:site",
+        "apollographql-client-version": "1.0",
+        "argonath-api-key": "77cd9282-9d81-4ba8-8868-ca9125c76991",
+    }
+
+    def start_requests(self):
+
+        scenequery = {
+            "operationName": "ListVideo",
+            "variables": {
+                "after": "",
+                "limit": 15
+            },
+            "query": "query ListVideo($order: [OrderEntry!], $after: ID, $limit: Int) {\n  video {\n    list(input: {order: $order, after: $after, first: $limit}) {\n      result {\n        edges {\n          node {\n            videoId\n            title\n            description {\n              long\n            }\n            talent {\n              type\n              talent {\n                talentId\n                name\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+        }
+        url = "https://fit18.team18.app/graphql"
+        scenequery = json.dumps(scenequery)
+        # ~ print(data2)
+        yield Request(url, headers=self.headers, body=scenequery, method="POST", callback=self.get_scenes)
 
     selector_map = {
-        'title': '//div[@class="row scene"]/div/h1/text()',
-        'description': '//div[@class="row scene"]/div/p/text()',
+        'title': '',
+        'description': '',
         'date': '',
-        'image': '//div[@class="video-box"]/div/a/img[contains(@src,".jpg")]/@src',
-        'performers': '//div[@class="row scene"]/div/h2/span/following-sibling::a/text()',
+        'image': '',
+        'performers': '',
         'tags': '',
-        'external_id': '.*models\/(.*)',
+        'external_id': r'',
         'trailer': '',
         'pagination': ''
     }
-    
-
-    def start_requests(self):
-        if self.input:
-            input = self.input
-            fileurl = "file:///" + input
-            print(fileurl)
-            yield scrapy.Request(fileurl,
-                         callback=self.get_scenes,
-                         headers=self.headers,
-                         cookies=self.cookies)    
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"model-videos")]/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        meta = response.meta
+        jsondata = response.json()['data']['video']['list']['result']['edges']
+        for jsonrow in jsondata:
+            item = SceneItem()
+            item['id'] = jsonrow['node']['videoId'].replace(":", "-")
+            item['title'] = jsonrow['node']['title']
+            item['description'] = jsonrow['node']['description']['long']
+            item['performers'] = []
+            for performer in jsonrow['node']['talent']:
+                item['performers'].append(performer['talent']['name'])
 
-    def get_site(self, response):
-        return "Fit18"
+            item['site'] = "Fit 18"
+            item['network'] = "Fit 18"
+            item['parent'] = "Fit 18"
+            item['url'] = "https://fit18.com/videos/" + item['id']
+            item['date'] = dateparser.parse('today').isoformat()
+            item['trailer'] = ''
+            item['tags'] = []
+            meta['item'] = item.copy()
+            imagedata = jsonrow['node']['videoId'].split(":")
 
-    def get_parent(self, response):
-        return "Fit18"
+            imagequery = {
+                "operationName": "BatchFindAssetQuery",
+                "variables": {
+                    "paths": [
+                        "/members/models/" + imagedata[0] + "/scenes/" + imagedata[1] + "/videothumb.jpg",
+                    ]
+                },
+                "query": "query BatchFindAssetQuery($paths: [String!]!) {\n  asset {\n    batch(input: {paths: $paths}) {\n      result {\nserve {\n uri\n}\n}\n}\n}\n}\n"}
+            url = "https://fit18.team18.app/graphql"
+            imagequery = json.dumps(imagequery)
+            yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
 
-
-    def get_id(self, response):
-        search = self.regex['external_id'].search(response.url).group(1)
-        if search:
-            search = search.replace("/","-")
-            return search
-        return None
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
-
-
-    def get_description(self, response):
-        description = self.process_xpath(response, self.get_selector_map('description')).get()
-        if description:
-            description = description.replace('In 60FPS.', '')
-
-            return html.unescape(description.strip())
-
-        return ''
-
-
-    def format_url(self, base, path):
-        base = 'https://www.fit18.com'
-        if path.startswith('http'):
-            return path
-
-        if path.startswith('//'):
-            return 'https:' + path
-
-        new_url = urlparse(path)
-        url = urlparse(base)
-        url = url._replace(path=new_url.path, query=new_url.query)
-
-        return url.geturl()
+    def get_images(self, response):
+        meta = response.meta
+        item = meta['item']
+        jsondata = response.json()['data']['asset']['batch']['result'][0]['serve']
+        item['image'] = jsondata['uri']
+        if item['id'] and item['title']:
+            yield item
