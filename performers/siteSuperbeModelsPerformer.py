@@ -1,12 +1,9 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
+import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class siteSuperbeModelsPerformerSpider(BasePerformerScraper):
+class SiteSuperbeModelsPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[contains(@class, "modelContainerHeading")]/h2/text()',
         'image': '//div[@class="img"]/a/img/@src',
@@ -16,7 +13,7 @@ class siteSuperbeModelsPerformerSpider(BasePerformerScraper):
         'weight': '//ul[@class="model-list"]/li[contains(text(), "Weight")]/span/text()',
         'bio': '//div[contains(@class,"text-desc-2")]/text()',
         'pagination': '/models/page-%s/?tag=&sort=recent&pussy=all&',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models\/(.*).html'
     }
 
     name = 'SuperbeModelsPerformer'
