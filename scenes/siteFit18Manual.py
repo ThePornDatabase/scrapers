@@ -1,8 +1,8 @@
-import scrapy
 import re
-import dateparser
 from urllib.parse import urlparse
 import html
+import dateparser
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 # Purely manual scraper...  save html from Fit18 index page into a text file
@@ -10,7 +10,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 # (or obviously "-a input='c:\FullPath\To\filename.txt" on Windows)
 
 
-class siteFit18Spider(BaseSceneScraper):
+class SiteFit18Spider(BaseSceneScraper):
     name = 'Fit18Old'
     network = 'Fit18'
     parent = 'Fit18'
@@ -26,21 +26,20 @@ class siteFit18Spider(BaseSceneScraper):
         'image': '//div[@class="video-box"]/div/a/img[contains(@src,".jpg")]/@src',
         'performers': '//div[@class="row scene"]/div/h2/span/following-sibling::a/text()',
         'tags': '',
-        'external_id': '.*models\/(.*)',
+        'external_id': r'.*models\/(.*)',
         'trailer': '',
         'pagination': ''
     }
 
-
     def start_requests(self):
         if self.input:
-            input = self.input
-            fileurl = "file:///" + input
+            fileinput = self.input
+            fileurl = "file:///" + fileinput
             print(fileurl)
             yield scrapy.Request(fileurl,
-                         callback=self.get_scenes,
-                         headers=self.headers,
-                         cookies=self.cookies)
+                                 callback=self.get_scenes,
+                                 headers=self.headers,
+                                 cookies=self.cookies)
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[contains(@class,"model-videos")]/a/@href').getall()
@@ -54,17 +53,15 @@ class siteFit18Spider(BaseSceneScraper):
     def get_parent(self, response):
         return "Fit18"
 
-
     def get_id(self, response):
         search = self.regex['external_id'].search(response.url).group(1)
         if search:
-            search = search.replace("/","-")
+            search = search.replace("/", "-")
             return search
         return None
 
     def get_date(self, response):
         return dateparser.parse('today').isoformat()
-
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description')).get()
@@ -74,7 +71,6 @@ class siteFit18Spider(BaseSceneScraper):
             return html.unescape(description.strip())
 
         return ''
-
 
     def format_url(self, base, path):
         base = 'https://www.fit18.com'
