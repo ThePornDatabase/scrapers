@@ -30,7 +30,7 @@ class SiteSlimk4kPerformerSpider(BasePerformerScraper):
     def get_performers(self, response):
         performers = response.xpath('//div[@id="list_models_models_list_items"]/a')
         for performer in performers:
-            image = performer.xpath('./div/img/@src').get()
+            image = performer.xpath('./div/img/@src').get().replace(" ", "%20")
             if not image:
                 image = ''
             performer = performer.xpath('./@href').get()
