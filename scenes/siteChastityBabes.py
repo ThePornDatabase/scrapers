@@ -59,12 +59,12 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def parse_model_scenes(self, response):
-        name = response.meta['name']
+        modelname = response.meta['name']
         scenes = response.xpath('//h2[@class="title"]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene,
                                  callback=self.parse_scenes,
-                                 meta={'name': name},
+                                 meta={'name': modelname},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -74,7 +74,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
             nextpage = nextpage.strip()
             yield scrapy.Request(url=nextpage,
                                  callback=self.parse_model_scenes,
-                                 meta={'name': name},
+                                 meta={'name': modelname},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -82,8 +82,8 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
 
     def parse_scenes(self, response):
         item = SceneItem()
-        name = response.meta['name']
-        item['performers'] = [name]
+        modelname = response.meta['name']
+        item['performers'] = [modelname]
         title = response.xpath('//h1[@id="post-title"]/text()').get()
         if title:
             item['title'] = title.strip().title()
