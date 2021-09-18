@@ -18,11 +18,16 @@ class BangSpider(BaseSceneScraper):
     per_page = 10
 
     def start_requests(self):
+        if self.page:
+            page = int(self.page)
+        else:
+            page = 0
+
         yield scrapy.Request(
             url='https://www.bang.com/api/search/videos/video/_search',
             method='POST',
             headers={'Content-Type': 'application/json'},
-            meta={'page': 0},
+            meta={'page': page},
             callback=self.parse,
             body=json.dumps(self.get_elastic_payload(self.per_page, 0))
         )
