@@ -95,8 +95,15 @@ class NubilesSpider(BaseSceneScraper):
     def get_description(self, response):
         if 'description' not in self.get_selector_map():
             return ''
-        description = self.process_xpath(
-            response, self.get_selector_map('description')).get()
+        descriptionxpath = self.process_xpath(response, self.get_selector_map('description'))
+        if descriptionxpath:
+            description = ''
+            descriptionxpath = descriptionxpath.getall()
+            for descrow in descriptionxpath:
+                descrow = descrow.replace("\n", "").replace("\r", "").replace("\t", "").strip()
+                if descrow:
+                    description = description + descrow
+
         if not description or (description and len(description.strip())):
             description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()')
             description = description.getall()
