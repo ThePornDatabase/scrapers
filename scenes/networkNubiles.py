@@ -98,10 +98,7 @@ class NubilesSpider(BaseSceneScraper):
         description = self.process_xpath(
             response, self.get_selector_map('description')).get()
         if not description or (description and len(description.strip())):
-            description = response.xpath(
-                '//div[contains(@class,'
-                '"content-pane-column")]/div/p/text()'
-            )
+            description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()')
             description = description.getall()
             if description:
                 description = " ".join(description)
