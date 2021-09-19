@@ -4,17 +4,20 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+# Individual sites are no longer updated.  They've been rolled into Pornworld, which is tied
+# to Legal Porno.  Scrape with LegalPornoPornworld scraper
+
 
 class PornWorldScraper(BaseSceneScraper):
     name = 'PornWorldAlt'
     network = 'ddfnetwork'
 
     start_urls = [
-        'https://www.sandysfantasies.com/',
-        'https://cherryjul.com/',
-        'https://eveangelofficial.com/',
-        'https://sexvideocasting.com/',
-        'https://hairytwatter.net/'
+        # ~ 'https://www.sandysfantasies.com/',
+        # ~ 'https://cherryjul.com/',
+        # ~ 'https://eveangelofficial.com/',
+        # ~ 'https://sexvideocasting.com/',
+        # ~ 'https://hairytwatter.net/'
     ]
 
     selector_map = {

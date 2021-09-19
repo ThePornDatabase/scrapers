@@ -4,21 +4,24 @@ import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+# Individual sites are no longer updated.  They've been rolled into Pornworld, which is tied
+# to Legal Porno.  Scrape with LegalPornoPornworld scraper
+
 
 class PornWorldScraper(BaseSceneScraper):
     name = 'PornWorld'
     network = 'ddfnetwork'
 
     start_urls = [
-        'https://1by-day.com/',
-        'https://ddfbusty.com/',
-        'https://eurogirlsongirls.com/',
-        'https://euroteenerotica.com/',
-        'https://fuckinhd.com',
-        'https://handsonhardcore.com/',
-        'https://hotlegsandfeet.com/',
-        'https://houseoftaboo.com/',
-        'https://onlyblowjob.com/',
+        # ~ 'https://1by-day.com/',
+        # ~ 'https://ddfbusty.com/',
+        # ~ 'https://eurogirlsongirls.com/',
+        # ~ 'https://euroteenerotica.com/',
+        # ~ 'https://fuckinhd.com',
+        # ~ 'https://handsonhardcore.com/',
+        # ~ 'https://hotlegsandfeet.com/',
+        # ~ 'https://houseoftaboo.com/',
+        # ~ 'https://onlyblowjob.com/',
     ]
 
     selector_map = {
