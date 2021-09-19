@@ -5,13 +5,13 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
 
-class SiteMySexyMobilePerformerSpider(BasePerformerScraper):
+class SiteMySexMobilePerformerSpider(BasePerformerScraper):
     selector_map = {
         'pagination': '/tour/models/models_%s_d.html',
         'external_id': 'girls/(.+)/?$'
     }
 
-    name = 'MySexyMobilePerformer'
+    name = 'MySexMobilePerformer'
 
     start_urls = [
         'https://mysexmobile.com',
@@ -38,7 +38,7 @@ class SiteMySexyMobilePerformerSpider(BasePerformerScraper):
                 item['image'] = ''
 
             item['url'] = performer.xpath('./@href').get()
-            item['network'] = 'My Sexy Mobile'
+            item['network'] = 'My Sex Mobile'
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''

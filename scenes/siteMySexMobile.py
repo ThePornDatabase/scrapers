@@ -8,9 +8,9 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SiteMySexyMobileSpider(BaseSceneScraper):
-    name = 'MySexyMobile'
-    network = 'My Sexy Mobile'
+class SiteMySexMobileSpider(BaseSceneScraper):
+    name = 'MySexMobile'
+    network = 'My Sex Mobile'
 
     start_urls = [
         'https://mysexmobile.com',
@@ -45,10 +45,10 @@ class SiteMySexyMobileSpider(BaseSceneScraper):
                 yield scrapy.Request(sceneurl, callback=self.parse_scene, meta={'date': scenedate, 'id': sceneid, 'title': scenetitle, 'image': sceneimage})
 
     def get_site(self, response):
-        return "My Sexy Mobile"
+        return "My Sex Mobile"
 
     def get_parent(self, response):
-        return "My Sexy Mobile"
+        return "My Sex Mobile"
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description'))
