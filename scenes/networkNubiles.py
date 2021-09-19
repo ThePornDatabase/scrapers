@@ -62,14 +62,19 @@ class NubilesSpider(BaseSceneScraper):
                 }
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
+                    meta['parent'] = "Bratty Sis"
                 elif "anilos" in response.url:
                     meta['site'] = "Anilos"
+                    meta['parent'] = "Anilos"
                 elif "deeplush" in response.url:
                     meta['site'] = "Deep Lush"
+                    meta['parent'] = "Deep Lush"
                 elif "nfbusty" in response.url:
                     meta['site'] = "NF Busty"
+                    meta['parent'] = "NF Busty"
                 elif "nubiles.net" in response.url:
                     meta['site'] = "Nubiles"
+                    meta['parent'] = "Nubiles"
                 else:
                     meta['site'] = scene.xpath(
                         './/a[@class="site-link"]/text()'
@@ -84,8 +89,14 @@ class NubilesSpider(BaseSceneScraper):
             '//meta[@property="og:site_name"]/@content').get().replace("'", "")
         if site:
             return site
-
         return super().get_site(response)
+
+    def get_parent(self, response):
+        parent = response.xpath(
+            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
+        if parent:
+            return parent
+        return super().get_parent(response)
 
     def get_next_page_url(self, base, page):
         page = (page - 1) * 10
