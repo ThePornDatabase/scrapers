@@ -1,17 +1,13 @@
-import scrapy
-import html
-from urllib.parse import urlparse
-
-
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-class networkOlderWomanFunPornstarSpider(BasePerformerScraper):
+
+class SiteVividPornstarSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//div[@class="update_details"]/a[1]/text()',
-        'image': "//div[contains(@class,'image_area')]/img[@class='img-responsive']/@src",
+        'name': '',
+        'image': "",
         'pagination': '/stars/api/?flagCeleb=N&limit=24&offset=%s&sort=datedesc',
-        'external_id': 'girls/(.+)/?$'
+        'external_id': ''
     }
 
     name = 'VividPerformer'
