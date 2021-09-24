@@ -1,6 +1,7 @@
-import scrapy
-from tpdb.BaseSceneScraper import BaseSceneScraper
 import re
+import scrapy
+
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class CXWowSpider(BaseSceneScraper):
@@ -44,24 +45,23 @@ class CXWowSpider(BaseSceneScraper):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
             return self.format_link(response, image)
-        else:
-            image = response.xpath('//script[contains(text(),"playTrailer")]/text()').get()
-            if image:
-                image = re.search('\simage:\ \"(.*?)\".',image).group(1)
-                image = "https://www.pure-ts.com/" + image
-                return self.format_link(response, image)
+
+        image = response.xpath('//script[contains(text(),"playTrailer")]/text()').get()
+        if image:
+            image = re.search(r'\simage:\ \"(.*?)\".', image).group(1)
+            image = "https://www.pure-ts.com/" + image
+            return self.format_link(response, image)
         return ''
 
     def get_trailer(self, response):
         trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
         if trailer:
-            trailer = re.search('\sfile:\ \"(.*?)\",',trailer).group(1)
+            trailer = re.search(r'\sfile:\ \"(.*?)\",', trailer).group(1)
             trailer = "https://www.pure-ts.com/" + trailer
             return self.format_link(response, trailer)
-        else:
-            return ''
-        
-    def get_site(sef,response):
+        return ''
+
+    def get_site(self, response):
         if "becomingfemme" in response.url:
             return "Becoming Femme"
         if "pure-bbw" in response.url:
@@ -70,9 +70,8 @@ class CXWowSpider(BaseSceneScraper):
             return "Pure TS"
         if "tspov" in response.url:
             return "TSPOV"
-            
-    def get_gender(self,response):
+
+    def get_gender(self, response):
         if "becomingfemme" in response.url:
             return "Female"
-        else:
-            return "Trans"
+        return "Trans"

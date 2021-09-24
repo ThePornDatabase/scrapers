@@ -1,7 +1,7 @@
-import scrapy
 import re
 import datetime
 import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -20,9 +20,9 @@ class PutaLocuraSpider(BaseSceneScraper):
         'description': '//div[@class="description clearfix"]/p[2]/text()',
         'date': '//div[@class="released-views"]/span[1]/text()',
         'image': '//script[contains(text(), "fluidPlayer")]/text()',
-        'performers': '', # They can be pulled with '//span[@class="site-name"]/text()', but halfway through the same spot becomes sites or categories instead
+        'performers': '',  # They can be pulled with '//span[@class="site-name"]/text()', but halfway through the same spot becomes sites or categories instead
         'tags': '',
-        'external_id': '.*\/(.*?)$',
+        'external_id': r'.*\/(.*?)$',
         'trailer': '',
         'pagination': '/en?page=%s'
     }
@@ -35,12 +35,12 @@ class PutaLocuraSpider(BaseSceneScraper):
 
     def get_site(self, response):
         return "Puta Locura"
-        
+
     def get_title(self, response):
         title = self.process_xpath(
             response, self.get_selector_map('title')).get()
         if "|" in title:
-            title = re.search('(.*)\|', title).group(1)
+            title = re.search(r'(.*)\|', title).group(1)
             if title:
                 title = title.strip()
         if title:
@@ -53,9 +53,7 @@ class PutaLocuraSpider(BaseSceneScraper):
             date = datetime.datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
             if date:
                 return dateparser.parse(date.strip()).isoformat()
-
-        return datetime.now().isoformat()
-
+            return dateparser.parse('today').isoformat()
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()

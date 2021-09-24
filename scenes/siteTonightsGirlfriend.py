@@ -33,9 +33,9 @@ class TonightsGirlfriendSpider(BaseSceneScraper):
         return dateparser.parse(data).isoformat()
 
     def get_title(self, response):
-        id = self.get_id(response).replace('-', ' ')
-        id = re.sub("(\\d+)$", "", id)
-        return id.title()
+        externid = self.get_id(response).replace('-', ' ')
+        externid = re.sub("(\\d+)$", "", externid)
+        return externid.title()
 
     def get_scenes(self, response):
         scenes = response.css(

@@ -1,10 +1,9 @@
+import re
+from datetime import datetime
+from urllib.parse import urlparse
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-import re
-import dateparser
-from datetime import datetime
-from urllib.parse import urlparse
 
 
 class NomadMediaSpider(BaseSceneScraper):
@@ -47,7 +46,6 @@ class NomadMediaSpider(BaseSceneScraper):
 
         if image is not None:
             return self.format_link(response, image)
-
 
     def get_trailer(self, response):
         parsed_uri = urlparse(response.url)

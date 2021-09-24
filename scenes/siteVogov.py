@@ -1,6 +1,5 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -22,7 +21,7 @@ class VogovSpider(BaseSceneScraper):
         'date': '//li[contains(text(),"Release")]/span/text()',
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//div[contains(@class,"info-video-category")]/a/text()',
-        'external_id': 'videos\/(.*)\/?',
+        'external_id': r'videos\/(.*)\/?',
         'trailer': '//script[contains(text(),"video_url")]/text()',
         'pagination': '/latest-videos/%s/'
     }
@@ -36,7 +35,7 @@ class VogovSpider(BaseSceneScraper):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(
                 response, self.get_selector_map('trailer')).get()
-            trailer = re.search('video_url:\ .*?(https:\/\/.*?\.mp4)\/', trailer).group(1)
+            trailer = re.search(r'video_url:\ .*?(https:\/\/.*?\.mp4)\/', trailer).group(1)
             if trailer:
                 return trailer
         return ''

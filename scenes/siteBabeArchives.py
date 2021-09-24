@@ -1,7 +1,4 @@
-import dateparser
 import scrapy
-import re
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -16,12 +13,12 @@ class BabeArchivesWhoresSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//div[contains(@class,"videoDetails")]/h3/text()',
-        'description': '//div[contains(@class,"videoDetails")]/h3/text()', #No description on site, just using title for filler
+        'description': '//div[contains(@class,"videoDetails")]/h3/text()',  # No description on site, just using title for filler
         'date': '//span[contains(text(),"Added:")]/following-sibling::text()',
         'image': '//div[@class="player-thumb"]/img/@src0_1x',
         'performers': '//li[@class="update_models"]/a/text()',
         'tags': '',
-        'external_id': '\/trailers\/(.+)\.html',
+        'external_id': r'\/trailers\/(.+)\.html',
         'trailer': '',
         'pagination': '/categories/movies/%s/latest/'
     }

@@ -1,7 +1,8 @@
 import re
-
+import dateparser
 import scrapy
 import tldextract
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -10,11 +11,12 @@ def match_site(argument):
         'girlgirl': "Girl Girl",
         'julesjordan': "Jules Jordan",
         'manuelferrara': "Manuel Ferrara",
+        'theassfactory': "The Ass Factory",
         'spermswallowers': "Sperm Swallowers",
     }
-    return match.get(argument, '')
-    
-    
+    return match.get(argument, argument)
+
+
 class JulesJordanSpider(BaseSceneScraper):
     name = 'JulesJordan'
     network = 'julesjordan'
@@ -52,8 +54,19 @@ class JulesJordanSpider(BaseSceneScraper):
         if result:
             return self.format_link(response, result.group(1))
 
-
     def get_site(self, response):
-        site = tldextract.extract(response.url).domain            
+        site = tldextract.extract(response.url).domain
         site = match_site(site)
         return site
+
+    def get_date(self, response):
+        date = self.process_xpath(response, self.get_selector_map('date'))
+        if date:
+            date = self.get_from_regex(date.get(), 're_date')
+            if date:
+                date = date.strip()
+                if date:
+                    date = date.replace('Released:', '').replace('Added:', '').strip()
+                    date_formats = self.get_selector_map('date_formats') if 'date_formats' in self.get_selector_map() else None
+                    return dateparser.parse(date, date_formats=date_formats).isoformat()
+        return dateparser.parse('today').isoformat()

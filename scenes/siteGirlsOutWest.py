@@ -1,8 +1,8 @@
 import re
-import scrapy
-from tpdb.BaseSceneScraper import BaseSceneScraper
-from datetime import datetime
 import dateparser
+import scrapy
+
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class GirlsOutWestSpider(BaseSceneScraper):

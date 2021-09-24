@@ -35,9 +35,9 @@ class JavBusSpider(BaseSceneScraper):
     def get_title(self, response):
         title = response.xpath(
             '//head/title/text()').get().strip().replace(' - JavBus', '')
-        id = self.get_id(response)
-        if id.replace('-', '').replace('_', '').replace(' ', '').isdigit():
+        externid = self.get_id(response)
+        if externid.replace('-', '').replace('_', '').replace(' ', '').isdigit():
             title = self.get_site(response) + ' ' + title
-            title = title.replace(id + ' ', '')
+            title = title.replace(externid + ' ', '')
 
         return title

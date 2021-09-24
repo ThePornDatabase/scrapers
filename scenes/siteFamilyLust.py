@@ -5,7 +5,8 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-### Part of the Tugpass network, but not included on their index, and different enough that it's easier to just make a new scraper
+# Part of the Tugpass network, but not included on their index, and different enough that it's easier to just make a new scraper
+
 
 class FamilyLustSpider(BaseSceneScraper):
     name = 'FamilyLust'
@@ -35,7 +36,7 @@ class FamilyLustSpider(BaseSceneScraper):
 
         for child in parentxpath:
             date = child.xpath("./h4/text()").get()
-            date = date.replace("Date: ","")
+            date = date.replace("Date: ", "")
             if date[-1] == ",":
                 date = date[:-1].strip()
             date = dateparser.parse(date).isoformat()
@@ -59,6 +60,6 @@ class FamilyLustSpider(BaseSceneScraper):
             image = "https://www.familylust.com/" + image
             return self.format_link(response, image)
         return ''
-        
+
     def get_parent(self, response):
         return "Family Lust"

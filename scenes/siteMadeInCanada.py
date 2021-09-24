@@ -1,8 +1,8 @@
+import re
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-import re
-import dateparser
 
 
 class MadeInCanadaSpider(BaseSceneScraper):
@@ -44,10 +44,10 @@ class MadeInCanadaSpider(BaseSceneScraper):
 
     def get_performers(self, response):
         return ''
-        
+
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if "-0001" in date:
             date = date.replace("-0001", "2014")
         date.replace('Released:', '').replace('Added:', '').strip()
-        return dateparser.parse(date.strip()).isoformat()        
+        return dateparser.parse(date.strip()).isoformat()

@@ -1,6 +1,6 @@
-import scrapy
 import re
 import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -53,8 +53,6 @@ class SexMexSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
                                      meta={'date': date, 'title': title, 'description': description, 'image': image, 'performers': performers, 'id': sceneid})
 
-
-
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
@@ -63,6 +61,6 @@ class SexMexSpider(BaseSceneScraper):
                     trailer = "https://sexmex.xxx/" + trailer
                 return trailer
         return ''
-        
+
     def get_site(self, response):
         return "SexMex"

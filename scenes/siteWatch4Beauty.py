@@ -1,8 +1,5 @@
-import dateparser
-import scrapy
-import json
 from datetime import datetime, timedelta
-import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -18,7 +15,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
 
     selector_map = {
         'external_id': '',
-        'pagination': ''            
+        'pagination': ''
     }
 
     def start_requests(self):
@@ -46,10 +43,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)         
-
-
-
+                                     cookies=self.cookies)
 
     def get_scenes(self, response):
         for scene in response.json():
@@ -59,10 +53,10 @@ class Watch4BeautyScraper(BaseSceneScraper):
     def parse_scene(self, response):
         data = response.json()
         item = SceneItem()
-        
+
         if len(data):
             data = data[0]
-            
+
             item['title'] = data['issue_title']
             item['date'] = data['issue_datetime']
             if "Z" in item['date']:
@@ -71,6 +65,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['tags'] = data['issue_tags'].split(",")
             item['tags'] = list(map(str.strip, item['tags']))
             item['tags'] = list(map(str.capitalize, item['tags']))
+            item['tags'][:] = [x for x in item['tags'] if x]
             item['site'] = "Watch4Beauty"
             item['network'] = "Watch4Beauty"
             item['parent'] = "Watch4Beauty"
@@ -78,27 +73,25 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['id'] = data['issue_simple_title']
             item['trailer'] = ''
             item['image'] = "https://s5q3w2t8.ssl.hwcdn.net/production/%s-issue-cover-wide-2560.jpg" % (datetime.fromisoformat(item['date']).strftime('%Y%m%d'))
-            item['performers']=[]
-            
-            modelurl = response.url+"/models"
-            yield scrapy.Request(modelurl, callback=self.parse_models, meta={'item':item})
+            item['performers'] = []
+
+            modelurl = response.url + "/models"
+            yield scrapy.Request(modelurl, callback=self.parse_models, meta={'item': item})
 
     def parse_models(self, response):
         item = response.meta['item']
         data = response.json()
         performers = []
-        
+
         if len(data):
-            scene = SceneItem()        
-            Models = data[0]['Models']
-            for model in Models:
+            models = data[0]['Models']
+            for model in models:
                 performers.append(model['model_nickname'].strip())
-                
+
         item['performers'] = performers
         yield item
-        
-        
-    def get_next_page_url(self, base, page, response = ""):
+
+    def get_next_page_url(self, base, page, response=""):
         if response:
             oldestscene = datetime.now().isoformat()
             for scene in response.json():
@@ -109,5 +102,4 @@ class Watch4BeautyScraper(BaseSceneScraper):
                     oldestscene = date
             date = (datetime.fromisoformat(date) - timedelta(days=1)).isoformat() + "Z"
             return "https://www.watch4beauty.com/api/7Wywy44w9G9Bbtf?before=" + date
-        else:
-            return "https://www.watch4beauty.com/api/7Wywy44w9G9Bbtf?before=" + datetime.now().isoformat()
+        return "https://www.watch4beauty.com/api/7Wywy44w9G9Bbtf?before=" + datetime.now().isoformat()

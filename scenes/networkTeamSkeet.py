@@ -33,11 +33,11 @@ link_to_info = {
         "contentText": v2_videos_content_text,
         "v2": True
     },
-    "mylf-organic-2uxkybtwvv": {
+    "mylf-elastic-hka5k7vyuw": {
         "site": "MYLF",
-        "navText": videos_nav_text,
-        "contentText": videos_content_text,
-        "v2": False
+        "navText": v2_videos_content_text,
+        "contentText": v2_videos_content_text,
+        "v2": True
     },
     "FOS-organic-n5oaginage": {
         "site": "Foster Tapes",
@@ -217,7 +217,6 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         'external_id': '\\/(.+)\\.json'
     }
 
-            
     def start_requests(self):
 
         for linkName, siteInfo in link_to_info.items():
@@ -227,11 +226,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 is_v2 = False
             if is_v2:
                 start = "0"
-                limit=250
+                limit = 250
             else:
                 start = "aaaaaaaa"
-                limit=450
-            url=format_nav_url(linkName, start, limit, is_v2)
+                limit = 450
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
                                  meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2},
@@ -241,7 +239,6 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
     def parse(self, response, **kwargs):
         meta = response.meta
         highwater = ""
-        limit = 250
         if not meta['is_v2']:
             scene_list = json.loads(response.body)
             if scene_list:
@@ -263,13 +260,13 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)            
+                                     cookies=self.cookies)
 
     def parse_scene(self, response):
         data = response.json()
         item = SceneItem()
         is_v2 = "store2" in response.url
-                
+
         if "store2" in response.url:
             data = data['_source']
         item['title'] = data['title']
@@ -280,7 +277,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         else:
             item['tags'] = []
         item['id'] = data['id']
-        
+
         if 'videoTrailer' in data:
             item['trailer'] = data['videoTrailer']
         elif 'video' in data:
@@ -310,7 +307,6 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         else:
             item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
 
-
         item['performers'] = []
         if 'models' in data:
             for model in data['models']:
@@ -332,7 +328,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 if "id" in scene:
                     scene_id = scene["id"]
                     scene_url = format_scene_url(site_link, scene_id, is_v2)
-                    yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=response.meta)      
+                    yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=response.meta)
         else:
             if scene_info:
                 for key, scene in scene_info.items():
@@ -341,11 +337,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                         scene_url = format_scene_url(site_link, scene_id, is_v2)
                         yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=response.meta)
 
-
     def get_next_page_url(self, base, page, highwater):
         limit = 250
         if 'store2' in base:
-            start = str(250 * (page-1))
+            start = str(250 * (page - 1))
             is_v2 = True
         else:
             is_v2 = False

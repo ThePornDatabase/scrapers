@@ -1,4 +1,3 @@
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -13,31 +12,40 @@ class MindControlTheatreScraper(BaseSceneScraper):
         'https://mindcontroltheatre.com'
     ]
 
+    cookies = {
+        'age': 'yes',
+    }
+
     selector_map = {
         'title': "//h1/text()",
-        'description': "//div[@id='description']/p",
+        'description': "//div[@id='description']/p/text()",
         'date': "//p[@id='data']/text()",
+        're_date': r'(\d{1,2} .*? \d{4})',
         'image': '//video/@poster',
         'performers': "//div[@id='cast']/a/text()",
         'tags': "",
-        'external_id': 'movie\\/(.+)',
+        'external_id': r'.*\/(.*?)$',
         'trailer': '',
         'pagination': '/movies?page=%s'
     }
 
     max_pages = 1
 
+    def start_requests(self):
+        url = "https://mindcontroltheatre.com/movies"
+        yield scrapy.Request(url, callback=self.get_scenes,
+                             meta={'page': self.page},
+                             headers=self.headers,
+                             cookies=self.cookies)
+
     def get_scenes(self, response):
-        scenes = response.css(".movielist a::attr(href)").getall()
+        scenes = response.xpath('//div[@class="movielist"]/div[1]/a/@href').getall()
         for scene in scenes:
             if "movie" in scene:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_date(self, response):
-        date_string = response.xpath("//p[@id='data']/text()").extract_first()
-        if date_string:
-            date_string = dateparser.parse(
-                date_string.split(",")[0]).isoformat()
-        else:
-            date_string = ""
-        return date_string
+    def get_site(self, response):
+        return "Mind Control Theatre"
+
+    def get_parent(self, response):
+        return "Mind Control Theatre"

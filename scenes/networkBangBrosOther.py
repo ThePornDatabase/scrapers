@@ -52,8 +52,8 @@ class BangBrosAltSpider(BaseSceneScraper):
         tags = []
         genres = response.xpath(
             '//meta[@http-equiv="keywords"]/@content').get().split(',')
-        for genreLink in genres:
-            tags.append(genreLink.strip())
+        for genrelink in genres:
+            tags.append(genrelink.strip())
 
         return tags
 

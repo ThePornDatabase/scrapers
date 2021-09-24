@@ -10,7 +10,7 @@ class SiteLaFranceAPoilPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[contains(@class,"thumbstar")]//div[@class="pull-left"]/text()',
         'image': '//div[contains(@class,"thumbstar")]//img/@src',
-        'pagination': '/portal/morestars.php?aff=&page=%s&tag=&video=&thid=&tr=&trlfap=&cp=&tunl=&iduser=&sort=&lang=en',
+        'pagination': '/portal/morestars.php?aff=&page=%s&tag=&video=&thid=&tr=&trlfap=&cp=&tunl=&iduser=&sort=name&lang=en',
         'external_id': 'girls/(.+)/?$'
     }
 

@@ -1,9 +1,8 @@
-import scrapy
+import re
+from datetime import datetime
+import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-import re
-import dateparser
-from datetime import datetime
 from tpdb.items import SceneItem
 
 
@@ -82,12 +81,12 @@ class MontysPOVSpider(BaseSceneScraper):
             image = sceneresponse.xpath('./a/img/@src').get()
             if not image:
                 image = ''
-            item['image'] = image.strip()
+            item['image'] = image.replace(" ", "%20").strip()
 
             # URL
             url = sceneresponse.xpath('./a/img/@src').get()
             url = re.search('(.*)\\.(?:jpg|png|gif)', url).group(1)
-            item['url'] = url.strip()
+            item['url'] = url.replace(" ", "%20").strip()
 
             # ID
             item['id'] = re.search('\\/scene\\/(\\d+)', item['url']).group(1)
@@ -107,8 +106,7 @@ class MontysPOVSpider(BaseSceneScraper):
         if self.debug:
             print(items)
             return items
-        else:
-            return items
+        return items
 
     def get_next_page_url(self, base, page):
         selector = '/public/most-recent/%s/'

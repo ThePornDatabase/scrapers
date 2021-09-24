@@ -1,9 +1,6 @@
-import scrapy
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
 import re
-import dateparser
-from datetime import datetime
+import scrapy
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class HotGuysFuckSpider(BaseSceneScraper):
@@ -23,7 +20,7 @@ class HotGuysFuckSpider(BaseSceneScraper):
         'performers': '//meta[@property="og:video:actor"]/@content',
         'tags': '//meta[@property="og:video:tag"]/@content',
         'trailer': '',
-        'external_id': 'video\/(.*)',
+        'external_id': r'video\/(.*)',
         'pagination': '/videos/recent?page=%s'
     }
 

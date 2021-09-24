@@ -1,9 +1,7 @@
-import dateparser
-import scrapy
 import re
-
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
+
 
 class DickDrainersSpider(BaseSceneScraper):
     name = 'DickDrainers'
@@ -21,7 +19,7 @@ class DickDrainersSpider(BaseSceneScraper):
         'image': '//script[contains(text(),"video_content")]/text()',
         'performers': '//div[@class="featuring clear"]//a[contains(@href,"/models/")]/text()',
         'tags': '//div[@class="featuring clear"]//a[contains(@href,"/categories/")]/text()',
-        'external_id': '\/trailers\/(.+)\.html',
+        'external_id': r'\/trailers\/(.+)\.html',
         'trailer': '//script[contains(text(),"video_content")]/text()',
         'pagination': '/tour/categories/movies/%s/latest/'
     }
@@ -40,33 +38,32 @@ class DickDrainersSpider(BaseSceneScraper):
                 desc = desc.strip()
             description = '\n'.join(description)
             return description.strip()
-        
-        return ''
 
+        return ''
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
-            image = re.search('poster=\"(.*.jpg)\"', image)
+            image = re.search(r'poster=\"(.*.jpg)\"', image)
             if image:
                 image = image.group(1)
-                image = image.replace('//','/')
+                image = image.replace('//', '/')
                 image = 'http://www.dickdrainers.com' + image.strip()
                 return self.format_link(response, image)
-        return ''        
+        return ''
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
             if trailer:
-                trailer = re.search('video src=\"(.*.mp4)\"', trailer)
+                trailer = re.search(r'video src=\"(.*.mp4)\"', trailer)
                 if trailer:
                     trailer = trailer.group(1)
-                    trailer = trailer.replace('//','/')
+                    trailer = trailer.replace('//', '/')
                     trailer = 'http://www.dickdrainers.com' + trailer.strip()
                     return self.format_link(response, trailer)
 
         return ''
-        
-    def get_site(self,response):
+
+    def get_site(self, response):
         return 'Dick Drainers'

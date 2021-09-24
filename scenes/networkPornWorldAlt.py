@@ -1,12 +1,11 @@
-# Fixed old sites to scrape historical
-
 import re
-
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from datetime import datetime
-import dateparser
+
+# Individual sites are no longer updated.  They've been rolled into Pornworld, which is tied
+# to Legal Porno.  Scrape with LegalPornoPornworld scraper
 
 
 class PornWorldScraper(BaseSceneScraper):
@@ -14,11 +13,11 @@ class PornWorldScraper(BaseSceneScraper):
     network = 'ddfnetwork'
 
     start_urls = [
-        'https://www.sandysfantasies.com/',
-        'https://cherryjul.com/',
-        'https://eveangelofficial.com/',
-        'https://sexvideocasting.com/',
-        'https://hairytwatter.net/'
+        # ~ 'https://www.sandysfantasies.com/',
+        # ~ 'https://cherryjul.com/',
+        # ~ 'https://eveangelofficial.com/',
+        # ~ 'https://sexvideocasting.com/',
+        # ~ 'https://hairytwatter.net/'
     ]
 
     selector_map = {
@@ -38,7 +37,7 @@ class PornWorldScraper(BaseSceneScraper):
         for scene in scenes:
             performerlist = scene.xpath('./div/div[@class="featuring"]/a/text()').getall()
             if performerlist:
-                performers = [j.strip() for j in performerlist] 
+                performers = [j.strip() for j in performerlist]
             scene = scene.xpath('./div[@class="videoPic"]/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 if performers:

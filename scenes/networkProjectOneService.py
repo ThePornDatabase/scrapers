@@ -1,7 +1,8 @@
 import re
+import string
 from urllib.parse import urlencode
-import dateparser
 import datetime
+import dateparser
 import scrapy
 from slugify import slugify
 from tldextract import tldextract
@@ -293,14 +294,21 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             # Deviante abbreviations
             if item['site'] == "fmf":
                 item['site'] = "Forgive Me Father"
+                item['parent'] = "Deviante"
             if item['site'] == "sw":
                 item['site'] = "Sex Working"
+                item['parent'] = "Deviante"
             if item['site'] == "pdt":
                 item['site'] = "Pretty Dirty Teens"
+                item['parent'] = "Deviante"
             if item['site'] == "lha":
                 item['site'] = "Love Her Ass"
+                item['parent'] = "Deviante"
             if item['site'] == "es":
                 item['site'] = "Erotic Spice"
+                item['parent'] = "Deviante"
+
+            item['parent'] = string.capwords(item['parent'])
 
             scene_count = scene_count + 1
 

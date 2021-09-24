@@ -67,8 +67,11 @@ class PinkLabelSpider(BaseSceneScraper):
         description = re.sub('<[^<]+?>', '', description).strip()
         return description
 
-    def get_trailer(self, repsonse):
-        return re.search("http.*\.mp4", repsonse.text).group(0)
+    def get_trailer(self, response):
+        trailer = re.search("http.*\.mp4", response.text)
+        if trailer:
+            return trailer.group(0)
+        return ''
 
     def get_date(self, response):
         metadata = response.xpath("//script[@class='yoast-schema-graph']//text()").get()

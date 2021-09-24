@@ -62,14 +62,19 @@ class NubilesSpider(BaseSceneScraper):
                 }
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
+                    meta['parent'] = "Bratty Sis"
                 elif "anilos" in response.url:
                     meta['site'] = "Anilos"
+                    meta['parent'] = "Anilos"
                 elif "deeplush" in response.url:
                     meta['site'] = "Deep Lush"
+                    meta['parent'] = "Deep Lush"
                 elif "nfbusty" in response.url:
                     meta['site'] = "NF Busty"
+                    meta['parent'] = "NF Busty"
                 elif "nubiles.net" in response.url:
                     meta['site'] = "Nubiles"
+                    meta['parent'] = "Nubiles"
                 else:
                     meta['site'] = scene.xpath(
                         './/a[@class="site-link"]/text()'
@@ -84,8 +89,14 @@ class NubilesSpider(BaseSceneScraper):
             '//meta[@property="og:site_name"]/@content').get().replace("'", "")
         if site:
             return site
-
         return super().get_site(response)
+
+    def get_parent(self, response):
+        parent = response.xpath(
+            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
+        if parent:
+            return parent
+        return super().get_parent(response)
 
     def get_next_page_url(self, base, page):
         page = (page - 1) * 10
@@ -95,13 +106,17 @@ class NubilesSpider(BaseSceneScraper):
     def get_description(self, response):
         if 'description' not in self.get_selector_map():
             return ''
-        description = self.process_xpath(
-            response, self.get_selector_map('description')).get()
+        descriptionxpath = self.process_xpath(response, self.get_selector_map('description'))
+        if descriptionxpath:
+            description = ''
+            descriptionxpath = descriptionxpath.getall()
+            for descrow in descriptionxpath:
+                descrow = descrow.replace("\n", "").replace("\r", "").replace("\t", "").strip()
+                if descrow:
+                    description = description + descrow
+
         if not description or (description and len(description.strip())):
-            description = response.xpath(
-                '//div[contains(@class,'
-                '"content-pane-column")]/div/p/text()'
-            )
+            description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()')
             description = description.getall()
             if description:
                 description = " ".join(description)

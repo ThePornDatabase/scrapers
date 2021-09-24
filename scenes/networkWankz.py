@@ -6,7 +6,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class networkWankzSpider(BaseSceneScraper):
+class NetworkWankzSpider(BaseSceneScraper):
     name = 'Wankz'
     network = "Wankz"
 
@@ -72,7 +72,7 @@ class networkWankzSpider(BaseSceneScraper):
         # ~ 'https://www.wildmassage.com',
         # ~ 'https://www.xxxatwork.com',
         # ~ 'https://www.youngdirtylesbians.com',
-        # ~ 'https://www.youngslutshardcore.com',     
+        # ~ 'https://www.youngslutshardcore.com',
     ]
 
     selector_map = {

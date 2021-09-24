@@ -1,6 +1,5 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -38,8 +37,7 @@ class Only3XSpider(BaseSceneScraper):
             '//i[@class="icon-home"]/following-sibling::text()').get()
         if site:
             return site.strip()
-        else:
-            super.get_site(response)
+        super.get_site(response)
 
     def get_description(self, response):
         description = response.xpath('//div[@class="set-desc"]').getall()

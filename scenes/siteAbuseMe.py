@@ -6,7 +6,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteAbuseMeSpider(BaseSceneScraper):
+class SiteAbuseMeSpider(BaseSceneScraper):
     name = 'AbuseMe'
     network = "Abuse Me"
     parent = "Abuse Me"
@@ -22,7 +22,7 @@ class siteAbuseMeSpider(BaseSceneScraper):
         'image': '//img[@class="playerPic"]/@src',
         'performers': '//script[contains(text(),"shootModels")]/text()',
         'tags': '//meta[@http-equiv="keywords"]/@content',
-        'external_id': '\/video(\d+)',
+        'external_id': r'\/video(\d+)',
         'trailer': '//script[@type="text/javascript"]/text()',
         'pagination': '/videos/%s'
     }
@@ -46,7 +46,7 @@ class siteAbuseMeSpider(BaseSceneScraper):
                 image = "http://" + image
             return self.format_link(response, image)
         return ''
-        
+
     def get_site(self, response):
         return "Abuse Me"
 
@@ -54,7 +54,7 @@ class siteAbuseMeSpider(BaseSceneScraper):
         if 'performers' in self.get_selector_map() and self.get_selector_map('performers'):
             performers = self.process_xpath(response, self.get_selector_map('performers')).get()
             if performers:
-                performers = re.findall('\"\d+ : (.*?)\",', performers)
+                performers = re.findall(r'\"\d+ : (.*?)\",', performers)
                 if performers:
                     return list(map(lambda x: x.strip().title(), performers))
         return ''
@@ -78,12 +78,11 @@ class siteAbuseMeSpider(BaseSceneScraper):
                 return list(map(lambda x: x.strip().title(), tags))
         return []
 
-
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
             if trailer:
-                trailer = re.search('\'\/\/(.*.mp4)\'', trailer).group(1)
+                trailer = re.search(r'\'\/\/(.*.mp4)\'', trailer).group(1)
                 if trailer:
                     trailer = "http://" + trailer
                     return trailer.strip()

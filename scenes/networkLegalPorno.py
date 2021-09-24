@@ -8,7 +8,7 @@ class LegalPornoSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.analvids.com',
-        'https://pornworld.com'
+        # ~ 'https://pornworld.com'  # Located in networkLegaPornoPornworld.py
     ]
 
     selector_map = {
