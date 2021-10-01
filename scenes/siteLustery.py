@@ -27,6 +27,7 @@ class LusterySpider(BaseSceneScraper):
         image_url = response.xpath('//video-js/@data-poster').get()
         if image_url is None:
             image_url = response.xpath('//div[@class="poster-with-video lazy-image"]/@data-src').get()
+        image_url = image_url.replace("_20_blurred", "")
         return image_url
 
     def get_trailer(self, response):
