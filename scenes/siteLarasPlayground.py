@@ -52,11 +52,9 @@ class SiteLarasPlaygroundSpider(BaseSceneScraper):
                 item['tags'] = []
                 item['date'] = dateparser.parse('today').isoformat()
 
-                image = scene.xpath(
-                    r'./div/div[@class="serie_pic01"]/img/@src'
-                )
+                image = scene.xpath(r'./div/div[@class="serie_pic01"]/img/@src')
                 if image:
-                    item['image'] = image.get()
+                    image = image.get()
                     item['image'] = image.strip()
                 else:
                     item['image'] = []

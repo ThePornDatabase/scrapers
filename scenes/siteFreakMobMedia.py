@@ -1,13 +1,12 @@
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteFreakMobMediaSpider(BaseSceneScraper):
+class SiteFreakMobMediaSpider(BaseSceneScraper):
     name = 'FreakMobMedia'
     network = 'Freak Mob Media'
-
 
     start_urls = [
         'https://www.freakmobmedia.com/',
@@ -20,9 +19,9 @@ class siteFreakMobMediaSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[@class="meta-info" and contains(text(),"Model")]/following-sibling::a/text()',
         'tags': '//div[@class="post-info"]//a/text()',
-        'external_id': '.*\/(.*?)\/',
+        'external_id': r'.*\/(.*?)\/',
         'trailer': '//script[contains(text(),"var jw")]/text()',
-        're_trailer': '.*(http.*?\.(?:mp4|mov)).*',
+        're_trailer': r'.*(http.*?\.(?:mp4|mov)).*',
         'pagination': '/page/%s/'
     }
 
@@ -44,7 +43,9 @@ class siteFreakMobMediaSpider(BaseSceneScraper):
             if trailer:
                 trailer = self.get_from_regex(trailer.get(), 're_trailer')
                 if trailer:
-                    trailer = trailer.replace("www. freakmobmedia", "www.freakmobmedia").replace("///","//").replace("////","//")
+                    trailer = trailer.replace("www. freakmobmedia", "www.freakmobmedia").replace("///", "//").replace("////", "//")
+                    if "http:www" in trailer:
+                        trailer = trailer.replace("http:www", "https://www")
                     return trailer.replace(" ", "%20")
 
         return ''

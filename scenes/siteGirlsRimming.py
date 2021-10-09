@@ -1,10 +1,11 @@
-import scrapy
 import re
+import scrapy
 import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class siteGirlsRimmingSpider(BaseSceneScraper):
+
+class SiteGirlsRimmingSpider(BaseSceneScraper):
     name = 'GirlsRimming'
     network = 'Girls Rimming'
     parent = 'Girls Rimming'
@@ -12,7 +13,6 @@ class siteGirlsRimmingSpider(BaseSceneScraper):
     start_urls = [
         'https://www.girlsrimming.com'
     ]
-
 
     selector_map = {
         'title': '',
@@ -22,7 +22,7 @@ class siteGirlsRimmingSpider(BaseSceneScraper):
         'image': '//img[contains(@class,"player-thumb-img")]/@src0_4x|//img[contains(@class,"player-thumb-img")]/@src0_3x|//img[contains(@class,"player-thumb-img")]/@src0_2x|//img[contains(@class,"player-thumb-img")]/@src0_1x',
         'tags': '//meta[@name="keywords"]/@content',
         'trailer': '',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*/(.*?).html',
         'pagination': '/tour/categories/movies/%s/latest/'
     }
 
@@ -33,15 +33,17 @@ class siteGirlsRimmingSpider(BaseSceneScraper):
             meta['site'] = "Girls Rimming"
             meta['parent'] = "Girls Rimming"
             meta['network'] = "Girls Rimming"
-            
+
             title = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/text()').get()
             if title:
                 meta['title'] = title.strip()
-                
+
             performers = scene.xpath('./span[@class="update_models"]/a/text()').getall()
             if performers:
                 meta['performers'] = list(map(lambda x: x.strip().title(), performers))
-                
+            else:
+                meta['performers'] = []
+
             image = scene.xpath('./a/img/@src1_4x').get()
             if not image:
                 image = scene.xpath('./a/img/@src1_3x').get()
@@ -49,19 +51,17 @@ class siteGirlsRimmingSpider(BaseSceneScraper):
                 image = scene.xpath('./a/img/@src1_2x').get()
             if not image:
                 image = scene.xpath('./a/img/@src1_1x').get()
-                
+
             if image:
                 meta['image'] = image.strip()
-                
+
             date = scene.xpath('.//div[@class="cell update_date"]/comment()/following-sibling::text()').get()
             if date:
                 meta['date'] = dateparser.parse(date.strip()).isoformat()
-            
+
             scene = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
-                
-
 
     def get_tags(self, response):
         meta = response.meta
@@ -69,25 +69,25 @@ class siteGirlsRimmingSpider(BaseSceneScraper):
             tags = self.process_xpath(response, self.get_selector_map('tags')).get()
             if tags:
                 tags = tags.split(",")
-                for performer in meta['performers']:
-                    if performer in tags:
-                        tags.remove(performer)
-                    if "" in tags:
-                        tags.remove("")
+                if meta['performers']:
+                    for performer in meta['performers']:
+                        if performer in tags:
+                            tags.remove(performer)
+                        if "" in tags:
+                            tags.remove("")
                 tags2 = tags.copy()
                 for tag in tags2:
-                    matches = [' id ', '...', 'pornstar', 'ramon', 'updates', 'movies', 'anita', 'girlsriming',
-                                'models', 'tags', 'photos', 'girlsrimming', '(id:', 'tony', 'totti']
+                    matches = [' id ', '...', 'pornstar', 'ramon', 'updates', 'movies', 'anita', 'girlsriming', 'models', 'tags', 'photos', 'girlsrimming', '(id:', 'tony', 'totti']
                     if any(x in tag.lower() for x in matches):
-                        tags.remove(tag)                    
+                        tags.remove(tag)
                 tags = list(map(lambda x: x.strip().title(), tags))
                 if 'Rimming' not in tags:
                     tags.append('Rimming')
-                    
+
                 return tags
 
         return []
-    
+
     def get_id(self, response):
         if 'external_id' in self.regex and self.regex['external_id']:
             search = self.regex['external_id'].search(response.url)
@@ -96,3 +96,6 @@ class siteGirlsRimmingSpider(BaseSceneScraper):
                 return extern_id.lower()
 
         return None
+
+    def get_performers(self, response):
+        return []

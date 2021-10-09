@@ -1,12 +1,11 @@
 import re
-
 import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class sitePornstarPlatinumSpider(BaseSceneScraper):
+class SitePornstarPlatinumSpider(BaseSceneScraper):
     name = 'PornstarPlatinum'
     network = "Pornstar Platinum"
     parent = "Pornstar Platinum"
@@ -22,7 +21,7 @@ class sitePornstarPlatinumSpider(BaseSceneScraper):
         'image': '//div[contains(@class, "video-tour")]/div/a/img/@src',
         'performers': '//div[@class="row"]/div[contains(@class,"columns info")]/h2/span[contains(text(),"eaturing")]/following-sibling::a/text()',
         'tags': '//div[@class="panel-content"]/div[@class="widget"]/div[@class="tagcloud"]/a/text()',
-        'external_id': '.*\/(.*)\.html',
+        'external_id': r'.*/(.*)\.html',
         'trailer': '',
         'pagination': '/tour/latest.php?page=%s'
     }
@@ -35,13 +34,13 @@ class sitePornstarPlatinumSpider(BaseSceneScraper):
             performers = scene.xpath('./div[@class="item-content"]/div/span[@class="marker left"]/text()')
             if performers:
                 performers = performers.getall()
-                meta['performers'] =  list(map(lambda x: x.strip().title(), performers))
-            
+                meta['performers'] = list(map(lambda x: x.strip().title(), performers))
+
             image = scene.xpath('./div[@class="item-header"]/a/img/@rel')
             if image:
                 image = image.get()
                 meta['image'] = image.strip()
-            
+
             scene = scene.xpath('./div[@class="item-content"]/h3/a/@href').get()
             if ".html" in scene:
                 if re.search(self.get_selector_map('external_id'), scene) and "signup.php" not in scene:
@@ -53,10 +52,9 @@ class sitePornstarPlatinumSpider(BaseSceneScraper):
     def get_id(self, response):
         search = re.search(self.get_selector_map('external_id'), response.url, re.IGNORECASE)
         search = search.group(1)
-        search = search.replace("_","-").strip().lower()
+        search = search.replace("_", "-").strip().lower()
         search = re.sub('[^a-zA-Z0-9-]', '', search)
         return search
-
 
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date'))
@@ -65,8 +63,7 @@ class sitePornstarPlatinumSpider(BaseSceneScraper):
             date = date.strip()
         else:
             date = dateparser.parse('today').isoformat()
-            
-        
+
         return dateparser.parse(date.strip()).isoformat()
 
     def get_tags(self, response):
