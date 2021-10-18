@@ -16,7 +16,7 @@ class DickDrainersSpider(BaseSceneScraper):
         'title': '//h3/text()',
         'description': '//div[@class="videoDetails clear"]//span[@style="color:#00ff00;"]/text()',
         'date': '//span[contains(text(),"Added")]/following-sibling::text()',
-        'image': '//script[contains(text(),"video_content")]/text()',
+        'image': '//div[@class="player full_width"]//img/@src0_1x',
         'performers': '//div[@class="featuring clear"]//a[contains(@href,"/models/")]/text()',
         'tags': '//div[@class="featuring clear"]//a[contains(@href,"/categories/")]/text()',
         'external_id': r'\/trailers\/(.+)\.html',
@@ -39,17 +39,6 @@ class DickDrainersSpider(BaseSceneScraper):
             description = '\n'.join(description)
             return description.strip()
 
-        return ''
-
-    def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image')).get()
-        if image:
-            image = re.search(r'poster=\"(.*.jpg)\"', image)
-            if image:
-                image = image.group(1)
-                image = image.replace('//', '/')
-                image = 'http://www.dickdrainers.com' + image.strip()
-                return self.format_link(response, image)
         return ''
 
     def get_trailer(self, response):

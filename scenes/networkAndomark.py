@@ -181,8 +181,8 @@ class AndomarkSpider(BaseSceneScraper):
         if trailer:
             trailer = re.search('\'(.*.mp4)\'', trailer).group(1)
             if trailer:
-                return domain + trailer
-
+                trailer = domain + trailer
+                return trailer.replace(" ", "%20")
         return ''
 
     def get_date(self, response):
@@ -312,14 +312,13 @@ class AndomarkSpider(BaseSceneScraper):
     def get_performers(self, response):
         if 'minkaxxx' in response.url:
             return ["Minka"]
-        elif 'sexykaren' in response.url:
+        if 'sexykaren' in response.url:
             return ["Karen Fisher"]
-        elif 'houseofyre' in response.url:
+        if 'houseofyre' in response.url:
             performersearch = '//div[@class="update_block_info"]/span[@class="tour_update_models"]/a/text()'
-        elif 'meanawolf' in response.url:
+        if 'meanawolf' in response.url:
             performersearch = '//span[contains(text(),"FEATURING:")]/following-sibling::a[contains(@href,"/models/")]/text()'
-        else:
-            performersearch = self.get_selector_map('performers')
+        performersearch = self.get_selector_map('performers')
 
         performers = response.xpath(performersearch).getall()
         return list(map(lambda x: x.strip(), performers))
