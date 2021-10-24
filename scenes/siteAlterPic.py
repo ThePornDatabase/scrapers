@@ -49,13 +49,13 @@ class SiteAlterPicSpider(BaseSceneScraper):
         item['network'] = "AlterPic"
 
         if "alterpic" in response.url:
-                item['site'] = "Fetish Clinic"
-                item['parent'] = "Fetish Clinic"
-                item['url'] = "https://alterpic.com/videos/" + item['id']
+            item['site'] = "Fetish Clinic"
+            item['parent'] = "Fetish Clinic"
+            item['url'] = "https://alterpic.com/videos/" + item['id']
         if "kinkyponygirl" in response.url:
-                item['site'] = "Kinky Pony Girl"
-                item['parent'] = "Kinky Pony Girl"
-                item['url'] = "https://kinkyponygirl.com/videos/" + item['id']
+            item['site'] = "Kinky Pony Girl"
+            item['parent'] = "Kinky Pony Girl"
+            item['url'] = "https://kinkyponygirl.com/videos/" + item['id']
 
         item['date'] = dateparser.parse(jsonrow['publish_date']).isoformat()
         item['trailer'] = ''
