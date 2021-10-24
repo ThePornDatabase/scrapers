@@ -11,7 +11,8 @@ class SiteAlterPicSpider(BaseSceneScraper):
     network = 'AlterPic'
 
     start_urls = [
-        'https://alterpic.adultmembersites.com',
+        # ~ 'https://alterpic.adultmembersites.com',
+        'https://kinkyponygirl.adultmembersites.com',
     ]
 
     selector_map = {
@@ -29,7 +30,10 @@ class SiteAlterPicSpider(BaseSceneScraper):
     def get_scenes(self, response):
         jsondata = response.json()['data']
         for scene in jsondata:
-            url = "https://alterpic.adultmembersites.com/api/videos/" + str(scene['id'])
+            if "alterpic" in response.url:
+                url = "https://alterpic.adultmembersites.com/api/videos/" + str(scene['id'])
+            if "kinkyponygirl" in response.url:
+                url = "https://kinkyponygirl.adultmembersites.com/api/videos/" + str(scene['id'])
             yield scrapy.Request(url, callback=self.get_json_scene)
 
     def get_json_scene(self, response):
@@ -42,10 +46,17 @@ class SiteAlterPicSpider(BaseSceneScraper):
         for performer in jsonrow['casts']:
             item['performers'].append(string.capwords(performer['screen_name']))
 
-        item['site'] = "Fetish Clinic"
         item['network'] = "AlterPic"
-        item['parent'] = "Fetish Clinic"
-        item['url'] = "https://alterpic.com/videos/" + item['id']
+
+        if "alterpic" in response.url:
+                item['site'] = "Fetish Clinic"
+                item['parent'] = "Fetish Clinic"
+                item['url'] = "https://alterpic.com/videos/" + item['id']
+        if "kinkyponygirl" in response.url:
+                item['site'] = "Kinky Pony Girl"
+                item['parent'] = "Kinky Pony Girl"
+                item['url'] = "https://kinkyponygirl.com/videos/" + item['id']
+
         item['date'] = dateparser.parse(jsonrow['publish_date']).isoformat()
         item['trailer'] = ''
         item['tags'] = []
