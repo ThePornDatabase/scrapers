@@ -1,9 +1,6 @@
-import scrapy
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
 import re
-import dateparser
-from datetime import datetime
+import scrapy
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class HotMilfsFuckSpider(BaseSceneScraper):
@@ -40,14 +37,13 @@ class HotMilfsFuckSpider(BaseSceneScraper):
         if image:
             image_re = re.search('poster=\"(.*.jpg)\"', image).group(1)
             if image_re:
-                image = "https://www.hotmilfsfuck.com/" +  image_re.strip()
+                image = "https://www.hotmilfsfuck.com/" + image_re.strip()
         if not image:
             image = response.xpath('//div[@class="player-window-play"]/following-sibling::img/@src0_1x').get()
-            
+
         if image:
             return self.format_link(response, image.strip())
-        else:
-            return ''
+        return ''
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
@@ -56,7 +52,7 @@ class HotMilfsFuckSpider(BaseSceneScraper):
             if trailer:
                 trailer = "https://www.hotmilfsfuck.com/" + \
                     re.search('src=\"(.*.mp4)\"', trailer).group(1).strip()
-                return trailer
+                return trailer.replace(" ", "%20")
         return ''
 
     def get_description(self, response):

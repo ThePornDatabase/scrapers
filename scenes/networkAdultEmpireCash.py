@@ -1,5 +1,3 @@
-import re
-
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -10,6 +8,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
 
     start_urls = [
         'https://www.mypervyfamily.com/',
+        'https://www.conorcoxxx.com',
+        'https://www.hornyhousehold.com',
         'https://jayspov.net',
         'https://www.filthykings.com/',
         'https://thirdworldxxx.com',
@@ -56,12 +56,15 @@ class AdultEmpireCashScraper(BaseSceneScraper):
 
         return response.xpath('//div[@class="studio"]//span[2]/text()').get().strip()
 
-
     def get_next_page_url(self, base, page):
         pagination = self.get_selector_map('pagination')
-        
+
         if "mypervyfamily" in base:
             pagination = "/my-pervy-family.html?page=%s&view=grid"
+        if "conorcoxxx" in base:
+            pagination = "/conor-coxxx-clips.html?page=%s&hybridview=member"
+        if "hornyhousehold" in base:
+            pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "jayspov" in base:
             pagination = "/jays-pov-updates.html?page=%s&hybridview=member"
         if "lantinoguys" in base:

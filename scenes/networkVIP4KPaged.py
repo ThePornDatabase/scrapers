@@ -58,7 +58,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
             item['parent'] = "VIP 4K"
             item['network'] = "VIP 4K"
             item['url'] = response.url
-            item['tags'] = ''
+            item['tags'] = []
             description = ''
 
             item['date'] = datetime.now().isoformat()

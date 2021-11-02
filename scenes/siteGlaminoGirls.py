@@ -1,15 +1,14 @@
-from datetime import datetime
+import re
 import string
 import html
-import scrapy
-import re
 import dateparser
 import tldextract
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-class siteGlaminoGirlsSpider(BaseSceneScraper):
+
+class SiteGlaminoGirlsSpider(BaseSceneScraper):
     name = 'GlaminoGirls'
     network = 'Czech Casting'
 
@@ -22,9 +21,9 @@ class siteGlaminoGirlsSpider(BaseSceneScraper):
         'title': "//h2[@class='nice-title']/text()",
         'description': "//div[@class='desc-text']//p/text()",
         'image': "//meta[@property='og:image']/@content",
-        're_image': '(.*)\?',
+        're_image': r'(.*)\?',
         'tags': '//ul[@class="tags"]/li/a/text()',
-        'external_id': '/tour\\/preview\\/(.+)/',
+        'external_id': r'/tour/preview/(.+)/',
         'trailer': '',
         'pagination': '/tour/page-%s/'
     }
@@ -38,32 +37,30 @@ class siteGlaminoGirlsSpider(BaseSceneScraper):
             title = scene.xpath('.//h2/text()').get()
             if title:
                 item['title'] = html.unescape(string.capwords(title.strip()))
-                
+
             item['image'] = ''
             image = scene.xpath('.//div[@class="thumbnail_wrapper"]/img/@src').get()
             if image:
-                image = re.search('(.*)\?', image)
+                image = re.search(r'(.*)\?', image)
                 if image:
                     item['image'] = image.group(1).strip()
-            
+
             item['performers'] = []
             performers = scene.xpath('.//span[@class="episode__artist__name"]/text()').get()
             if performers:
                 item['performers'] = [html.unescape(string.capwords(performers.strip()))]
-                
+
             item['url'] = ''
             item['id'] = ''
             url = scene.xpath('.//div[contains(@class,"description")]/a/@href').get()
             if url:
                 item['url'] = "https://" + tldextract.extract(response.url).domain + ".com" + url.strip()
-                item['id'] = re.search('.*\/(.*?)\/', url).group(1)
-                
+                item['id'] = re.search(r'.*\/(.*?)\/', url).group(1)
+
             item['date'] = dateparser.parse('today').isoformat()
             item['description'] = ''
-            item['tags'] = ''
+            item['tags'] = []
             item['trailer'] = ''
-            
-            
             item['network'] = 'Czech Casting'
             if "glaminogirls" in response.url:
                 item['parent'] = "Glamino Girls"

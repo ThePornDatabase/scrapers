@@ -1,5 +1,5 @@
 import re
-
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -43,7 +43,7 @@ class VnaNetworkSpider(BaseSceneScraper):
         'https://tashareign.com',
         'https://vickyathome.com',
         'https://womenbyjuliaann.com',
-        
+
         # Invalid VNA Sites, here for reference
         # Can't be scraped for various reasons...  Locked, no pagination, no video page, etc
         # ~ https://bobbiedenlive.com
@@ -52,7 +52,7 @@ class VnaNetworkSpider(BaseSceneScraper):
         # ~ https://nikkibenz.com
         # ~ https://rachelstormsxxx.com
         # ~ https://samanthagrace.com
-        
+
     ]
 
     selector_map = {
@@ -75,20 +75,20 @@ class VnaNetworkSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_tags(self, response):
-        tagLink = self.process_xpath(
+        taglink = self.process_xpath(
             response, self.get_selector_map('tags')).get()
         tags = []
-        for tag in tagLink.strip().split(','):
+        for tag in taglink.strip().split(','):
             if tag.strip():
                 tags.append(tag.strip().title())
         return tags
 
     def get_performers(self, response):
-        performerLink = self.process_xpath(
+        performerlink = self.process_xpath(
             response, self.get_selector_map('performers')).get()
 
         performers = []
-        for performer in performerLink.replace('&nbsp', '').split(','):
+        for performer in performerlink.replace('&nbsp', '').split(','):
             if performer.strip():
                 performers.append(performer.strip())
 
@@ -98,9 +98,14 @@ class VnaNetworkSpider(BaseSceneScraper):
             performers.append('Mandy Tyler')
 
         return performers
-        
+
     def get_next_page_url(self, base, page):
         if "vickyathome" in base:
-            return self.format_url(base, "/milf-videos/page/%s" % page)        
-        else:
-            return self.format_url(base, self.get_selector_map('pagination') % page)        
+            return self.format_url(base, "/milf-videos/page/%s" % page)
+        return self.format_url(base, self.get_selector_map('pagination') % page)
+
+    def get_date(self, response):
+        date = super().get_date(response)
+        if not date:
+            date = dateparser.parse('today').isoformat()
+        return date

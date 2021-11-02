@@ -1,5 +1,6 @@
 import re
 import html
+import dateparser
 from unidecode import unidecode
 import scrapy
 
@@ -66,3 +67,9 @@ class SiteLaFranceAPoilSpider(BaseSceneScraper):
         description = super().get_description(response)
         description = unidecode(description)
         return description
+
+    def get_date(self, response):
+        date = super().get_date(response)
+        if not date:
+            date = dateparser.parse('today').isoformat()
+        return date
