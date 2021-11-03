@@ -11,7 +11,7 @@ class DorcelClubSpider(BaseSceneScraper):
     start_urls = [
         'https://www.dorcelclub.com'
     ]
-    
+
     headers = {
         'Accept-Language': 'en-US,en',
     }
@@ -29,8 +29,8 @@ class DorcelClubSpider(BaseSceneScraper):
     }
 
     cookies = {
-        'dorcelclub': 'c11g8qtdog2p7bhvf6ngr03iam',
-        'u': '6106b2e6adfab1e2538',
+        'dorcelclub': 'bkf9vlradpm1sjuntouo9ifnui',
+        'u': '6183100b9fdaf12a123',
         'disclaimer2': 'xx'
     }
 
