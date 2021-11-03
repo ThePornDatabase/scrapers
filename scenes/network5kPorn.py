@@ -14,7 +14,7 @@ class FiveKPornSpider(BaseSceneScraper):
         'https://www.5kporn.com'
     ]
 
-    cookies = {'nats': 'MC4wLjMuNTguMC4wLjAuMC4w'}
+    cookies = {'nats': 'MC4wLjEuMS4wLjAuMC4wLjA'}
 
     selector_map = {
         'title': "//p[@class='trailer-title']/text()",
