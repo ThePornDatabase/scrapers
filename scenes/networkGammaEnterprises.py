@@ -175,8 +175,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.christophclarkonline.com/',
         'https://www.cumshotoasis.com',
         'https://www.currycreampie.com',
-        'https://www.devilsgangbangs.com',
-        'https://www.devilstgirls.com',
         'https://www.dpfanatics.com',
         'https://www.falconstudios.com',
         'https://www.footsiebabes.com',
@@ -185,14 +183,12 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.girlsandstuds.com',
         'https://www.girlstryanal.com',
         'https://www.grannyghetto.com',
-        'https://www.hairyundies.com',
         'https://www.hothouse.com',
         'https://www.jakemalone.com',
         'https://www.jaysinxxx.com',
         'https://www.joeysilvera.com',
         'https://www.jonnidarkkoxxx.com',
         'https://www.lewood.com',
-        'https://www.lesbianfactor.com',
         'http://www.lexingtonsteele.com',
         'https://www.maledigital.com',
         'https://www.maskurbate.com',
@@ -200,14 +196,12 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.mommysgirl.com', Part of Adulttime API now
         'https://www.nachovidalhardcore.com',
         'https://www.nudefightclub.com',
-        'https://www.outofthefamily.com',
         'https://www.pantypops.com',
         'https://www.povblowjobs.com',
         'https://www.povthis.com',
         'https://www.prettydirty.com',
         'https://www.ragingstallion.com',
         'https://www.soapymassage.com',
-        'https://www.squirtalicious.com',
         'https://www.squirtingorgies.com',
         'https://www.strapattackers.com',
         'https://www.tittycreampies.com',
@@ -230,6 +224,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.cockchokingsluts.com',
         # 'https://www.johnleslie.com',
 
+        #  Moved to AdultTime API
+        # 'https://www.devilsgangbangs.com',
+        # 'https://www.devilstgirls.com',
+        # 'https://www.hairyundies.com',
+        # 'https://www.lesbianfactor.com',
+        # 'https://www.outofthefamily.com',
+        # 'https://www.squirtalicious.com',
 
         # To do in another scraper, too different
         # 'https://www.ashleyfires.com'
