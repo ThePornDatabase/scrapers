@@ -92,7 +92,7 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'title': '//h1[contains(@class, "title_bar")]/text()',
         'description': '//p[@class="description-text"]/text()',
         'performers': '//div[@class="video-info"]//span[@class="update_models"]/a/text()',
-        'image': '//video/@poster',
+        'image': '//video/@poster|//div[@id="preview"]/a/div/img/@src0_1x',
         'date': '//label[contains(text(), "Date Added")]/following-sibling::p[1]/text()',
         'date_formats': ['%Y-%m-%d'],
         'tags': '//ul/li/a[contains(@href, "/categories/")]/text()',
@@ -106,12 +106,6 @@ class FullPornNetworkSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_image(self, response):
-        image = super().get_image(response)
-        if not image:
-            image = ''
-        return image
 
     def get_site(self, response):
         if "badfamily" in response.url:
