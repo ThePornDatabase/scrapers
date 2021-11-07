@@ -7,6 +7,7 @@
 import os
 import re
 import json
+import base64
 import datetime
 import dateparser
 import requests
@@ -22,6 +23,8 @@ class InTheCrackSpider(BaseSceneScraper):
     network = 'In The Crack'
     parent = 'In The Crack'
 
+    cfcookies = {}
+
     start_urls = [
         'https://inthecrack.com/',
     ]
@@ -35,6 +38,7 @@ class InTheCrackSpider(BaseSceneScraper):
         'description': '//div[@class="ClipDetail"]//p/text()',
         'date': '',
         'image': '//style[contains(text(),"background-image")]/text()',
+        'image_blob': '//style[contains(text(),"background-image")]/text()',
         'performers': '//section[@class="modelCollectionHeader"]/h2/span/text()',
         'tags': '',
         'external_id': r'/(\d*)$',
@@ -47,19 +51,23 @@ class InTheCrackSpider(BaseSceneScraper):
             url = self.get_next_page_url(link, self.page)
             headers = self.headers
             headers['Content-Type'] = 'application/json'
-            setup = json.dumps({'cmd': 'sessions.create', 'session': 'inthecrack'})
-            requests.post("http://192.168.1.151:8191/v1", data=setup, headers=headers)
-            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'inthecrack', 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
-            yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
+            # ~ setup = json.dumps({'cmd': 'sessions.create', 'session': 'inthecrack'})
+            # ~ requests.post("http://192.168.1.151:8191/v1", data=setup, headers=headers)
+            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page), 'domain': 'inthecrack.com'}]}
+            yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers)
 
     def parse(self, response, **kwargs):
-        jsondata = response.json()
+        jsondata = json.loads(response.body)
         htmlcode = jsondata['solution']['response']
         response = HtmlResponse(url=response.url, body=htmlcode, encoding='utf-8')
         cookies = jsondata['solution']['cookies']
+        self.cookies = cookies
+        self.headers['User-Agent'] = jsondata['solution']['userAgent']
         for cookie in cookies:
+            self.cfcookies[cookie['name']] = cookie['value']
             if cookie['name'] == 'mypage':
                 page = int(cookie['value'])
+
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -74,7 +82,7 @@ class InTheCrackSpider(BaseSceneScraper):
                 headers['Content-Type'] = 'application/json'
                 url = self.get_next_page_url("https://inthecrack.com", page)
                 page = str(page)
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'inthecrack', 'cookies': [{'name': 'mypage', 'value': page}]}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': page}]}
                 yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def get_next_page_url(self, base, page):
@@ -96,7 +104,8 @@ class InTheCrackSpider(BaseSceneScraper):
                 date = dateparser.parse('today').isoformat()
             scene = scene.xpath('./@href').get()
             url = "https://inthecrack.com" + scene
-            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'inthecrack', 'cookies': [{'name': 'mydate', 'value': date}]}
+
+            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mydate', 'value': date}]}
             yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def get_title(self, response):
@@ -132,6 +141,14 @@ class InTheCrackSpider(BaseSceneScraper):
             return self.format_link(response, image)
         return ''
 
+    def get_image_blob(self, response):
+        image = self.get_image(response)
+        if image:
+            rsp = requests.get(image, headers=self.headers, cookies=self.cfcookies)
+            return base64.b64encode(rsp.content).decode('utf-8')
+
+        return None
+
     def get_performers(self, response):
         performers = []
         performer_text = self.process_xpath(
@@ -146,10 +163,15 @@ class InTheCrackSpider(BaseSceneScraper):
         return []
 
     def parse_scene(self, response):
-        jsondata = response.json()
+        jsondata = json.loads(response.body)
         htmlcode = jsondata['solution']['response']
+        imagedata = {}
+        imagedata['url'] = response.url
+        imagedata['html'] = htmlcode
+        imagedata['cookies'] = jsondata['solution']['cookies']
         response = HtmlResponse(url=response.url, body=htmlcode, encoding='utf-8')
         cookies = jsondata['solution']['cookies']
+
         for cookie in cookies:
             if cookie['name'] == 'mydate':
                 date = cookie['value']
@@ -163,6 +185,7 @@ class InTheCrackSpider(BaseSceneScraper):
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
         item['image'] = self.get_image(response)
+        item['image_blob'] = self.get_image_blob(response)
         item['performers'] = self.get_performers(response)
         item['tags'] = self.get_tags(response)
         item['id'] = re.search(r'(\d+) ', item['title']).group(1)
