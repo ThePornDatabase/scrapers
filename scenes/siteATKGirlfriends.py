@@ -46,9 +46,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
             url = self.get_next_page_url(link, self.page)
             headers = self.headers
             headers['Content-Type'] = 'application/json'
-            setup = json.dumps({'cmd': 'sessions.create', 'session': 'atkgirlfriends'})
-            requests.post("http://192.168.1.151:8191/v1", data=setup, headers=headers)
-            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'atkgirlfriends', 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
+            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
             yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
@@ -73,7 +71,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
                 headers['Content-Type'] = 'application/json'
                 url = self.get_next_page_url("https://www.atkgirlfriends.com/tour/movies/", page)
                 page = str(page)
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'atkgirlfriends', 'cookies': [{'name': 'mypage', 'value': page}]}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': page}]}
                 yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def get_scenes(self, response):
@@ -89,7 +87,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
             if "join.atkgirlfriends.com" not in link:
                 headers = self.headers
                 headers['Content-Type'] = 'application/json'
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'session': 'atkgirlfriends', 'cookies': [{'name': 'mydate', 'value': date}]}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'cookies': [{'name': 'mydate', 'value': date}]}
                 yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
             else:
                 item = SceneItem()
