@@ -7,7 +7,7 @@ import datetime
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-    
+
     # A few things about this scraper:
     # 1) There is no page 1 with regular pagination.  Pagination picks up on Page 2, so custom starting url
     # 2) There are no dates on scenes, instead just "xx days/weeks/months/years" ago, so it's calculated
@@ -30,6 +30,7 @@ class siteCumLouderSpider(BaseSceneScraper):
         'description': '//strong[contains(text(),"Description")]/following-sibling::text()',
         'date': '//strong[contains(text(),"Added")]/following-sibling::text()',
         'image': '//link[@rel="preload" and @as="image" and contains(@href,".jpg")]/@href',
+        'image_blob': '//link[@rel="preload" and @as="image" and contains(@href,".jpg")]/@href',
         'performers': '//a[@class="pornstar-link"]/text()',
         'tags': '//a[@class="tag-link"]/text()',
         'external_id': '.*porn-video\/(.*)\/$',
