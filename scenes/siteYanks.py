@@ -76,7 +76,9 @@ class SiteYanksSpider(BaseSceneScraper):
                     image = image.get()
                     item['image'] = image.strip()
                 else:
-                    item['image'] = []
+                    item['image'] = None
+
+                item['image_blob'] = None
 
                 item['tags'] = []
                 item['trailer'] = ''

@@ -26,10 +26,14 @@ class AnnaClaireCloudsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
+        scenes = response.xpath('//div[@class="updateItem"]/a')
         for scene in scenes:
+            image = scene.xpath('./img/@src').get()
+            if not image:
+                image = ''
+            scene = scene.xpath('./@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image})
 
     def get_site(self, response):
         return "Anna Claire Clouds"

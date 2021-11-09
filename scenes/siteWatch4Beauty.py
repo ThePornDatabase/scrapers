@@ -48,7 +48,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
     def get_scenes(self, response):
         for scene in response.json():
             if scene['issue_category'] == 6 or scene['issue_video_present'] == 1:
-                yield scrapy.Request(url=self.format_link(response, '/api/7Wywy44w9G9Bbtf/' + scene['issue_simple_title']), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, '/api/issues/' + scene['issue_simple_title']), callback=self.parse_scene)
 
     def parse_scene(self, response):
         data = response.json()
@@ -73,6 +73,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['id'] = data['issue_simple_title']
             item['trailer'] = ''
             item['image'] = "https://s5q3w2t8.ssl.hwcdn.net/production/%s-issue-cover-wide-2560.jpg" % (datetime.fromisoformat(item['date']).strftime('%Y%m%d'))
+            item['image_blob'] = None
             item['performers'] = []
 
             modelurl = response.url + "/models"
@@ -101,5 +102,5 @@ class Watch4BeautyScraper(BaseSceneScraper):
                 if date < oldestscene:
                     oldestscene = date
             date = (datetime.fromisoformat(date) - timedelta(days=1)).isoformat() + "Z"
-            return "https://www.watch4beauty.com/api/7Wywy44w9G9Bbtf?before=" + date
-        return "https://www.watch4beauty.com/api/7Wywy44w9G9Bbtf?before=" + datetime.now().isoformat()
+            return "https://www.watch4beauty.com/api/issues?before=" + date
+        return "https://www.watch4beauty.com/api/issues?before=" + datetime.now().isoformat()

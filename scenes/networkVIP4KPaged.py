@@ -126,7 +126,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
             if "debt4k" in response.url:
                 image = scene.xpath('.//div[@class="episode__player"]//img/@data-src').get()
             if "hunt4k" in response.url:
-                image = scene.xpath('./div/div[@class="embed"]/a/img/@data-src').get()
+                image = scene.xpath('.//div[@class="embed"]/a//img/@data-src').get()
             if "law4k" in response.url:
                 image = scene.xpath('.//div/span[contains(text(),"Punishment")]/../../../a/@style').get()
                 if image:
@@ -139,11 +139,12 @@ class VIP4KPagedSpider(BaseSceneScraper):
                 image = scene.xpath('./div[@class="episode__img"]/a/img/@data-src').get()
             if "tutor4k" in response.url:
                 image = scene.xpath('./div[@class="episode__img"]/a/img/@data-src').get()
+            if image:
+                if image[:2] == "//":
+                    image = "https:" + image.strip()
 
-            if image[:2] == "//":
-                image = "https:" + image
-
-            item['image'] = image.strip()
+            item['image'] = image
+            item['image_blob'] = None
             item['site'] = tldextract.extract(response.url).domain
 
             yield item

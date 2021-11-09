@@ -45,6 +45,8 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Jerky Wives', 'Jerky Wives', '/studio/28671/jerky-wives-/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Bareback Studios', 'Bareback Studios', '/studio/35625/bare-back-studios/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Mandy Flores', 'Mandy Flores', '/studio/33729/mandy-flores/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'FM Concepts', 'FM Concepts', '/studio/116614/fm-concepts-1080p-bondage-store/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4") and not(contains(./following-sibling::span/text(), "4K"))]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Mouth Stuffed and Tied Up Girls', 'Mouth Stuffed and Tied Up Girls', '/studio/4458/mouth-stuffed-and-tied-up-girls/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -145,7 +147,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("hd-", "")
             title = title.replace("(hd-4k)", "")
             title = title.replace(" optimum", "")
-            title = title.replace("1080p", "")
+            title = title.replace("1080p Version", "")
             title = title.replace("1080p", "")
             title = title.replace("720p", "")
             title = title.replace("()", "")

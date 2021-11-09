@@ -60,6 +60,10 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
         if 'splashImagePath' in movie:
             item['image'] = movie['splashImagePath']
+        else:
+            item['image'] = None
+
+        item['image_blob'] = None
 
         if 'hustler' in response.url:
             item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']

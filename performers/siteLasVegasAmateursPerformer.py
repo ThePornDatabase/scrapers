@@ -29,7 +29,8 @@ class SiteLasVegasAmateursPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = "https://lasvegasamateurs.com/" + image.replace(" ", "%20")
             else:
-                item['image'] = ''
+                item['image'] = None
+            item['image'] = None
 
             url = performer.xpath('./a[contains(@href, "/models/")][1]/@href').get()
             if url:

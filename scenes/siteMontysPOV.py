@@ -80,8 +80,10 @@ class MontysPOVSpider(BaseSceneScraper):
             # Image
             image = sceneresponse.xpath('./a/img/@src').get()
             if not image:
-                image = ''
+                image = None
             item['image'] = image.replace(" ", "%20").strip()
+
+            item['image_blob'] = None
 
             # URL
             url = sceneresponse.xpath('./a/img/@src').get()

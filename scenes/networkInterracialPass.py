@@ -4,6 +4,7 @@ import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
+
 def match_site(argument):
     match = {
         'backroomcastingcouch': "Backroom Casting Couch",
@@ -13,8 +14,8 @@ def match_site(argument):
         'interracialpass': "Interracial Pass",
     }
     return match.get(argument, '')
-    
-    
+
+
 class InterracialPassSpider(BaseSceneScraper):
     name = 'InterracialPass'
     network = 'InterracialPass'
@@ -69,7 +70,6 @@ class InterracialPassSpider(BaseSceneScraper):
             response, self.get_selector_map('date')).extract()
         return dateparser.parse(date[1].strip()).isoformat()
 
-
     def get_image(self, response):
         meta = response.meta
         image = self.process_xpath(response, self.get_selector_map('image'))
@@ -85,11 +85,10 @@ class InterracialPassSpider(BaseSceneScraper):
         return ''
 
     def get_site(self, response):
-        site = tldextract.extract(response.url).domain            
+        site = tldextract.extract(response.url).domain
         site = match_site(site)
         return site
-        
-        
+
     def parse_scene(self, response):
         item = SceneItem()
 
@@ -114,6 +113,8 @@ class InterracialPassSpider(BaseSceneScraper):
             item['date'] = self.get_date(response)
 
         item['image'] = self.get_image(response)
+
+        item['image_blob'] = None
 
         if 'performers' in response.meta:
             item['performers'] = response.meta['performers']
@@ -150,4 +151,4 @@ class InterracialPassSpider(BaseSceneScraper):
         if self.debug:
             print(item)
         else:
-            yield item        
+            yield item

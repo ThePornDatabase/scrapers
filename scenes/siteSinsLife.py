@@ -61,6 +61,10 @@ class SiteSinsLifeSpider(BaseSceneScraper):
 
             if image:
                 item['image'] = image.strip()
+            else:
+                item['image'] = None
+
+            item['image_blob'] = None
 
             if item['id'] and item['title'] and item['date']:
                 scenelist.append(item.copy())

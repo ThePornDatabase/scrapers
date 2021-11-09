@@ -1,13 +1,12 @@
+import re
+import json
+import html
+import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-import re
-import dateparser
-import json
-import html
-
-from datetime import datetime
 from tpdb.items import SceneItem
+
 
 class BiGuysFuckSpider(BaseSceneScraper):
     name = 'BiGuysFuck'
@@ -26,7 +25,7 @@ class BiGuysFuckSpider(BaseSceneScraper):
         'performers': '',
         'tags': '',
         'trailer': '',
-        'external_id': '.*\/(.*?)$',
+        'external_id': r'.*/(.*?)$',
         'pagination': '/videos?page=%s'
     }
 
@@ -38,38 +37,38 @@ class BiGuysFuckSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-
     def parse_scene(self, response):
         item = SceneItem()
         global json
-        
+
         jsondata = response.xpath('//script[@type="application/ld+json"]/text()').get()
-        jsondata = jsondata.replace("\r\n","")
+        jsondata = jsondata.replace("\r\n", "")
         try:
             data = json.loads(jsondata.strip())
         except:
-            print (f'JSON Data: {jsondata}')
+            print(f'JSON Data: {jsondata}')
         data = data[0]
-        
+
         item['title'] = html.unescape(data['name'])
         item['description'] = html.unescape(data['description'].strip())
-        
+
         item['date'] = dateparser.parse(data['uploadDate'].strip()).isoformat()
 
         tags = data['keywords'].split(",")
         item['tags'] = list(map(lambda x: x.strip().title(), tags))
-        
+
         item['performers'] = list(
             map(lambda x: x['name'].strip(), data['actor']))
 
         item['url'] = response.url
         item['image'] = data['thumbnailUrl'].replace(" ", "%20")
+        item['image_blob'] = None
         item['trailer'] = ''
         item['site'] = 'Bi Guys Fuck'
         item['parent'] = 'Bi Guys Fuck'
         item['network'] = 'Bi Guys Fuck'
-        item['id'] = re.search('.*\/(.*?)$',response.url).group(1)
-        
+        item['id'] = re.search(r'.*/(.*?)$', response.url).group(1)
+
         if self.debug:
             print(item)
         else:

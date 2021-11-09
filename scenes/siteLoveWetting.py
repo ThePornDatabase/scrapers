@@ -49,7 +49,7 @@ class SiteLoveWettingSpider(BaseSceneScraper):
                 item['date'] = dateparser.parse(scenedate).isoformat()
 
             image = scene.xpath('.//div[@class="imgwrap"]//img/@src')
-            item['image'] = ''
+            item['image'] = None
             item['id'] = ''
             item['url'] = ''
             if image:
@@ -57,6 +57,8 @@ class SiteLoveWettingSpider(BaseSceneScraper):
                 item['image'] = self.format_link(response, image)
                 item['id'] = re.search(r'\d{4}\/(.*)\&', item['image']).group(1)
                 item['url'] = re.search(r'(.*\d{4}\/.*)\&', item['image']).group(1)
+
+            item['image_blob'] = None
 
             performers = scene.xpath('.//p[@class="tags"]/strong[contains(text(), "Models")]/following-sibling::a/text()')
             item['performers'] = []

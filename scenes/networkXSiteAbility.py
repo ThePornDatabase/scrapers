@@ -133,8 +133,10 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                 item['id'] = item['id'].replace("_tn", "").replace('%20', '')
                 item['id'] = re.sub(r'[^a-zA-Z0-9-]', '', item['id'])
             else:
-                item['image'] = ''
-                item['id'] = ''
+                item['image'] = None
+                item['id'] = None
+
+            item['image_blob'] = None
 
             if meta['site'] == "Brendas Bound":
                 description = scene.xpath('.//span[contains(@style,"font-size: medium;")]/em/text()')
