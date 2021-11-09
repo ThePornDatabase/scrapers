@@ -46,8 +46,6 @@ class BiGuysFuckSpider(BaseSceneScraper):
 
     def parse_scene(self, response):
         item = SceneItem()
-        global json
-
         jsondata = response.xpath('//script[@type="application/ld+json"]/text()').get()
         jsondata = jsondata.replace("\r\n", "")
         try:

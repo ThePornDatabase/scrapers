@@ -4,14 +4,14 @@ import warnings
 import dateparser
 import scrapy
 
+from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
+
 # Ignore dateparser warnings regarding pytz
 warnings.filterwarnings(
     "ignore",
     message="The localize method is no longer necessary, as this time zone supports the fold attribute",
 )
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class ChastityBabesFullImportSpider(BaseSceneScraper):
