@@ -1,4 +1,6 @@
 import re
+import sys
+import warnings
 import json
 import html
 import string
@@ -8,6 +10,12 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 
 class NetworkAdultCentroSpider(BaseSceneScraper):
@@ -64,13 +72,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 ah = re.search(r'"ah":"(.*?)"', appscript).group(1)
                 aet = re.search(r'"aet":([0-9]+?),', appscript).group(1)
                 if ah and aet:
-                    print(f'ah: {ah}')
-                    print(f'aet: {aet}')
+                    # ~ print(f'ah: {ah}')
+                    # ~ print(f'aet: {aet}')
                     token = ah[::-1] + "/" + str(aet)
-                    print(f'Token: {token}')
+                    # ~ print(f'Token: {token}')
 
             if not token:
-                quit()
+                sys.exit()
             else:
                 meta['token'] = token
 
@@ -150,7 +158,6 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        global json
         jsondata = json.loads(response.text)
         jsondata = jsondata['response']['collection']
 
@@ -165,7 +172,6 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
     def parse_scene(self, response):
         meta = response.meta
         item = SceneItem()
-        global json
 
         jsondata = response.text
         jsondata = jsondata.replace('\r\n', '')

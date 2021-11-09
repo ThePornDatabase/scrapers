@@ -1,10 +1,17 @@
-import scrapy
 import re
+import warnings
 import dateparser
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
-class siteCumBuffetSpider(BaseSceneScraper):
+
+class SiteCumBuffetSpider(BaseSceneScraper):
     name = 'CumBuffet'
     network = 'Cum Buffet'
     parent = 'Cum Buffet'
@@ -18,23 +25,21 @@ class siteCumBuffetSpider(BaseSceneScraper):
         'description': '',
         'date': '',
         'image': '//div[@class="vp"]/div[contains(@class,"player")]/@style',
-        're_image': '(http.*\.jpg)',
+        're_image': r'(http.*\.jpg)',
         'performers': '//div[contains(@class,"tags")]/a[contains(@href,"/girl/")]/text()',
         'tags': '//div[contains(@class,"tags")]/ul/li/a/text()',
-        'external_id': 'sample\/(.*?)\/',
+        'external_id': r'sample/(.*?)/',
         'trailer': '//video/source/@src',
         'pagination': '/categories/movies_%s_d.html#'
     }
 
-
     def start_requests(self):
-        for link in self.start_urls:
-            yield scrapy.Request(url="https://www.cumbuffet.com/samples",
-                                 callback=self.get_scenes,
-                                 meta={'page': self.page},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
-                                 
+        yield scrapy.Request(url="https://www.cumbuffet.com/samples",
+                             callback=self.get_scenes,
+                             meta={'page': self.page},
+                             headers=self.headers,
+                             cookies=self.cookies)
+
     def get_scenes(self, response):
         meta = response.meta
         scenes = response.xpath('//div[@class="video"]')
@@ -53,8 +58,6 @@ class siteCumBuffetSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Cum Buffet"
-        
+
     def get_description(self, response):
         return ''
-        
-        

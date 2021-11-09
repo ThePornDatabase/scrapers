@@ -1,12 +1,10 @@
 import re
-
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteXArtSpider(BaseSceneScraper):
+class SiteXArtSpider(BaseSceneScraper):
     name = 'X-Art'
     network = "BC Media"
     parent = "X-Art"
@@ -22,7 +20,7 @@ class siteXArtSpider(BaseSceneScraper):
         'image': '//div[contains(@class, "video-tour")]/div/a/img/@src',
         'performers': '//div[@class="row"]/div[contains(@class,"columns info")]/h2/span[contains(text(),"eaturing")]/following-sibling::a/text()',
         'tags': '',
-        'external_id': '.*\/(.*)\/$',
+        'external_id': r'.*/(.*)\/$',
         'trailer': '',
         'pagination': '/videos/recent/%s'
     }
@@ -39,7 +37,7 @@ class siteXArtSpider(BaseSceneScraper):
     def get_id(self, response):
         search = re.search(self.get_selector_map('external_id'), response.url, re.IGNORECASE)
         search = search.group(1)
-        search = search.replace("_","-").strip()
+        search = search.replace("_", "-").strip()
         return search
 
     def get_description(self, response):

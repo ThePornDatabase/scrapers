@@ -1,11 +1,18 @@
+import re
+import warnings
 import string
 import html
-import re
 from datetime import date
 import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 
 class SiteYanksSpider(BaseSceneScraper):

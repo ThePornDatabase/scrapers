@@ -1,9 +1,14 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
+import warnings
 import dateparser
+import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 
 class BaberoticaPerformerSpider(BasePerformerScraper):
@@ -25,7 +30,7 @@ class BaberoticaPerformerSpider(BasePerformerScraper):
         'cupsize': '//div[@id="model"]/div/strong[contains(text(),"Breasts")]/../following-sibling::div[1]/text()',
         'aliases': '//div[@id="model"]/div/strong[contains(text(),"Aliases")]/../following-sibling::div[1]/text()',
         'pagination': '/models/page/%s',
-        'external_id': 'model\/(.*)/'
+        'external_id': r'model\/(.*)/'
     }
 
     name = 'BaberoticaPerformer'
@@ -48,20 +53,18 @@ class BaberoticaPerformerSpider(BasePerformerScraper):
                 callback=self.parse_performer
             )
 
-
     def get_aliases(self, response):
-        image = self.process_xpath(response, self.get_selector_map('aliases')).get()
+        aliases = self.process_xpath(response, self.get_selector_map('aliases')).get()
         if aliases:
             aliases = aliases.split(", ").trim()
             return aliases
         return ''
 
-
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.match('\d+.*?-.*?\d+.*?-.*?\d+', measurements):
-                measurements = measurements.replace("B","").replace("W","").replace("H","")
+            if measurements and re.match(r'\d+.*?-.*?\d+.*?-.*?\d+', measurements):
+                measurements = measurements.replace("B", "").replace("W", "").replace("H", "")
                 return measurements.strip()
         return ''
 
@@ -71,8 +74,8 @@ class BaberoticaPerformerSpider(BasePerformerScraper):
             if cupsize:
                 if 'measurements' in self.selector_map:
                     measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-                    if measurements and re.match('\d+.*?-.*?\d+.*?-.*?\d+', measurements):
-                        breasts = re.search('(\d+).*?-.*?\d+.*?-.*?\d+',measurements).group(1)
+                    if measurements and re.match(r'\d+.*?-.*?\d+.*?-.*?\d+', measurements):
+                        breasts = re.search(r'(\d+).*?-.*?\d+.*?-.*?\d+', measurements).group(1)
                         cupsize = breasts.strip() + cupsize.strip()
                         if cupsize:
                             return cupsize.strip()
@@ -90,9 +93,9 @@ class BaberoticaPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                if "cm" in height and re.match('(\d+\s?cm)', height):
-                    height = re.search('(\d+\s?cm)', height).group(1).strip()
-                    height = height.replace(" ","")
+                if "cm" in height and re.match(r'(\d+\s?cm)', height):
+                    height = re.search(r'(\d+\s?cm)', height).group(1).strip()
+                    height = height.replace(" ", "")
                 if "0 ft" not in height:
                     return height.strip()
         return ''
@@ -102,8 +105,8 @@ class BaberoticaPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight:
-                    weight = re.search('(\d+\s?kg)', weight).group(1).strip()
-                    weight = weight.replace(" ","")
+                    weight = re.search(r'(\d+\s?kg)', weight).group(1).strip()
+                    weight = weight.replace(" ", "")
                 return weight.strip()
         return ''
 

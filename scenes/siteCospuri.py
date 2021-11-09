@@ -1,10 +1,17 @@
-import scrapy
 import re
+import warnings
 import dateparser
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
-class siteCospuriSpider(BaseSceneScraper):
+
+class SiteCospuriSpider(BaseSceneScraper):
     name = 'Cospuri'
     network = 'Cospuri'
     parent = 'Cospuri'
@@ -23,15 +30,14 @@ class siteCospuriSpider(BaseSceneScraper):
         'description': '//div[@class="description"]/text()',
         'date': '//div[@class="date"]/text()',
         'image': '//div[@class="vid cosplay"]/div/@style',
-        're_image': '\((http.*.jpg)\)',
+        're_image': r'\((http.*.jpg)\)',
         'performers': '//div[@class="sample-model"]/a/text()',
         'tags': '//div[@class="tags"]/a/text()',
         'external_id': 'id=(.*)',
         'trailer': '//script[contains(text(),"sources")]/text()',
-        're_trailer': '(https.*\.mp4)',
+        're_trailer': r'(https.*\.mp4)',
         'pagination': '/samples?channel=cosplay&page=%s'
     }
-    
 
     def start_requests(self):
         for pagination in self.paginations:
@@ -62,7 +68,7 @@ class siteCospuriSpider(BaseSceneScraper):
                                          cookies=self.cookies)
 
     def get_next_page_url(self, url, page, pagination):
-        return self.format_url(url, pagination % page)    
+        return self.format_url(url, pagination % page)
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="scene cosplay"]/div/a/@href').getall()
@@ -72,17 +78,15 @@ class siteCospuriSpider(BaseSceneScraper):
 
     def get_site(self, response):
         return "Cospuri"
-        
 
     def get_parent(self, response):
         return "Cospuri"
-
 
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if date:
             # ~ print(f'Date: {date}')
-            dates = re.search('(\d{4}).*?(\d{2}).*?(\d{2})', date)
+            dates = re.search(r'(\d{4}).*?(\d{2}).*?(\d{2})', date)
             if dates:
                 year = dates.group(1)
                 month = dates.group(2)

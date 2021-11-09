@@ -1,21 +1,19 @@
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteCruelFuriesSpider(BaseSceneScraper):
+class SiteCruelFuriesSpider(BaseSceneScraper):
     name = 'CruelFuries'
     network = 'Cruel Furies'
 
     start_urls = [
         'https://www.cruel-furies.com',
     ]
-    
-    cookies =  {
+
+    cookies = {
         'fury_site_accepted': 'eyJpdiI6InphQ3pBcXp3MmFDV1lRNFEySVwvT2NnPT0iLCJ2YWx1ZSI6Ikg0WkhUK2dONHhPSzlOY1dHVGNXZEE9PSIsIm1hYyI6ImIwOTAxNjljNDI1Yzc2M2UyNzFhNzQwMDQzNzM1ZmRjOTY4MDczNDc5YWZlNWRlMGYyNjliZTg5MDhlNGRiMzcifQ',
     }
-    
+
     selector_map = {
         'title': '//div[contains(@class,"model-info")]/h3/text()',
         'description': '//div[contains(@class,"model-info")]/p[contains(@class,"mt-4")]/preceding-sibling::p[1]/text()',
@@ -24,7 +22,7 @@ class siteCruelFuriesSpider(BaseSceneScraper):
         'date_formats': ['%Y-%m-%d'],
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//meta[@name="keywords"]/@content',
-        'external_id': '(\d+)$',
+        'external_id': r'(\d+)$',
         'trailer': '//video/source/@src',
         'pagination': '/list/%s',
     }
@@ -36,7 +34,7 @@ class siteCruelFuriesSpider(BaseSceneScraper):
                              meta={'page': self.page},
                              headers=self.headers,
                              cookies=self.cookies)
-    
+
     def start_requests2(self, response):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, self.page),
@@ -52,7 +50,7 @@ class siteCruelFuriesSpider(BaseSceneScraper):
 
     def get_site(self, response):
         return "Cruel Furies"
-   
+
     def get_parent(self, response):
         return "Cruel Furies"
 

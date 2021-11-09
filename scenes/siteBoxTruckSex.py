@@ -1,11 +1,10 @@
-import scrapy
 import re
-import html
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteBoxTruckSexSpider(BaseSceneScraper):
+class SiteBoxTruckSexSpider(BaseSceneScraper):
     name = 'BoxTruckSex'
     network = 'Box Truck Sex'
     parent = 'Box Truck Sex'
@@ -22,7 +21,7 @@ class siteBoxTruckSexSpider(BaseSceneScraper):
         'image': '//div/img[contains(@class,"fp-splash")]/@data-orig-src',
         'performers': '//h5/a[contains(@href,"/models/")]/text()',
         'tags': '//h5/a[contains(@href,"/categories/")]/text()',
-        'external_id': '.*\/(.*).html',
+        'external_id': r'.*/(.*).html',
         'trailer': '',
         'pagination': '/tour/categories/videos_%s_d.html'
     }
@@ -35,19 +34,19 @@ class siteBoxTruckSexSpider(BaseSceneScraper):
                 image = "https://www.boxtrucksex.com/" + image.strip()
             else:
                 image = ''
-                
+
             performers = scene.xpath('.//i[contains(@class,"icon-female")]/following-sibling::text()').get()
             if performers:
                 if "," in performers:
                     performers = performers.split(",")
                 else:
                     performers = [performers]
-                    
+
             if performers:
                 performers = list(map(lambda x: x.strip().title(), performers))
             else:
                 performers = []
-                
+
             scene = scene.xpath('./@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'performers': performers})
@@ -57,13 +56,12 @@ class siteBoxTruckSexSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Box Truck Sex"
-        
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(response, self.get_selector_map('trailer'))
             if trailer:
                 trailer = self.get_from_regex(trailer.get(), 're_trailer')
-                return trailer.replace(" ", "%20").replace("\\","")
+                return trailer.replace(" ", "%20").replace("\\", "")
 
-        return ''        
+        return ''

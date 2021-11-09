@@ -1,10 +1,10 @@
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteAuntJudysSpider(BaseSceneScraper):
+class SiteAuntJudysSpider(BaseSceneScraper):
     name = 'AuntJudys'
     network = 'Aunt Judys'
     parent = 'Aunt Judys'
@@ -20,7 +20,7 @@ class siteAuntJudysSpider(BaseSceneScraper):
         'image': '//span[@class="model_update_thumb"]/img/@src',
         'performers': '//div[@class="gallery_info"]/p/span[@class="update_models"]/a/text()',
         'tags': '//div[@class="gallery_info"]/span[@class="update_tags"]/a/text()',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*/(.*?).html',
         'trailer': '//script[contains(text(),"df_movie")]/text()',
         're_trailer': '.*df_movie.*?path:\"(.*?.mp4)\"',
         'pagination': '/tour/categories/movies_%s_d.html'
@@ -40,7 +40,7 @@ class siteAuntJudysSpider(BaseSceneScraper):
                 image = "https://www.auntjudys.com" + image.strip()
             else:
                 image = ""
-                
+
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image})
@@ -50,7 +50,6 @@ class siteAuntJudysSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Aunt Judys"
-        
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
@@ -62,7 +61,6 @@ class siteAuntJudysSpider(BaseSceneScraper):
                     return trailer
 
         return ''
-
 
     def get_id(self, response):
         if 'external_id' in self.regex and self.regex['external_id']:
