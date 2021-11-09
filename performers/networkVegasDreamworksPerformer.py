@@ -1,23 +1,20 @@
-import scrapy
 import re
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import dateparser
-
-from urllib.parse import urlparse
+import scrapy
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
-from tpdb.items import PerformerItem
 
 
 def get_birthday_from_age(age):
     age = int(age.strip())
-    if age >= 18 and age <= 99:
+    if 18 <= age <= 99:
         birthdate = datetime.now() - relativedelta(years=age)
         birthdate = birthdate.strftime('%Y-%m-%d')
         return birthdate
     return ''
-    
+
+
 class VegasDreamworksPerformerSpider(BasePerformerScraper):
     name = 'VegasDreamworksPerformer'
     network = 'Vegas Dreamworks'
@@ -56,7 +53,7 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination':link[1]},
+                                 meta={'page': self.page, 'pagination': link[1]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -81,7 +78,7 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)                                     
+                                     cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
         page_link = pagination % page
@@ -105,7 +102,6 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
                         return cupsize.strip()
         return ''
 
-
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
@@ -119,19 +115,17 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
             bio = self.process_xpath(response, self.get_selector_map('bio')).getall()
             if bio:
                 bio = " ".join(bio)
-                return bio.strip()
             else:
                 bio = response.xpath('//div[@class="model-desc"]/text()').getall()
                 if bio:
                     bio = " ".join(bio)
-                    return bio.strip()                
+            return bio.strip()
         return ''
 
     def get_gender(self, response):
         if "helloladyboy" in response.url:
             return "Trans"
         return "Female"
-
 
     def get_birthday(self, response):
         if 'birthday' in self.selector_map:
@@ -141,4 +135,4 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
                     age = birthday.strip()
                     birthday = get_birthday_from_age(age)
                     return birthday
-        return ''    
+        return ''

@@ -82,6 +82,7 @@ class BangSpider(BaseSceneScraper):
                 json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
         except BaseException:
             print(f"Index out of Range: {item['id']}")
+        item['image_blob'] = None
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'
         item['parent'] = 'Bang'

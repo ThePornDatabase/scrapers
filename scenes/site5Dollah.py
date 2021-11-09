@@ -1,12 +1,11 @@
-import scrapy
 import re
-import dateparser
+import scrapy
 
 from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class site5DollahSpider(BaseSceneScraper):
+class Site5DollahSpider(BaseSceneScraper):
     name = '5Dollah'
     network = '5Dollah'
     parent = '5Dollah'
@@ -22,7 +21,7 @@ class site5DollahSpider(BaseSceneScraper):
         'image': '//video/@poster',
         'performers': '//h1/following-sibling::a[contains(@href,"pornstars")]/strong/text()',
         'tags': '//text()[contains(.,"Tags")]/following-sibling::span/a/text()',
-        'external_id': '.*\/(.*).html',
+        'external_id': r'.*/(.*).html',
         'trailer': '//video/source/@src',
         'pagination': '/videos/page%s.html'
     }
@@ -43,7 +42,6 @@ class site5DollahSpider(BaseSceneScraper):
 
     def get_site(self, response):
         return "5Dollah"
-
 
     def parse_scene(self, response):
         item = SceneItem()
@@ -73,6 +71,11 @@ class site5DollahSpider(BaseSceneScraper):
         else:
             item['image'] = self.get_image(response)
 
+        if not item['image']:
+            item['image'] = None
+
+        item['image_blob'] = None
+
         if 'performers' in response.meta:
             item['performers'] = response.meta['performers']
         else:
@@ -86,8 +89,7 @@ class site5DollahSpider(BaseSceneScraper):
                 for performer in item['performers']:
                     if performer in item['tags']:
                         item['tags'].remove(performer)
-                        tags = item['tags']
-                        
+
         if 'id' in response.meta:
             item['id'] = response.meta['id']
         else:

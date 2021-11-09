@@ -105,7 +105,9 @@ class SiteALSAngelsSpider(BaseSceneScraper):
             if image:
                 item['image'] = "http://www.alsangels.com/" + image.strip()
             else:
-                item['image'] = ''
+                item['image'] = None
+
+            item['image_blob'] = None
 
             date = scene.xpath('./td[@class="videotext"]/span[@class="videodate"]/text()').get()
             if date:

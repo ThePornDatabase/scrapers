@@ -5,7 +5,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-    # This site is being updated, but not for any sites that are needed.  A lot of the sites that were 
+    # This site is being updated, but not for any sites that are needed.  A lot of the sites that were
     # originally scraped from Data18 had further updates past where Data18 lost the 21Sextury feeds
     # so this is just a one-time scrape to pull those additional scenes.  On this site they only
     # range from the 2015-2020 or so timeframe
@@ -65,7 +65,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination),
                                  callback=self.parse,
                                  meta={
-                                    'page': self.page, 
+                                    'page': self.page,
                                     'pagination': pagination,
                                     'site': site,
                                     'parent': parent,
@@ -211,6 +211,8 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             item['image'] = response.meta['image']
         else:
             item['image'] = self.get_image(response)
+
+        item['image_blob'] = None
 
         if 'performers' in response.meta:
             item['performers'] = response.meta['performers']

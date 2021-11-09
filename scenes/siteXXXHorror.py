@@ -1,7 +1,6 @@
-import scrapy
 import re
 import dateparser
-import tldextract
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -29,13 +28,12 @@ class XXXHorrorSpider(BaseSceneScraper):
 
     def parse(self, response, **kwargs):
         count = 0
-        
+
         scenes = self.parse_scenepage(response)
         if scenes:
             count = len(scenes)
             for scene in scenes:
                 yield scene
-                
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
@@ -56,7 +54,7 @@ class XXXHorrorSpider(BaseSceneScraper):
             item['performers'] = []
             item['title'] = ''
             item['id'] = ''
-            
+
             title = scene.xpath('./header/h2/a/text()').get()
             if title:
                 title = title.strip()
@@ -65,19 +63,19 @@ class XXXHorrorSpider(BaseSceneScraper):
             url = scene.xpath('./header/h2/a/@href').get()
             if url:
                 item['url'] = url.strip()
-                scene_id = re.search('.*\/(.*?)\/$', item['url']).group(1)
+                scene_id = re.search(r'.*/(.*?)/$', item['url']).group(1)
                 if scene_id:
                     item['id'] = scene_id.strip()
-            
+
             date = scene.xpath('.//time[contains(@class,"published")]/@datetime').get()
             if date:
                 date = date.strip()
             else:
                 date = "1970-01-01"
-                date = dateparser.parse(date).isoformat()     
-            
+                date = dateparser.parse(date).isoformat()
+
             item['date'] = date
-            
+
             description = scene.xpath('.//div[@class="entry-content"]/p/text()').getall()
             if not description:
                 description = scene.xpath('.//div[@class="entry-content"]//img/following-sibling::text()').getall()
@@ -87,18 +85,18 @@ class XXXHorrorSpider(BaseSceneScraper):
                 item['description'] = description
             else:
                 item['description'] = ''
-                
-            
+
             image = scene.xpath('.//div[@class="entry-content"]/figure//img/@src').get()
             if not image:
                 image = scene.xpath('.//img[contains(@src,"uploads")]/@src').get()
-                
+
             if image:
                 image = image.strip()
             else:
-                image = ''
-                
+                image = None
+
             item['image'] = image
+            item['image_blob'] = None
 
             performers = scene.xpath('.//span[@class="cat-links"]/a/text()').getall()
             if performers:
@@ -113,18 +111,14 @@ class XXXHorrorSpider(BaseSceneScraper):
                 item['tags'] = tags
             else:
                 item['tags'] = []
-                
-                
+
             item['trailer'] = ''
             item['parent'] = "XXX Horror"
             item['network'] = "XXX Horror"
             item['site'] = "XXX Horror"
-                    
+
             if item['id']:
                 scenelist.append(item.copy())
                 item.clear()
-                
-        return scenelist
-            
-                    
 
+        return scenelist

@@ -1,12 +1,10 @@
-import scrapy
-import re
 import html
 
 from tpdb.items import PerformerItem
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class networkManojobPerformerSpider(BasePerformerScraper):
+class NetworkManojobPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h3[@class="mg-md"]/text()',
         'image': '//div[contains(@class,"bigmodelpic")]/img/@src',
@@ -16,7 +14,7 @@ class networkManojobPerformerSpider(BasePerformerScraper):
         'height': '//div[contains(@class,"modeldetail")]/strong[contains(text(),"Height")]/following-sibling::text()[1]',
         'weight': '//div[contains(@class,"modeldetail")]/strong[contains(text(),"Weight")]/following-sibling::text()[1]',
         'pagination': '/performers/%s',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'ManojobPerformer'
@@ -30,24 +28,25 @@ class networkManojobPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[contains(@class,"card performer")]')
         for performer in performers:
             item = PerformerItem()
-            
+
             name = performer.xpath('.//a[contains(@class,"primary")]/text()').get()
             if name:
-                name = name.replace("More ","")
+                name = name.replace("More ", "")
                 item['name'] = html.unescape(name.strip().title())
 
             image = performer.xpath('.//span/img/@src').get()
             if image:
                 item['image'] = image.strip()
             else:
-                item['image'] = ''
-                
+                item['image'] = None
+            item['image_blob'] = None
+
             url = performer.xpath('.//a[contains(@class,"primary")]/@href').get()
             if url:
                 item['url'] = url.strip()
-                
+
             item['network'] = 'Manojob'
-            
+
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -63,6 +62,6 @@ class networkManojobPerformerSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''                
-            
-            yield item            
+            item['weight'] = ''
+
+            yield item

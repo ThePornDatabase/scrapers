@@ -1,12 +1,10 @@
-import scrapy
 import html
-from urllib.parse import urlparse
-
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-class networkOlderWomanFunPornstarSpider(BasePerformerScraper):
+
+class NetworkOlderWomanFunPornstarSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[@class="update_details"]/a[1]/text()',
         'image': "//div[contains(@class,'image_area')]/img[@class='img-responsive']/@src",
@@ -20,7 +18,6 @@ class networkOlderWomanFunPornstarSpider(BasePerformerScraper):
     start_urls = [
         'https://www.olderwomanfun.com',
     ]
-
 
     def get_gender(self, response):
         return 'Female'
@@ -38,7 +35,8 @@ class networkOlderWomanFunPornstarSpider(BasePerformerScraper):
             if image:
                 item['image'] = self.format_link(response, image.strip())
             else:
-                item['image'] = ''
+                item['image'] = None
+            item['image_blob'] = None
 
             item['url'] = performer.xpath('./a[1]/@href').get().strip()
 

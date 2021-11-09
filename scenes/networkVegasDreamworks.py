@@ -1,11 +1,11 @@
-import dateparser
-import scrapy
 import re
 from datetime import date
-import tldextract 
+import tldextract
+import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
+
 
 def get_scenedate(scene):
     scenedate = scene.xpath('.//div[contains(@class,"fsdate")]/span/text()').get()
@@ -14,29 +14,28 @@ def get_scenedate(scene):
     else:
         poster = scene.xpath('.//amp-video/@poster').get()
         if poster:
-            if re.search('\/(\d{4})\/(\d{2})', poster):
-                poster_groups = re.search('\/(\d{4})\/(\d{2})', poster)
+            if re.search(r'/(\d{4})/(\d{2})', poster):
+                poster_groups = re.search(r'/(\d{4})/(\d{2})', poster)
                 scenedate = poster_groups.group(1) + "-" + poster_groups.group(2) + "-01T12:00:00"
         else:
             poster = scene.xpath('.//amp-img/@src').get()
             if poster:
-                if re.search('\/(\d{4})\/(\d{2})', poster):
-                    poster_groups = re.search('\/(\d{4})\/(\d{2})', poster)
+                if re.search(r'/(\d{4})/(\d{2})', poster):
+                    poster_groups = re.search(r'/(\d{4})/(\d{2})', poster)
                     scenedate = poster_groups.group(1) + "-" + poster_groups.group(2) + "-01T12:00:00"
             else:
                 poster = scene.xpath('.//div[contains(@class,"entry-media")]/img/@src').get()
                 if poster:
-                    if re.search('\/(\d{4})\/(\d{2})', poster):
-                        poster_groups = re.search('\/(\d{4})\/(\d{2})', poster)
-                        scenedate = poster_groups.group(1) + "-" + poster_groups.group(2) + "-01T12:00:00"                
+                    if re.search(r'/(\d{4})/(\d{2})', poster):
+                        poster_groups = re.search(r'/(\d{4})/(\d{2})', poster)
+                        scenedate = poster_groups.group(1) + "-" + poster_groups.group(2) + "-01T12:00:00"
 
     if scenedate:
         return scenedate
-    else:
-        return date.today().isoformat()    
-        
+    return date.today().isoformat()
 
-class networkVegasDreamworksSpider(BaseSceneScraper):
+
+class NetworkVegasDreamworksSpider(BaseSceneScraper):
     name = 'VegasDreamworks'
     network = 'Vegas Dreamworks'
     parent = 'Vegas Dreamworks'
@@ -58,10 +57,9 @@ class networkVegasDreamworksSpider(BaseSceneScraper):
         'image': '//div[contains(@class,"video-player")]//amp-img/@src',
         'performers': '//div[@class="update-info"]/a[contains(@href,"/model/")]/text()|//div[@class="update_bb_info"]/a[contains(@href,"/model_content/")]/text()',
         'tags': '//div[@class="amp-category"]/span/a/text()|//div[@class="cat_tag"]/a/text()',
-        'external_id': '.*\/(.+)\/$',
+        'external_id': r'.*/(.+)/$',
         'trailer': '//div[contains(@class,"video-player")]//amp-video/@src|//div[contains(@class,"preview_trailer")]//video/source/@src',
     }
-
 
     def start_requests(self):
         if not hasattr(self, 'start_urls'):
@@ -73,7 +71,7 @@ class networkVegasDreamworksSpider(BaseSceneScraper):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination':link[1], 'site':link[2], 'url':link[0]},
+                                 meta={'page': self.page, 'pagination': link[1], 'site': link[2], 'url': link[0]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -97,10 +95,8 @@ class networkVegasDreamworksSpider(BaseSceneScraper):
                                          headers=self.headers,
                                          cookies=self.cookies)
 
-
     def get_next_page_url(self, base, page, pagination):
         return self.format_url(base, pagination % page)
-
 
     def get_scenes(self, response):
         meta = response.meta
@@ -121,24 +117,20 @@ class networkVegasDreamworksSpider(BaseSceneScraper):
                 desc = desc.strip()
             description = ' '.join(description)
             return description.strip()
-        
+
         return ''
 
-        
-    def get_site(self,response):
-        meta=response.meta
+    def get_site(self, response):
+        meta = response.meta
         if meta['site']:
             return meta['site']
-        else:
-            return tldextract.extract(response.url).domain
+        return tldextract.extract(response.url).domain
 
     def get_date(self, response):
-        meta=response.meta
+        meta = response.meta
         if meta['date']:
             return meta['date']
-        else:
-            return date.today().isoformat()
-
+        return date.today().isoformat()
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
@@ -146,15 +138,14 @@ class networkVegasDreamworksSpider(BaseSceneScraper):
             image = response.xpath('//meta[@property="og:image"]/@content').get()
         if image:
             return self.format_link(response, image)
-            
-        return ''
 
+        return ''
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
             trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
             if trailer:
-                if trailer[0:6] =="/asset":
+                if trailer[0:6] == "/asset":
                     return ''
                 return trailer
         return ''

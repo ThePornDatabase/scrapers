@@ -1,8 +1,7 @@
 import json
+from urllib.parse import urlparse
 import dateparser
 import scrapy
-
-from urllib.parse import urlparse
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -85,6 +84,7 @@ class VixenScraper(BaseSceneScraper):
 
         scene['network'] = "Vixen"
         scene['parent'] = site
+        scene['image_blob'] = None
 
         scene['date'] = dateparser.parse(data['releaseDate']).isoformat()
         scene['url'] = self.format_link(response, '/videos/' + data['slug'])

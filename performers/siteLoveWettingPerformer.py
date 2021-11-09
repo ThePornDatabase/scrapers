@@ -36,7 +36,8 @@ class SiteLoveWettingPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = self.format_link(response, image).replace(" ", "%20")
             else:
-                item['image'] = ''
+                item['image'] = None
+            item['image_blob'] = None
 
             url = performer.xpath('./div[@class="box-info"]/a/@href').get()
             if url:

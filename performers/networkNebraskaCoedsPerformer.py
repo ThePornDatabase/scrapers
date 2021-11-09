@@ -1,17 +1,16 @@
-import scrapy
 import html
 from urllib.parse import urlparse
-
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-class networkNebraskaCoedsPornstarSpider(BasePerformerScraper):
+
+class NetworkNebraskaCoedsPornstarSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[@class="update_details"]/a[1]/text()',
         'image': "//div[contains(@class,'image_area')]/img[@class='img-responsive']/@src",
         'pagination': '/models/models_%s_d.html',
-        'external_id': 'girls/(.+)/?$'
+        'external_id': r'girls/(.+)/?$'
     }
 
     name = 'NebraskaCoedsPerformer'
@@ -24,8 +23,7 @@ class networkNebraskaCoedsPornstarSpider(BasePerformerScraper):
         'https://tour.afterhoursexposed.com',
         'https://tour.eurocoeds.com',
     ]
-    
-    
+
     def get_gender(self, response):
         return 'Female'
 
@@ -33,7 +31,7 @@ class networkNebraskaCoedsPornstarSpider(BasePerformerScraper):
         performers = response.xpath('//div[@class="modelPic"]')
         for performer in performers:
             item = PerformerItem()
-            
+
             name = performer.xpath('./div[@class="modelName"]/p/a/text()').get()
             if name:
                 item['name'] = html.unescape(name.strip().title())
@@ -42,18 +40,19 @@ class networkNebraskaCoedsPornstarSpider(BasePerformerScraper):
             if image:
                 item['image'] = image.strip()
             else:
-                item['image'] = ''
-                
+                item['image'] = None
+            item['image_blob'] = None
+
             url = performer.xpath('./a[1]/@href').get()
             if url:
                 if "sets.php" in url:
                     uri = urlparse(response.url)
                     base = uri.scheme + "://" + uri.netloc
-                    url = base + "/" + url.strip()                    
+                    url = base + "/" + url.strip()
                 item['url'] = url.strip()
-                
+
             item['network'] = 'Nebraska Coeds'
-            
+
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -69,6 +68,6 @@ class networkNebraskaCoedsPornstarSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''                
-            
+            item['weight'] = ''
+
             yield item
