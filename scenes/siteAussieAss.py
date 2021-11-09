@@ -1,8 +1,15 @@
 import re
+import warnings
 import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 
 class AussieAssSpider(BaseSceneScraper):
@@ -65,7 +72,8 @@ class AussieAssSpider(BaseSceneScraper):
                 if "aussiepov" in response.url:
                     item['image'] = "https://aussiepov.com/" + image.strip()
             else:
-                item['image'] = ''
+                item['image'] = None
+            item['image_blob'] = None
 
             performers = child.xpath('.//span[@class="update_models"]/a/text()').getall()
             if performers:

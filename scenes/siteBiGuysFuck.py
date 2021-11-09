@@ -1,4 +1,5 @@
 import re
+import warnings
 import json
 import html
 import dateparser
@@ -6,6 +7,12 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 
 class BiGuysFuckSpider(BaseSceneScraper):
@@ -39,8 +46,6 @@ class BiGuysFuckSpider(BaseSceneScraper):
 
     def parse_scene(self, response):
         item = SceneItem()
-        global json
-
         jsondata = response.xpath('//script[@type="application/ld+json"]/text()').get()
         jsondata = jsondata.replace("\r\n", "")
         try:

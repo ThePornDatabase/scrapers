@@ -112,7 +112,7 @@ link_to_info = {
         "v2": False
     },
     "Organic-pna-OongoaF1": {
-        "site": "PervNana",
+        "site": "Perv Nana",
         "navText": movies_nav_text,
         "contentText": movies_content_text,
         "v2": False

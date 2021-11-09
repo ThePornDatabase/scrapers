@@ -1,11 +1,16 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
+import warnings
 from urllib.parse import urlparse
+import dateparser
+import scrapy
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 
 class BellaPassnPerformerSpider(BasePerformerScraper):
@@ -54,17 +59,11 @@ class BellaPassnPerformerSpider(BasePerformerScraper):
     def get_performers(self, response):
         performers = response.xpath('//div[@class="item-portrait"]/a/@href').getall()
         for performer in performers:
-            #performer = performer.replace("//", "")
+            # performer = performer.replace("//", "")
             yield scrapy.Request(
                 url=self.format_link(response, performer),
                 callback=self.parse_performer
             )
-
-    def get_cupsize(self, response):
-        if 'cupsize' in self.selector_map:
-            cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get().strip().replace("-","")
-            return cupsize
-        return ''
 
     def get_ethnicity(self, response):
         if 'ethnicity' in self.selector_map:
@@ -81,47 +80,45 @@ class BellaPassnPerformerSpider(BasePerformerScraper):
             if nationality:
                 if "," in nationality:
                     nationality = nationality.split(",")[1]
-                    return nationality.strip()
                 else:
                     nationality = response.xpath('//td/li/strong[contains(text(),"Lives In")]/../../following-sibling::td/text()').get()
-                    if nationality:
-                        return nationality.strip()
+                if nationality:
+                    return nationality.strip()
         return ''
 
     def get_height(self, response):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                str_height = re.findall('(\d{1,2})', height)
+                str_height = re.findall(r'(\d{1,2})', height)
                 if len(str_height):
                     feet = int(str_height[0])
                     if len(str_height) > 1:
                         inches = int(str_height[1])
                     else:
                         inches = 0
-                    heightcm = str(round(((feet*12)+inches) * 2.54)) + "cm"
+                    heightcm = str(round(((feet * 12) + inches) * 2.54)) + "cm"
                     return heightcm.strip()
-        return ''         
+        return ''
 
     def get_cupsize(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = measurements.replace(" ","").strip()
-                measurements = re.search('(.*-\d{2}-\d{2})', measurements).group(1)
+                measurements = measurements.replace(" ", "").strip()
+                measurements = re.search(r'(.*-\d{2}-\d{2})', measurements).group(1)
                 if measurements:
-                    cupsize = re.search('(.*?)-.*', measurements).group(1)
+                    cupsize = re.search(r'(.*?)-.*', measurements).group(1)
                     if cupsize:
                         return cupsize.upper().strip()
-        return ''   
-    
+        return ''
 
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = measurements.replace(" ","").strip()
-                measurements = re.search('(.*-\d{2}-\d{2})', measurements).group(1)
+                measurements = measurements.replace(" ", "").strip()
+                measurements = re.search(r'(.*-\d{2}-\d{2})', measurements).group(1)
                 if measurements:
                     return measurements.upper().strip()
         return ''
@@ -130,16 +127,16 @@ class BellaPassnPerformerSpider(BasePerformerScraper):
         if 'birthday' in self.selector_map:
             birthday = self.process_xpath(response, self.get_selector_map('birthday')).get()
             if birthday:
-                checkbirthday = re.search('(.*?)\s+(\d+).*(\d{4})', birthday)
+                checkbirthday = re.search(r'(.*?)\s+(\d+).*(\d{4})', birthday)
                 if checkbirthday:
                     if checkbirthday[3]:
                         if len(checkbirthday[2]) == 3:
                             tempday = checkbirthday[2]
                             tempday = tempday[1:]
                             birthday = checkbirthday[1] + " " + tempday + ", " + checkbirthday[3]
-                return dateparser.parse(birthday.strip()).isoformat()                        
+                return dateparser.parse(birthday.strip()).isoformat()
         return ''
-        
+
     def get_image(self, response):
         url = urlparse(response.url)
         base = url.scheme + "://" + url.netloc
@@ -148,4 +145,3 @@ class BellaPassnPerformerSpider(BasePerformerScraper):
             if image:
                 return image.strip()
         return ''
-        

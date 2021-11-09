@@ -1,11 +1,10 @@
-import dateparser
-import scrapy
 import re
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteBAMVisionsBTSSpider(BaseSceneScraper):
+class SiteBAMVisionsBTSSpider(BaseSceneScraper):
     name = 'BAMVisionsBTS'
     network = 'BAM Visions'
     parent = 'BAM Visions'
@@ -22,7 +21,7 @@ class siteBAMVisionsBTSSpider(BaseSceneScraper):
         'date': '//li/i[@class="fa fa-calendar"]/following-sibling::strong/following-sibling::text()',
         'image': '//script[contains(text(),"poster")]/text()',
         'tags': '//meta[@name="keywords"]/@content',
-        'external_id': 'trailers\/(.*)\.html',
+        'external_id': r'trailers/(.*)\.html',
         'trailer': '//script[contains(text(),"poster")]/text()',
         'pagination': '/categories/BTS/%s/latest/'
     }
@@ -32,23 +31,21 @@ class siteBAMVisionsBTSSpider(BaseSceneScraper):
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': 'BAM Visions'})
 
-
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
-            image = re.search('poster=\"(.*.jpg)\"',image).group(1)
+            image = re.search(r'poster=\"(.*.jpg)\"', image).group(1)
             if image:
                 image = "https://tour.bamvisions.com/" + image
                 return self.format_link(response, image)
         return ''
-        
 
     def get_trailer(self, response):
         trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
         if trailer:
-            trailer = re.search('video\ src=\"(.*.mp4)\"',trailer).group(1)
+            trailer = re.search(r'video\ src=\"(.*.mp4)\"', trailer).group(1)
             if trailer:
                 trailer = "https://tour.bamvisions.com/" + trailer
-                trailer = trailer.replace(" ","%20")
+                trailer = trailer.replace(" ", "%20")
                 return self.format_link(response, trailer)
-        return ''    
+        return ''

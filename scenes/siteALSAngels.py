@@ -1,9 +1,16 @@
 import re
+import warnings
 import scrapy
 import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
+# Ignore dateparser warnings regarding pytz
+warnings.filterwarnings(
+    "ignore",
+    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
+)
 
 # All the videos are on one long, page, but the logic should handle the
 # normal "limit_pages" values
