@@ -33,6 +33,7 @@ class SiteMVGCashPerformerSpider(BasePerformerScraper):
             if name:
                 item['name'] = html.unescape(name.strip().title())
             item['image'] = performer.xpath('./div/a/img/@src0_1x').get().strip()
+            item['image_blob'] = None
             url = performer.xpath('.//h3/a/@href').get()
             if url:
                 item['url'] = url.strip()

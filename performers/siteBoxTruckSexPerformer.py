@@ -1,17 +1,15 @@
-import scrapy
-import re
 import html
 
 from tpdb.items import PerformerItem
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class siteBoxTruckSexPerformerSpider(BasePerformerScraper):
+class SiteBoxTruckSexPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h3[@class="mg-md"]/text()',
         'image': '//div[contains(@class,"bigmodelpic")]/img/@src',
         'pagination': '/tour/models/models_%s.html',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'BoxTruckSexPerformer'
@@ -25,7 +23,7 @@ class siteBoxTruckSexPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//li[contains(@class,"featured-video")]')
         for performer in performers:
             item = PerformerItem()
-            
+
             name = performer.xpath('.//h5/a/text()').get()
             if name:
                 item['name'] = html.unescape(name.strip().title())
@@ -37,14 +35,15 @@ class siteBoxTruckSexPerformerSpider(BasePerformerScraper):
                 image = "https://www.boxtrucksex.com" + image.strip()
                 item['image'] = image.strip()
             else:
-                item['image'] = ''
-                
+                item['image'] = None
+            item['image_blob'] = None
+
             url = performer.xpath('.//h5/a/@href').get()
             if url:
                 item['url'] = url.strip()
-                
+
             item['network'] = 'Box Truck Sex'
-            
+
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -60,6 +59,6 @@ class siteBoxTruckSexPerformerSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''                
-            
-            yield item            
+            item['weight'] = ''
+
+            yield item

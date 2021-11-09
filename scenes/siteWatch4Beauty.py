@@ -73,6 +73,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['id'] = data['issue_simple_title']
             item['trailer'] = ''
             item['image'] = "https://s5q3w2t8.ssl.hwcdn.net/production/%s-issue-cover-wide-2560.jpg" % (datetime.fromisoformat(item['date']).strftime('%Y%m%d'))
+            item['image_blob'] = None
             item['performers'] = []
 
             modelurl = response.url + "/models"

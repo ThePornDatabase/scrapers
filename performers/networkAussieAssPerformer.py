@@ -1,10 +1,8 @@
-import scrapy
 import re
-import dateparser
-from urllib.parse import urlparse
+import scrapy
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
-from tpdb.items import PerformerItem
+
 
 class AussieAssPerformerSpider(BasePerformerScraper):
     name = 'AussieAssPerformer'
@@ -36,7 +34,7 @@ class AussieAssPerformerSpider(BasePerformerScraper):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination':link[1]},
+                                 meta={'page': self.page, 'pagination': link[1]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -61,7 +59,7 @@ class AussieAssPerformerSpider(BasePerformerScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)                                     
+                                     cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
         page_link = pagination % page
@@ -89,11 +87,11 @@ class AussieAssPerformerSpider(BasePerformerScraper):
             if height:
                 if "cm" in height:
                     height = re.sub(r'\s+', '', height)
-                    height = re.search('(\d+cm)', height)
+                    height = re.search(r'(\d+cm)', height)
                     if height:
                         height = height.group(1)
                         return height.strip()
-        return ''        
+        return ''
 
     def get_astrology(self, response):
         if 'astrology' in self.selector_map:
@@ -112,4 +110,4 @@ class AussieAssPerformerSpider(BasePerformerScraper):
                 image = "https://aussiepov.com" + image
             if image:
                 return image.strip()
-        return ''
+        return None

@@ -1,8 +1,9 @@
-import scrapy
 import string
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+
 
 class IFeelMyselfSpider(BaseSceneScraper):
     name = 'IFeelMyself'
@@ -12,7 +13,7 @@ class IFeelMyselfSpider(BaseSceneScraper):
     start_urls = ["https://ifeelmyself.com"]
 
     selector_map = {
-        'external_id': 'media_id=([0-9]+)&',
+        'external_id': r'media_id=([0-9]+)&',
         'description': '//td[@class="blog_wide_new_text"]/text()',
         'date': '//span[@class="entryDatestamp"]//text()',
         'date_formats': ['%d %b %Y'],
@@ -21,7 +22,7 @@ class IFeelMyselfSpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page):
-        return self.format_url(base, self.get_selector_map('pagination') % ((page-1) * 12))
+        return self.format_url(base, self.get_selector_map('pagination') % ((page - 1) * 12))
 
     def get_scenes(self, response):
         for scene in response.xpath('//table[@class="ThumbTab ppss-scene"]/tr/td/a/@href').getall():
@@ -41,7 +42,6 @@ class IFeelMyselfSpider(BaseSceneScraper):
     def get_performers(self, response):
         return [response.xpath('//span[@class="entryHeadingFlash"]/a[2]/text()').get().replace("_", " ")]
 
-
     def get_tags(self, response):
         tags = response.xpath('//table[@class="news_bottom_line"]/tr//text()').getall()
         tags = [t.strip() for t in tags]
@@ -52,7 +52,6 @@ class IFeelMyselfSpider(BaseSceneScraper):
             fulltags.remove('HD')
         fulltags = list(map(lambda x: x.strip().title(), fulltags))
         return fulltags
-        
 
     def get_all_performers(self, response):
         '''Override performers with correct value
