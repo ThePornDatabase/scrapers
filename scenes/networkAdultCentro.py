@@ -1,18 +1,16 @@
-import scrapy
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
 import re
-import dateparser
 import json
 import html
 import string
 from urllib.parse import urlparse
-import time
+import dateparser
+import scrapy
 
-from datetime import datetime
+from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-class networkAdultCentroSpider(BaseSceneScraper):
+
+class NetworkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
 
     sites = {
@@ -54,18 +52,8 @@ class networkAdultCentroSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        # ~ link = ''
-        # ~ if self.site:
-            # ~ if self.site in self.sites:
-                # ~ link = self.sites[self.site]
-
-        # ~ if not link:
-            # ~ print(f'Scraper requires a site with -a site=xxxxx flag.')
-            # ~ print(f'Current available options are {self.sites}')
-            # ~ self.crawler.engine.close_spider(self, reason='No Site Selected')
-        # ~ else:
         for link in self.sites:
-            yield scrapy.Request(link + '/videos/', callback=self.start_requests_2, meta={'link':link})
+            yield scrapy.Request(link + '/videos/', callback=self.start_requests_2, meta={'link': link})
 
     def start_requests_2(self, response):
 
@@ -85,7 +73,6 @@ class networkAdultCentroSpider(BaseSceneScraper):
                 quit()
             else:
                 meta['token'] = token
-
 
             url = self.get_next_page_url(meta['link'], self.page, meta['token'])
             meta['page'] = self.page
@@ -176,7 +163,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
 
     def parse_scene(self, response):
-        meta=response.meta
+        meta = response.meta
         item = SceneItem()
         global json
 
@@ -399,7 +386,6 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://facialcasting.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
 
     def get_performers_json(self, response):
         meta = response.meta

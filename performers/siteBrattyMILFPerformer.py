@@ -1,8 +1,6 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
+import scrapy
+
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
@@ -15,7 +13,7 @@ class BrattyMILFPerformerSpider(BasePerformerScraper):
         'nationality': '//h5[contains(text(), "Location")]/following-sibling::p[1]/text()',
         'measurements': '//h5[contains(text(), "Figure")]/following-sibling::p[1]/text()',
         'pagination': '/model/gallery/%s',
-        'external_id': 'model\/(.*)/'
+        'external_id': r'model/(.*)/'
     }
 
     name = 'BrattyMILFPerformer'
@@ -43,8 +41,8 @@ class BrattyMILFPerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.match('\d+.*?-.*?\d+.*?-.*?\d+', measurements):
-                measurements = measurements.replace("B","").replace("W","").replace("H","")
+            if measurements and re.match(r'\d+.*?-.*?\d+.*?-.*?\d+', measurements):
+                measurements = measurements.replace("B", "").replace("W", "").replace("H", "")
                 return measurements.strip()
         return ''
 
@@ -54,8 +52,8 @@ class BrattyMILFPerformerSpider(BasePerformerScraper):
             if cupsize:
                 if 'measurements' in self.selector_map:
                     measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-                    if measurements and re.match('\d+.*?-.*?\d+.*?-.*?\d+', measurements):
-                        breasts = re.search('(\d+).*?-.*?\d+.*?-.*?\d+',measurements).group(1)
+                    if measurements and re.match(r'\d+.*?-.*?\d+.*?-.*?\d+', measurements):
+                        breasts = re.search(r'(\d+).*?-.*?\d+.*?-.*?\d+', measurements).group(1)
                         cupsize = breasts.strip() + cupsize.strip()
                         if cupsize:
                             return cupsize.strip()

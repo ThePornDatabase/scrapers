@@ -1,14 +1,15 @@
 import re
 from datetime import datetime
+import tldextract
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-    # This site is being updated, but not for any sites that are needed.  A lot of the sites that were
-    # originally scraped from Data18 had further updates past where Data18 lost the 21Sextury feeds
-    # so this is just a one-time scrape to pull those additional scenes.  On this site they only
-    # range from the 2015-2020 or so timeframe
+# This site is being updated, but not for any sites that are needed.  A lot of the sites that were
+# originally scraped from Data18 had further updates past where Data18 lost the 21Sextury feeds
+# so this is just a one-time scrape to pull those additional scenes.  On this site they only
+# range from the 2015-2020 or so timeframe
 
 
 class EurostunnersFillerSpider(BaseSceneScraper):
@@ -18,23 +19,22 @@ class EurostunnersFillerSpider(BaseSceneScraper):
     url = 'https://eurostunners.com'
 
     paginations = [
-        ['/showcase/21%20Erotic%20Anal/{0}/','21 Erotic Anal', '21Sextury', 'Gamma Enterprises','2000-01-01T12:00:00','current'],
-        ['/showcase/21FootArt/{0}/','21FootArt', '21Sextury', 'Gamma Enterprises','2000-01-01T12:00:00','current'],
-        ['/showcase/Anal%20Teen%20Club/{0}/','Anal Teen Club', '21Sextury', 'Gamma Enterprises','2000-01-01T12:00:00','current'],
-        ['/showcase/Busty%20Fever/{0}/','Busty Fever', '21Sextury', 'Gamma Enterprises','2000-01-01T12:00:00','current'],
-        ['/showcase/Daily%20Sex%20Dose/{0}/','Daily Sex Dose', '21Sextury', 'Gamma Enterprises','2011-07-05T12:00:00','current'],
-        ['/showcase/DP%20Overload/{0}/','DP Overload', '21Sextury', 'Gamma Enterprises','2012-03-06T12:00:00','current'],
-        ['/showcase/Enslaved%20Gals/{0}/','Enslaved Gals', '21Sextury', 'Gamma Enterprises','2012-06-18T12:00:00','current'],
-        ['/showcase/Grandpas%20Fuck%20Teens/{0}/','Grandpas Fuck Teens', '21Sextury', 'Gamma Enterprises','2018-03-25T12:00:00','current'],
-        ['/showcase/Intermixed%20Sluts/{0}/','Intermixed Sluts', '21Sextury', 'Gamma Enterprises','2012-05-20T12:00:00','current'],
-        ['/showcase/Lust%20For%20Anal/{0}/','Lust For Anal', '21Sextury', 'Gamma Enterprises','2012-05-24T12:00:00','current'],
-        ['/showcase/Lusty%20Busty%20Chix/{0}/','Lusty Busty Chix', '21Sextury', 'Gamma Enterprises','2012-05-28T12:00:00','current'],
-        ['/showcase/Lusty%20Grandmas/{0}/','Lusty Grandmas', '21Sextury', 'Gamma Enterprises','2018-03-30T12:00:00','current'],
-        ['/showcase/Oral%20Quickies/{0}/','Oral Quickies', '21Sextury', 'Gamma Enterprises','2012-05-04T12:00:00','current'],
-        ['/showcase/Teach%20Me%20Fisting/{0}/','Teach Me Fisting', '21Sextury', 'Gamma Enterprises','2018-03-27T12:00:00','current'],
-        ['/showcase/Teen%20Bitch%20Club/{0}/','Teen Bitch Club', '21Sextury', 'Gamma Enterprises','2012-05-19T12:00:00','current'],
-
-        ['/showcase/Wifeys%20World/{0}/','Wifeys World', 'Wifeys World', 'Wifeys World','2000-01-01T12:00:00','current', 'https://pornstar-scenes.com/'],
+        ['/showcase/21%20Erotic%20Anal/{0}/', '21 Erotic Anal', '21Sextury', 'Gamma Enterprises', '2000-01-01T12:00:00', 'current'],
+        ['/showcase/21FootArt/{0}/', '21FootArt', '21Sextury', 'Gamma Enterprises', '2000-01-01T12:00:00', 'current'],
+        ['/showcase/Anal%20Teen%20Club/{0}/', 'Anal Teen Club', '21Sextury', 'Gamma Enterprises', '2000-01-01T12:00:00', 'current'],
+        ['/showcase/Busty%20Fever/{0}/', 'Busty Fever', '21Sextury', 'Gamma Enterprises', '2000-01-01T12:00:00', 'current'],
+        ['/showcase/Daily%20Sex%20Dose/{0}/', 'Daily Sex Dose', '21Sextury', 'Gamma Enterprises', '2011-07-05T12:00:00', 'current'],
+        ['/showcase/DP%20Overload/{0}/', 'DP Overload', '21Sextury', 'Gamma Enterprises', '2012-03-06T12:00:00', 'current'],
+        ['/showcase/Enslaved%20Gals/{0}/', 'Enslaved Gals', '21Sextury', 'Gamma Enterprises', '2012-06-18T12:00:00', 'current'],
+        ['/showcase/Grandpas%20Fuck%20Teens/{0}/', 'Grandpas Fuck Teens', '21Sextury', 'Gamma Enterprises', '2018-03-25T12:00:00', 'current'],
+        ['/showcase/Intermixed%20Sluts/{0}/', 'Intermixed Sluts', '21Sextury', 'Gamma Enterprises', '2012-05-20T12:00:00', 'current'],
+        ['/showcase/Lust%20For%20Anal/{0}/', 'Lust For Anal', '21Sextury', 'Gamma Enterprises', '2012-05-24T12:00:00', 'current'],
+        ['/showcase/Lusty%20Busty%20Chix/{0}/', 'Lusty Busty Chix', '21Sextury', 'Gamma Enterprises', '2012-05-28T12:00:00', 'current'],
+        ['/showcase/Lusty%20Grandmas/{0}/', 'Lusty Grandmas', '21Sextury', 'Gamma Enterprises', '2018-03-30T12:00:00', 'current'],
+        ['/showcase/Oral%20Quickies/{0}/', 'Oral Quickies', '21Sextury', 'Gamma Enterprises', '2012-05-04T12:00:00', 'current'],
+        ['/showcase/Teach%20Me%20Fisting/{0}/', 'Teach Me Fisting', '21Sextury', 'Gamma Enterprises', '2018-03-27T12:00:00', 'current'],
+        ['/showcase/Teen%20Bitch%20Club/{0}/', 'Teen Bitch Club', '21Sextury', 'Gamma Enterprises', '2012-05-19T12:00:00', 'current'],
+        ['/showcase/Wifeys%20World/{0}/', 'Wifeys World', 'Wifeys World', 'Wifeys World', '2000-01-01T12:00:00', 'current', 'https://pornstar-scenes.com/'],
     ]
 
     selector_map = {
@@ -44,7 +44,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
         'image': '//script[@type="application/ld+json"]/text()',
         'performers': '//h1/a[contains(@href,"model")]/text()',
         'tags': '//div[@class="card-body"]//a[contains(@href,"/tag/")]/text()',
-        'external_id': '.*\/(.+)\/$',
+        'external_id': r'.*/(.+)/$',
         'trailer': '//script[@type="application/ld+json"]/text()',
         'pagination': '/shoots/latest?page=%s'
     }
@@ -64,16 +64,9 @@ class EurostunnersFillerSpider(BaseSceneScraper):
                 todate = todate.isoformat()
             yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination),
                                  callback=self.parse,
-                                 meta={
-                                    'page': self.page,
-                                    'pagination': pagination,
-                                    'site': site,
-                                    'parent': parent,
-                                    'network': network,
-                                    'fromdate': fromdate,
-                                    'todate': todate},
-                headers=self.headers,
-                cookies=self.cookies)
+                                 meta={'page': self.page, 'pagination': pagination, 'site': site, 'parent': parent, 'network': network, 'fromdate': fromdate, 'todate': todate},
+                                 headers=self.headers,
+                                 cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         if response.status == 200:
@@ -101,7 +94,6 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
-
     def get_next_page_url(self, url, page, pagination):
         return self.format_url(url, pagination.format(page))
 
@@ -110,7 +102,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             response, self.get_selector_map('title')).get()
         if title:
             if '"name"' in title:
-                title = re.search('Object\",\"name\":\s+\"(.*?)\"', title).group(1)
+                title = re.search(r'Object\",\"name\":\s+\"(.*?)\"', title).group(1)
                 if title:
                     return title.strip().title()
         return ''
@@ -120,7 +112,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             response, self.get_selector_map('description')).get()
         if description:
             if '"description"' in description:
-                description = re.search('\"description\":\s+\"(.*?)\"', description).group(1)
+                description = re.search(r'\"description\":\s+\"(.*?)\"', description).group(1)
                 if description:
                     return description.strip()
         return ''
@@ -130,7 +122,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             response, self.get_selector_map('date')).get()
         if date:
             if '"uploadDate"' in date:
-                date = re.search('\"uploadDate\":\s+\"(.*?)\"', date).group(1)
+                date = re.search(r'\"uploadDate\":\s+\"(.*?)\"', date).group(1)
                 if date:
                     return date.strip()
         return ''
@@ -140,7 +132,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             response, self.get_selector_map('image')).get()
         if image:
             if '"thumbnailUrl"' in image:
-                image = re.search('\"thumbnailUrl\":\s+\"(.*?)\"', image).group(1)
+                image = re.search(r'\"thumbnailUrl\":\s+\"(.*?)\"', image).group(1)
                 if image:
                     if image[0:2] == "//":
                         image = "https:" + image
@@ -153,14 +145,13 @@ class EurostunnersFillerSpider(BaseSceneScraper):
             response, self.get_selector_map('trailer')).get()
         if trailer:
             if '"contentUrl"' in trailer:
-                trailer = re.search('\"contentUrl\":\s+\"(.*?)\"', trailer).group(1)
+                trailer = re.search(r'\"contentUrl\":\s+\"(.*?)\"', trailer).group(1)
                 if trailer:
                     if trailer[0:2] == "//":
                         trailer = "https:" + trailer
                     trailer = trailer.replace('https:https:', 'https:')
                     return trailer.strip()
         return ''
-
 
     def get_site(self, response):
         meta = response.meta
@@ -170,7 +161,7 @@ class EurostunnersFillerSpider(BaseSceneScraper):
 
     def get_network(self, response):
         meta = response.meta
-        print (f'Network Meta: {meta}')
+        print(f'Network Meta: {meta}')
         if meta['network']:
             return meta['network']
         return tldextract.extract(response.url).domain
@@ -180,8 +171,6 @@ class EurostunnersFillerSpider(BaseSceneScraper):
         if meta['parent']:
             return meta['parent']
         return tldextract.extract(response.url).domain
-
-
 
     def parse_scene(self, response):
         meta = response.meta

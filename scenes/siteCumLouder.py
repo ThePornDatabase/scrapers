@@ -1,22 +1,19 @@
 import re
-
-import scrapy
-from dateutil.relativedelta import relativedelta
-import dateparser
 import datetime
+from dateutil.relativedelta import relativedelta
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-    # A few things about this scraper:
-    # 1) There is no page 1 with regular pagination.  Pagination picks up on Page 2, so custom starting url
-    # 2) There are no dates on scenes, instead just "xx days/weeks/months/years" ago, so it's calculated
-    #    This is going to cause a lot of mismatched dates on initial import, but should be good for recent stuff
-    #    At the time of writing the newest scene is 2 days ago, so I'm guessing on "today" and "yesterday"
+# A few things about this scraper:
+# 1) There is no page 1 with regular pagination.  Pagination picks up on Page 2, so custom starting url
+# 2) There are no dates on scenes, instead just "xx days/weeks/months/years" ago, so it's calculated
+#    This is going to cause a lot of mismatched dates on initial import, but should be good for recent stuff
+#    At the time of writing the newest scene is 2 days ago, so I'm guessing on "today" and "yesterday"
 
 
-
-class siteCumLouderSpider(BaseSceneScraper):
+class SiteCumLouderSpider(BaseSceneScraper):
     name = 'CumLouder'
     network = "Cum Louder"
     parent = "Cum Louder"
@@ -33,25 +30,17 @@ class siteCumLouderSpider(BaseSceneScraper):
         'image_blob': '//link[@rel="preload" and @as="image" and contains(@href,".jpg")]/@href',
         'performers': '//a[@class="pornstar-link"]/text()',
         'tags': '//a[@class="tag-link"]/text()',
-        'external_id': '.*porn-video\/(.*)\/$',
+        'external_id': r'.*porn-video/(.*)\/$',
         'trailer': '',
         'pagination': '/%s/?s=last'
     }
 
-
     def start_requests(self):
-        if not hasattr(self, 'start_urls'):
-            raise AttributeError('start_urls missing')
-
-        if not self.start_urls:
-            raise AttributeError('start_urls selector missing')
-
-        for link in self.start_urls:
-            yield scrapy.Request(url="https://www.cumlouder.com/porn/?s=last",
-                                 callback=self.parse,
-                                 meta={'page': self.page},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+        yield scrapy.Request(url="https://www.cumlouder.com/porn/?s=last",
+                             callback=self.parse,
+                             meta={'page': self.page},
+                             headers=self.headers,
+                             cookies=self.cookies)
 
     def get_scenes(self, response):
         scenes = response.xpath('//a[contains(@href,"/porn-video/")]/@href').getall()
@@ -65,7 +54,7 @@ class siteCumLouderSpider(BaseSceneScraper):
     def get_id(self, response):
         search = re.search(self.get_selector_map('external_id'), response.url, re.IGNORECASE)
         search = search.group(1)
-        search = search.replace("_","-").strip()
+        search = search.replace("_", "-").strip()
         return search
 
     def get_title(self, response):
@@ -75,7 +64,6 @@ class siteCumLouderSpider(BaseSceneScraper):
             return title.strip().title()
         return ''
 
-
     def get_tags(self, response):
         if self.get_selector_map('tags'):
             tags = self.process_xpath(
@@ -84,12 +72,11 @@ class siteCumLouderSpider(BaseSceneScraper):
                 return list(map(lambda x: x.strip().title(), tags))
         return []
 
-
     def get_date(self, response):
         today = datetime.datetime.now()
         datestring = self.process_xpath(response, self.get_selector_map('date')).get()
         datestring = datestring.lower()
-        intervalcount = re.search('(\d+)', datestring).group(1)
+        intervalcount = re.search(r'(\d+)', datestring).group(1)
         if not intervalcount:
             intervalcount = 0
         else:
