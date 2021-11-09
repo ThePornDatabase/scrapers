@@ -58,7 +58,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
         # ~ if self.site:
             # ~ if self.site in self.sites:
                 # ~ link = self.sites[self.site]
-
+        
         # ~ if not link:
             # ~ print(f'Scraper requires a site with -a site=xxxxx flag.')
             # ~ print(f'Current available options are {self.sites}')
@@ -68,7 +68,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             yield scrapy.Request(link + '/videos/', callback=self.start_requests_2, meta={'link':link})
 
     def start_requests_2(self, response):
-
+        
         appscript = response.xpath('//script[contains(text(),"fox.createApplication")]/text()').get()
         meta = response.meta
         if meta['link']:
@@ -86,7 +86,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             else:
                 meta['token'] = token
 
-
+            
             url = self.get_next_page_url(meta['link'], self.page, meta['token'])
             meta['page'] = self.page
             yield scrapy.Request(url, callback=self.parse, meta=meta)
@@ -158,7 +158,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "cleagaultier" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-
+            
         return self.format_url(base, page_url.format(page))
 
     def get_scenes(self, response):
@@ -198,9 +198,9 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = ['Eva Lovia']
         else:
             item['performers'] = []
-
+            
         item['tags'] = []
-
+        
         if "jerkoff" in response.url or "dillionation" in response.url:
             performers = data['tags']['collection']
             for performer in performers:
@@ -216,7 +216,6 @@ class networkAdultCentroSpider(BaseSceneScraper):
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url']
-        item['image_blob'] = None
 
         if "cospimps" in response.url:
             item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
@@ -226,10 +225,10 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['trailer'] = ''
         else:
             item['trailer'] = data['_resources']['hoverPreview']
-
+            
         if not item['trailer']:
             item['trailer'] = ''
-
+                        
         if "aussiefellatio" in response.url:
             item['site'] = 'Aussie Fellatio Queens'
             item['parent'] = 'Aussie Fellatio Queens'
@@ -237,7 +236,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://aussiefellatioqueens.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+                        
         if "aussiexxxhookups" in response.url:
             item['site'] = 'Aussie XXX Hookups'
             item['parent'] = 'Aussie XXX Hookups'
@@ -245,7 +244,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://aussiexxxhookups.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+                        
         if "svenskaporrfilmer" in response.url:
             item['site'] = 'Svenska Porrfilmer'
             item['parent'] = 'Svenska Porrfilmer'
@@ -253,39 +252,39 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://svenskaporrfilmer.net/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "jerkoff" in response.url:
             item['site'] = 'Jerk Off With Me'
             item['parent'] = 'Jerk Off With Me'
             item['network'] = 'Jerk Off With Me'
             yield item
-
+            
         if "fallinlovia" in response.url:
             item['site'] = 'Fall in Lovia'
             item['parent'] = 'Fall in Lovia'
             item['network'] = 'Fall in Lovia'
             yield item
-
+            
         if "dillionation" in response.url:
             item['site'] = 'Dillion Harper'
             item['parent'] = 'Dillion Harper'
             item['network'] = 'Dillion Harper'
             yield item
-
+            
         if "miami" in response.url:
             item['site'] = 'My Life In Miami'
             item['parent'] = 'My Life In Miami'
             item['network'] = 'My Life In Miami'
             item['performers'] = []
             yield item
-
+            
         if "daddyscowgirl" in response.url:
             item['site'] = 'Daddys Cowgirl'
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
             item['performers'] = []
             yield item
-
+            
         if "cleagaultier" in response.url:
             item['site'] = 'Clea Gaultier'
             item['parent'] = 'Clea Gaultier'
@@ -293,14 +292,14 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = ['Clea Gaultier']
             item['tags'] = []
             yield item
-
+            
         if "realagent" in response.url:
             item['site'] = 'Real Agent'
             item['parent'] = 'Real Agent'
             item['network'] = 'Real Agent'
             item['performers'] = []
             yield item
-
+            
         if "trinitystclair" in response.url:
             item['site'] = 'Trinity St Clair'
             item['parent'] = 'Trinity St Clair'
@@ -308,7 +307,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://trinitystclair.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "psychohenessy" in response.url:
             item['site'] = 'Psycho Henessy'
             item['parent'] = 'Psycho Henessy'
@@ -316,7 +315,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://psychohenessy.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "porntugal" in response.url:
             item['site'] = 'Porntugal'
             item['parent'] = 'Porntugal'
@@ -324,7 +323,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://porntugal.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "ninnworx" in response.url:
             item['site'] = 'Ninn Worx'
             item['parent'] = 'Ninn Worx'
@@ -332,7 +331,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://ninnworx.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "therealscarletred" in response.url:
             item['site'] = 'Scarlet Red'
             item['parent'] = 'Scarlet Red'
@@ -340,21 +339,21 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://therealscarletred.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "santalatina" in response.url:
             item['site'] = 'Santa Latina'
             item['parent'] = 'Santa Latina'
             item['network'] = 'Santa Latina'
             item['performers'] = []
             yield item
-
+            
         if "bigjohnnyxxx" in response.url:
             item['site'] = 'Big Johnny XXX'
             item['parent'] = 'Big Johnny XXX'
             item['network'] = 'Big Johnny XXX'
             item['performers'] = []
             yield item
-
+            
         if "danidaniels" in response.url:
             item['site'] = 'Dani Daniels'
             item['parent'] = 'Dani Daniels'
@@ -362,28 +361,28 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = ['Dani Daniels']
             item['tags'] = []
             yield item
-
+            
         if "peghim" in response.url:
             item['site'] = 'PegHim'
             item['parent'] = 'PegHim'
             item['network'] = 'PegHim'
             item['performers'] = []
             yield item
-
+            
         if "katie71" in response.url:
             item['site'] = 'Katie71'
             item['parent'] = 'Katie71'
             item['network'] = 'Katie71'
             item['performers'] = ['Katie71']
             yield item
-
+            
         if "natashanice" in response.url:
             item['site'] = 'Natasha Nice'
             item['parent'] = 'Natasha Nice'
             item['network'] = 'Natasha Nice'
             item['performers'] = ['Natasha Nice']
             yield item
-
+            
         if "cospimps" in response.url:
             item['site'] = 'Cospimps'
             item['parent'] = 'Cospimps'
@@ -391,7 +390,7 @@ class networkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://cospimps.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
+            
         if "facialcasting" in response.url:
             item['site'] = 'Facial Casting'
             item['parent'] = 'Facial Casting'
@@ -411,14 +410,14 @@ class networkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = performers
         else:
             item['performers'] = []
-
+        
         if "psychohenessy" in response.url:
             item['performers'].append('Henessy')
-
+        
         if "therealscarletred" in response.url:
             item['performers'].append('Scarlet Red')
-
+        
         if "trinitystclair" in response.url:
             item['performers'].append('Trinity St Clair')
-
+        
         yield item

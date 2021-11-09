@@ -210,11 +210,6 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
         else:
             item['image'] = self.get_image(response)
 
-        if not item['image']:
-            item['image'] = None
-
-        item['image_blob'] = None
-
         if 'performers' in response.meta:
             item['performers'] = response.meta['performers']
         else:

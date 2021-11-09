@@ -57,9 +57,7 @@ class SiteLarasPlaygroundSpider(BaseSceneScraper):
                     image = image.get()
                     item['image'] = image.strip()
                 else:
-                    item['image'] = None
-
-                item['image_blob'] = None
+                    item['image'] = []
 
                 item['trailer'] = ''
                 item['site'] = "Laras Playground"

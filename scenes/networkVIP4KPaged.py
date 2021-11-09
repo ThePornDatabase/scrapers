@@ -144,7 +144,6 @@ class VIP4KPagedSpider(BaseSceneScraper):
                     image = "https:" + image.strip()
 
             item['image'] = image
-            item['image_blob'] = None
             item['site'] = tldextract.extract(response.url).domain
 
             yield item

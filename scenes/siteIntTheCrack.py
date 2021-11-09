@@ -135,11 +135,11 @@ class InTheCrackSpider(BaseSceneScraper):
             if image:
                 image = 'https://www.inthecrack.com' + image.strip()
             else:
-                image = None
+                image = ''
 
         if image:
             return self.format_link(response, image)
-        return None
+        return ''
 
     def get_image_blob(self, response):
         image = self.get_image(response)

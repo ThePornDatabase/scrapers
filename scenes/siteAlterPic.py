@@ -64,7 +64,6 @@ class SiteAlterPicSpider(BaseSceneScraper):
             item['tags'].append(string.capwords(tag['name']))
 
         item['image'] = jsonrow['poster_src']
-        item['image_blob'] = None
 
         if item['id'] and item['title']:
             yield item

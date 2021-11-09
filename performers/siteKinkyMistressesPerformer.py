@@ -28,8 +28,7 @@ class SiteKinkyMistressesPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = "https://www.kinkymistresses.com" + image
             else:
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
 
             item['url'] = "https://www.kinkymistresses.com/" + performer.xpath('./a/@href').get()
             item['network'] = 'Kinky Mistresses'

@@ -86,6 +86,5 @@ class SiteFit18PerformerSpider(BasePerformerScraper):
         item = meta['item']
         jsondata = response.json()['data']['asset']['batch']['result'][0]['serve']
         item['image'] = jsondata['uri']
-        item['image_blob'] = None
         if item['name']:
             yield item

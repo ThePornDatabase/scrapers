@@ -1,10 +1,10 @@
 import re
+import dateparser
+import scrapy
 import html
 import string
-import dateparser
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
 
 class ArchangelVideoSpider(BaseSceneScraper):
     name = 'ArchangelVideo'
@@ -22,7 +22,7 @@ class ArchangelVideoSpider(BaseSceneScraper):
         'image': '',
         'performers': '',
         'tags': '',
-        'external_id': r'.*/(.*?)\.html',
+        'external_id': '.*\/(.*?)\.html',
         'trailer': '',
         'pagination': '/tour/categories/movies/%s/latest/'
     }
@@ -47,44 +47,45 @@ class ArchangelVideoSpider(BaseSceneScraper):
                 date = dateparser.parse(date.strip()).isoformat()
                 item['date'] = date
             else:
-                item['date'] = "1970-01-01T00:00:00"
+                item['date'] = "1970-01-01T00:00:00"            
 
             performers = scene.xpath('./div[@class="item-info"]//a[contains(@href,"/models/") or contains(@href,"sets.php")]/text()').getall()
             if len(performers):
                 item['performers'] = list(map(lambda x: x.strip().title(), performers))
             else:
                 item['performers'] = []
-
+                
             image = scene.xpath('.//span[@class="left"]/a/img/@src0_1x').get()
             if image:
-                image = image.replace('//', '/').strip()
-                image = image.replace('#id#', '').strip()
+                image = image.replace('//','/').strip()
+                image = image.replace('#id#','').strip()
                 image = "https://www.archangelvideo.com" + image
                 item['image'] = image.strip()
             else:
-                item['image'] = None
-
-            item['image_blob'] = None
+                item['image'] = ''
 
             item['trailer'] = ''
-
+            
             url = scene.xpath('.//span[@class="left"]/a/@href').get()
             if url:
                 item['url'] = url.strip()
-                external_id = re.search(r'.*/(.*).html', url).group(1)
+                external_id = re.search('.*\/(.*).html', url).group(1)
                 if external_id:
                     item['id'] = external_id.strip().lower()
                 else:
                     item['id'] = ''
             else:
                 item['url'] = ''
-
+                
             item['description'] = ''
             item['tags'] = []
-
+                
             if item['title'] and item['id']:
                 scenelist.append(item.copy())
-
+            
             item.clear()
-
+        
         return scenelist
+                
+                
+            

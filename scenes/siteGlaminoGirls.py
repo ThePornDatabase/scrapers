@@ -38,14 +38,12 @@ class SiteGlaminoGirlsSpider(BaseSceneScraper):
             if title:
                 item['title'] = html.unescape(string.capwords(title.strip()))
 
-            item['image'] = None
+            item['image'] = ''
             image = scene.xpath('.//div[@class="thumbnail_wrapper"]/img/@src').get()
             if image:
                 image = re.search(r'(.*)\?', image)
                 if image:
                     item['image'] = image.group(1).strip()
-
-            item['image_blob'] = None
 
             item['performers'] = []
             performers = scene.xpath('.//span[@class="episode__artist__name"]/text()').get()

@@ -1,11 +1,10 @@
 import re
+import dateparser
+import scrapy
 import html
 import string
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
 
 class AlettaOceanLiveSpider(BaseSceneScraper):
     name = 'AlettaOceanLive'
@@ -23,7 +22,7 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
         'image': '',
         'performers': '',
         'tags': '',
-        'external_id': r'.*/(.*?)\.html',
+        'external_id': '.*\/(.*?)\.html',
         'trailer': '',
         'pagination': '/tour/categories/movies_%s_d.html'
     }
@@ -48,37 +47,40 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
                 date = dateparser.parse(date.strip()).isoformat()
                 item['date'] = date
             else:
-                item['date'] = "1970-01-01T00:00:00"
+                item['date'] = "1970-01-01T00:00:00"            
 
             item['performers'] = ['Aletta Ocean']
-
+                
             image = scene.xpath('./@style').get()
             if image:
-                image = re.search(r'url\((.*.jpg)', image).group(1)
+                image = re.search('url\((.*.jpg)', image).group(1)
                 if image:
                     item['image'] = image.strip()
             else:
                 item['image'] = ''
 
             item['trailer'] = ''
-
+            
             url = scene.xpath('./a/@href').get()
             if url:
                 item['url'] = url.strip()
-                external_id = re.search(r'.*/(.*).html', url).group(1)
+                external_id = re.search('.*\/(.*).html', url).group(1)
                 if external_id:
                     item['id'] = external_id.strip().lower()
                 else:
                     item['id'] = ''
             else:
                 item['url'] = ''
-
+                
             item['description'] = ''
             item['tags'] = []
-
+                
             if item['title'] and item['id']:
                 scenelist.append(item.copy())
-
+            
             item.clear()
-
+        
         return scenelist
+                
+                
+            

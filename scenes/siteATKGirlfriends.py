@@ -107,8 +107,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
                     item['image'] = image.strip().replace("/sm_", "/")
                     item['image_blob'] = base64.b64encode(requests.get(item['image']).content).decode('utf-8')
                 else:
-                    item['image'] = None
-                    item['image_blob'] = None
+                    item['image'] = ''
 
                 url = scene.xpath('./div/a[contains(@href,"/model/")]/@href').get()
                 if url:

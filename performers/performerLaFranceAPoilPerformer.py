@@ -45,9 +45,6 @@ class SiteLaFranceAPoilPerformerSpider(BasePerformerScraper):
             image = performer.xpath('.//img/@src').get()
             if image:
                 item['image'] = image.strip()
-            else:
-                item['image'] = None
-            item['image_blob'] = None
 
             url = performer.xpath('./@href').get()
             if url:

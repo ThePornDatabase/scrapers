@@ -218,7 +218,7 @@ class ATKKingdomSpider(BaseSceneScraper):
                     imagealt = imagealt.group(1)
                     imagealt = self.format_link(response, imagealt)
                     return imagealt.replace(" ", "%20")
-            image = None
+            image = ''
         return image
 
     def get_image_blob(self, response):
@@ -233,4 +233,4 @@ class ATKKingdomSpider(BaseSceneScraper):
                     image = imagealt.replace(" ", "%20")
         if image:
             return base64.b64encode(requests.get(image).content).decode('utf-8')
-        return None
+        return ''

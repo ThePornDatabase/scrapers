@@ -77,8 +77,7 @@ class HobyBuchanonSpider(BaseSceneScraper):
             item['performers'] = []
             item['tags'] = []
             item['trailer'] = ''
-            item['image'] = None
-            item['image_blob'] = None
+            item['image'] = ''
             item['description'] = ''
             item['network'] = "Hoby Buchanon"
             item['parent'] = "Hoby Buchanon"

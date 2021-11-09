@@ -46,11 +46,9 @@ class SiteHotWifeRioSpider(BaseSceneScraper):
                 item['date'] = dateparser.parse(scenedate.get().strip(), date_formats=['%m/%d/%Y']).isoformat()
 
             image = scene.xpath('./following-sibling::div[@class="update_image"]/img/@src')
-            item['image'] = None
+            item['image'] = ''
             if image:
                 item['image'] = "https://hotwiferio.com/new-tour/" + image.get().strip()
-
-            item['image_blob'] = None
 
             item['performers'] = ['Rio Blaze']
 

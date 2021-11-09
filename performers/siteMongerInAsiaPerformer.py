@@ -1,13 +1,15 @@
+import scrapy
+import re
 import html
 
 from tpdb.items import PerformerItem
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class SiteMongerInAsiaPerformerSpider(BasePerformerScraper):
+class siteMongerInAsiaPerformerSpider(BasePerformerScraper):
     selector_map = {
         'pagination': '/categories/models_%s_d',
-        'external_id': r'models/(.*).html'
+        'external_id': 'models\/(.*).html'
     }
 
     name = 'MongerInAsiaPerformer'
@@ -21,7 +23,7 @@ class SiteMongerInAsiaPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[@class="model"]')
         for performer in performers:
             item = PerformerItem()
-
+            
             name = performer.xpath('./div/p/text()').get()
             if name:
                 item['name'] = html.unescape(name.strip().title())
@@ -32,13 +34,12 @@ class SiteMongerInAsiaPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = image.strip()
             else:
-                item['image'] = None
-            item['image_blob'] = None
-
+                item['image'] = ''
+                
             item['url'] = response.url
-
+                
             item['network'] = 'Monger in Asia'
-
+            
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -54,6 +55,6 @@ class SiteMongerInAsiaPerformerSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''
-
-            yield item
+            item['weight'] = ''                
+            
+            yield item            

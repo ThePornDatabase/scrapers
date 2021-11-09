@@ -1,10 +1,10 @@
+import scrapy
 import html
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-
-class SiteAmericanPornstarSpider(BasePerformerScraper):
+class siteAmericanPornstarSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[@class="update_details"]/a[1]/text()',
         'image': "//div[contains(@class,'image_area')]/img[@class='img-responsive']/@src",
@@ -18,7 +18,7 @@ class SiteAmericanPornstarSpider(BasePerformerScraper):
     start_urls = [
         'http://american-pornstar.com',
     ]
-
+    
     def get_gender(self, response):
         return 'Female'
 
@@ -26,7 +26,7 @@ class SiteAmericanPornstarSpider(BasePerformerScraper):
         performers = response.xpath('//div[@class="update_details"]')
         for performer in performers:
             item = PerformerItem()
-
+            
             name = performer.xpath('./a[1]/text()').get()
             if name:
                 item['name'] = html.unescape(name.strip().title())
@@ -35,15 +35,14 @@ class SiteAmericanPornstarSpider(BasePerformerScraper):
             if image:
                 item['image'] = "http://american-pornstar.com" + image.strip()
             else:
-                item['image'] = None
-            item['image_blob'] = None
-
+                item['image'] = ''
+                
             url = performer.xpath('./a[1]/@href').get()
             if url:
                 item['url'] = url.strip()
-
+                
             item['network'] = 'American Pornstar'
-
+            
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -59,6 +58,6 @@ class SiteAmericanPornstarSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''
-
+            item['weight'] = ''                
+            
             yield item

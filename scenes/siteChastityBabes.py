@@ -77,6 +77,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
                                  meta={'name': modelname},
                                  headers=self.headers,
                                  cookies=self.cookies)
+
         return None
 
     def parse_scenes(self, response):
@@ -120,10 +121,6 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         image = response.xpath('//div[@class="postcontent"]/a[1]/img/@src').get()
         if image:
             item['image'] = image.strip()
-        else:
-            item['image'] = None
-
-        item['image_blob'] = None
 
         tags = response.xpath('//a[@rel="category tag"]/text()').getall()
         if tags:

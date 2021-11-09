@@ -80,9 +80,7 @@ class NetworkMoodUniversePagedSpider(BaseSceneScraper):
                 image = image.get()
                 item['image'] = self.format_link(response, image)
             else:
-                item['image'] = None
-
-            item['image_blob'] = None
+                item['image'] = ''
 
             item['url'] = self.format_link(response, scene.xpath('./a[1]/@href').get())
 

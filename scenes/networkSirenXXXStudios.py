@@ -1,12 +1,12 @@
+import scrapy
 import re
 import string
-import scrapy
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
-class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
+
+class networkSirenXXXStudiosSpider(BaseSceneScraper):
     name = 'SirenXXXStudios'
     network = 'Siren XXX Studios'
     parent = 'Siren XXX Studios'
@@ -20,12 +20,12 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
         'title': '//h2/text()',
         'description': '//span[contains(text(),"Description")]/following-sibling::text()',
         'date': '//meta[@property="og:image"]/@content',
-        're_date': r'content/(\d{8})',
+        're_date': 'content\/(\d{8})',
         'date_formats': ['%Y%m%d', '%m/%d/%Y'],
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//li[contains(text(),"Starring")]/a/text()',
         'tags': '//li[contains(text(),"Tags")]/a/text()',
-        'external_id': r'.*/(.*).html',
+        'external_id': '.*\/(.*).html',
         'trailer': '//script[contains(text(),"preview")]',
         're_trailer': 'src=\"(.*.mp4)',
         'pagination': '/tour/categories/movies_%s_d.html'
@@ -37,7 +37,7 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
         for scene in scenes:
             date = scene.xpath('.//comment()[contains(.,"Release")]').get()
             if date:
-                date = re.search(r'(\d{2}/\d{2}/\d{4})', date).group(1)
+                date = re.search('(\d{2}\/\d{2}\/\d{4})', date).group(1)
             scenelink = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scenelink) and "signup.php" not in scenelink:
                 yield scrapy.Request(url=self.format_link(response, scenelink), callback=self.parse_scene, meta={'date': date})
@@ -50,11 +50,11 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                 else:
                     item['title'] = ''
 
-                extern_id = item['title'].replace(" ", "-").replace("_", "-").strip().lower()
+                extern_id = item['title'].replace(" ","-").replace("_","-").strip().lower()
                 extern_id = re.sub('[^a-zA-Z0-9-]', '', extern_id)
                 if extern_id:
                     item['id'] = extern_id.strip()
-
+                
                 image = scene.xpath('.//img/@src0_4x').get()
                 if not image:
                     image = scene.xpath('.//img/@src0_3x').get()
@@ -62,28 +62,29 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                     image = scene.xpath('.//img/@src0_2x').get()
                 if not image:
                     image = scene.xpath('.//img/@src0_1x').get()
-
+                    
                 if image:
                     item['image'] = image.strip()
                 else:
                     item['image'] = ''
-
+                
                 performers = scene.xpath('./p/a/text()').getall()
                 if performers:
                     item['performers'] = list(map(lambda x: x.strip(), performers))
                 else:
                     item['performers'] = []
-
+                
                 item['tags'] = []
                 item['trailer'] = ''
                 item['url'] = scenelink
-
+                    
                 item['network'] = "Siren XXX Studios"
                 item['parent'] = "Siren XXX Studios"
                 item['site'] = self.get_site(response)
                 item['description'] = ''
-
+                
                 yield item
+                
 
     def get_site(self, response):
         if "realnaughtynymphos" in response.url:
@@ -92,6 +93,7 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
             return "My First Time Sluts"
         return ''
 
+
     def get_id(self, response):
         if 'external_id' in self.regex and self.regex['external_id']:
             search = self.regex['external_id'].search(response.url.lower())
@@ -99,6 +101,7 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                 return search.group(1)
 
         return None
+        
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
@@ -107,7 +110,7 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                 trailer = re.search('src=\"(.*.mp4)', trailer)
                 if trailer:
                     trailer = trailer.group(1)
-                    trailer = trailer.replace(" ", "%20")
+                    trailer = trailer.replace(" ","%20")
                     if trailer[0] == "/":
                         if "realnaughtynymphos" in response.url:
                             return "https://realnaughtynymphos.com" + trailer.strip()
@@ -115,4 +118,4 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                             return "https://myfirsttimesluts.com" + trailer.strip()
                     else:
                         return trailer.strip()
-        return ''
+        return ''    

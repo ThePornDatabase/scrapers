@@ -424,8 +424,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             else:
                 item['image'] = self.get_image(response)
 
-            item['image_blob'] = None
-
             if 'performers' in response.meta:
                 item['performers'] = response.meta['performers']
             elif 'actor' in jsonlde:

@@ -1,9 +1,10 @@
+import scrapy
 import html
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
 
-class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
+class networkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
     selector_map = {
         'pagination': '/tour3/models/models_%s.html',
         'external_id': 'girls/(.+)/?$'
@@ -23,7 +24,7 @@ class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[contains(@class,"text-center pad_bottom_15")]')
         for performer in performers:
             item = PerformerItem()
-
+            
             name = performer.xpath('./h3/text()').get()
             if name:
                 item['name'] = html.unescape(name.strip().title())
@@ -32,15 +33,14 @@ class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = image.strip()
             else:
-                item['image'] = None
-            item['image_blob'] = None
-
+                item['image'] = ''
+                
             url = performer.xpath('./a/@href').get()
             if url:
                 item['url'] = "https://www.trans500.com" + url.strip()
-
+                
             item['network'] = 'Josh Stone Productions'
-
+            
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -56,6 +56,6 @@ class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
             item['nationality'] = ''
             item['piercings'] = ''
             item['tattoos'] = ''
-            item['weight'] = ''
-
+            item['weight'] = ''                
+            
             yield item

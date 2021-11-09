@@ -1,13 +1,13 @@
-import re
-from urllib.parse import urlparse
-import dateparser
 import scrapy
+import re
+import dateparser
+from urllib.parse import urlparse
 
 from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class NetworkPureCFNMSpider(BaseSceneScraper):
+class networkPureCFNMSpider(BaseSceneScraper):
     name = 'PureCFNM'
     network = 'Pure CFNM'
     parent = 'Pure CFNM'
@@ -28,16 +28,18 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
         'image': '',
         'performers': '',
         'tags': '',
-        'external_id': r'view/(\d+)/',
+        'external_id': 'view\/(\d+)\/',
         'trailer': '',
         'pagination': '/videos?order=publish_date&sort=desc&page=%s'
     }
+
+
 
     def start_requests(self):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination': link[1], 'site': link[2], 'url': link[0]},
+                                 meta={'page': self.page, 'pagination':link[1], 'site':link[2], 'url':link[0]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -61,32 +63,33 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
                                          headers=self.headers,
                                          cookies=self.cookies)
 
+
     def get_next_page_url(self, base, page, pagination):
         return self.format_url(base, pagination % page)
-
+        
     def get_scenes(self, response):
         meta = response.meta
-
+        
         scenes = response.xpath('//div[@class="update_details"]')
         for scene in scenes:
             item = SceneItem()
-
+            
             title = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/text()').get()
             if title:
                 item['title'] = title.strip()
-
+            
             date = scene.xpath('.//div[contains(@class,"update_date")]/comment()/following-sibling::text()').get()
             if date:
                 item['date'] = dateparser.parse(date.strip()).isoformat()
             else:
                 item['date'] = dateparser.parse('today').isoformat()
-
+            
             performers = scene.xpath('.//span[@class="update_models"]/a/text()').getall()
             if performers:
                 item['performers'] = list(map(lambda x: x.strip().title(), performers))
             else:
                 item['performers'] = []
-
+            
             image = scene.xpath('./a/img/@data-src0_3x').get()
             if not image:
                 image = scene.xpath('./a/img/@data-src0_2x').get()
@@ -99,13 +102,11 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
                 base = uri.scheme + "://" + uri.netloc
                 item['image'] = base + image.strip()
             else:
-                item['image'] = None
-
-            item['image_blob'] = None
-
+                item['image'] = ''
+            
             trailer = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a[contains(@onclick,"/trailer/")]/@onclick').get()
             if trailer:
-                trailer = re.search(r'tload\(\'(.*.mp4)\'', trailer)
+                trailer = re.search('tload\(\'(.*.mp4)\'', trailer)
                 if trailer:
                     trailer = trailer.group(1)
                     uri = urlparse(response.url)
@@ -113,7 +114,7 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
                     item['trailer'] = base + trailer.strip()
             else:
                 item['trailer'] = ''
-
+                
             item['id'] = scene.xpath('./@data-setid').get()
             item['url'] = response.url
             item['description'] = ''
@@ -121,6 +122,8 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
             item['site'] = meta['site']
             item['parent'] = meta['site']
             item['network'] = "Pure CFNM"
-
+            
             if item['id'] and item['title']:
                 yield item
+            
+                

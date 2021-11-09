@@ -205,8 +205,6 @@ class AdultTimeAPISpider(BaseSceneScraper):
                                     scene['pictures'][size]
                     break
 
-            item['image_blob'] = None
-
             item['trailer'] = ''
             for size in self.trailer_sizes:
                 if size in scene['trailers']:

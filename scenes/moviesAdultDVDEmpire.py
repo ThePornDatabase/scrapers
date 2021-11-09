@@ -48,8 +48,8 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             return "Movie: " + site.strip()
         else:
             return ""
-
-
+            
+            
     def get_description(self, response):
 
         description = response.xpath('//h4[contains(@class,"synopsis")]/p/text()|//h4[contains(@class,"synopsis")]/following-sibling::p/text()').get()
@@ -78,10 +78,10 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
                 date = date + "-01-01"
             if not date:
                 return datetime.now().isoformat()
-
+                
         return dateparser.parse(date.strip()).isoformat()
-
-
+        
+        
     def parse_scene(self, response):
         item = SceneItem()
 
@@ -109,8 +109,6 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             item['image'] = response.meta['image']
         else:
             item['image'] = self.get_image(response)
-
-        item['image_blob'] = None
 
         if 'performers' in response.meta:
             item['performers'] = response.meta['performers']
@@ -174,4 +172,4 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             if self.debug:
                 print(item)
             else:
-                yield item
+                yield item        

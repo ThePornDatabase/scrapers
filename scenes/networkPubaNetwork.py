@@ -1,20 +1,19 @@
+import scrapy
 import re
 import json
+import dateparser
 import string
 import html
-import dateparser
-import scrapy
 
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-
-class NetworkPubaNetworkSpider(BaseSceneScraper):
+class networkPubaNetworkSpider(BaseSceneScraper):
     name = 'PubaNetwork'
     network = 'Puba Network'
 
-    url = 'https://www.puba.com/'
+    url = 'https://www.puba.com/',
 
     sites = [
         ['1 Girl 1 Camera', '3'],
@@ -90,15 +89,17 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         ['Vyxen Steel', '98'],
     ]
 
+
     def start_requests(self):
         for site in self.sites:
-
+            
             yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, site[1]),
                                  callback=self.parse,
                                  meta={'page': self.page, 'site': site[0], 'group': site[1]},
                                  headers=self.headers,
                                  cookies=self.cookies)
-
+                                 
+                                 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
         count = 0
@@ -118,17 +119,18 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def get_next_page_url(self, base, page, group):
-        page = str((int(page) - 1) * 12)
-        url = "https://www.puba.com/pornstarnetwork/index.php?section=538&group={}&searching=Search&start={}&count=12&format=json&resource=video".format(group, page)
+        page = str((int(page)-1)*12)
+        url = "https://www.puba.com/pornstarnetwork/index.php?section=538&group={}&searching=Search&start={}&count=12&format=json&resource=video".format(group,page)
         return url
+
 
     selector_map = {
         'image': '//div[@class="tour-video-title"]/following-sibling::a/img/@style',
-        're_image': r'\((.*\.jpg)\)',
+        're_image': '\((.*\.jpg)\)',
         'tags': '//a[contains(@class,"btn-outline-secondary")]/text()',
         'performers': '//a[contains(@class,"btn-secondary")]/text()',
         'external_id': '',
-        'pagination': ''
+        'pagination': ''        
     }
 
     def get_scenes(self, response):
@@ -144,10 +146,12 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
             meta['network'] = "Puba Network"
             meta['trailer'] = ''
             if meta['url'] and meta['id']:
-                yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta)
+                yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta)      
+
 
     def get_date(self, response):
         return dateparser.parse('today').isoformat()
+
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image'))
@@ -157,6 +161,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
                 image = "https://www.puba.com/pornstarnetwork/" + image.strip()
                 return image.replace(" ", "%20")
         return None
+
 
     def parse_scene(self, response):
         meta = response.meta
@@ -173,10 +178,9 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         item['network'] = meta['network']
         item['date'] = dateparser.parse('today').isoformat()
         item['trailer'] = ''
-        item['url'] = re.search(r'(.*)\&nats', meta['url']).group(1)
-
+        item['url'] = re.search('(.*)\&nats',meta['url']).group(1)
+        
         item['image'] = self.get_image(response)
-        item['image_blob'] = None
         item['tags'] = self.get_tags(response)
 
         if self.debug:

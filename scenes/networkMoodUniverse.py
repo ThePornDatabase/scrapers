@@ -92,9 +92,7 @@ class NetworkMoodUniverseSpider(BaseSceneScraper):
                 image = re.sub(r'\?.*', '', image)
                 item['image'] = self.format_link(response, image)
             else:
-                item['image'] = None
-
-            item['image_blob'] = None
+                item['image'] = ''
 
             item['url'] = response.url
 

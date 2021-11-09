@@ -25,9 +25,6 @@ class SiteVividPornstarSpider(BasePerformerScraper):
 
             item['name'] = performer['stagename']
             item['image'] = performer['placard']
-            if not item['image']:
-                item['image'] = None
-            item['image_blob'] = None
             item['gender'] = performer['gender']
             item['url'] = self.format_link(response, performer['url'])
             item['network'] = 'Vivid'

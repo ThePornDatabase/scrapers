@@ -49,8 +49,7 @@ class SiteFightingDollsPerformerSpider(BasePerformerScraper):
                 if "trib-dolls" in response.url:
                     item['image'] = "https://www.trib-dolls.com" + image.strip()
             else:
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
 
             url = performer.xpath('./div[@class="photo"]/a/@href').get()
             if url:

@@ -38,8 +38,7 @@ class BJRawSpider(BaseSceneScraper):
             item['description'] = re.sub('<[^<]+?>', '', item['description']).strip()
             item['image'] = jsonentry['trailer']['poster']
             if not isinstance(item['image'], str):
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
             item['id'] = jsonentry['id']
             item['trailer'] = jsonentry['trailer']['src']
             if item['trailer'] == "https://c2d8j4g8.ssl.hwcdn.net/6/0/2/5/8/60258852ed44c/bjr0005_rachaelcavalli _trailer.mp4":  # For some reason shows this scene trailer as invalid

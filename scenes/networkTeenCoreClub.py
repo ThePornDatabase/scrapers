@@ -160,8 +160,7 @@ class TeenCoreClubSpider(BaseSceneScraper):
             if isinstance(item['image'], str):
                 item['image'] = "https:" + item['image']
             else:
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             item['url'] = domain + "video/" + str(jsonentry['id']) + "/" + jsonentry['slug']

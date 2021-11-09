@@ -32,8 +32,7 @@ class SiteDigitalDesireSpider(BasePerformerScraper):
             if image:
                 item['image'] = "https:" + image.replace(" ", "%20")
             else:
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
 
             url = performer.xpath('./a[contains(@href, "/models/")][1]/@href').get()
             if url:

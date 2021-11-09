@@ -53,7 +53,7 @@ class SiteThisIsGlamourSpider(BaseSceneScraper):
                 item['title'] = string.capwords(title.get().replace("...", ""))
 
             image = scene.xpath('./div/a/img/@src')
-            item['image'] = None
+            item['image'] = ''
             if image:
                 image = image.get().strip().replace("https://", "http://")
                 item['image'] = image
@@ -74,8 +74,6 @@ class SiteThisIsGlamourSpider(BaseSceneScraper):
 
             if item['image']:
                 item['id'] = re.search(r'galid\/(\d+)\/', item['image']).group(1)
-
-            item['image_blob'] = None
 
             item['url'] = response.url
 

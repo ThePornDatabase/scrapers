@@ -257,9 +257,6 @@ class ProjectOneServiceSpider(BaseSceneScraper):
                 item['site'] = 'digitalplayground'
 
             item['image'] = self.get_image(scene)
-
-            item['image_blob'] = None
-
             item['trailer'] = self.get_trailer(scene)
             if not item['trailer']:
                 item['trailer'] = ''

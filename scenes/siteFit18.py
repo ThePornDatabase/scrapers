@@ -81,6 +81,5 @@ class SiteFit18Spider(BaseSceneScraper):
         item = meta['item']
         jsondata = response.json()['data']['asset']['batch']['result'][0]['serve']
         item['image'] = jsondata['uri']
-        item['image_blob'] = None
         if item['id'] and item['title']:
             yield item

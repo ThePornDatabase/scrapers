@@ -47,8 +47,7 @@ class NetworkARXBucksPerformerSpider(BasePerformerScraper):
                 item['gender'] = "Trans"
             # ~ item['image'] = jsonrow['node']['thumbnailUrl']
             # ~ if "https" not in item['image']:
-            item['image'] = None
-            item['image_blob'] = None
+            item['image'] = ''
             item['birthday'] = jsonrow['node']['dob']
             if not item['birthday']:
                 item['birthday'] = ''

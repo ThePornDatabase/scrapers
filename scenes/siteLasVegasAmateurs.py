@@ -59,9 +59,7 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
                     image = image.get()
                     item['image'] = "http://lasvegasamateurs.com/tour/" + image.strip()
                 else:
-                    item['image'] = None
-
-                item['image_blob'] = None
+                    item['image'] = []
 
                 item['tags'] = []
                 trailer = scene.xpath('./div/a/@onclick')

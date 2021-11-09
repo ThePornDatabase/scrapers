@@ -164,10 +164,9 @@ class FetishNetworkPagedSpider(BaseSceneScraper):
                 baseurl = re.search(r'(.*\/t2\/)', response.url).group(1)
                 image = baseurl + image.strip()
             else:
-                image = None
+                image = ''
 
             item['image'] = image
-            item['image_blob'] = None
 
             idcode = ''
             if re.search(r'p\d{3,4}_s\d{3,4}_\d{3,4}_', item['image']):

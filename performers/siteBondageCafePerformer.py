@@ -34,8 +34,7 @@ class SiteBondageCafeSpider(BasePerformerScraper):
             if image:
                 item['image'] = "http://www.bondagecafe.com" + image.strip()
             else:
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
 
             url = performer.xpath('./p/a/@href').get()
             if url:

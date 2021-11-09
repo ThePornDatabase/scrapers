@@ -33,8 +33,7 @@ class SiteBigBootyTGirlsPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = "https://www.bigbootytgirls.com/" + image.strip()
             else:
-                item['image'] = None
-            item['image_blob'] = None
+                item['image'] = ''
 
             url = performer.xpath('./a/@href').get()
             if url:

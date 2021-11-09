@@ -1,16 +1,16 @@
+import scrapy
 import re
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
-
-class SiteXConfessionsPerformerSpider(BasePerformerScraper):
+class siteXConfessionsPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h3[contains(text(),"About")]/text()',
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
         'bio': '//div[@class="profile-about"]/p/text()',
         'pagination': '/performers?page=%s',
-        'external_id': r'models/(.*).html'
+        'external_id': 'models\/(.*).html'
     }
 
     name = 'XConfessionsPerformer'
@@ -25,31 +25,30 @@ class SiteXConfessionsPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[contains(@class,"overflow-hidden") and ./a[contains(@href,"/performers/")]]')
         for performer in performers:
             item = PerformerItem()
-
+            
             name = performer.xpath('.//a/p/text()').get()
             if name:
                 item['name'] = name.strip()
             else:
                 item['name'] = ''
-
+                
             image = performer.xpath('.//source/@data-srcset').get()
             if image:
-                image = re.search(r'(.*)\?', image).group(1)
+                image = re.search('(.*)\?', image).group(1)
                 if image:
                     item['image'] = image.strip()
-
+                
             if not image:
-                item['image'] = None
-            item['image_blob'] = None
-
+                item['image'] = ''
+                
             url = performer.xpath('./div/a/@href').get()
             if url:
                 item['url'] = "https://xconfessions.com/" + url.strip()
             else:
                 item['url'] = ''
-
+                
             item['network'] = 'XConfessions'
-
+            
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
