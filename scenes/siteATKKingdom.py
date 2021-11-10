@@ -48,8 +48,12 @@ class ATKKingdomSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
+        page = self.page
         for link in self.start_urls:
-            url = link + "/tour/movies"
+            if page > 1:
+                url = link + "/tour/movies/" + str(page)
+            else:
+                url = link + "/tour/movies"
             headers = self.headers
             headers['Content-Type'] = 'application/json'
             my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
@@ -75,13 +79,13 @@ class ATKKingdomSpider(BaseSceneScraper):
         if count:
             if page and page < self.limit_pages and page < 15:
                 page = page + 1
-                print('NEXT PAGE: ' + str(page))
                 headers = self.headers
                 headers['Content-Type'] = 'application/json'
                 url = jsondata['solution']['url']
-                if page > 2:
+                if page > 1:
                     url = re.search(r'/(.*/)', url).group(1)
                 url = self.get_next_page_url(url, page)
+                print(f'Next Page URL: {url}')
                 page = str(page)
                 my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': page}]}
                 yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
@@ -154,7 +158,9 @@ class ATKKingdomSpider(BaseSceneScraper):
         return []
 
     def get_next_page_url(self, base, page):
-        url = self.format_url(base, self.get_selector_map('pagination') % page)
+        if base[0:1] == "/":
+            base = "https:/" + base
+        url = base + str(page)
         return url
 
     def parse_scene(self, response):
@@ -177,7 +183,7 @@ class ATKKingdomSpider(BaseSceneScraper):
         if performer:
             item['performers'] = [performer]
         else:
-            item['performer'] = []
+            item['performers'] = []
 
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
