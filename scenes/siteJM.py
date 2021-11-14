@@ -7,7 +7,6 @@
 import re
 import json
 import base64
-import warnings
 import requests
 import scrapy
 from scrapy.http import HtmlResponse
@@ -15,12 +14,6 @@ from scrapy.utils.project import get_project_settings
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
