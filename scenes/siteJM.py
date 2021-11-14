@@ -1,5 +1,8 @@
 #  Requires Splash for Image download (https://github.com/scrapinghub/splash)
 #  Requires Flaresolverr for base page retrieval (https://github.com/FlareSolverr/FlareSolverr)
+#  Please enter fields into settings.py with full command such as:
+#  FLARE_ADDRESS = 'http://192.168.1.151:8191/v1'
+#  SPLASH_ADDRESS = 'http://192.168.1.151:8050/run'
 
 import re
 import json
@@ -8,6 +11,7 @@ import warnings
 import requests
 import scrapy
 from scrapy.http import HtmlResponse
+from scrapy.utils.project import get_project_settings
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -26,8 +30,9 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
 
     cfcookies = {}
 
-    flare_address = 'http://192.168.1.151:8191/v1'
-    splash_address = 'http://192.168.1.151:8050/run'
+    settings = get_project_settings()
+    flare_address = settings.get('FLARE_ADDRESS')
+    splash_address = settings.get('SPLASH_ADDRESS')
 
     custom_settings = {
         'CONCURRENT_REQUESTS': 1
