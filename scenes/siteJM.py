@@ -69,7 +69,9 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
 
         headers = self.headers
         headers['Content-Type'] = 'application/json'
-        my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
+        setup = json.dumps({'cmd': 'sessions.create', 'session': 'jacquie'})
+        requests.post(self.flare_address, data=setup, headers=headers)
+        my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'jacquie', 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
         yield scrapy.Request(self.flare_address, method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
@@ -102,7 +104,7 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
                 url = self.get_next_page_url(url, page)
                 print(f'Next Page URL: {url}')
                 page = str(page)
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': page}]}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'jacquie', 'cookies': [{'name': 'mypage', 'value': page}]}
                 yield scrapy.Request(self.flare_address, method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def get_scenes(self, indexdata):
@@ -112,7 +114,7 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="row video-list"]//div[contains(@class,"video-item")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': "https://www.jacquieetmicheltv.net" + scene}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'session': 'jacquie', 'url': "https://www.jacquieetmicheltv.net" + scene}
                 yield scrapy.Request(self.flare_address, method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def get_tags(self, response):
@@ -166,3 +168,9 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
             rsp = requests.post(self.splash_address, json={'lua_source': script, 'url': image})
             return base64.b64encode(rsp.content).decode('utf-8')
         return None
+
+    def closed(self, response):
+        headers = self.headers
+        headers['Content-Type'] = 'application/json'
+        setup = json.dumps({'cmd': 'sessions.destroy', 'session': 'jacquie'})
+        requests.post(self.flare_address, data=setup, headers=headers)
