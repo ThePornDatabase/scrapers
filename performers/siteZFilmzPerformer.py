@@ -8,7 +8,7 @@ class SiteZFilmzPerformerSpider(BasePerformerScraper):
         'image': '',
         'haircolor': '//dt[contains(text(), "Hair")]/following-sibling::dd[1]/text()',
         'eyecolor': '//dt[contains(text(), "Eye")]/following-sibling::dd[1]/text()',
-        'pagination': '',
+        'pagination': '/en/collections/page/%s?media=video',
         'external_id': r'models/(.*).html'
     }
 
