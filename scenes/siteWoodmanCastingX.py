@@ -1,16 +1,8 @@
 import re
-import warnings
-import dateparser
 import tldextract
 
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class WoodmanCastingXScraper(BaseSceneScraper):
@@ -90,16 +82,16 @@ class WoodmanCastingXScraper(BaseSceneScraper):
             if desc.strip():
                 description = description + desc.strip() + '\n'
 
-        return description.strip()
+        return self.cleanup_description(description)
 
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if re.search(r'\d{4}-\d{2}-\d{2}', date):
             date = re.search(r'(\d{4}-\d{2}-\d{2})', date).group(1)
         else:
-            date = dateparser.parse('today')
+            date = self.parse_date('today')
 
-        return dateparser.parse(date.strip()).isoformat()
+        return self.parse_date(date.strip()).isoformat()
 
     def get_performers(self, response):
         performers = self.process_xpath(
@@ -120,7 +112,7 @@ class WoodmanCastingXScraper(BaseSceneScraper):
         title = self.process_xpath(
             response, self.get_selector_map('title')).get()
         if title:
-            return title.strip().title()
+            return self.cleanup_title(title)
         return ''
 
     def get_site(self, response):

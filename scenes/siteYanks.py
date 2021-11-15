@@ -1,18 +1,9 @@
 import re
-import warnings
 import string
-import html
 from datetime import date
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteYanksSpider(BaseSceneScraper):
@@ -44,7 +35,7 @@ class SiteYanksSpider(BaseSceneScraper):
                 item = SceneItem()
                 title = scene.xpath('.//h3/a/text()').get()
                 if title:
-                    item['title'] = html.unescape(string.capwords(title))
+                    item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
 
@@ -61,7 +52,7 @@ class SiteYanksSpider(BaseSceneScraper):
                     item['performers'] = []
 
                 date_xpath = scene.xpath('.//p[contains(text(),"Featuring")]//text()')
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
                 if date_xpath:
                     today = date.today()
                     lastyear = today.year - 1
@@ -75,7 +66,7 @@ class SiteYanksSpider(BaseSceneScraper):
                             datepart = datepart + "/" + str(lastyear)
                         else:
                             datepart = datepart + "/" + today.strftime('%y')
-                        date_result = dateparser.parse(datepart, date_formats=['%m/%d/%Y']).isoformat()
+                        date_result = self.parse_date(datepart, date_formats=['%m/%d/%Y']).isoformat()
                         item['date'] = date_result
 
                 image = scene.xpath('.//div[@class="videoimg"]/a/img/@src')

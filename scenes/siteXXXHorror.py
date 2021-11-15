@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -57,8 +56,7 @@ class XXXHorrorSpider(BaseSceneScraper):
 
             title = scene.xpath('./header/h2/a/text()').get()
             if title:
-                title = title.strip()
-                item['title'] = title
+                item['title'] = self.cleanup_title(title)
 
             url = scene.xpath('./header/h2/a/@href').get()
             if url:
@@ -72,7 +70,7 @@ class XXXHorrorSpider(BaseSceneScraper):
                 date = date.strip()
             else:
                 date = "1970-01-01"
-                date = dateparser.parse(date).isoformat()
+                date = self.parse_date(date).isoformat()
 
             item['date'] = date
 
@@ -82,7 +80,7 @@ class XXXHorrorSpider(BaseSceneScraper):
             if description:
                 description = list(map(lambda x: x.strip(), description))
                 description = " ".join(description)
-                item['description'] = description
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 

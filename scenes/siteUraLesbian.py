@@ -1,7 +1,4 @@
 import re
-import string
-import html
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -47,13 +44,13 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
                     title = scene.xpath('./div[@class="content-info"]/a/div/text()').get()
                     if title:
-                        item['title'] = html.unescape(string.capwords(title))
+                        item['title'] = self.cleanup_title(title)
                     else:
                         item['title'] = ''
 
                     description = scene.xpath('./div[@class="content-info"]/a/div/text()').get()
                     if description:
-                        item['description'] = html.unescape(description)
+                        item['description'] = self.cleanup_description(description)
                     else:
                         item['description'] = ''
 
@@ -71,9 +68,9 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
                     date = scene.xpath('.//div[contains(@class,"content-date")]/div[1][not(contains(text(),"photo")) and not(contains(text(),"video"))]/text()').get()
                     if date:
-                        item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+                        item['date'] = self.parse_date(date, date_formats=['%m/%d/%Y']).isoformat()
                     else:
-                        item['date'] = []
+                        item['date'] = self.parse_date('today').isoformat()
 
                     image = scene.xpath('./div[contains(@class,"content-img")]/@style').get()
                     if image:
