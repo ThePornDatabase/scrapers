@@ -48,8 +48,12 @@ class ATKKingdomSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
+        page = self.page
         for link in self.start_urls:
-            url = link + "/tour/movies"
+            if page > 1:
+                url = link + "/tour/movies/" + str(page)
+            else:
+                url = link + "/tour/movies"
             headers = self.headers
             headers['Content-Type'] = 'application/json'
             my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page)}]}
@@ -75,13 +79,13 @@ class ATKKingdomSpider(BaseSceneScraper):
         if count:
             if page and page < self.limit_pages and page < 15:
                 page = page + 1
-                print('NEXT PAGE: ' + str(page))
                 headers = self.headers
                 headers['Content-Type'] = 'application/json'
                 url = jsondata['solution']['url']
-                if page > 2:
+                if page > 1:
                     url = re.search(r'/(.*/)', url).group(1)
                 url = self.get_next_page_url(url, page)
+                print(f'Next Page URL: {url}')
                 page = str(page)
                 my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': page}]}
                 yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
@@ -136,6 +140,53 @@ class ATKKingdomSpider(BaseSceneScraper):
                 my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'cookies': [{'name': 'mydate', 'value': date}, {'name': 'performer', 'value': performer}]}
                 if "?w=" not in link:
                     yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
+                else:
+                    item = SceneItem()
+                    item['network'] = "ATK Girlfriends"
+                    if "atkarchives" in response_url:
+                        item['parent'] = "ATK Archives"
+                        item['site'] = "ATK Archives"
+                    if "atkexotics" in response_url:
+                        item['parent'] = "ATK Exotics"
+                        item['site'] = "ATK Exotics"
+                    if "atkpremium" in response_url:
+                        item['parent'] = "ATK Premium"
+                        item['site'] = "ATK Premium"
+                    if "atkpetites" in response_url:
+                        item['parent'] = "ATK Petites"
+                        item['site'] = "ATK Petites"
+                    if "atkhairy" in response_url:
+                        item['parent'] = "ATK Hairy"
+                        item['site'] = "ATK Hairy"
+                    if "amkingdom" in response_url:
+                        item['parent'] = "ATK Galleria"
+                        item['site'] = "ATK Galleria"
+                    title = scene.xpath('.//img/@alt')
+                    if title:
+                        item['title'] = title.get().strip()
+                    else:
+                        item['title'] = ''
+                    item['date'] = date
+                    item['url'] = response_url
+                    image = scene.xpath('.//img/@src')
+                    if image:
+                        item['image'] = image.get().strip()
+                    else:
+                        item['image'] = ''
+                    if item['image']:
+                        item['image_blob'] = base64.b64encode(requests.get(item['image']).content).decode('utf-8')
+                    performer = scene.xpath('./div[@class="video-name"]/a/text()')
+                    if performer:
+                        item['performers'] = [performer.get().strip()]
+                    else:
+                        item['performers'] = []
+                    item['description'] = None
+                    item['trailer'] = None
+                    item['tags'] = []
+                    if item['image']:
+                        item['id'] = re.search(r'.*/(\d{4,8})/.*', item['image']).group(1)
+
+                    yield item
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -154,7 +205,9 @@ class ATKKingdomSpider(BaseSceneScraper):
         return []
 
     def get_next_page_url(self, base, page):
-        url = self.format_url(base, self.get_selector_map('pagination') % page)
+        if base[0:1] == "/":
+            base = "https:/" + base
+        url = base + str(page)
         return url
 
     def parse_scene(self, response):
@@ -177,7 +230,7 @@ class ATKKingdomSpider(BaseSceneScraper):
         if performer:
             item['performers'] = [performer]
         else:
-            item['performer'] = []
+            item['performers'] = []
 
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
