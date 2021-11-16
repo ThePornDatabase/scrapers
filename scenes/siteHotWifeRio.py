@@ -1,7 +1,5 @@
 import re
 import string
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -33,17 +31,17 @@ class SiteHotWifeRioSpider(BaseSceneScraper):
             title = scene.xpath('./div/span[@class="update_title"]/text()')
             item['title'] = ''
             if title:
-                item['title'] = string.capwords(title.get().strip())
+                item['title'] = self.cleanup_title(title.get())
 
             description = scene.xpath('.//span[@class="update_description"]/text()')
             item['description'] = ''
             if description:
-                item['description'] = description.get().strip()
+                item['description'] = self.cleanup_description(description.get())
 
             scenedate = scene.xpath('.//span[@class="update_date"]/text()')
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             if scenedate:
-                item['date'] = dateparser.parse(scenedate.get().strip(), date_formats=['%m/%d/%Y']).isoformat()
+                item['date'] = self.parse_date(scenedate.get().strip(), date_formats=['%m/%d/%Y']).isoformat()
 
             image = scene.xpath('./following-sibling::div[@class="update_image"]/img/@src')
             item['image'] = None

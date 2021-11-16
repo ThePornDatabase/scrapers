@@ -1,6 +1,4 @@
 import re
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -35,7 +33,7 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
             if title:
                 title = re.search(r'fft_(.*)\.', title)
                 if title:
-                    item['title'] = title.group(1).strip().title()
+                    item['title'] = self.cleanup_title(title.group(1))
                     item['id'] = title.group(1).strip()
 
             item['performers'] = []
@@ -53,17 +51,17 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
                 date = re.search(r'(\d{2}/\d{2}/\d{4})', date)
                 if date:
                     date = date.group(1)
-                    item['date'] = dateparser.parse(date.strip()).isoformat()
+                    item['date'] = self.parse_date(date.strip()).isoformat()
 
             if not item['date']:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             description = scene.xpath('.//div[@align="justify"]/font/text()').getall()
             if description:
                 description = " ".join(description)
                 description = description.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
                 description = re.sub(r'\s{3,100}', ' ', description)
-                item['description'] = description.strip()
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -74,6 +72,7 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
                 item['image'] = "https://jesseloadsmonsterfacials.com/visitors/" + image.strip()
             else:
                 item['image'] = ''
+            item['image_blob'] = ''
 
             trailer = scene.xpath('.//a[contains(@href,"trailer")]/@href').get()
             if trailer:

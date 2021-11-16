@@ -1,6 +1,4 @@
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -30,7 +28,7 @@ class JoyMiiSpider(BaseSceneScraper):
             "//div[contains(@class, 'box-results')]//div[contains(@class, 'set')]")
         for scene in scenes:
             meta = {
-                'date': dateparser.parse(scene.css('.release_date::text').get()).isoformat()
+                'date': self.parse_date(scene.css('.release_date::text').get()).isoformat()
             }
 
             link = self.format_link(response, scene.css('a::attr(href)').get())

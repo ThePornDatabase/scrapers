@@ -1,11 +1,8 @@
-import dateparser
 import scrapy
-import re
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteJapanHDVSpider(BaseSceneScraper):
+class SiteJapanHDVSpider(BaseSceneScraper):
     name = 'JapanHDV'
     network = 'AV Revenue'
     parent = 'JapanHDV'
@@ -22,7 +19,7 @@ class siteJapanHDVSpider(BaseSceneScraper):
         'date': '',
         'image': '//div[@class="thumb"]//video/@poster',
         'tags': '//p/strong[contains(text(),"Categories:")]/following-sibling::a/text()',
-        'external_id': '.com\/(.*)\/',
+        'external_id': r'.com/(.*)/',
         'trailer': '',
         'pagination': '/japan-porn/page/%s/'
     }
@@ -32,19 +29,16 @@ class siteJapanHDVSpider(BaseSceneScraper):
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': 'JapanHDV'})
 
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
-
     def get_tags(self, response):
         if self.get_selector_map('tags'):
             tags = self.process_xpath(response, self.get_selector_map('tags'))
             if tags:
                 tags = list(map(lambda x: x.strip().title(), tags.getall()))
-            
+
             series = response.xpath('//p/strong[contains(text(),"Series:")]/following-sibling::a/text()').get()
             if series:
                 tags.append("JHDV Series: " + series.strip().title())
-                
+
             if tags:
                 return tags
 

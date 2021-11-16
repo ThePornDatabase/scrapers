@@ -1,7 +1,5 @@
 import re
 import scrapy
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -34,9 +32,11 @@ class SiteGirlsRimmingSpider(BaseSceneScraper):
             meta['parent'] = "Girls Rimming"
             meta['network'] = "Girls Rimming"
 
-            title = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/text()').get()
+            title = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/text()')
             if title:
-                meta['title'] = title.strip()
+                meta['title'] = self.cleanup_title(title.get())
+            else:
+                meta['title'] = ''
 
             performers = scene.xpath('./span[@class="update_models"]/a/text()').getall()
             if performers:
@@ -57,10 +57,10 @@ class SiteGirlsRimmingSpider(BaseSceneScraper):
 
             date = scene.xpath('.//div[@class="cell update_date"]/comment()/following-sibling::text()').get()
             if date:
-                meta['date'] = dateparser.parse(date.strip()).isoformat()
+                meta['date'] = self.parse_date(date.strip()).isoformat()
 
             scene = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
+            if re.search(self.get_selector_map('external_id'), scene) and meta['title']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
@@ -89,13 +89,5 @@ class SiteGirlsRimmingSpider(BaseSceneScraper):
         return []
 
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                extern_id = search.group(1)
-                return extern_id.lower()
-
-        return None
-
-    def get_performers(self, response):
-        return []
+        extern_id = super().get_id(response)
+        return extern_id.lower()

@@ -1,7 +1,5 @@
 import re
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -28,7 +26,7 @@ class HobyBuchanonSpider(BaseSceneScraper):
         'performers': '',
         'tags': '',
         'external_id': r'.*\/(.*?)\/$',
-        'trailer': '',  # trailer is on site, but hosted through a third party with tokens
+        'trailer': '',
         'pagination': '/updates/page/%s/'
     }
 
@@ -87,21 +85,27 @@ class HobyBuchanonSpider(BaseSceneScraper):
             url = scene.xpath('.//div[@class="image_wrapper"]/a/@href').get()
             if url:
                 item['url'] = url.strip()
-                externid = re.search(r'.*\/(.*?)\/$', url).group(1)
+                externid = re.search(r'.*/(.*?)/$', url).group(1)
                 if externid:
                     item['id'] = externid.strip()
 
-            title = scene.xpath('.//h2[@class="entry-title"]/a/text()').get()
+            title = scene.xpath('.//h2[@class="entry-title"]/a/text()')
             if title:
-                item['title'] = title.strip()
+                item['title'] = self.cleanup_title(title.get())
+            else:
+                item['title'] = ''
 
-            description = scene.xpath('.//div[@class="post-excerpt"]/text()').get()
+            description = scene.xpath('.//div[@class="post-excerpt"]/text()')
             if description:
-                item['description'] = description.strip()
+                item['description'] = self.cleanup_description(description.get())
+            else:
+                item['description'] = ''
 
-            date = scene.xpath('.//div[@class="date_label"]/text()').get()
+            date = scene.xpath('.//div[@class="date_label"]/text()')
             if date:
-                item['date'] = dateparser.parse(date.strip()).isoformat()
+                item['date'] = self.parse_date(date.get()).isoformat()
+            else:
+                item['date'] = self.parse_date('today').isoformat()
 
             image = scene.xpath('.//div[@class="image_links double"]/a/@href').get()
             if not image:

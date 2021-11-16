@@ -1,6 +1,4 @@
 import scrapy
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -32,5 +30,5 @@ class JimSlipSpider(BaseSceneScraper):
             if scene.css('td.gray::text').get():
                 text = scene.css('td.gray::text').get().strip().replace(
                     'added ', '').replace('.', '-')
-                meta['date'] = dateparser.parse(text.strip(), date_formats=['%d.%m.%Y']).isoformat()
+                meta['date'] = self.parse_date(text.strip(), date_formats=['%d.%m.%Y']).isoformat()
             yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
