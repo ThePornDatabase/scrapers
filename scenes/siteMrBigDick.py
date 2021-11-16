@@ -1,5 +1,4 @@
 import json
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -19,13 +18,12 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        global json
         movies = json.loads(response.text)
 
         for movie in movies:
             item = SceneItem()
 
-            item['title'] = movie['fullName'].strip().title()
+            item['title'] = self.cleanup_title(movie['fullName'])
             item['description'] = ''
 
             item['performers'] = []
@@ -38,13 +36,12 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
 
             item['image_blob'] = None
 
-            item['date'] = dateparser.parse(movie['publishDate']).isoformat()
+            item['date'] = self.parse_date(movie['publishDate']).isoformat()
 
             item['tags'] = []
             for tag in movie['tags']:
                 item['tags'].append(tag['fullName'].strip().title())
 
-            # ~ item['trailer'] = movie['videoSrc_1920']
             item['trailer'] = ''
 
             item['site'] = "MrBigfatdick"
