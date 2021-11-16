@@ -1,8 +1,8 @@
-import warnings
 import scrapy
 from scrapy.http import HtmlResponse
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+
 
 class FiveKPornSpider(BaseSceneScraper):
     name = '5kporn'
@@ -18,23 +18,16 @@ class FiveKPornSpider(BaseSceneScraper):
     selector_map = {
         'title': "//p[@class='trailer-title']/text()",
         'description': '//div[contains(@class, "video-summary")]//p[@class=""]/text()',
-        'date': "//div[@class='row video-summary']/div/h5[4]/text()",
+        'date': '//h5[contains(text(), "Published")]/text()',
         'image': '//div[contains(@class, "gal")]//img/@src',
         'performers': '//h5[contains(., "Starring")]/a/text()',
-        'tags': "",
-        'external_id': 'episodes\\/(.+)',
+        'tags': '',
+        'external_id': r'episodes/(.+)',
         'trailer': '',
         'pagination': '/episodes/search?page=%s'
     }
 
     def get_scenes(self, response):
-        rsp = HtmlResponse(url=response.url, body=response.json()[
-                           'html'], encoding='utf-8')
+        rsp = HtmlResponse(url=response.url, body=response.json()['html'], encoding='utf-8')
         for scene in rsp.css('.thumb-holder a::attr(href)').getall():
             yield scrapy.Request(url=scene, callback=self.parse_scene, cookies=self.cookies)
-
-    def get_date(self, response):
-        date = response.xpath('//h5[contains(text(), "Published")]/text()')
-        if date:
-            return self.parse_date(self.cleanup_date(date.get()).strip()).isoformat()
-        return self.parse_date('today').isoformat()
