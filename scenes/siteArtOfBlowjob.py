@@ -1,13 +1,13 @@
 import re
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class SiteArtOfBlowjobSpider(BaseSceneScraper):
     name = 'ArtOfBlowjob'
     network = 'Art of Blowjob'
+    parent = 'Art of Blowjob'
+    site = 'Art of Blowjob'
 
     start_urls = [
         'https://theartofblowjob.com/',
@@ -20,35 +20,20 @@ class SiteArtOfBlowjobSpider(BaseSceneScraper):
         'image': '//section[@id="about"]/img/@src',
         'performers': '',
         'tags': '',
-        'external_id': r'videos\/(\d+)\/',
+        'external_id': r'videos/(\d+)/',
         'trailer': '',
         'pagination': '/display/updatelist/'
     }
 
     def start_requests(self):
         url = "https://www.theartofblowjob.com/display/updatelist/"
-        yield scrapy.Request(url, callback=self.get_scenes,
-                             meta={'page': self.page},
-                             headers=self.headers,
-                             cookies=self.cookies)
+        yield scrapy.Request(url, callback=self.get_scenes, meta={'page': self.page}, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="video-thumbnail"]/../../span/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_site(self, response):
-        return "Art of Blowjob"
-
-    def get_parent(self, response):
-        return "Art of Blowjob"
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
-
-    def get_performers(self, response):
-        return []
 
     def get_tags(self, response):
         return ['Blowjob']

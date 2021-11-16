@@ -1,6 +1,5 @@
 import re
 import string
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -34,19 +33,18 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             title = scene.xpath('./div[@class="box-info"]/h3/text()')
             item['title'] = ''
             if title:
-                item['title'] = string.capwords(title.get().strip())
+                item['title'] = self.cleanup_title(title)
 
             description = scene.xpath('./div[@class="box-info"]/article/div[contains(@class, "description")]/text()')
             item['description'] = ''
             if description:
-                item['description'] = description.get().strip()
+                item['description'] = self.cleanup_description(description.get())
 
             scenedate = scene.xpath('./div[@class="box-info"]/p/span/i[contains(@class, "calendar")]/following-sibling::text()')
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             item['date'] = ''
             if scenedate:
-                scenedate = scenedate.get().strip()
-                item['date'] = dateparser.parse(scenedate).isoformat()
+                item['date'] = self.parse_date(scenedate.get().strip()).isoformat()
 
             image = scene.xpath('.//div[@class="imgwrap"]//img/@src')
             item['image'] = None

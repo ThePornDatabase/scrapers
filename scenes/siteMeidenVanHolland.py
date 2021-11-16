@@ -1,8 +1,6 @@
 import re
 import codecs
-import html
 import json
-import dateparser
 import scrapy
 from tpdb.items import SceneItem
 
@@ -37,6 +35,8 @@ def match_tag(argument):
 class SiteMedienVanHolldandSpider(BaseSceneScraper):
     name = 'MeidenVanHolland'
     network = 'Meiden Van Holland'
+    parent = 'Meiden Van Holland'
+    site = 'Meiden Van Holland'
 
     base_url = 'https://meidenvanholland.nl'
 
@@ -142,11 +142,9 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
         if 'description' not in self.get_selector_map():
             return ''
 
-        description = self.process_xpath(response,
-                                         self.get_selector_map('description'))
+        description = self.process_xpath(response, self.get_selector_map('description'))
         if description:
-            description = self.get_from_regex(description.get(),
-                                              're_description')
+            description = self.get_from_regex(description.get(), 're_description')
 
             if description:
                 try:
@@ -156,7 +154,7 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
                 description = re.sub(r'<[^<]+?>', '', description).strip()
                 description = re.sub(
                     r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
-                return html.unescape(description.strip())
+                return self.cleanup_description(description)
         return ''
 
     def get_date(self, response):
@@ -166,21 +164,14 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
             datestring = datestring.get()
             date = self.get_from_regex(datestring, 're_date')
             if not date:
-                date = re.search(
-                    r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
+                date = re.search(r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
                 if date:
                     date = date.group(1)
 
             if date:
-                return dateparser.parse(date).isoformat()
-            return dateparser.parse('today').isoformat()
+                return self.parse_date(date).isoformat()
+            return self.parse_date('today').isoformat()
         return None
-
-    def get_site(self, response):
-        return "Meiden Van Holland"
-
-    def get_parent(self, response):
-        return "Meiden Van Holland"
 
     def parse_scene(self, response):
         item = SceneItem()

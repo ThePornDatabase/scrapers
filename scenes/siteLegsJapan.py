@@ -1,7 +1,4 @@
 import re
-import string
-import html
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -35,13 +32,13 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
             title = scene.xpath('.//h3[1]/strong/text()').get()
             if title:
-                item['title'] = html.unescape(string.capwords(title))
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = ''
 
             description = scene.xpath('.//h3[1]/strong/text()').get()
             if description:
-                item['description'] = html.unescape(description)
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -59,7 +56,7 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
             date = scene.xpath('.//h3[contains(text(),"released")]/strong/text()').get()
             if date:
-                item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+                item['date'] = self.parse_date(date, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = []
 
