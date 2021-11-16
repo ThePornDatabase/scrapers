@@ -1,20 +1,13 @@
 import re
-import warnings
-import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteCumBuffetSpider(BaseSceneScraper):
     name = 'CumBuffet'
     network = 'Cum Buffet'
     parent = 'Cum Buffet'
+    site = 'Cum Buffet'
 
     start_urls = [
         'https://www.cumbuffet.com',
@@ -46,18 +39,9 @@ class SiteCumBuffetSpider(BaseSceneScraper):
         for scene in scenes:
             date = scene.xpath('.//div[@class="date"]/text()').get()
             if date:
-                meta['date'] = dateparser.parse(date.strip(), date_formats=['%b %d, %Y']).isoformat()
+                meta['date'] = self.parse_date(date.strip(), date_formats=['%b %d, %Y']).isoformat()
             else:
-                meta['date'] = dateparser.parse('today').isoformat()
+                meta['date'] = self.parse_date('today').isoformat()
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
-
-    def get_site(self, response):
-        return "Cum Buffet"
-
-    def get_parent(self, response):
-        return "Cum Buffet"
-
-    def get_description(self, response):
-        return ''

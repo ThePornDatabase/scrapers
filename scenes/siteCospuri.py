@@ -1,20 +1,13 @@
 import re
-import warnings
-import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteCospuriSpider(BaseSceneScraper):
     name = 'Cospuri'
     network = 'Cospuri'
     parent = 'Cospuri'
+    site = 'Cospuri'
 
     url = 'https://www.cospuri.com/'
 
@@ -76,16 +69,9 @@ class SiteCospuriSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_site(self, response):
-        return "Cospuri"
-
-    def get_parent(self, response):
-        return "Cospuri"
-
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if date:
-            # ~ print(f'Date: {date}')
             dates = re.search(r'(\d{4}).*?(\d{2}).*?(\d{2})', date)
             if dates:
                 year = dates.group(1)
@@ -93,6 +79,6 @@ class SiteCospuriSpider(BaseSceneScraper):
                 day = dates.group(3)
                 date = year + month + day
 
-            return dateparser.parse(date, date_formats=['%Y%m%d']).isoformat()
+            return self.parse_date(date, date_formats=['%Y%m%d']).isoformat()
 
         return None

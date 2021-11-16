@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -8,6 +7,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class SiteEricJohnsSexAdventuresSpider(BaseSceneScraper):
     name = 'EricJohnsSexAdventures'
     network = 'Eric Johns Sex Adventures'
+    parent = 'Eric Johns Sex Adventures'
+    site = 'Eric Johns Sex Adventures'
 
     start_urls = [
         'https://ericjohnssexadventures.com',
@@ -30,12 +31,3 @@ class SiteEricJohnsSexAdventuresSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_site(self, response):
-        return "Eric Johns Sex Adventures"
-
-    def get_parent(self, response):
-        return "Eric Johns Sex Adventures"
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()

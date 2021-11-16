@@ -1,22 +1,14 @@
 import re
-import warnings
 import string
-import html
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteCruelGirlfriendSpider(BaseSceneScraper):
     name = 'CruelGirlfriend'
     network = 'Cruel Girlfriend'
+    parent = 'Cruel Girlfriend'
+    site = 'Cruel Girlfriend'
 
     start_urls = [
         'https://cruelgf.com',
@@ -39,9 +31,9 @@ class SiteCruelGirlfriendSpider(BaseSceneScraper):
         for scene in scenes:
             title = scene.xpath('./div[contains(@class, "Title")]/text()')
             if title:
-                title = string.capwords(title.get().strip())
+                title = self.cleanup_title(title.get())
             else:
-                title = False
+                title = ''
 
             performers = scene.xpath('.//div[contains(@class, "Name")]/a/text()')
             if performers:
@@ -49,38 +41,24 @@ class SiteCruelGirlfriendSpider(BaseSceneScraper):
                 if '' in performers:
                     performers.remove('')
             else:
-                performers = False
+                performers = []
 
             date = scene.xpath('./div[contains(@class, "Date")]/text()')
             if date:
-                date = dateparser.parse(date.get(), date_formats=['%d %b %Y']).isoformat()
+                date = self.parse_date(date.get(), date_formats=['%d %b %Y']).isoformat()
             else:
-                date = dateparser.parse('today').isoformat()
+                date = self.parse_date('today').isoformat()
 
             scene = scene.xpath('./div[contains(@class,"LatestUpdate-Pink")]/div/a/@href').get()
             scene = self.format_link(response, scene)
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'title': title, 'date': date, 'performers': performers})
 
-    def get_site(self, response):
-        return "Cruel Girlfriend"
-
-    def get_parent(self, response):
-        return "Cruel Girlfriend"
-
     def get_id(self, response):
         externid = super().get_id(response)
         externid = externid.replace("%20", "")
         externid = re.sub('[^a-zA-Z0-9-]', '', externid)
         return externid.lower().strip()
-
-    def get_description(self, response):
-        description = self.process_xpath(response, self.get_selector_map('description'))
-        if description:
-            description = list(map(lambda x: x.strip(), description.getall()))
-            description = " ".join(description)
-            return html.unescape(description.strip())
-        return ''
 
     def get_tags(self, response):
         tags = super().get_tags(response)
