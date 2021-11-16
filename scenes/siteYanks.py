@@ -1,5 +1,4 @@
 import re
-import string
 from datetime import date
 
 from tpdb.BaseSceneScraper import BaseSceneScraper

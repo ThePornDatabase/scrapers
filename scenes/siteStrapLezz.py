@@ -4,7 +4,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteStrapLezzSpider(BaseSceneScraper):
+class SiteStrapLezzSpider(BaseSceneScraper):
     name = 'StrapLezz'
     network = 'Strap Lezz'
     parent = 'Strap Lezz'
@@ -35,7 +35,6 @@ class siteStrapLezzSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
