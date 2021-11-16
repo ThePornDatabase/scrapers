@@ -1,5 +1,4 @@
 import json
-import dateparser
 from scrapy.http import Request
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -27,7 +26,6 @@ class SiteFit18Spider(BaseSceneScraper):
         }
         url = "https://fit18.team18.app/graphql"
         scenequery = json.dumps(scenequery)
-        # ~ print(data2)
         yield Request(url, headers=self.headers, body=scenequery, method="POST", callback=self.get_scenes)
 
     selector_map = {
@@ -48,8 +46,8 @@ class SiteFit18Spider(BaseSceneScraper):
         for jsonrow in jsondata:
             item = SceneItem()
             item['id'] = jsonrow['node']['videoId'].replace(":", "-")
-            item['title'] = jsonrow['node']['title']
-            item['description'] = jsonrow['node']['description']['long']
+            item['title'] = self.cleanup_title(jsonrow['node']['title'])
+            item['description'] = self.cleanup_description(jsonrow['node']['description']['long'])
             item['performers'] = []
             for performer in jsonrow['node']['talent']:
                 item['performers'].append(performer['talent']['name'])
@@ -58,7 +56,7 @@ class SiteFit18Spider(BaseSceneScraper):
             item['network'] = "Fit 18"
             item['parent'] = "Fit 18"
             item['url'] = "https://fit18.com/videos/" + item['id']
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             item['trailer'] = ''
             item['tags'] = []
             meta['item'] = item.copy()

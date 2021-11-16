@@ -1,9 +1,5 @@
 import re
-import string
-import html
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -51,7 +47,7 @@ class SiteFellatioJapanSpider(BaseSceneScraper):
             title = scene.xpath('./span[@class="sGirl"]//text()').getall()
             if title:
                 title = " ".join(title)
-                item['title'] = html.unescape(string.capwords(title.strip()))
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = ''
 
@@ -72,9 +68,9 @@ class SiteFellatioJapanSpider(BaseSceneScraper):
             date = scene.xpath('.//div[@class="sDate"]/text()').get()
             if date:
                 if date:
-                    item['date'] = dateparser.parse(date, date_formats=['%Y-%m-%d']).isoformat()
+                    item['date'] = self.parse_date(date, date_formats=['%Y-%m-%d']).isoformat()
             else:
-                item['date'] = []
+                item['date'] = self.parse_date('today').isoformat()
 
             image = scene.xpath('.//div[@class="scene-img"]/@style').get()
             if image:
@@ -98,6 +94,3 @@ class SiteFellatioJapanSpider(BaseSceneScraper):
             item['url'] = response.url
 
             yield item
-
-    def get_site(self, response):
-        return "After School.jp"

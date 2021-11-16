@@ -1,7 +1,4 @@
-import dateparser
 import scrapy
-import re
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -16,13 +13,14 @@ class ExposedWhoresSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//span[contains(@class,"update_title")]/text()',
-        'description': '//span[contains(@class,"update_title")]/text()', #No description on site, just using title for filler
+        'description': '',
         'date': '//span[contains(@class,"availdate")]/text()',
         'image': '//img[contains(@class,"large_update_thumb")]/@src',
         'performers': '//div[@class="update_block_info"]/span[contains(@class,"tour_update_models")]/a/text()',
         'tags': '//span[contains(@class,"update_tags")]/a/text()',
-        'external_id': '\/updates\/(.+)\.html',
+        'external_id': r'/updates/(.+)\.html',
         'trailer': '//div[@class="update_image"]/a/@onclick',
+        're_trailer': r'tload\(\'(.*)\'\)',
         'pagination': '/new-tour/categories/updates_%s_d.html'
     }
 
@@ -30,35 +28,3 @@ class ExposedWhoresSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta={'site': 'Exposed Whores'})
-
-    def get_trailer(self, response):
-        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
-            trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
-            if trailer:
-                trailer = re.search('tload\(\'(.*)\'\)', trailer).group(1)
-                if trailer:
-                    trailer = "https://exposedwhores.com" + trailer
-                    return trailer
-        return ''
-
-
-    def get_description(self, response):
-
-        description = self.process_xpath(
-            response, self.get_selector_map('description')).get()
-
-        if description is not None:
-            return description.replace('\r\n', '  ').strip()
-        return ""
-
-
-    def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image')).get()
-        if image:
-            image = self.get_from_regex(image, 're_image')
-
-            if image:
-                image = "https://exposedwhores.com/new-tour/" + image
-                return image.replace(" ", "%20")
-
-        return None

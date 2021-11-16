@@ -1,6 +1,4 @@
-# Fixed old sites to scrape historical
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -33,13 +31,17 @@ class FTVGirlsScraper(BaseSceneScraper):
         for scene in scenes:
             taglist = []
 
-            title = scene.xpath('.//div[@class="ModelName"]/h2/text()').get()
+            title = scene.xpath('.//div[@class="ModelName"]/h2/text()')
             if title:
-                title = title.strip()
+                title = self.cleanup_title(title.get())
+            else:
+                title = ''
 
-            date = scene.xpath('.//div[@class="UpdateDate"]/h3/text()').get()
+            date = scene.xpath('.//div[@class="UpdateDate"]/h3/text()')
             if date:
-                date = dateparser.parse(date.strip()).isoformat()
+                date = self.parse_date(date.get().strip()).isoformat()
+            else:
+                date = self.parse_date('today').isoformat()
 
             tags = scene.xpath('.//div[contains(@class,"Tags")]/img/@title').getall()
             if tags:
@@ -48,25 +50,13 @@ class FTVGirlsScraper(BaseSceneScraper):
                         tag = re.search('(.*) - ', tag).group(1)
                         if tag:
                             taglist.append(tag)
+            else:
+                tags = []
 
             sceneurl = scene.xpath('.//div[@class="ModelPhoto"]/a/@href').get()
             if sceneurl:
                 if re.search(self.get_selector_map('external_id'), sceneurl):
                     yield scrapy.Request(url=self.format_link(response, sceneurl), callback=self.parse_scene, meta={'date': date, 'tags': taglist, 'title': title})
-
-    def get_title(self, response):
-        meta = response.meta
-
-        if meta['title']:
-            return meta['title']
-        return ''
-
-    def get_date(self, response):
-        meta = response.meta
-
-        if meta['date']:
-            return meta['date']
-        return ''
 
     def get_performers(self, response):
         performerlist = []
@@ -81,13 +71,6 @@ class FTVGirlsScraper(BaseSceneScraper):
 
         if performerlist:
             return performerlist
-        return []
-
-    def get_tags(self, response):
-        meta = response.meta
-
-        if meta['tags']:
-            return meta['tags']
         return []
 
     def get_id(self, response):
