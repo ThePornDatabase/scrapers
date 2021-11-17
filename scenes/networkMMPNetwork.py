@@ -21,7 +21,7 @@ class SiteMMPNetworkSpider(BaseSceneScraper):
     network = 'MMP Network'
 
     start_urls = [
-        # ~ 'https://mmpnetwork.com',
+        'https://mmpnetwork.com',
         'https://fakeshooting.com',
     ]
 
