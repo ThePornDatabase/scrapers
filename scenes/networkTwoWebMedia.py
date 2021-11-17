@@ -1,7 +1,4 @@
 import re
-import string
-import html
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -43,9 +40,9 @@ class NetworkTwoWebMediaSpider(BaseSceneScraper):
         for scene in scenes:
             date = scene.xpath('.//span[@class="meta_date"]/text()').get()
             if date:
-                date = dateparser.parse(date).isoformat()
+                date = self.parse_date(date).isoformat()
             else:
-                date = dateparser.parse('today').isoformat()
+                date = self.parse_date('today').isoformat()
             scene = scene.xpath('.//h2/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date})
@@ -59,7 +56,7 @@ class NetworkTwoWebMediaSpider(BaseSceneScraper):
         title = title.replace(" & ", " and ")
         title = re.sub(r'&#\d+;', '', title)
         title = re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
-        return string.capwords(html.unescape(title.strip())).replace("  ", " ")
+        return self.cleanup_title(title).replace("  ", " ")
 
     def get_image(self, response):
         imageurl = super().get_image(response)

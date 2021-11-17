@@ -54,6 +54,8 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
             else:
                 item['image'] = ''
 
+            item['image_blob'] = ''
+
             item['trailer'] = ''
 
             url = scene.xpath('./a/@href').get()

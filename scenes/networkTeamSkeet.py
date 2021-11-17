@@ -1,8 +1,5 @@
 import json
 import re
-from datetime import datetime
-
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -303,9 +300,9 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         item['parent'] = response.meta['site']
 
         if 'publishedDate' in data:
-            item['date'] = dateparser.parse(data['publishedDate']).isoformat()
+            item['date'] = self.parse_date(data['publishedDate']).isoformat()
         else:
-            item['date'] = datetime.now().isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
         if 'site' in data:
             if 'name' in data['site']:

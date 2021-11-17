@@ -1,4 +1,3 @@
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -26,7 +25,7 @@ class NewSensationsSpider(BaseSceneScraper):
     selector_map = {
         'title': '//div[@class="indScene"]/*[self::h1 or self::h2 or self::h3]/text()',
         'description': '//div[@class="description"]/span/following-sibling::h2/text()',
-        'date': "//div[contains(@class, 'stat')]//span[contains(text(),'Date:')]/following-sibling::span/text()",
+        'date': '//div[@class="sceneDateP"]/span/text()',
         'image': '//span[@id="trailer_thumb"]//img/@src',
         'performers': '//div[@class="sceneTextLink"]//span[@class="tour_update_models"]/a/text()',
         'tags': '//meta[@name="keywords"]/@content',
@@ -39,14 +38,6 @@ class NewSensationsSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="captions"]/h4/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
-
-    def get_date(self, response):
-        date = response.xpath(
-            '//div[@class="sceneDateP"]/span/text()').get().strip(',').strip()
-        return dateparser.parse(date).isoformat()
-
-    def get_tags(self, response):
-        return []
 
     def get_site(self, response):
         if self.get_selector_map('tags'):

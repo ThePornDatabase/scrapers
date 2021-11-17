@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -54,5 +53,10 @@ class NetworkSmutPuppetSpider(BaseSceneScraper):
             return meta['site'].strip()
         return "Smut Puppet"
 
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
+    def get_id(self, response):
+        sceneid = self.get_from_regex(response.url, 'external_id')
+        if not sceneid:
+            sceneid = re.search(r'update/(\d+)/', response.url)
+            if sceneid:
+                sceneid = sceneid.group(1)
+        return sceneid

@@ -1,15 +1,7 @@
 import re
-import warnings
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class VnaNetworkSpider(BaseSceneScraper):
@@ -110,9 +102,3 @@ class VnaNetworkSpider(BaseSceneScraper):
         if "vickyathome" in base:
             return self.format_url(base, "/milf-videos/page/%s" % page)
         return self.format_url(base, self.get_selector_map('pagination') % page)
-
-    def get_date(self, response):
-        date = super().get_date(response)
-        if not date:
-            date = dateparser.parse('today').isoformat()
-        return date

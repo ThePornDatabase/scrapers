@@ -1,6 +1,4 @@
 import re
-
-import dateparser
 import scrapy
 from extruct.jsonld import JsonLdExtractor
 
@@ -13,7 +11,7 @@ class SexLikeRealSpider(BaseSceneScraper):
     network = 'SexLikeReal'
 
     start_urls = [
-        # 'https://www.sexlikereal.com'
+        'https://www.sexlikereal.com'
     ]
 
     selector_map = {
@@ -45,17 +43,17 @@ class SexLikeRealSpider(BaseSceneScraper):
                 break
 
         item = SceneItem()
-        item['title'] = data['name']
-        item['description'] = data['description']
+        item['title'] = self.cleanup_title(data['name'])
+        item['description'] = self.cleanup_description(data['description'])
         item['image'] = data['thumbnail']
         item['image_blob'] = None
         item['id'] = self.get_id(response)
         item['trailer'] = data['contentUrl']
         item['url'] = response.url
-        item['date'] = dateparser.parse(data['datePublished']).isoformat()
+        item['date'] = self.parse_date(data['datePublished']).isoformat()
         item['site'] = data['author']['name']
         item['network'] = self.network
-        item['parent'] = self.parent
+        item['parent'] = item['site']
 
         item['performers'] = []
         for model in data['actor']:

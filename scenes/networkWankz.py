@@ -1,15 +1,7 @@
 import re
-import warnings
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class NetworkWankzSpider(BaseSceneScraper):
@@ -85,6 +77,7 @@ class NetworkWankzSpider(BaseSceneScraper):
         'title': '//title/text()',
         'description': '//div[@class="description"]/p/text()',
         'date': "//div[@class='views']/span/text()",
+        're_date': r'span>Added (.*?)</span',
         'image': '//a[@class="noplayer"]/img/@src',
         'performers': '//div[@class="models-wrapper actors"]/a/span/text()',
         'tags': "//a[@class='cat']/text()",
@@ -100,12 +93,6 @@ class NetworkWankzSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_date(self, response):
-        search = re.search('span>Added\\ (.*?)<\\/span', response.text)
-        scenedate = dateparser.parse(search.group(1)).isoformat()
-        return scenedate
-
     def get_site(self, response):
-        site = response.xpath(
-            '//div[@class="inner"]/div/p/a[@class="sitelogom"]/img/@alt').get().strip()
+        site = response.xpath('//div[@class="inner"]/div/p/a[@class="sitelogom"]/img/@alt').get().strip()
         return site

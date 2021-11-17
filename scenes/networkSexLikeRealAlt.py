@@ -10,7 +10,7 @@ class SexLikeRealAltSpider(BaseSceneScraper):
     network = 'SexLikeReal'
 
     start_urls = [
-        'https://www.sexlikereal.com'
+        # ~ 'https://www.sexlikereal.com'
     ]
 
     selector_map = {
@@ -35,6 +35,12 @@ class SexLikeRealAltSpider(BaseSceneScraper):
         site = response.xpath('//div[@class="u-block"]/span/a/span/text()').get()
         if site:
             return site.strip()
+        return "Sex Like Real"
+
+    def get_parent(self, response):
+        parent = response.xpath('//div[@class="u-block"]/span/a/span/text()').get()
+        if parent:
+            return parent.strip()
         return "Sex Like Real"
 
     def get_tags(self, response):

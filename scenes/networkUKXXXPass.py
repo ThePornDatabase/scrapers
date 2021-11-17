@@ -1,8 +1,6 @@
 import re
 from urllib.parse import urlparse
-import html
 import string
-import dateparser
 import tldextract
 import scrapy
 
@@ -52,39 +50,33 @@ class NetworkUKXXXPassSpider(BaseSceneScraper):
         for scene in scenes:
             item = SceneItem()
 
-            title = scene.xpath('.//span[contains(@class,"title")]/text()').get()
+            title = scene.xpath('.//span[contains(@class,"title")]/text()')
             if title:
-                item['title'] = html.unescape(string.capwords(title.strip()))
+                item['title'] = self.cleanup_title(title.get())
             else:
                 item['title'] = ''
 
             date = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
             if date:
-                item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+                item['date'] = self.parse_date(date, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = ''
 
-            title = scene.xpath('.//span[contains(@class,"title")]/text()').get()
-            if title:
-                item['title'] = html.unescape(string.capwords(title.strip()))
-            else:
-                item['title'] = ''
-
-            description = scene.xpath('.//span[contains(@class,"update_description")]/text()').get()
+            description = scene.xpath('.//span[contains(@class,"update_description")]/text()')
             if description:
-                item['description'] = html.unescape(description.strip())
+                item['description'] = self.cleanup_description(description.get())
             else:
                 item['description'] = ''
 
             performers = scene.xpath('.//span[contains(@class,"update_models")]/a/text()').getall()
             if performers:
-                item['performers'] = list(map(lambda x: x.strip().title(), performers))
+                item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
             else:
                 item['performers'] = []
 
             tags = scene.xpath('.//span[contains(@class,"update_tags")]/a/text()').getall()
             if tags:
-                item['tags'] = list(map(lambda x: x.strip().title(), tags))
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
             else:
                 item['tags'] = []
 
@@ -118,8 +110,8 @@ class NetworkUKXXXPassSpider(BaseSceneScraper):
             else:
                 item['trailer'] = ''
 
-            if title:
-                externalid = re.sub(r'[^a-zA-Z0-9-]', '', title)
+            if item['title']:
+                externalid = re.sub(r'[^a-zA-Z0-9-]', '', item['title'])
                 item['id'] = externalid.lower().strip().replace(" ", "-")
 
             item['url'] = response.url

@@ -1,17 +1,9 @@
 import re
-import warnings
 import string
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class NetworkXSiteAbilitySpider(BaseSceneScraper):
@@ -130,7 +122,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             else:
                 title = re.search(r'(setid=\d+)', item['url']).group(1)
                 item['title'] = title.replace('=', ' ').title()
-            item['title'] = item['title'].replace('\n', '').replace('\r', '').replace('\t', '')
+            item['title'] = self.cleanup_title(item['title'])
 
             image = scene.xpath('.//img/@src')
             if image:
@@ -155,6 +147,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                 item['description'] = re.sub(r'\d{1,3} photos', '', item['description'], flags=re.IGNORECASE)
                 item['description'] = re.sub(r'\d{1,3}:\d{1,3} video', '', item['description'], flags=re.IGNORECASE)
                 item['description'] = re.sub('  ', ' ', item['description'])
+                item['description'] = self.cleanup_description(item['description'])
             else:
                 item['description'] = ''
 
@@ -163,9 +156,9 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                 date = re.search(r'(\d{2}\.\d{2}\.\d{2})', item['description'])
 
             if date:
-                item['date'] = dateparser.parse(date.group(1).strip()).isoformat()
+                item['date'] = self.parse_date(date.group(1).strip()).isoformat()
             else:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
             item['performers'] = self.site_performers(scene, meta)
             item['tags'] = self.site_tags(scene, meta)
             item['trailer'] = ''
