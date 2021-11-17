@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -223,11 +222,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['title'] = scene['movie_title']
 
             item['description'] = scene['description']
-            if dateparser.parse(scene['release_date']):
-                item['date'] = dateparser.parse(scene['release_date']).isoformat()
+            if self.parse_date(scene['release_date']):
+                item['date'] = self.parse_date(scene['release_date']).isoformat()
             else:
-                date = "1970-01-01"
-                item['date'] = dateparser.parse(date).isoformat()
+                item['date'] = self.parse_date('today').isoformat()
             item['performers'] = list(
                 map(lambda x: x['name'], scene['actors']))
             item['tags'] = list(map(lambda x: x['name'], scene['categories']))
