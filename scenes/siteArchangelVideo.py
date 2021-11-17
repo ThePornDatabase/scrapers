@@ -1,7 +1,5 @@
 import re
-import html
 import string
-import dateparser
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -35,23 +33,21 @@ class ArchangelVideoSpider(BaseSceneScraper):
             item['site'] = "Arch Angel"
             item['parent'] = "Arch Angel"
             item['network'] = "Arch Angel"
-            title = scene.xpath('.//h3/a/text()').get()
+            title = scene.xpath('.//h3/a/text()')
             if title:
-                item['title'] = string.capwords(title.strip())
-                item['title'] = html.unescape(item['title'])
+                item['title'] = self.cleanup_title(title.get())
             else:
                 item['title'] = 'No Title Available'
 
             date = scene.xpath('.//strong[contains(text(),"Date")]/following-sibling::text()').get()
             if date:
-                date = dateparser.parse(date.strip()).isoformat()
-                item['date'] = date
+                item['date'] = self.parse_date(date)
             else:
-                item['date'] = "1970-01-01T00:00:00"
+                item['date'] = self.parse_date('today').isoformat()
 
             performers = scene.xpath('./div[@class="item-info"]//a[contains(@href,"/models/") or contains(@href,"sets.php")]/text()').getall()
             if len(performers):
-                item['performers'] = list(map(lambda x: x.strip().title(), performers))
+                item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
             else:
                 item['performers'] = []
 

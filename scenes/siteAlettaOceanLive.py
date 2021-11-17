@@ -1,8 +1,4 @@
 import re
-import html
-import string
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -36,19 +32,17 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
             item['site'] = "Aletta Ocean Live"
             item['parent'] = "Aletta Ocean Live"
             item['network'] = "Aletta Ocean"
-            title = scene.xpath('.//div[contains(@class,"title")]/text()').get()
+            title = scene.xpath('.//div[contains(@class,"title")]/text()')
             if title:
-                item['title'] = string.capwords(title.strip())
-                item['title'] = html.unescape(item['title'])
+                item['title'] = self.cleanup_title(title.get())
             else:
                 item['title'] = 'No Title Available'
 
-            date = scene.xpath('.//div[contains(@class,"date")]/text()').get()
+            date = scene.xpath('.//div[contains(@class,"date")]/text()')
             if date:
-                date = dateparser.parse(date.strip()).isoformat()
-                item['date'] = date
+                item['date'] = self.parse_date(date.get().strip()).isoformat()
             else:
-                item['date'] = "1970-01-01T00:00:00"
+                item['date'] = self.parse_date('today').isoformat()
 
             item['performers'] = ['Aletta Ocean']
 

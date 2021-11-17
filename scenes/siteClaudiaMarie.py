@@ -1,17 +1,7 @@
 import re
-import warnings
 import string
-import html
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteClaudiaMarieSpider(BaseSceneScraper):
@@ -42,13 +32,13 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
 
             title = scene.xpath('.//h2/text()').get()
             if title:
-                item['title'] = html.unescape(string.capwords(title))
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = ''
 
             description = scene.xpath('.//span[contains(@class,"description")]/text()').get()
             if description:
-                item['description'] = html.unescape(description)
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -60,13 +50,13 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
 
             tags = scene.xpath('.//span[contains(@class,"tags")]/a/text()').getall()
             if tags:
-                item['tags'] = list(map(lambda x: x.strip(), tags))
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
             else:
                 item['tags'] = []
 
             date = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
             if date:
-                item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+                item['date'] = self.parse_date(date, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = []
 

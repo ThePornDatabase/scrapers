@@ -1,20 +1,12 @@
 import re
 import json
-import warnings
 import base64
 import requests
-import dateparser
 import scrapy
 from scrapy.http import HtmlResponse
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class ATKGirlfriendsSpider(BaseSceneScraper):
@@ -88,9 +80,9 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
             link = "https://www.atkgirlfriends.com" + link
             date = scene.xpath('./div[@class="vid-count left"]/text()').get()
             if date:
-                date = dateparser.parse(date.strip()).isoformat()
+                date = self.parse_date(date.strip()).isoformat()
             else:
-                date = dateparser.parse('today').isoformat()
+                date = self.parse_date('today').isoformat()
             if "join.atkgirlfriends.com" not in link:
                 headers = self.headers
                 headers['Content-Type'] = 'application/json'
@@ -100,14 +92,14 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
                 item = SceneItem()
                 title = scene.xpath('./div/a/text()').get()
                 if title:
-                    item['title'] = title.strip()
+                    item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
 
                 if date:
                     item['date'] = date
                 else:
-                    item['date'] = dateparser.parse('today').isoformat()
+                    item['date'] = self.parse_date('today').isoformat()
 
                 image = scene.xpath('./div/a/img/@src').get()
                 if image:
@@ -170,9 +162,9 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
 
         item = SceneItem()
         if date:
-            item['date'] = dateparser.parse(date).isoformat()
+            item['date'] = self.parse_date(date).isoformat()
         else:
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)

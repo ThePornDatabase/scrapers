@@ -1,17 +1,7 @@
-import html
 import re
-import warnings
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class ChastityBabesFullImportSpider(BaseSceneScraper):
@@ -84,7 +74,6 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
                                  meta={'name': modelname},
                                  headers=self.headers,
                                  cookies=self.cookies)
-        return None
 
     def parse_scenes(self, response):
         item = SceneItem()
@@ -92,13 +81,11 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         item['performers'] = [modelname]
         title = response.xpath('//h1[@id="post-title"]/text()').get()
         if title:
-            item['title'] = title.strip().title()
-            item['title'] = html.unescape(item['title'])
+            item['title'] = self.cleanup_title(title)
 
         description = response.xpath('//div[@class="postcontent"]//p/text()').get()
         if description:
-            item['description'] = description.strip()
-            item['description'] = html.unescape(item['description'])
+            item['description'] = self.cleanup(description)
 
         item['site'] = "Chastity Babes"
         item['parent'] = "Chastity Babes"
@@ -111,7 +98,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
             date = re.search(r'Posted\s+on\s?(.*)\s?in', postinfo)
             if date:
                 date = date.group(1)
-                date = dateparser.parse(date.strip()).isoformat()
+                date = self.parse_date(date.strip()).isoformat()
                 item['date'] = date
 
             externalid = re.search(r'Update\s?(.*)\ ?\|', postinfo)
@@ -146,5 +133,3 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
 
         if item['id'] and item['title'] and item['date']:
             yield item
-
-        return None

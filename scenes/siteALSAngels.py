@@ -1,16 +1,8 @@
 import re
-import warnings
+import string
 import scrapy
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 # All the videos are on one long, page, but the logic should handle the
 # normal "limit_pages" values
@@ -84,9 +76,9 @@ class SiteALSAngelsSpider(BaseSceneScraper):
                 performerlist = performerlist.replace("  ", " ").strip()
 
                 item['performers'] = performerlist.split("&")
-                item['performers'] = list(map(lambda x: x.strip(), item['performers']))
+                item['performers'] = list(map(lambda x: string.capwords(x.strip()), item['performers']))
 
-                item['title'] = titletext + " " + item['tags'][0]
+                item['title'] = self.cleanup_title(titletext + " " + item['tags'][0])
             else:
                 item['title'] = ""
                 item['performers'] = []
@@ -120,13 +112,13 @@ class SiteALSAngelsSpider(BaseSceneScraper):
             if date:
                 date = date.replace("Date:", "").strip()
                 if date:
-                    item['date'] = dateparser.parse(date).isoformat()
+                    item['date'] = self.parse_date(date).isoformat()
             else:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             description = scene.xpath('./td[@class="videotext"]//span[@class="videodescription"]/text()').get()
             if description:
-                item['description'] = description.strip()
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 

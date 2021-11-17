@@ -1,18 +1,9 @@
 import re
-import warnings
 import json
-import html
-import dateparser
+import string
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class BiGuysFuckSpider(BaseSceneScraper):
@@ -54,16 +45,16 @@ class BiGuysFuckSpider(BaseSceneScraper):
             print(f'JSON Data: {jsondata}')
         data = data[0]
 
-        item['title'] = html.unescape(data['name'])
-        item['description'] = html.unescape(data['description'].strip())
+        item['title'] = self.cleanup_title(data['name'])
+        item['description'] = self.cleanup_description(data['description'].strip())
 
-        item['date'] = dateparser.parse(data['uploadDate'].strip()).isoformat()
+        item['date'] = self.parse_date(data['uploadDate'].strip()).isoformat()
 
         tags = data['keywords'].split(",")
-        item['tags'] = list(map(lambda x: x.strip().title(), tags))
+        item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
 
         item['performers'] = list(
-            map(lambda x: x['name'].strip(), data['actor']))
+            map(lambda x: string.capwords(x['name'].strip()), data['actor']))
 
         item['url'] = response.url
         item['image'] = data['thumbnailUrl'].replace(" ", "%20")

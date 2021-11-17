@@ -1,20 +1,12 @@
 import re
 import json
 import base64
-import warnings
 import requests
-import dateparser
 import scrapy
 from scrapy.http import HtmlResponse
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class ATKKingdomSpider(BaseSceneScraper):
@@ -102,9 +94,9 @@ class ATKKingdomSpider(BaseSceneScraper):
                 link = scene.xpath('.//div[@class="player"]/a/@href').get()
                 date = scene.xpath('.//span[contains(@class, "movie_date")]/text()').get()
                 if date:
-                    date = dateparser.parse(date.strip()).isoformat()
+                    date = self.parse_date(date.strip()).isoformat()
                 else:
-                    date = dateparser.parse('today').isoformat()
+                    date = self.parse_date('today').isoformat()
                 performer = scene.xpath('./div/span[contains(@class,"video_name")]/a/text()').get()
                 performer = performer.strip()
                 if not performer:
@@ -113,9 +105,9 @@ class ATKKingdomSpider(BaseSceneScraper):
                 link = scene.xpath('./div[@class="movie-image"]/a/@href').get()
                 date = scene.xpath('./div[@class="date left clear"][2]/text()').get()
                 if date:
-                    date = dateparser.parse(date.strip()).isoformat()
+                    date = self.parse_date(date.strip()).isoformat()
                 else:
-                    date = dateparser.parse('today').isoformat()
+                    date = self.parse_date('today').isoformat()
                 performer = scene.xpath('./div[@class="video-name"]/a/text()').get()
                 performer = performer.strip()
                 if not performer:
@@ -163,7 +155,7 @@ class ATKKingdomSpider(BaseSceneScraper):
                         item['site'] = "ATK Galleria"
                     title = scene.xpath('.//img/@alt')
                     if title:
-                        item['title'] = title.get().strip()
+                        item['title'] = self.cleanup_title(title.get())
                     else:
                         item['title'] = ''
                     item['date'] = date
@@ -223,9 +215,9 @@ class ATKKingdomSpider(BaseSceneScraper):
                 performer = cookie['value']
         item = SceneItem()
         if date:
-            item['date'] = dateparser.parse(date).isoformat()
+            item['date'] = self.parse_date(date).isoformat()
         else:
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
         if performer:
             item['performers'] = [performer]

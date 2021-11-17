@@ -1,7 +1,5 @@
 import string
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -11,7 +9,7 @@ class SiteAlterPicSpider(BaseSceneScraper):
     network = 'AlterPic'
 
     start_urls = [
-        # ~ 'https://alterpic.adultmembersites.com',
+        'https://alterpic.adultmembersites.com',
         'https://kinkyponygirl.adultmembersites.com',
     ]
 
@@ -40,8 +38,8 @@ class SiteAlterPicSpider(BaseSceneScraper):
         jsonrow = response.json()
         item = SceneItem()
         item['id'] = str(jsonrow['id'])
-        item['title'] = jsonrow['title']
-        item['description'] = jsonrow['description']
+        item['title'] = self.cleanup_title(jsonrow['title'])
+        item['description'] = self.cleanup_description(jsonrow['description'])
         item['performers'] = []
         for performer in jsonrow['casts']:
             item['performers'].append(string.capwords(performer['screen_name']))
@@ -57,7 +55,7 @@ class SiteAlterPicSpider(BaseSceneScraper):
             item['parent'] = "Kinky Pony Girl"
             item['url'] = "https://kinkyponygirl.com/videos/" + item['id']
 
-        item['date'] = dateparser.parse(jsonrow['publish_date']).isoformat()
+        item['date'] = self.parse_date(jsonrow['publish_date']).isoformat()
         item['trailer'] = ''
         item['tags'] = []
         for tag in jsonrow['tags']:

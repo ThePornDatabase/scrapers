@@ -1,15 +1,7 @@
 import re
-import warnings
-import dateparser
-
+import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class AussieAssSpider(BaseSceneScraper):
@@ -49,21 +41,21 @@ class AussieAssSpider(BaseSceneScraper):
             if title:
                 if re.search(r'^\d+\s+?.*', title):
                     title = re.sub(r'^(\d+\s+?)', '', title)
-                item['title'] = title.strip().title()
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = ''
 
             description = child.xpath('.//span[@class="video-title"]/a/@title').get()
             if description:
-                item['description'] = description.strip()
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
             date = child.xpath('.//span[@class="video-date"]/text()[2]').get()
             if date:
-                item['date'] = dateparser.parse(date.strip()).isoformat()
+                item['date'] = self.parse_date(date.strip()).isoformat()
             else:
-                item['description'] = '1970-01-01T12:00:00'
+                item['date'] = self.parse_date('today').isoformat()
 
             image = child.xpath('./div/a/img/@src').get()
             if image:
@@ -77,7 +69,7 @@ class AussieAssSpider(BaseSceneScraper):
 
             performers = child.xpath('.//span[@class="update_models"]/a/text()').getall()
             if performers:
-                item['performers'] = list(map(lambda x: x.strip(), performers))
+                item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
             else:
                 item['performers'] = []
 
