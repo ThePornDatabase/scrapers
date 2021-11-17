@@ -1,6 +1,5 @@
 import re
 import json
-import dateparser
 import tldextract
 from chompjs import chompjs
 from extruct.jsonld import JsonLdExtractor
@@ -86,6 +85,7 @@ def match_site(argument):
         'povthis': "POV This",
         'ragingstallion': "Raging Stallion",
         'roccosiffredi': "Rocco Siffredi",
+        'seemyflixxx': "SeeMyFlixxx",
         'soapymassage': "Soapy Massage",
         'squirtalicious': "Squirtalicious",
         'squirtingorgies': "Squirting Orgies",
@@ -201,6 +201,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.povthis.com',
         'https://www.prettydirty.com',
         'https://www.ragingstallion.com',
+        'http://www.seemyflixxx.com',
         'https://www.soapymassage.com',
         'https://www.squirtingorgies.com',
         'https://www.strapattackers.com',
@@ -398,13 +399,13 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             if 'date' in response.meta:
                 item['date'] = response.meta['date']
             elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['dateCreated']:
-                item['date'] = dateparser.parse(jsonlde['dateCreated'], date_formats=['%Y-%m-%d']).isoformat()
+                item['date'] = self.parse_date(jsonlde['dateCreated'], date_formats=['%Y-%m-%d']).isoformat()
             elif 'datePublished' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['datePublished']:
-                item['date'] = dateparser.parse(jsonlde['datePublished'], date_formats=['%Y-%m-%d']).isoformat()
+                item['date'] = self.parse_date(jsonlde['datePublished'], date_formats=['%Y-%m-%d']).isoformat()
             elif 'nudefightclub' in response.url:
                 date = response.xpath(
                     '//div[@class="updatedDate"]/b/following-sibling::text()').get()
-                item['date'] = dateparser.parse(date.strip()).isoformat()
+                item['date'] = self.parse_date(date.strip()).isoformat()
             else:
                 item['date'] = self.get_date(response)
 
@@ -415,7 +416,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                 date2 = re.search(r'sceneReleaseDate\":\"(\d{4}-\d{2}-\d{2})', data2)
                 if date2:
                     date2 = date2.group(1)
-                    date2 = dateparser.parse(date2.strip(), date_formats=['%Y-%m-%d']).isoformat()
+                    date2 = self.parse_date(date2.strip(), date_formats=['%Y-%m-%d']).isoformat()
                     if item['date'] and date2 > item['date']:
                         item['date'] = date2
 
@@ -463,6 +464,12 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             else:
                 item['parent'] = self.get_parent(response)
 
+            if item['title']:
+                item['title'] = self.cleanup_title(item['title'])
+
+            if item['description']:
+                item['description'] = self.cleanup_description(item['description'])
+
             if self.debug:
                 print(item)
             else:
@@ -482,7 +489,10 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if 'activeduty' in base:
             selector = '/en/videos/latest/All-categories/0/All-soldiers/0/%s'
 
-        if 'blowpass' in base or 'allgirlmassage' in base:
+        if 'allgirlmassage' in base:
+            selector = '/en/videos/page/%s'
+
+        if 'blowpass' in base:
             selector = '/en/videos/blowpass/latest/All-Categories/0/All-Pornstars/0/%s'
 
         if 'bskow' in base or 'lexingtonsteele' in base:
@@ -566,6 +576,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'squirtingorgies' in base:
             selector = '/en/latest/%s#main'
+
+        if 'seemyflixxx' in base:
+            selector = '/en/videos/All-Categories/0/All-Pornstars/0/0/All-Dvds/%s'
 
         if 'tsfactor' in base:
             selector = '/en/videos/updates/%s/All/0/Pornstar/0'
@@ -656,7 +669,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         if not date:
             date = response.xpath('//div[@class="updatedDate"]/b/following-sibling::text()').get()
 
-        return dateparser.parse(date.strip(), date_formats=['%m-%d-%Y', '%Y-%m-%d']).isoformat()
+        return self.parse_date(date.strip(), date_formats=['%m-%d-%Y', '%Y-%m-%d']).isoformat()
 
     def get_title(self, response):
         title = self.process_xpath(
@@ -724,6 +737,10 @@ class GammaEnterprisesSpider(BaseSceneScraper):
                     response, self.get_selector_map('tags')).getall()
         if tags:
             tags = list(map(str.strip, tags))
+            if "Newest" in tags:
+                tags.remove("Newest")
+            if "newest" in tags:
+                tags.remove("newest")
             return list(map(lambda x: x.strip(), tags))
         return []
 

@@ -70,7 +70,9 @@ class SiteAmericanPornstarSpider(BaseSceneScraper):
             if image:
                 item['image'] = "http://american-pornstar.com/" + image.strip().replace(" ", "%20")
             else:
-                item['image'] = ''
+                item['image'] = None
+
+            item['image_blob'] = None
 
             trailer = scene.xpath('.//div[@class="update_image"]/a/@onclick').get()
             if trailer:
@@ -82,7 +84,7 @@ class SiteAmericanPornstarSpider(BaseSceneScraper):
                 item['trailer'] = ''
 
             if title:
-                externalid = re.sub('[^a-zA-Z0-9-]', '', title)
+                externalid = re.sub('[^a-zA-Z0-9-]', '', item['title'])
                 item['id'] = externalid.lower().strip().replace(" ", "-")
 
             item['url'] = response.url

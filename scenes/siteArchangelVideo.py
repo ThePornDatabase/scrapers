@@ -39,9 +39,9 @@ class ArchangelVideoSpider(BaseSceneScraper):
             else:
                 item['title'] = 'No Title Available'
 
-            date = scene.xpath('.//strong[contains(text(),"Date")]/following-sibling::text()').get()
+            date = scene.xpath('.//strong[contains(text(),"Date")]/following-sibling::text()')
             if date:
-                item['date'] = self.parse_date(date)
+                item['date'] = self.parse_date(date.get()).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
