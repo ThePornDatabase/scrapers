@@ -46,7 +46,7 @@ class SiteAfterSchooljpSpider(BaseSceneScraper):
 
             title = scene.xpath('./div[@class="sample-title"]/text()')
             if title:
-                title = self.cleanup_title(re.sub(r'^\d{1,2}\.', '', title.get()))
+                item['title'] = self.cleanup_title(re.sub(r'^\d{1,2}\.', '', title.get()))
             else:
                 item['title'] = ''
 
@@ -81,6 +81,8 @@ class SiteAfterSchooljpSpider(BaseSceneScraper):
                 item['image'] = image.strip()
             else:
                 item['image'] = []
+
+            item['image_blob'] = ''
 
             if item['image']:
                 extern_id = re.search(r'\.jp/.*?/(.*?)/', item['image']).group(1)
