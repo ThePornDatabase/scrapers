@@ -1,6 +1,4 @@
 import re
-import html
-import string
 import tldextract
 import scrapy
 
@@ -47,6 +45,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Mandy Flores', 'Mandy Flores', '/studio/33729/mandy-flores/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'FM Concepts', 'FM Concepts', '/studio/116614/fm-concepts-1080p-bondage-store/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4") and not(contains(./following-sibling::span/text(), "4K"))]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Mouth Stuffed and Tied Up Girls', 'Mouth Stuffed and Tied Up Girls', '/studio/4458/mouth-stuffed-and-tied-up-girls/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Jon Woods', 'American Damsels', '/studio/6571/american-damsels-by-jon-woods/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -165,8 +164,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.strip()
             if title[-2:] == " -":
                 title = title[:-2]
-            title = string.capwords(title)
-            return title.strip()
+            return self.cleanup_title(title)
         return ''
 
     def get_tags(self, response):
@@ -174,6 +172,8 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             tags = self.process_xpath(
                 response, self.get_selector_map('tags')).getall()
             if tags:
+                if 'Bondage By Jon Woods' in tags:
+                    tags.remove('Bondage By Jon Woods')
                 return list(map(lambda x: x.strip().title(), tags))
         return []
 
@@ -272,7 +272,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
                     if "this format is" not in desc:
                         if not re.search(r'(\d{3,4}\*\d{3,4})', desc):
                             description = description + " " + desc.strip()
-            return html.unescape(description.strip())
+            return self.cleanup_description(description)
         return ''
 
     def get_site(self, response):
