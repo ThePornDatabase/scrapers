@@ -1,8 +1,7 @@
 import re
+import string
 from urllib.parse import urlparse
-import dateparser
 import scrapy
-
 from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -73,17 +72,17 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
 
             title = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a/text()').get()
             if title:
-                item['title'] = title.strip()
+                item['title'] = self.cleanup_title(title)
 
             date = scene.xpath('.//div[contains(@class,"update_date")]/comment()/following-sibling::text()').get()
             if date:
-                item['date'] = dateparser.parse(date.strip()).isoformat()
+                item['date'] = self.parse_date(date.strip()).isoformat()
             else:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             performers = scene.xpath('.//span[@class="update_models"]/a/text()').getall()
             if performers:
-                item['performers'] = list(map(lambda x: x.strip().title(), performers))
+                item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
             else:
                 item['performers'] = []
 
