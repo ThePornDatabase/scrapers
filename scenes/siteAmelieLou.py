@@ -39,3 +39,9 @@ class SiteAmelieLouSpider(BaseSceneScraper):
 
     def get_performers(self, response):
         return ['Amelie Lou']
+
+    def get_tags(self, response):
+        tags = super().get_tags(response)
+        if tags:
+            tags = list(map(lambda x: x.replace(",", ""), tags))
+        return tags
