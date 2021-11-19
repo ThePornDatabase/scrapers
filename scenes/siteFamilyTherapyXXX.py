@@ -26,9 +26,16 @@ class FamilyTherapyXXXSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//a[@class="entry-featured-image-url"]/@href').getall()
+        scenes = response.xpath('//div[contains(@class,"salvattore_content")]//article[contains(@id,"post")]')
         for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': 'FamilyTherapyXXX'})
+            image = scene.xpath('./div/a/img/@src')
+            if image:
+                image = self.format_link(response, image.get())
+            else:
+                image = ''
+            scene = scene.xpath('./div/a/@href').get()
+
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': 'FamilyTherapyXXX', 'image': image})
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -47,6 +54,3 @@ class FamilyTherapyXXXSpider(BaseSceneScraper):
                 performers = performers.split("&")
                 return list(map(lambda x: x.strip(), performers))
         return []
-
-    def get_image(self, response):
-        return ''
