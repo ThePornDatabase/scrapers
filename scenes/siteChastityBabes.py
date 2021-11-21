@@ -85,7 +85,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
 
         description = response.xpath('//div[@class="postcontent"]//p/text()').get()
         if description:
-            item['description'] = self.cleanup(description)
+            item['description'] = self.cleanup_description(description)
 
         item['site'] = "Chastity Babes"
         item['parent'] = "Chastity Babes"

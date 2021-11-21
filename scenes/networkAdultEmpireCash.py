@@ -39,7 +39,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta = {}
                 meta['site'] = "Spank Monster"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
-        if "latinoguys" in response.url:
+        elif "latinoguys" in response.url:
             scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
             for scene in scenes:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
