@@ -1,17 +1,9 @@
 import re
-import warnings
 import string
 import base64
 import requests
-import dateparser
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteThisIsGlamourSpider(BaseSceneScraper):
@@ -37,7 +29,7 @@ class SiteThisIsGlamourSpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page):
-        page = str((int(page) - 1) * 28)
+        page = str((int(page) - 1) * 25)
         url = self.format_url(base, self.get_selector_map('pagination') % page)
         return url
 
@@ -64,9 +56,13 @@ class SiteThisIsGlamourSpider(BaseSceneScraper):
             if image:
                 image = image.get().strip().replace("https://", "http://")
                 item['image'] = image
+                item['id'] = re.search(r'galid\/(\d+)\/', item['image']).group(1)
                 if self.phpsessid:
                     imagereq = requests.get(image, cookies={'PHPSESSID': self.phpsessid})
                     item['image_blob'] = base64.b64encode(imagereq.content).decode('utf-8')
+
+            if not item['image_blob']:
+                item['image_blob'] = None
 
             performers = scene.xpath('./div[@class="pi-model"]/a/text()')
             item['performers'] = []
@@ -75,14 +71,9 @@ class SiteThisIsGlamourSpider(BaseSceneScraper):
                 item['performers'] = list(map(lambda x: x.replace(" TIG", "").strip().title(), performers))
 
             date = scene.xpath('./div[@class="pi-added"]/text()')
-            item['date'] = dateparser.parse('today').isoformat
+            item['date'] = self.parse_date('today').isoformat
             if date:
-                item['date'] = dateparser.parse(date.get(), date_formats=['%d %b %Y']).isoformat()
-
-            if item['image']:
-                item['id'] = re.search(r'galid\/(\d+)\/', item['image']).group(1)
-
-            item['image_blob'] = None
+                item['date'] = self.parse_date(date.get(), date_formats=['%d %b %Y']).isoformat()
 
             item['url'] = response.url
 

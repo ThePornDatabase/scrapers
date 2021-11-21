@@ -28,7 +28,7 @@ class SiteColetteSpider(BaseSceneScraper):
         're_image': r'.*\[(http.*lrg.jpg)',
         'performers': '//div[@class="row"]/div/h2/span/following-sibling::a/text()',
         'tags': '',
-        'external_id': r'.*\/(.*?)\/$',
+        'external_id': r'.*/(.*?)/$',
         'trailer': '',
         'pagination': '/index.php?show=videos&pref=items&page=%s&catname=&order=recent'
     }
@@ -55,9 +55,6 @@ class SiteColetteSpider(BaseSceneScraper):
         return ''
 
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                return search.group(1).replace("%20", "-").lower()
-
-        return None
+        externid = super().get_id(response)
+        externid = externid.replace("%20", "-").lower()
+        return externid

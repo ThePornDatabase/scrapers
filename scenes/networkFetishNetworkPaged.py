@@ -1,6 +1,5 @@
 import re
 import scrapy
-import dateparser
 import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -86,7 +85,7 @@ class FetishNetworkPagedSpider(BaseSceneScraper):
     def parse_scenepage(self, response):
         scenelist = []
         if "brutaldungeon" in response.url:
-            scenes = response.xpath('//div[contains(@class,"download-box-large")]')
+            scenes = response.xpath('//div[contains(@class,"download-box-large")]/label/..')
         else:
             scenes = response.xpath('//div[@class="row"]/div[contains(@class,"content-image-video")]')
         for scene in scenes:
@@ -132,13 +131,9 @@ class FetishNetworkPagedSpider(BaseSceneScraper):
 
             if date:
                 date = date.strip()
-
-            if date:
-                date = date.strip()
-                item['date'] = dateparser.parse(date.strip()).isoformat()
+                item['date'] = self.parse_date(date.strip()).isoformat()
             else:
-                date = "1970-01-01"
-                item['date'] = dateparser.parse(date).isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             if "brutaldungeon" in response.url:
                 description = scene.xpath('.//p/text()').get()

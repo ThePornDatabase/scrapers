@@ -1,7 +1,7 @@
+import re
+from datetime import datetime
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from datetime import datetime
-import re
 
 # Call with -a max_id=1000
 # This needs to be increased over time
@@ -11,6 +11,7 @@ class LusterySpider(BaseSceneScraper):
     name = 'Lustery'
     network = 'Lustery'
     parent = 'Lustery'
+    max_id = '2000'
 
     start_urls = ["https://lustery.com"]
 
@@ -55,7 +56,7 @@ class LusterySpider(BaseSceneScraper):
         if img_url is None:
             img_url = response.xpath('//div[@class="poster-with-video lazy-image"]/@data-src').get()
         timestamp = int(img_url.split("=")[1])
-        return datetime.fromtimestamp(timestamp)
+        return datetime.fromtimestamp(timestamp).isoformat()
 
     def start_requests(self):
         # Lustery doesn't allow you to see all pages without logging in.

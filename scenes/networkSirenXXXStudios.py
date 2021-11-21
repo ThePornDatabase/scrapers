@@ -66,7 +66,8 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                 if image:
                     item['image'] = image.strip()
                 else:
-                    item['image'] = ''
+                    item['image'] = None
+                item['image_blob'] = None
 
                 performers = scene.xpath('./p/a/text()').getall()
                 if performers:
@@ -93,12 +94,8 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
         return ''
 
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url.lower())
-            if search:
-                return search.group(1)
-
-        return None
+        externid = super().get_id(response)
+        return externid.lower()
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):

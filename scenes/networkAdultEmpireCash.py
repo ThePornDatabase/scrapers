@@ -39,6 +39,10 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta = {}
                 meta['site'] = "Spank Monster"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        if "latinoguys" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
         else:
             scenes = response.css('.grid-item')
             for scene in scenes:
@@ -67,7 +71,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "jayspov" in base:
             pagination = "/jays-pov-updates.html?page=%s&hybridview=member"
-        if "lantinoguys" in base:
+        if "latinoguys" in base:
             pagination = "/watch-newest-latino-guys-porn-clips-and-scenes.html?page=%s&hybridview=member"
         if "cospimps" in base:
             pagination = "/videos/videos_page=%s"

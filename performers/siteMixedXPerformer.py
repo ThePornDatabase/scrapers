@@ -18,8 +18,8 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         'external_id': 'models\/(.*).html'
     }
 
-    url = 'http://mixedx.com/'
-    
+    url = 'https://mixedx.com/'
+
     paginations = {
         '/models/%s/latest/?g=f',
         '/models/%s/latest/?g=m',
@@ -64,10 +64,10 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         name = self.process_xpath(response, self.get_selector_map('name')).get().strip()
         name = name.replace("About", "").strip()
         return name
-        
+
     def get_performers(self, response):
         meta = response.meta
-        performers = response.xpath('//div[@class="item-portrait"]/a/@href').getall()
+        performers = response.xpath('//div[contains(@class,"item-portrait")]/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(
                 url=self.format_link(response, performer),
@@ -107,11 +107,11 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         if bio:
             bio = " ".join(bio)
             return bio
-            
+
         return ''
 
     def get_birthday(self, response):
         date = self.process_xpath(response, self.get_selector_map('birthday')).get()
         if date:
             return dateparser.parse(date.strip()).isoformat()
-        return None   
+        return None

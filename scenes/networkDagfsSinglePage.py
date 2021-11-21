@@ -1,25 +1,23 @@
-import scrapy
 import re
-import dateparser
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class networkDaGFsSpider(BaseSceneScraper):
+class NetworkDaGFsSpider(BaseSceneScraper):
     name = 'DagfsSinglePage'
     network = 'dagfs'
 
     start_urls = [
-        ['https://www.filf.com','FILF'],
-        ['https://www.shedoesanal.com','She Does Anal'],
-        ['https://www.steplesbians.com','Step Lesbians'],
+        ['https://www.filf.com', 'FILF'],
+        ['https://www.shedoesanal.com', 'She Does Anal'],
+        ['https://www.steplesbians.com', 'Step Lesbians'],
     ]
-    
-    
+
     def start_requests(self):
         for link in self.start_urls:
             yield scrapy.Request(url=link[0],
                                  callback=self.get_scenes,
-                                 meta={'page': self.page, 'site': link[1]},
+                                 meta={'page': self.page, 'site': link[1], 'parent': link[1]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -30,7 +28,7 @@ class networkDaGFsSpider(BaseSceneScraper):
         'image': '//img[@class="scene-img"]/@src',
         'performers': '//div[@class="name-ctn"]/span/text()',
         'tags': '',
-        'external_id': '.*\/(.*?)\/\?',
+        'external_id': r'.*/(.*?)/',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html#'
     }
@@ -42,17 +40,5 @@ class networkDaGFsSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
-    def get_site(self, response):
-        meta = response.meta
-        return meta['site']
-
-    def get_parent(self, response):
-        meta = response.meta
-        return meta['site']
-        
-    def get_date(self,response):
-        return dateparser.parse('today').isoformat()
-
-    def get_url(self, response):
-        url = re.search('(.*)\?', response.url).group(1)
-        return url
+    def get_date(self, response):
+        return self.parse_date('today').isoformat()

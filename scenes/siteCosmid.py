@@ -79,7 +79,7 @@ class CosmidFullImportSpider(BaseSceneScraper):
 
             date = scene.xpath('./div[contains(@class,"item-info")]/div[@class="date"]/text()').get()
             if date:
-                item['date'] = self.parse_date(date, date_formats=['%Y-%m-%d'])
+                item['date'] = self.parse_date(date, date_formats=['%Y-%m-%d']).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 

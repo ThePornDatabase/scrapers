@@ -25,7 +25,7 @@ class BabeArchivePerformerSpider(BasePerformerScraper):
     parent = "Babe Archive"
 
     start_urls = [
-        'https://www.babearchive.com',
+        'https://www.babearchives.com',
     ]
 
     def get_gender(self, response):
@@ -48,7 +48,7 @@ class BabeArchivePerformerSpider(BasePerformerScraper):
                     height = height.replace(" ","")
                 return height.strip()
         return ''
-        
+
     def get_weight(self, response):
         if 'weight' in self.selector_map:
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
@@ -57,15 +57,15 @@ class BabeArchivePerformerSpider(BasePerformerScraper):
                     weight = re.search('(\d+\s?kg)', weight).group(1).strip()
                     weight = weight.replace(" ","")
                 return weight.strip()
-        return ''        
-        
+        return ''
+
     def get_image(self, response):
         if 'image' in self.selector_map:
             image = self.process_xpath(response, self.get_selector_map('image')).get()
             if image:
                 image = "https://www.babearchives.com" + image
                 return image.strip()
-        return ''        
+        return ''
 
     def get_cupsize(self, response):
         if 'measurements' in self.selector_map:
@@ -77,8 +77,8 @@ class BabeArchivePerformerSpider(BasePerformerScraper):
                     cupsize = re.search('(.*?)-.*', measurements).group(1)
                     if cupsize:
                         return cupsize.upper().strip()
-        return ''   
-    
+        return ''
+
 
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:

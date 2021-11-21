@@ -1,5 +1,6 @@
+import base64
+import requests
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -27,6 +28,7 @@ class NewSensationsSpider(BaseSceneScraper):
         'description': '//div[@class="description"]/span/following-sibling::h2/text()',
         'date': '//div[@class="sceneDateP"]/span/text()',
         'image': '//span[@id="trailer_thumb"]//img/@src',
+        'image_blob': '//span[@id="trailer_thumb"]//img/@src',
         'performers': '//div[@class="sceneTextLink"]//span[@class="tour_update_models"]/a/text()',
         'tags': '//meta[@name="keywords"]/@content',
         'external_id': 'tour_ns\\/updates\\/(.+)\\.html',
@@ -58,3 +60,16 @@ class NewSensationsSpider(BaseSceneScraper):
             if "parody" in taglist.lower():
                 return "Parody Pass"
             return "New Sensations"
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if image[-3:] == "%20":
+            image = image[:-3]
+        return image
+
+    def get_image_blob(self, response):
+        image = self.get_image(response)
+        if image:
+            image = self.format_link(response, image)
+            return base64.b64encode(requests.get(image).content).decode('utf-8')
+        return None

@@ -86,14 +86,14 @@ class networkAllJapanesePassSpider(BaseSceneScraper):
             return title.strip()
 
         return None
-        
+
     def get_site(self, response):
         parsed_uri = tldextract.extract(response.url)
         domain = parsed_uri.domain
         site = match_site(domain)
         if not site:
             site = tldextract.extract(response.url).domain
-            
+
         return site
 
 

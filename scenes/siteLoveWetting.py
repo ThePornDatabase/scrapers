@@ -33,7 +33,7 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             title = scene.xpath('./div[@class="box-info"]/h3/text()')
             item['title'] = ''
             if title:
-                item['title'] = self.cleanup_title(title)
+                item['title'] = self.cleanup_title(title.get())
 
             description = scene.xpath('./div[@class="box-info"]/article/div[contains(@class, "description")]/text()')
             item['description'] = ''

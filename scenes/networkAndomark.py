@@ -91,7 +91,7 @@ class AndomarkSpider(BaseSceneScraper):
         'https://laurenphillips.com',
         'https://oldsexygrannies.com',
         'https://ravenswallowzxxx.com',
-        'https://reidmylips.elxcomplete.com',
+        # ~ # 'https://reidmylips.elxcomplete.com',  # Will requires bypass
         'https://rionkingxxx.com',
         'https://seanmichaelsxxx.com',
         'https://secretsusan.com',
@@ -168,8 +168,9 @@ class AndomarkSpider(BaseSceneScraper):
         else:
             scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
         for scene in scenes:
-            yield scrapy.Request(url=scene, callback=self.parse_scene,
-                                 cookies=self.cookies)
+            if len(scene) > 10:
+                yield scrapy.Request(url=scene, callback=self.parse_scene,
+                                     cookies=self.cookies)
 
     def get_trailer(self, response):
         trailerxpath = self.get_selector_map('trailer')

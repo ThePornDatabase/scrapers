@@ -92,6 +92,8 @@ class PornCZPerformerSpider(BasePerformerScraper):
             if image:
                 item['image'] = "https://www.porncz.com" + image.strip()
 
+            item['image_blob'] = None
+
             descline = performer.xpath('./a/div/p/text()').get()
             if descline:
                 descline = descline.replace("-", "").strip()

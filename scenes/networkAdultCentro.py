@@ -40,7 +40,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         'https://porntugal.com',
         'https://trinitystclair.com',
         'https://aussiexxxhookups.com',
-        'https://svenskaporrfilmer.net',
+        'https://nordiskaporrfilmer.com',
         'https://ninnworx.com',
         'https://therealscarletred.com',
         'https://psychohenessy.com',
@@ -149,7 +149,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "aussiexxxhookups" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[totalCount]=1&transitParameters[preset]=videos&transitParameters[v1]=OBoiu4zYsP'
-        if "svenskaporrfilmer" in base:
+        if "nordiskaporrfilmer" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "cleagaultier" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
@@ -239,11 +239,11 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
-        if "svenskaporrfilmer" in response.url:
+        if "nordiskaporrfilmer" in response.url:
             item['site'] = 'Svenska Porrfilmer'
             item['parent'] = 'Svenska Porrfilmer'
             item['network'] = 'Svenska Porrfilmer'
-            modelurl = "https://svenskaporrfilmer.net/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            modelurl = "https://nordiskaporrfilmer.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 

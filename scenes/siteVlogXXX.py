@@ -1,10 +1,9 @@
-import scrapy
 import re
-
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteVlogXXXSpider(BaseSceneScraper):
+class SiteVlogXXXSpider(BaseSceneScraper):
     name = 'VlogXXX'
     network = 'VlogXXX'
     parent = 'VlogXXX'
@@ -20,7 +19,7 @@ class siteVlogXXXSpider(BaseSceneScraper):
         'image': '//div[@id="noMore"]/img/@src',
         'performers': '//h3[contains(text(),"pornstars")]/following-sibling::a/text()',
         'tags': '//h3[contains(text(),"Categories")]/following-sibling::a/text()',
-        'external_id': 'updates\/(.*).html',
+        'external_id': r'updates/(.*).html',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html'
     }
@@ -31,18 +30,6 @@ class siteVlogXXXSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_site(self, response):
-        return "VlogXXX"
-        
-
-    def get_parent(self, response):
-        return "VlogXXX"
-        
-
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                return search.group(1).lower()
-
-        return None
+        externid = super().get_id(response)
+        return externid.lower()

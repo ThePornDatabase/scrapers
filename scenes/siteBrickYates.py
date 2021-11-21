@@ -47,11 +47,8 @@ class SiteBrickYatesSpider(BaseSceneScraper):
         return "Brick Yates"
 
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                return search.group(1).lower()
-        return None
+        externid = super().get_id(response)
+        return externid.lower()
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description')).getall()
