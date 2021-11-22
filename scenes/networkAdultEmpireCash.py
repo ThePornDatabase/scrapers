@@ -7,7 +7,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     network = 'AdultEmpireCash'
 
     start_urls = [
-        'https://www.mypervyfamily.com/',
+        # ~ 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
         'https://jayspov.net',
@@ -63,8 +63,6 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_next_page_url(self, base, page):
         pagination = self.get_selector_map('pagination')
 
-        if "mypervyfamily" in base:
-            pagination = "/my-pervy-family.html?page=%s&view=grid"
         if "conorcoxxx" in base:
             pagination = "/conor-coxxx-clips.html?page=%s&hybridview=member"
         if "hornyhousehold" in base:
