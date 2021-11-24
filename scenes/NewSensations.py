@@ -73,3 +73,29 @@ class NewSensationsSpider(BaseSceneScraper):
             image = self.format_link(response, image)
             return base64.b64encode(requests.get(image).content).decode('utf-8')
         return None
+
+    def get_tags(self, response):
+        performers = super().get_performers(response)
+        site = self.get_site(response).strip().title()
+
+        tags = super().get_tags(response)
+        if len(tags) == 1 and "," in tags[0]:
+            tags = tags[0].split(',')
+            tags = list(map(lambda x: x.strip().title(), tags))
+            for performer in performers:
+                if performer in tags:
+                    tags.remove(performer)
+            if "Movies" in tags:
+                tags.remove("Movies")
+            if "4K" in tags:
+                tags.remove("4K")
+            if "New Sensations" in tags:
+                tags.remove("New Sensations")
+            if site in tags:
+                tags.remove(site)
+            tags2 = tags.copy()
+            for tag in tags2:
+                if "#" in tag:
+                    tags.remove(tag)
+
+        return tags
