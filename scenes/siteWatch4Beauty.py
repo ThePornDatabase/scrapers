@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, timedelta, datetime
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -90,7 +90,24 @@ class Watch4BeautyScraper(BaseSceneScraper):
                 performers.append(model['model_nickname'].strip())
 
         item['performers'] = performers
-        yield item
+
+        if "days" in self.settings:
+            days = int(self.settings['days'])
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.isoformat()
+        else:
+            filterdate = "0000-00-00"
+
+        if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
+            print(item)
+        else:
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item
 
     def get_next_page_url(self, base, page, response=""):
         if response:

@@ -11,7 +11,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
         'https://jayspov.net',
-        'https://www.filthykings.com/',
+        # ~ 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
         'https://cospimps.com/',
@@ -73,6 +73,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/watch-newest-latino-guys-porn-clips-and-scenes.html?page=%s&hybridview=member"
         if "cospimps" in base:
             pagination = "/videos/videos_page=%s"
+        if "filthykings" in base:
+            pagination = "/en/videos/page/%s"
         if "pmggirls" in base:
             pagination = "/videos/videos_page=%s"
         if "lethalhardcore" in base:

@@ -1,4 +1,5 @@
 import json
+from datetime import date, timedelta
 from scrapy.http import Request
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -72,7 +73,21 @@ class NetworkARXBucksSpider(BaseSceneScraper):
                 item['parent'] = "Trans Day Spa"
             item['network'] = "ARX Bucks"
             if item['id'] and item['title']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
 
 def match_site(argument):

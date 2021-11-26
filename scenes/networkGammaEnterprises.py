@@ -1,6 +1,7 @@
 import re
 import json
 import tldextract
+from datetime import date, timedelta
 from chompjs import chompjs
 from extruct.jsonld import JsonLdExtractor
 import scrapy
@@ -403,9 +404,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             elif 'datePublished' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['datePublished']:
                 item['date'] = self.parse_date(jsonlde['datePublished'], date_formats=['%Y-%m-%d']).isoformat()
             elif 'nudefightclub' in response.url:
-                date = response.xpath(
+                date1 = response.xpath(
                     '//div[@class="updatedDate"]/b/following-sibling::text()').get()
-                item['date'] = self.parse_date(date.strip()).isoformat()
+                item['date'] = self.parse_date(date1.strip()).isoformat()
             else:
                 item['date'] = self.get_date(response)
 
@@ -469,11 +470,24 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
             if item['description']:
                 item['description'] = self.cleanup_description(item['description'])
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
 
-            if self.debug:
-                print(item)
-            else:
-                return item
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
+
         else:
             super().parse_scene(response)
 
@@ -494,6 +508,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'blowpass' in base:
             selector = '/en/videos/blowpass/latest/All-Categories/0/All-Pornstars/0/%s'
+            # ~ selector = '/en/videos/immorallive/latest/All-Categories/0/All-Pornstars/0/%s'  # Immoral Live isn't listed with the rest of the Blowpass sites on the index, will need to be manual
 
         if 'bskow' in base or 'lexingtonsteele' in base:
             selector = '/en/videos/updates/%s/All/0/Pornstar/0'

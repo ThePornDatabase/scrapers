@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -95,11 +96,11 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         if postinfo:
             postinfo = postinfo.replace("\r\n", " ")
             postinfo = postinfo.replace("\n", " ")
-            date = re.search(r'Posted\s+on\s?(.*)\s?in', postinfo)
-            if date:
-                date = date.group(1)
-                date = self.parse_date(date.strip()).isoformat()
-                item['date'] = date
+            scenedate = re.search(r'Posted\s+on\s?(.*)\s?in', postinfo)
+            if scenedate:
+                scenedate = scenedate.group(1)
+                scenedate = self.parse_date(scenedate.strip()).isoformat()
+                item['date'] = scenedate
 
             externalid = re.search(r'Update\s?(.*)\ ?\|', postinfo)
             if externalid:
@@ -132,4 +133,20 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         item['trailer'] = ''
 
         if item['id'] and item['title'] and item['date']:
-            yield item
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

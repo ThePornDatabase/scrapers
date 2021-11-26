@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 import scrapy
 
@@ -68,11 +69,11 @@ class SiteAfterSchooljpSpider(BaseSceneScraper):
             else:
                 item['tags'] = []
 
-            date = scene.xpath('./div[@class="sample-stats"]/text()').get()
-            if date:
-                date = re.search('released on (.*)', date.lower())
-                if date:
-                    item['date'] = self.parse_date(date.group(1), date_formats=['%m/%d/%Y']).isoformat()
+            scenedate = scene.xpath('./div[@class="sample-stats"]/text()').get()
+            if scenedate:
+                scenedate = re.search('released on (.*)', scenedate.lower())
+                if scenedate:
+                    item['date'] = self.parse_date(scenedate.group(1), date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = self.parse('today').isoformat()
 
@@ -101,7 +102,23 @@ class SiteAfterSchooljpSpider(BaseSceneScraper):
 
             item['url'] = response.url
 
-            yield item
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
     def get_site(self, response):
         return "After School.jp"

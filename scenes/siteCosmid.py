@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -77,9 +78,9 @@ class CosmidFullImportSpider(BaseSceneScraper):
             item['parent'] = "Cosmid"
             item['network'] = "Cosmid"
 
-            date = scene.xpath('./div[contains(@class,"item-info")]/div[@class="date"]/text()').get()
-            if date:
-                item['date'] = self.parse_date(date, date_formats=['%Y-%m-%d']).isoformat()
+            scenedate = scene.xpath('./div[contains(@class,"item-info")]/div[@class="date"]/text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate, date_formats=['%Y-%m-%d']).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -111,4 +112,20 @@ class CosmidFullImportSpider(BaseSceneScraper):
             item['url'] = response.url
 
             if item['id'] and item['title'] and item['date']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

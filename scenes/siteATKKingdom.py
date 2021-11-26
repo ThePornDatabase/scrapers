@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import json
 import base64
 import requests
@@ -92,22 +93,22 @@ class ATKKingdomSpider(BaseSceneScraper):
         for scene in scenes:
             if "atkarchives" in response_url or "atkpetites" in response_url or "atkhairy" in response_url or "atkpremium" in response_url:
                 link = scene.xpath('.//div[@class="player"]/a/@href').get()
-                date = scene.xpath('.//span[contains(@class, "movie_date")]/text()').get()
-                if date:
-                    date = self.parse_date(date.strip()).isoformat()
+                scenedate = scene.xpath('.//span[contains(@class, "movie_date")]/text()').get()
+                if scenedate:
+                    scenedate = self.parse_date(scenedate.strip()).isoformat()
                 else:
-                    date = self.parse_date('today').isoformat()
+                    scenedate = self.parse_date('today').isoformat()
                 performer = scene.xpath('./div/span[contains(@class,"video_name")]/a/text()').get()
                 performer = performer.strip()
                 if not performer:
                     performer = ''
             if "atkexotics" in response_url or "amkingdom" in response_url:
                 link = scene.xpath('./div[@class="movie-image"]/a/@href').get()
-                date = scene.xpath('./div[@class="date left clear"][2]/text()').get()
-                if date:
-                    date = self.parse_date(date.strip()).isoformat()
+                scenedate = scene.xpath('./div[@class="date left clear"][2]/text()').get()
+                if scenedate:
+                    scenedate = self.parse_date(scenedate.strip()).isoformat()
                 else:
-                    date = self.parse_date('today').isoformat()
+                    scenedate = self.parse_date('today').isoformat()
                 performer = scene.xpath('./div[@class="video-name"]/a/text()').get()
                 performer = performer.strip()
                 if not performer:
@@ -129,7 +130,7 @@ class ATKKingdomSpider(BaseSceneScraper):
 
                 headers = self.headers
                 headers['Content-Type'] = 'application/json'
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'cookies': [{'name': 'mydate', 'value': date}, {'name': 'performer', 'value': performer}]}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'cookies': [{'name': 'mydate', 'value': scenedate}, {'name': 'performer', 'value': performer}]}
                 if "?w=" not in link:
                     yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
                 else:
@@ -158,7 +159,7 @@ class ATKKingdomSpider(BaseSceneScraper):
                         item['title'] = self.cleanup_title(title.get())
                     else:
                         item['title'] = ''
-                    item['date'] = date
+                    item['date'] = scenedate
                     item['url'] = response_url
                     image = scene.xpath('.//img/@src')
                     if image:
@@ -178,7 +179,23 @@ class ATKKingdomSpider(BaseSceneScraper):
                     if item['image']:
                         item['id'] = re.search(r'.*/(\d{4,8})/.*', item['image']).group(1)
 
-                    yield item
+                    if "days" in self.settings:
+                        days = int(self.settings['days'])
+                        filterdate = date.today() - timedelta(days)
+                        filterdate = filterdate.isoformat()
+                    else:
+                        filterdate = "0000-00-00"
+
+                    if self.debug:
+                        if not item['date'] > filterdate:
+                            item['filtered'] = "Scene filtered due to date restraint"
+                        print(item)
+                    else:
+                        if filterdate:
+                            if item['date'] > filterdate:
+                                yield item
+                        else:
+                            yield item
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -210,12 +227,12 @@ class ATKKingdomSpider(BaseSceneScraper):
         cookies = jsondata['solution']['cookies']
         for cookie in cookies:
             if cookie['name'] == 'mydate':
-                date = cookie['value']
+                scenedate = cookie['value']
             if cookie['name'] == 'performer':
                 performer = cookie['value']
         item = SceneItem()
-        if date:
-            item['date'] = self.parse_date(date).isoformat()
+        if scenedate:
+            item['date'] = self.parse_date(scenedate).isoformat()
         else:
             item['date'] = self.parse_date('today').isoformat()
 
@@ -255,10 +272,23 @@ class ATKKingdomSpider(BaseSceneScraper):
             item['parent'] = "ATK Galleria"
             item['site'] = "ATK Galleria"
 
+        if "days" in self.settings:
+            days = int(self.settings['days'])
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.isoformat()
+        else:
+            filterdate = "0000-00-00"
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item
 
     def get_image(self, response):
         image = super().get_image(response)

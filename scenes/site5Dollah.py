@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 
 from tpdb.items import SceneItem
@@ -112,7 +113,20 @@ class Site5DollahSpider(BaseSceneScraper):
         else:
             item['parent'] = self.get_parent(response)
 
+        if "days" in self.settings:
+            days = int(self.settings['days'])
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.isoformat()
+        else:
+            filterdate = "0000-00-00"
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item

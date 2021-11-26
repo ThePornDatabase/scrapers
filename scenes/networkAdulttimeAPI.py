@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -115,6 +116,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.devilsfilm.com',
         'https://www.diabolic.com',
         'https://www.evilangel.com',
+        'https://www.filthykings.com',
         'https://www.genderx.com',
         'https://www.girlsway.com',
         'https://www.isthisreal.com',
@@ -260,6 +262,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if 'evilangel' in referrerurl:
                 item['parent'] = "Evil Angel"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'filthykings' in referrerurl:
+                item['parent'] = "Filthy Kings"
+                item['site'] = scene['serie_name']
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'genderx' in referrerurl:
                 item['parent'] = "Gender X"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
@@ -300,15 +306,37 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['parent'] = "Zero Tolerance"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
 
-            if 'mypervyfamily' in item['url'] and item['date'] < "2021-10-06":
+            #  The following sites were brought in from other scrapers.  Date limits are to avoid dupes
+            donotyield = 0
+            if (
+                ('mypervyfamily' in item['url'] and item['date'] < "2021-10-06") or
+                ('Filthy Blowjobs' in item['site'] and item['date'] < "2021-09-14") or
+                ('Filthy Massage' in item['site'] and item['date'] < "2021-09-28") or
+                ('Filthy Newbies' in item['site'] and item['date'] < "2021-09-21") or
+                ('Filthy POV' in item['site'] and item['date'] < "2021-10-05") or
+                ('Filthy Taboo' in item['site'] and item['date'] < "2021-10-09")
+                ):
                 donotyield = 1
-            else:
-                donotyield = 0
 
             matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
             if not any(x in item['site'] for x in matches):
                 if not donotyield:
-                    yield item
+
+                    if "days" in self.settings:
+                        days = int(self.settings['days'])
+                        filterdate = date.today() - timedelta(days)
+                        filterdate = filterdate.isoformat()
+
+                    if self.debug:
+                        if not item['date'] > filterdate:
+                            item['filtered'] = "Scene filtered due to date restraint"
+                        print(item)
+                    else:
+                        if filterdate:
+                            if item['date'] > filterdate:
+                                yield item
+                        else:
+                            yield item
 
     def call_algolia(self, page, token, referrer):
         # ~ print (f'Page: {page}        Token: {token}     Referrer: {referrer}')
@@ -333,6 +361,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facets=%5B%22availableOnSite%22%2C%22categories.name%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3Adevilsfilm%22%2C%22availableOnSite%3Asquirtalicious%22%2C%22availableOnSite%3Ahairyundies%22%2C%22availableOnSite%3Alesbianfactor%22%2C%22availableOnSite%3Adevilsfilmparodies%22%2C%22availableOnSite%3Agivemeteens%22%2C%22availableOnSite%3Aoutofthefamily%22%2C%22availableOnSite%3Adevilsgangbangs%22%2C%22availableOnSite%3AJaneDoePictures%22%2C%22availableOnSite%3Adevilstgirls%22%5D%5D"},{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&hitsPerPage=1&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite"}]}'
         if 'diabolic' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Adiabolic%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&analytics=false&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Adiabolic%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&clickAnalytics=false&facets=upcoming"}]}'
+        if 'filthykings' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Afilthykings%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&clickAnalytics=true&facets=%5B%22categories.name%22%2C%22channels.id%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&analytics=false&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Afilthykings%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&clickAnalytics=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming"}]}'
         if 'genderx' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Agenderx%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20site_id%3A428&facets=%5B%22categories.name%22%2C%22actors.name%22%2C%22serie_name%22%2C%22length_range_15min%22%2C%22download_sizes%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Agenderx%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20site_id%3A428&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming"}]}'
         if 'girlsway' in referrer:

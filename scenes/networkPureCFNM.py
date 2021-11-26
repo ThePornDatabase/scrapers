@@ -1,5 +1,6 @@
 import re
 import string
+from datetime import date, timedelta
 from urllib.parse import urlparse
 import scrapy
 from tpdb.items import SceneItem
@@ -74,9 +75,9 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
             if title:
                 item['title'] = self.cleanup_title(title)
 
-            date = scene.xpath('.//div[contains(@class,"update_date")]/comment()/following-sibling::text()').get()
-            if date:
-                item['date'] = self.parse_date(date.strip()).isoformat()
+            scenedate = scene.xpath('.//div[contains(@class,"update_date")]/comment()/following-sibling::text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.strip()).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -122,4 +123,20 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
             item['network'] = "Pure CFNM"
 
             if item['id'] and item['title']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

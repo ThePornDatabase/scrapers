@@ -1,6 +1,6 @@
 import re
 import string
-import dateparser
+from datetime import date, timedelta
 import tldextract
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -101,9 +101,9 @@ class NetworkMoodUniverseSpider(BaseSceneScraper):
             scenedate = scene.xpath('.//span[@class="date"]/text()')
             if scenedate:
                 scenedate = scenedate.get().strip()
-                item['date'] = dateparser.parse(scenedate, date_formats=['%d %b %Y']).isoformat()
+                item['date'] = self.parse_date(scenedate, date_formats=['%d %b %Y']).isoformat()
             else:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             item['id'] = scene.xpath('./@id').get().strip()
 
@@ -121,4 +121,20 @@ class NetworkMoodUniverseSpider(BaseSceneScraper):
                 item['site'] = match_site(tldextract.extract(response.url).domain)
 
             if item['id'] and item['title']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

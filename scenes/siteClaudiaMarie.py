@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -54,9 +55,9 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
             else:
                 item['tags'] = []
 
-            date = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
-            if date:
-                item['date'] = self.parse_date(date, date_formats=['%m/%d/%Y']).isoformat()
+            scenedate = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = []
 
@@ -87,4 +88,20 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
 
             item['url'] = "https://claudiamarie.com/tour/updates/" + item['id'] + ".html"
 
-            yield item
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

@@ -2,7 +2,7 @@ import re
 import string
 from urllib.parse import urlencode
 import datetime
-import dateparser
+from datetime import date, timedelta
 import scrapy
 from slugify import slugify
 from tldextract import tldextract
@@ -263,7 +263,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             item['trailer'] = self.get_trailer(scene)
             if not item['trailer']:
                 item['trailer'] = ''
-            item['date'] = dateparser.parse(scene['dateReleased']).isoformat()
+            item['date'] = self.parse_date(scene['dateReleased']).isoformat()
             item['id'] = scene['id']
             item['network'] = self.network
             item['parent'] = tldextract.extract(response.meta['url']).domain
@@ -271,9 +271,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             if 'title' in scene:
                 item['title'] = scene['title']
             else:
-                item['title'] = item['site'] + ' ' + \
-                    dateparser.parse(scene['dateReleased']
-                                     ).strftime('%b/%d/%Y')
+                item['title'] = item['site'] + ' ' + self.parse_date(scene['dateReleased']).strftime('%b/%d/%Y')
 
             if 'description' in scene:
                 item['description'] = scene['description']
@@ -314,8 +312,23 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             item['parent'] = string.capwords(item['parent'])
 
             scene_count = scene_count + 1
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
 
-            yield item
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
         if scene_count > 0:
             if 'page' in response.meta and (

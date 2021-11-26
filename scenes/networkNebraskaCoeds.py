@@ -1,6 +1,6 @@
 import re
 from urllib.parse import urlparse
-import dateparser
+from datetime import date, timedelta
 import scrapy
 
 from tpdb.items import SceneItem
@@ -75,11 +75,11 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
             else:
                 item['title'] = ''
 
-            date = scene.xpath('.//span[@class="availdate"]/text()|.//p/span[2]/text()').get()
-            if date:
-                item['date'] = dateparser.parse(date.strip()).isoformat()
+            scenedate = scene.xpath('.//span[@class="availdate"]/text()|.//p/span[2]/text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.strip()).isoformat()
             else:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             performers = scene.xpath('.//span[@class="tour_update_models"]/a/text()|.//p/span[1]/a/text()').getall()
             if performers:
@@ -123,4 +123,20 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
             item['network'] = "Nebraska Coeds"
 
             if item['id'] and item['title']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

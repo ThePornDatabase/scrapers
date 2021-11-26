@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import json
 from urllib.parse import urlparse
 import scrapy
@@ -167,7 +168,23 @@ class TeenCoreClubSpider(BaseSceneScraper):
 
             item['tags'] = []
 
-            itemlist.append(item.copy())
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        itemlist.append(item.copy())
+                else:
+                    itemlist.append(item.copy())
 
             item.clear()
         return itemlist

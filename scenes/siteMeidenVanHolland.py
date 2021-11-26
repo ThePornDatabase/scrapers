@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import codecs
 import json
 import scrapy
@@ -158,18 +159,17 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
         return ''
 
     def get_date(self, response):
-        datestring = self.process_xpath(
-            response, self.get_selector_map('date'))
+        datestring = self.process_xpath(response, self.get_selector_map('date'))
         if datestring:
-            datestring = datestring.get()
-            date = self.get_from_regex(datestring, 're_date')
+            datestring = datestring.get().replace(r"\u002F", "/")
+            date = re.search(self.get_selector_map('re_date'), datestring)
             if not date:
                 date = re.search(r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
-                if date:
-                    date = date.group(1)
-
+            if not date:
+                date = re.search(r'active_from:\"(\d{1,2}/\d{1,2}/\d{2})', datestring)
             if date:
-                return self.parse_date(date).isoformat()
+                date = date.group(1)
+                return self.parse_date(date, date_formats=['%Y-%m-%d', '%m/%d/%Y']).isoformat()
             return self.parse_date('today').isoformat()
         return None
 
@@ -239,7 +239,20 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
             item['parent'] = self.get_parent(response)
 
         if item['title'] and item['id']:
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
             if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
                 print(item)
             else:
-                yield item
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

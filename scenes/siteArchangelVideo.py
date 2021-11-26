@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -39,9 +40,9 @@ class ArchangelVideoSpider(BaseSceneScraper):
             else:
                 item['title'] = 'No Title Available'
 
-            date = scene.xpath('.//strong[contains(text(),"Date")]/following-sibling::text()')
-            if date:
-                item['date'] = self.parse_date(date.get()).isoformat()
+            scenedate = scene.xpath('.//strong[contains(text(),"Date")]/following-sibling::text()')
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.get()).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -79,7 +80,23 @@ class ArchangelVideoSpider(BaseSceneScraper):
             item['tags'] = []
 
             if item['title'] and item['id']:
-                scenelist.append(item.copy())
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            scenelist.append(item.copy())
+                    else:
+                        scenelist.append(item.copy())
 
             item.clear()
 

@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -39,10 +40,10 @@ class MontysPOVSpider(BaseSceneScraper):
             item['trailer'] = ''
 
             # Date
-            date = sceneresponse.xpath('./div[@class="meta"]/div[contains(@class,"vidData")]/span[contains(text(),"-")]/text()').get()
-            if not date:
-                date = self.parse_date('today').isoformat()
-            item['date'] = self.parse_date(date.strip(), date_formats=['%d-%m-%Y']).isoformat()
+            scenedate = sceneresponse.xpath('./div[@class="meta"]/div[contains(@class,"vidData")]/span[contains(text(),"-")]/text()').get()
+            if not scenedate:
+                scenedate = self.parse_date('today').isoformat()
+            item['date'] = self.parse_date(scenedate.strip(), date_formats=['%d-%m-%Y']).isoformat()
 
             # Performer
             performer = sceneresponse.xpath(
@@ -86,11 +87,26 @@ class MontysPOVSpider(BaseSceneScraper):
             # ID
             item['id'] = re.search('\\/scene\\/(\\d+)', item['url']).group(1)
 
-            items.append(item)
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        items.append(item)
+                else:
+                    items.append(item)
 
         if self.debug:
             print(items)
-            return items
         return items
 
     def get_next_page_url(self, base, page):

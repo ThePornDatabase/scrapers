@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -74,4 +75,20 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             item['trailer'] = ''
 
             if item['id'] and item['title']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

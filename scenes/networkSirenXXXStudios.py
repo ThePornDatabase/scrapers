@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 import scrapy
 
@@ -35,15 +36,16 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
         scenes = response.xpath(
             '//div[@class="videoBlock"]')
         for scene in scenes:
-            date = scene.xpath('.//comment()[contains(.,"Release")]').get()
-            if date:
-                date = re.search(r'(\d{2}/\d{2}/\d{4})', date).group(1)
+            scenedate = scene.xpath('.//comment()[contains(.,"Release")]').get()
+            if scenedate:
+                scenedate = re.search(r'(\d{2}/\d{2}/\d{4})', scenedate).group(1)
+                scenedate = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
             scenelink = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scenelink) and "signup.php" not in scenelink:
-                yield scrapy.Request(url=self.format_link(response, scenelink), callback=self.parse_scene, meta={'date': date})
+                yield scrapy.Request(url=self.format_link(response, scenelink), callback=self.parse_scene, meta={'date': scenedate})
             else:
                 item = SceneItem()
-                item['date'] = date
+                item['date'] = scenedate
                 title = scene.xpath('.//span/text()').get()
                 if title:
                     item['title'] = string.capwords(title.strip())
@@ -84,7 +86,23 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                 item['site'] = self.get_site(response)
                 item['description'] = ''
 
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
     def get_site(self, response):
         if "realnaughtynymphos" in response.url:

@@ -1,5 +1,5 @@
 import json
-
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -50,7 +50,23 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
             item['url'] = "https://www.mrbigfatdick.com/videos/" + movie['permaLink']
             item['id'] = movie['id']
 
-            yield item
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
     def get_next_page_url(self, base, page):
         page = str(int(page) - 1)

@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import json
 import string
 
@@ -47,7 +48,6 @@ class TopWebModelsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        global json
         responseresult = response.xpath('//script[contains(text(),"window.__DATA__")]/text()').get()
         responsedata = re.search(r'__DATA__\ =\ (.*)', responseresult).group(1)
         jsondata = json.loads(responsedata)
@@ -95,9 +95,22 @@ class TopWebModelsSpider(BaseSceneScraper):
                 if "scott's picks" not in tags['name'].lower():
                     item['tags'].append(string.capwords(tags['name']))
 
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
             if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
                 print(item)
             else:
-                yield item
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
             item.clear()

@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -101,9 +102,9 @@ class HobyBuchanonSpider(BaseSceneScraper):
             else:
                 item['description'] = ''
 
-            date = scene.xpath('.//div[@class="date_label"]/text()')
-            if date:
-                item['date'] = self.parse_date(date.get()).isoformat()
+            scenedate = scene.xpath('.//div[@class="date_label"]/text()')
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.get()).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -115,7 +116,23 @@ class HobyBuchanonSpider(BaseSceneScraper):
                 item['image'] = image.strip()
 
             if item['id'] and item['title'] and item['date']:
-                scenelist.append(item.copy())
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            scenelist.append(item.copy())
+                    else:
+                        scenelist.append(item.copy())
                 item.clear()
 
         return scenelist

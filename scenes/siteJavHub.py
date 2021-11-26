@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -41,12 +42,12 @@ class SiteJavHubSpider(BaseSceneScraper):
                 else:
                     item['title'] = ''
 
-                date = scene.xpath('.//span[@class="pub-date"]/text()')
-                if date:
-                    date = date.get()
-                    date = re.search(r'(\w+ \d{1,2}, \d{4})', date)
-                    if date:
-                        item['date'] = self.parse_date(date.group(1), date_formats=['%B %d, %Y']).isoformat()
+                scenedate = scene.xpath('.//span[@class="pub-date"]/text()')
+                if scenedate:
+                    scenedate = scenedate.get()
+                    scenedate = re.search(r'(\w+ \d{1,2}, \d{4})', scenedate)
+                    if scenedate:
+                        item['date'] = self.parse_date(scenedate.group(1), date_formats=['%B %d, %Y']).isoformat()
                 else:
                     item['date'] = self.parse_date('today').isoformat()
 
@@ -77,7 +78,23 @@ class SiteJavHubSpider(BaseSceneScraper):
                 item['site'] = 'JavHub'
 
                 if item['id'] and item['title']:
-                    yield item
+                    if "days" in self.settings:
+                        days = int(self.settings['days'])
+                        filterdate = date.today() - timedelta(days)
+                        filterdate = filterdate.isoformat()
+                    else:
+                        filterdate = "0000-00-00"
+
+                    if self.debug:
+                        if not item['date'] > filterdate:
+                            item['filtered'] = "Scene filtered due to date restraint"
+                        print(item)
+                    else:
+                        if filterdate:
+                            if item['date'] > filterdate:
+                                yield item
+                        else:
+                            yield item
 
     def get_tags(self, response):
         return ['Asian']

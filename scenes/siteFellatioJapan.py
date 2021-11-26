@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -65,10 +66,10 @@ class SiteFellatioJapanSpider(BaseSceneScraper):
             else:
                 item['tags'] = []
 
-            date = scene.xpath('.//div[@class="sDate"]/text()').get()
-            if date:
-                if date:
-                    item['date'] = self.parse_date(date, date_formats=['%Y-%m-%d']).isoformat()
+            scenedate = scene.xpath('.//div[@class="sDate"]/text()').get()
+            if scenedate:
+                if scenedate:
+                    item['date'] = self.parse_date(scenedate, date_formats=['%Y-%m-%d']).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -93,4 +94,20 @@ class SiteFellatioJapanSpider(BaseSceneScraper):
 
             item['url'] = response.url
 
-            yield item
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

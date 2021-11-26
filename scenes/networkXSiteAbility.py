@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 import scrapy
 
@@ -151,12 +152,12 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             else:
                 item['description'] = ''
 
-            date = re.search(r' (\w+ \d{1,2}, \d{4}) ', item['description'])
-            if not date:
-                date = re.search(r'(\d{2}\.\d{2}\.\d{2})', item['description'])
+            scenedate = re.search(r' (\w+ \d{1,2}, \d{4}) ', item['description'])
+            if not scenedate:
+                scenedate = re.search(r'(\d{2}\.\d{2}\.\d{2})', item['description'])
 
-            if date:
-                item['date'] = self.parse_date(date.group(1).strip()).isoformat()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.group(1).strip()).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
             item['performers'] = self.site_performers(scene, meta)
@@ -167,7 +168,23 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             item['network'] = 'XSiteAbility'
 
             if item['id']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
     def site_performers(self, scene, meta):
         performers = []

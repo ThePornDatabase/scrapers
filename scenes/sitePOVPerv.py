@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -36,11 +37,11 @@ class SitePOVPervSpider(BaseSceneScraper):
             else:
                 item['title'] = None
 
-            date = scene.xpath('./div//span[@class="date"]/span/following-sibling::text()')
-            if date:
-                date = date.get()
-                date = re.sub(r"([0123]?[0-9])(st|th|nd|rd)?", r"\1", date)
-                item['date'] = self.parse_date(date, date_formats=['%d %b %Y']).isoformat()
+            scenedate = scene.xpath('./div//span[@class="date"]/span/following-sibling::text()')
+            if scenedate:
+                scenedate = scenedate.get()
+                scenedate = re.sub(r"([0123]?[0-9])(st|th|nd|rd)?", r"\1", scenedate)
+                item['date'] = self.parse_date(scenedate, date_formats=['%d %b %Y']).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -73,4 +74,20 @@ class SitePOVPervSpider(BaseSceneScraper):
                 item['id'] = None
 
             if item['title'] and item['id'] and item['date'] > '2021-02-26':
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

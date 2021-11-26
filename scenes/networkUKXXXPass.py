@@ -1,5 +1,6 @@
 import re
 from urllib.parse import urlparse
+from datetime import date, timedelta
 import string
 import tldextract
 import scrapy
@@ -56,9 +57,9 @@ class NetworkUKXXXPassSpider(BaseSceneScraper):
             else:
                 item['title'] = ''
 
-            date = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
+            scenedate = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
             if date:
-                item['date'] = self.parse_date(date, date_formats=['%m/%d/%Y']).isoformat()
+                item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = ''
 
@@ -121,7 +122,23 @@ class NetworkUKXXXPassSpider(BaseSceneScraper):
             item['network'] = "UK XXX Pass"
 
             if item['id'] and item['date']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
         next_page = response.xpath('//comment()[contains(.,"Next Page Link")]/following-sibling::a[1]/@href').get()
         if next_page:

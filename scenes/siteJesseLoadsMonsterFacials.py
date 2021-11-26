@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -44,14 +45,14 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
                     item['performers'] = [performers.group(1).strip()]
 
             item['date'] = ''
-            date = scene.xpath('./preceding-sibling::font[1]/b/text()').getall()
-            if date:
-                date = "".join(date)
-                date = date.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
-                date = re.search(r'(\d{2}/\d{2}/\d{4})', date)
-                if date:
-                    date = date.group(1)
-                    item['date'] = self.parse_date(date.strip()).isoformat()
+            scenedate = scene.xpath('./preceding-sibling::font[1]/b/text()').getall()
+            if scenedate:
+                scenedate = "".join(scenedate)
+                scenedate = scenedate.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
+                scenedate = re.search(r'(\d{2}/\d{2}/\d{4})', scenedate)
+                if scenedate:
+                    scenedate = scenedate.group(1)
+                    item['date'] = self.parse_date(scenedate.strip()).isoformat()
 
             if not item['date']:
                 item['date'] = self.parse_date('today').isoformat()
@@ -86,7 +87,23 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
             item['network'] = "Jesse Loads Monster Facials"
 
             if item['url'] and item['id']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
     def get_next_page_url(self, base, page):
         page = str(page)

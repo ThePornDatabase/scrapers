@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 import scrapy
 import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -61,7 +60,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
             item['tags'] = []
             description = ''
 
-            item['date'] = datetime.now().isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
             if "debt4k" in response.url:
                 performer = scene.xpath('.//strong[contains(text(),"Name")]/../following-sibling::div/text()').get()

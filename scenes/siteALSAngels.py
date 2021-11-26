@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -108,11 +109,11 @@ class SiteALSAngelsSpider(BaseSceneScraper):
 
             item['image_blob'] = None
 
-            date = scene.xpath('./td[@class="videotext"]/span[@class="videodate"]/text()').get()
-            if date:
-                date = date.replace("Date:", "").strip()
-                if date:
-                    item['date'] = self.parse_date(date).isoformat()
+            scenedate = scene.xpath('./td[@class="videotext"]/span[@class="videodate"]/text()').get()
+            if scenedate:
+                scenedate = scenedate.replace("Date:", "").strip()
+                if scenedate:
+                    item['date'] = self.parse_date(scenedate).isoformat()
             else:
                 item['date'] = self.parse_date('today').isoformat()
 
@@ -134,7 +135,23 @@ class SiteALSAngelsSpider(BaseSceneScraper):
             item['trailer'] = ''
 
             if item['id'] and item['title'] and item['date']:
-                yield item
+                if "days" in self.settings:
+                    days = int(self.settings['days'])
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.isoformat()
+                else:
+                    filterdate = "0000-00-00"
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
             scenecounter += 1
             if scenecounter > scenelimit:
