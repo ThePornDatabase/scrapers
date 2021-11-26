@@ -135,12 +135,12 @@ class SiteALSAngelsSpider(BaseSceneScraper):
             item['trailer'] = ''
 
             if item['id'] and item['title'] and item['date']:
-                if "days" in self.settings:
-                    days = int(self.settings['days'])
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.isoformat()
-                else:
+                days = int(self.days)
+                if days > 27375:
                     filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
 
                 if self.debug:
                     if not item['date'] > filterdate:
