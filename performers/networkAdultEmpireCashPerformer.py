@@ -12,6 +12,7 @@ def match_path(argument):
         'thirdworldxxx.com': "/third-world-media-porn-stars.html?page=%s&hybridview=member",
         'latinoguysporn.com': "/latino-guys-porn-stars.html?page=%s&hybridview=member",
         'www.lethalhardcore.com': "/lethal-hardcore-porn-stars.html?page=%s&hybridview=member",
+        'www.wcpclub.com': "/west-coast-productions-porn-stars.html?page=%s&hybridview=member",
     }
     return match.get(argument, "")
 
@@ -52,6 +53,7 @@ class NetworkAdultEmpireCashPerformerSpider(BasePerformerScraper):
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
         'https://www.lethalhardcore.com',
+        'https://www.wcpclub.com',
     ]
 
     def get_next_page_url(self, base, page):

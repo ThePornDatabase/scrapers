@@ -1,3 +1,4 @@
+import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -14,10 +15,11 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         # ~ 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
-        'https://cospimps.com/',
-        'https://pmggirls.com/',
+        'https://cospimps.com',
+        'https://pmggirls.com',
         'https://www.lethalhardcore.com',
         'https://spankmonster.com',
+        'https://www.wcpclub.com'
     ]
 
     selector_map = {
@@ -57,6 +59,16 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_site(self, response):
         if 'jayspov' in response.url:
             return 'Jays POV'
+        if 'wcpclub' in response.url:
+            return 'West Coast Productions'
+
+        return response.xpath('//div[@class="studio"]//span[2]/text()').get().strip()
+
+    def get_parent(self, response):
+        if 'jayspov' in response.url:
+            return 'Jays POV'
+        if 'wcpclub' in response.url:
+            return 'West Coast Productions'
 
         return response.xpath('//div[@class="studio"]//span[2]/text()').get().strip()
 
@@ -82,3 +94,15 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         if "spankmonster" in base:
             pagination = "/watch-newest-spank-monster-clips-and-scenes.html?page=%s&hybridview=member"
         return self.format_url(base, pagination % page)
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        titlework = super().get_title(response)
+        titlework = re.sub('[^a-zA-Z]', '', titlework)
+        if titlework == "Scene":
+            release = response.xpath('//a[contains(@class, "movie-title")]/text()')
+            if release:
+                release = release.get()
+                title = title + " From " + release.strip()
+        return title
+
