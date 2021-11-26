@@ -308,14 +308,12 @@ class AdultTimeAPISpider(BaseSceneScraper):
 
             #  The following sites were brought in from other scrapers.  Date limits are to avoid dupes
             donotyield = 0
-            if (
-                ('mypervyfamily' in item['url'] and item['date'] < "2021-10-06") or
-                ('Filthy Blowjobs' in item['site'] and item['date'] < "2021-09-14") or
-                ('Filthy Massage' in item['site'] and item['date'] < "2021-09-28") or
-                ('Filthy Newbies' in item['site'] and item['date'] < "2021-09-21") or
-                ('Filthy POV' in item['site'] and item['date'] < "2021-10-05") or
-                ('Filthy Taboo' in item['site'] and item['date'] < "2021-10-09")
-                ):
+            if (('mypervyfamily' in item['url'] and item['date'] < "2021-10-06")
+                    or ('Filthy Blowjobs' in item['site'] and item['date'] < "2021-09-14")
+                    or ('Filthy Massage' in item['site'] and item['date'] < "2021-09-28")
+                    or ('Filthy Newbies' in item['site'] and item['date'] < "2021-09-21")
+                    or ('Filthy POV' in item['site'] and item['date'] < "2021-10-05")
+                    or ('Filthy Taboo' in item['site'] and item['date'] < "2021-10-09")):
                 donotyield = 1
 
             matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
