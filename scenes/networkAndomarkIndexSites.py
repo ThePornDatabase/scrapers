@@ -1,7 +1,6 @@
 import re
 import string
-from datetime import datetime
-import dateparser
+from datetime import date, timedelta, datetime
 from tpdb.items import SceneItem
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -55,10 +54,10 @@ class NetworkAndomarkIndexSpider(BaseSceneScraper):
                     item['trailer'] = self.format_link(response, trailer.strip())
 
             # Date
-            date = sceneresponse.xpath('.//p/span[contains(text(),"/")]/text()').get()
-            if not date:
-                date = datetime.now()
-            item['date'] = dateparser.parse(date.strip(), date_formats=['%m/%d/%Y']).isoformat()
+            scenedate = sceneresponse.xpath('.//p/span[contains(text(),"/")]/text()').get()
+            if not scenedate:
+                scenedate = datetime.now()
+            item['date'] = self.parse_date(scenedate.strip(), date_formats=['%m/%d/%Y']).isoformat()
 
             # Performer
             item['performers'] = []
@@ -113,10 +112,22 @@ class NetworkAndomarkIndexSpider(BaseSceneScraper):
             # ~ print(f"ID: {item['id']}")
             # ~ print("\n\n")
 
-            items.append(item)
+            if "days" in self.settings:
+                days = int(self.settings['days'])
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.isoformat()
+            else:
+                filterdate = "0000-00-00"
 
-        if self.debug:
-            print(items)
-            return items
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        items.append(item)
+                else:
+                    items.append(item)
 
         return items
