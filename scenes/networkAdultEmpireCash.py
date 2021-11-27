@@ -105,4 +105,3 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 release = release.get()
                 title = title + " From " + release.strip()
         return title
-
