@@ -29,13 +29,12 @@ class AbbyWintersSpider(BaseSceneScraper):
         'title': '//div[@class="container"]/h1/text()',
         'description': '//meta[@name="description"]/@content',
         'date': '//li/i[@class="icon-eye-open"]/following-sibling::span/following-sibling::text()',
-        'image': '//div[@class="feature-image"]/div/img/@src',
-        'imagealt': '//div[contains(@class,"video-player-container")]/@data-poster',
+        'image': '//div[@class="feature-image"]/div/img/@src|//div[contains(@class,"video-player-container")]/@data-poster',
+        'image_blob': '//div[@class="feature-image"]/div/img/@src|//div[contains(@class,"video-player-container")]/@data-poster',
         'performers': '//table[@class="table table-summary"]//th[contains(text(),"Girls in this Scene")]/following-sibling::td/a/text()',
         'tags': '//a[contains(@href,"/fetish/")]/text()',
         'external_id': 'abbywinters\\.com\\/(.*)',
-        'trailer': '//div[contains(@class,"video-player-container")]/@data-sources',
-        're_trailer': r'.*src\":\"(https.*?)\",',
+        'trailer': '',
         'pagination': '/updates/raves?page=%s'
     }
 
@@ -52,11 +51,3 @@ class AbbyWintersSpider(BaseSceneScraper):
         search = re.search(self.get_selector_map('external_id'), response.url, re.IGNORECASE)
         search = search.group(1).replace("/", "-")
         return search
-
-    def get_image(self, response):
-        image = self.process_xpath(
-            response, self.get_selector_map('image')).get()
-        if not image:
-            image = self.process_xpath(
-                response, self.get_selector_map('imagealt')).get()
-        return self.format_link(response, image)
