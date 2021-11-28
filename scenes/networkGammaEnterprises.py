@@ -112,7 +112,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # Network Sites
         ##############################
-        'https://www.21sextreme.com',
+        # ~ 'https://www.21sextreme.com',  Moved to Adult Time API
         # 'https://www.lustygrandmas.com',
         # 'https://www.teachmefisting.com',
         # 'https://www.trannyfrombrazil.com',
