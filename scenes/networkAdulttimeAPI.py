@@ -16,6 +16,7 @@ def match_site(argument):
         '21footart': '21 Foot Art',
         '21naturals': '21Naturals',
         '21sextury': '21Sextury',
+        '21sextreme': '21Sextreme',
         'addicted2girls': 'Addicted2Girls',
         'adulttime': 'AdultTime',
         'agentredgirl': 'Agent Red Girl',
@@ -25,6 +26,7 @@ def match_site(argument):
         'analteenangels': 'Anal Teen Angels',
         'assholefever': 'Asshole Fever',
         'austinwilde': 'Austin Wilde',
+        'babygotballs': 'Baby Got Balls',
         'biphoria': 'BiPhoria',
         'bethecuck': 'Be The Cuck',
         'blueangellive': 'Blue Angel Live',
@@ -34,6 +36,8 @@ def match_site(argument):
         'clubinfernodungeon': 'Club Inferno Dungeon',
         'clubsandy': 'Club Sandy',
         'codycummings': 'Cody Cummings',
+        'creampiereality': 'Creampie Reality',
+        'cummingmatures': 'Cumming Matures',
         'cutiesgalore': 'Cuties Galore',
         'deepthroatfrenzy': 'Deepthroat Frenzy',
         'diabolic': 'Diabolic',
@@ -41,6 +45,7 @@ def match_site(argument):
         'devilsfilmparodies': 'Devils Film Parodies',
         'devilsgangbangs': 'Devils Gangbangs',
         'devilstgirls': 'Devils T-Girls',
+        'dominatedgirls': 'Dominated Girls',
         # 'dpfanatics': 'DPFanatics', Pulled from Gamma
         'evilangel': 'Evil Angel',
         'femalesubmission': 'Female Submission',
@@ -52,15 +57,20 @@ def match_site(argument):
         'girlstryanal': 'Girls Try Anal',
         'girlsway': 'Girlsway',
         'givemeteens': 'Give Me Teens',
+        'grandpasfuckteens': 'Grandpas Fuck Teens',
         'hairyundies': 'Hairy Undies',
+        'homepornreality': 'Home Porn Reality',
         'hotmilfclub': 'Hot MILF Club',
         'isthisreal': 'Is This Real',
         'JaneDoePictures': 'Jane Doe Pictures',
         'lesbianfactor': 'Lesbian Factor',
         'letsplaylez': 'Lets Play Lez',
         'lezcuties': 'Lez Cuties',
+        'lustygrandmas': 'Lusty Grandmas',
+        'mandyiskinky': 'Mandy Is Kinky',
         'marcusmojo': 'Marcus Mojo',
         'masonwyler': 'Mason Wyler',
+        'mightymistress': 'Mighty Mistress',
         'modeltime': 'Model Time',
         'mommysgirl': 'Mommys Girl',
         'momsonmoms': 'Moms on Moms',
@@ -78,6 +88,7 @@ def match_site(argument):
         'oldyounglesbianlove': 'Old Young Lesbian Love',
         'oralexperiment': 'Oral Experiment',
         'outofthefamily': 'Out of the Family',
+        'peeandblow': 'Pee And Blow',
         'pixandvideo': 'Pix And Video',
         'puretaboo': 'Pure Taboo',
         'roddaily': 'Rod Daily',
@@ -85,16 +96,20 @@ def match_site(argument):
         'sistertrick': 'Sister Trick',
         'sextapelesbians': 'Sextape Lesbians',
         'sexwithkathianobili': 'Sex With Kathia Nobili',
+        'speculumplays': 'Speculum Plays',
         'squirtalicious': 'Squirtalicious',
         'stagcollectivesolos': 'Stag Collective Solos',
         'strokethatdick': 'Stroke That Dick',
         'sweetsophiemoone': 'Sweet Sophie Moon',
         'tabooheat': 'Taboo Heat',
+        'teachmefisting': 'Teach Me Fisting',
         'tommydxxx': 'Tommy D XXX',
         'touchmywife': 'Touch My Wife',
         'transfixed': 'Transfixed',
         'trickyspa': 'Tricky Spa',
+        'transfrombrazil': 'Trans From Brazil',
         'TransgressiveFilms': 'Transgressive Films',
+        'transsmuts': 'Trans Smuts',
         'truelesbian.com': 'True Lesbian',
         'trystanbull': 'Trystan Bull',
         'webyoung': 'Web Young',
@@ -102,6 +117,7 @@ def match_site(argument):
         'wheretheboysarent': 'Where the Boys Arent',
         'wicked': 'Wicked',
         'zerotolerance': 'Zero Tolerance',
+        'zoliboy': 'Zoliboy',
     }
     return match.get(argument, argument)
 
@@ -111,6 +127,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
     network = 'Gamma Enterprises'
 
     start_urls = [
+        'https://www.21sextreme.com',
         'https://www.21sextury.com',
         'https://www.21naturals.com',
         'https://www.addicted2girls.com',
@@ -242,6 +259,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             item['site'] = scene['sitename']
             item['site'] = match_site(item['site'])
             item['network'] = self.network
+            if '21sextreme' in referrerurl:
+                item['parent'] = "21Sextreme"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if '21sextury' in referrerurl:
                 item['parent'] = "21Sextury"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
@@ -318,8 +338,18 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if (('mypervyfamily' in item['url'] and item['date'] < "2021-10-06") or ('Filthy Blowjobs' in item['site'] and item['date'] < "2021-09-14") or ('Filthy Massage' in item['site'] and item['date'] < "2021-09-28") or ('Filthy Newbies' in item['site'] and item['date'] < "2021-09-21") or ('Filthy POV' in item['site'] and item['date'] < "2021-10-05") or ('Filthy Taboo' in item['site'] and item['date'] < "2021-10-09")):
                 donotyield = 1
 
+            if (('Lusty Grandmas' in item['site'] and item['date'] < "2019-02-01") or ('Grandpas Fuck Teens' in item['site'] and item['date'] < "2019-02-06") or ('Baby Got Balls' in item['site'] and item['date'] < "2008-05-04") or ('Creampie Reality' in item['site'] and item['date'] < "2006-10-04") or ('Cumming Matures' in item['site'] and item['date'] < "2009-12-01")):
+                donotyield = 1
+
+            if (('Dominated Girls' in item['site'] and item['date'] < "2013-08-26") or ('Home Porn Reality' in item['site'] and item['date'] < "2010-06-18") or ('Mandy Is Kinky' in item['site'] and item['date'] < "2008-04-30") or ('Mighty Mistress' in item['site'] and item['date'] < "2014-05-20") or ('Teach Me Fisting' in item['site'] and item['date'] < "2019-01-29") or ('Zoliboy' in item['site'] and item['date'] < "2018-03-18") or ('Pee And Blow' in item['site'] and item['date'] < "2009-12-16") or ('Speculum Plays' in item['site'] and item['date'] < "2007-09-07")):
+                donotyield = 1
+
+            #  Old Young Lesbian Love is returned both from Girlsway and 21Sextreme.  Only pull from Girlsway
+            if "oldyounglesbianlove" in scene['sitename'] and "21sextreme" in referrerurl:
+                donotyield = 1
+
             matches = ['dpfanatics', 'evilangelpartner', 'mommysgirl', 'nudefightclub']
-            if not any(x in item['site'] for x in matches):
+            if not any(x in scene['sitename'] for x in matches):
                 if not donotyield:
                     days = int(self.days)
                     if days > 27375:
@@ -348,6 +378,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             'Content-Type': 'application/json',
             'Referer': self.get_next_page_url(referrer, page)
         }
+        if '21sextreme' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facets=%5B%22availableOnSite%22%2C%22sitename%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3A21sextreme%22%2C%22availableOnSite%3Alustygrandmas%22%2C%22availableOnSite%3Agrandpasfuckteens%22%2C%22availableOnSite%3Ababygotballs%22%2C%22availableOnSite%3Acreampiereality%22%2C%22availableOnSite%3Acummingmatures%22%2C%22availableOnSite%3Adominatedgirls%22%2C%22availableOnSite%3Ahomepornreality%22%2C%22availableOnSite%3Amandyiskinky%22%2C%22availableOnSite%3Amightymistress%22%2C%22availableOnSite%3Apeeandblow%22%2C%22availableOnSite%3Aspeculumplays%22%2C%22availableOnSite%3Ateachmefisting%22%2C%22availableOnSite%3Atransfrombrazil%22%2C%22availableOnSite%3Atranssmuts%22%2C%22availableOnSite%3Azoliboy%22%5D%5D"},{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&hitsPerPage=1&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite"}]}'
         if '21sextury' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22categories.name%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3A21sextury%22%2C%22availableOnSite%3Aanalteenangels%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Aalettaoceanempire%22%2C%22availableOnSite%3Aassholefever%22%2C%22availableOnSite%3Afootsiebabes%22%2C%22availableOnSite%3Aanalqueenalysa%22%2C%22availableOnSite%3Ablueangellive%22%2C%22availableOnSite%3Abuttplays%22%2C%22availableOnSite%3Acheatingwhorewives%22%2C%22availableOnSite%3Aclubsandy%22%2C%22availableOnSite%3Acutiesgalore%22%2C%22availableOnSite%3Adeepthroatfrenzy%22%2C%22availableOnSite%3Agapeland%22%2C%22availableOnSite%3Ahotmilfclub%22%2C%22availableOnSite%3Aletsplaylez%22%2C%22availableOnSite%3Aonlyswallows%22%2C%22availableOnSite%3Apixandvideo%22%2C%22availableOnSite%3Asexwithkathianobili%22%2C%22availableOnSite%3Asweetsophiemoone%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming&facetFilters=%5B%5B%22availableOnSite%3A21sextury%22%2C%22availableOnSite%3Aanalteenangels%22%2C%22availableOnSite%3Alezcuties%22%2C%22availableOnSite%3Aalettaoceanempire%22%2C%22availableOnSite%3Aassholefever%22%2C%22availableOnSite%3Afootsiebabes%22%2C%22availableOnSite%3Aanalqueenalysa%22%2C%22availableOnSite%3Ablueangellive%22%2C%22availableOnSite%3Abuttplays%22%2C%22availableOnSite%3Acheatingwhorewives%22%2C%22availableOnSite%3Aclubsandy%22%2C%22availableOnSite%3Acutiesgalore%22%2C%22availableOnSite%3Adeepthroatfrenzy%22%2C%22availableOnSite%3Agapeland%22%2C%22availableOnSite%3Ahotmilfclub%22%2C%22availableOnSite%3Aletsplaylez%22%2C%22availableOnSite%3Aonlyswallows%22%2C%22availableOnSite%3Apixandvideo%22%2C%22availableOnSite%3Asexwithkathianobili%22%2C%22availableOnSite%3Asweetsophiemoone%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"}]}'
         if '21naturals' in referrer:
