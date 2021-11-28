@@ -166,7 +166,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # Standalone Sites
         ##############################
-        'https://www.21naturals.com',
+        # 'https://www.21naturals.com', Moved to AdultTime API
         'https://www.activeduty.com',
         'https://www.bigfatcreampie.com',
         'https://www.bskow.com',
