@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 import tldextract
 
@@ -35,7 +34,7 @@ class JulesJordanSpider(BaseSceneScraper):
         'date': '//div[@class="cell update_date"]/text()',
         'performers': '//div[@class="backgroundcolor_info"]/span[@class="update_models"]/a/text() | //div[@class="gallery_info"]//span[@class="update_models"]/div[@class="container"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': 'trial\\/scenes\\/(.+)\\.html',
+        'external_id': r'trial/scenes/(.+)\.html',
         'trailer': '',
         'pagination': '/trial/categories/movies_%s_d.html'
     }
@@ -58,15 +57,3 @@ class JulesJordanSpider(BaseSceneScraper):
         site = tldextract.extract(response.url).domain
         site = match_site(site)
         return site
-
-    def get_date(self, response):
-        date = self.process_xpath(response, self.get_selector_map('date'))
-        if date:
-            date = self.get_from_regex(date.get(), 're_date')
-            if date:
-                date = date.strip()
-                if date:
-                    date = date.replace('Released:', '').replace('Added:', '').strip()
-                    date_formats = self.get_selector_map('date_formats') if 'date_formats' in self.get_selector_map() else None
-                    return dateparser.parse(date, date_formats=date_formats).isoformat()
-        return dateparser.parse('today').isoformat()

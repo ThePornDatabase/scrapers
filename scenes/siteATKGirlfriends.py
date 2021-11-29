@@ -1,20 +1,13 @@
 import re
+from datetime import date, timedelta
 import json
-import warnings
 import base64
 import requests
-import dateparser
 import scrapy
 from scrapy.http import HtmlResponse
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class ATKGirlfriendsSpider(BaseSceneScraper):
@@ -86,28 +79,28 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
         for scene in scenes:
             link = scene.xpath('./div[@class="movie-image"]/a/@href').get()
             link = "https://www.atkgirlfriends.com" + link
-            date = scene.xpath('./div[@class="vid-count left"]/text()').get()
-            if date:
-                date = dateparser.parse(date.strip()).isoformat()
+            scenedate = scene.xpath('./div[@class="vid-count left"]/text()').get()
+            if scenedate:
+                scenedate = self.parse_date(scenedate.strip()).isoformat()
             else:
-                date = dateparser.parse('today').isoformat()
+                scenedate = self.parse_date('today').isoformat()
             if "join.atkgirlfriends.com" not in link:
                 headers = self.headers
                 headers['Content-Type'] = 'application/json'
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'cookies': [{'name': 'mydate', 'value': date}]}
+                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': link, 'cookies': [{'name': 'mydate', 'value': scenedate}]}
                 yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
             else:
                 item = SceneItem()
                 title = scene.xpath('./div/a/text()').get()
                 if title:
-                    item['title'] = title.strip()
+                    item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
 
-                if date:
-                    item['date'] = date
+                if scenedate:
+                    item['date'] = scenedate
                 else:
-                    item['date'] = dateparser.parse('today').isoformat()
+                    item['date'] = self.parse_date('today').isoformat()
 
                 image = scene.xpath('./div/a/img/@src').get()
                 if image:
@@ -137,7 +130,23 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
                 item['network'] = "ATK Girlfriends"
 
                 if item['title'] and item['image']:
-                    yield item
+                    days = int(self.days)
+                    if days > 27375:
+                        filterdate = "0000-00-00"
+                    else:
+                        filterdate = date.today() - timedelta(days)
+                        filterdate = filterdate.strftime('%Y-%m-%d')
+
+                    if self.debug:
+                        if not item['date'] > filterdate:
+                            item['filtered'] = "Scene filtered due to date restraint"
+                        print(item)
+                    else:
+                        if filterdate:
+                            if item['date'] > filterdate:
+                                yield item
+                        else:
+                            yield item
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -166,13 +175,13 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
         cookies = jsondata['solution']['cookies']
         for cookie in cookies:
             if cookie['name'] == 'mydate':
-                date = cookie['value']
+                scenedate = cookie['value']
 
         item = SceneItem()
-        if date:
-            item['date'] = dateparser.parse(date).isoformat()
+        if scenedate:
+            item['date'] = self.parse_date(scenedate).isoformat()
         else:
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
@@ -187,10 +196,23 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
         item['parent'] = "ATK Girlfriends"
         item['site'] = "ATK Girlfriends"
 
+        days = int(self.days)
+        if days > 27375:
+            filterdate = "0000-00-00"
+        else:
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.strftime('%Y-%m-%d')
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item
 
     def get_image(self, response):
         image = super().get_image(response)

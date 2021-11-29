@@ -1,17 +1,10 @@
 import re
-import warnings
+from datetime import date, timedelta
 import string
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class NetworkXSiteAbilitySpider(BaseSceneScraper):
@@ -130,7 +123,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             else:
                 title = re.search(r'(setid=\d+)', item['url']).group(1)
                 item['title'] = title.replace('=', ' ').title()
-            item['title'] = item['title'].replace('\n', '').replace('\r', '').replace('\t', '')
+            item['title'] = self.cleanup_title(item['title'])
 
             image = scene.xpath('.//img/@src')
             if image:
@@ -155,17 +148,18 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                 item['description'] = re.sub(r'\d{1,3} photos', '', item['description'], flags=re.IGNORECASE)
                 item['description'] = re.sub(r'\d{1,3}:\d{1,3} video', '', item['description'], flags=re.IGNORECASE)
                 item['description'] = re.sub('  ', ' ', item['description'])
+                item['description'] = self.cleanup_description(item['description'])
             else:
                 item['description'] = ''
 
-            date = re.search(r' (\w+ \d{1,2}, \d{4}) ', item['description'])
-            if not date:
-                date = re.search(r'(\d{2}\.\d{2}\.\d{2})', item['description'])
+            scenedate = re.search(r' (\w+ \d{1,2}, \d{4}) ', item['description'])
+            if not scenedate:
+                scenedate = re.search(r'(\d{2}\.\d{2}\.\d{2})', item['description'])
 
-            if date:
-                item['date'] = dateparser.parse(date.group(1).strip()).isoformat()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.group(1).strip()).isoformat()
             else:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
             item['performers'] = self.site_performers(scene, meta)
             item['tags'] = self.site_tags(scene, meta)
             item['trailer'] = ''
@@ -174,7 +168,23 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             item['network'] = 'XSiteAbility'
 
             if item['id']:
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
     def site_performers(self, scene, meta):
         performers = []

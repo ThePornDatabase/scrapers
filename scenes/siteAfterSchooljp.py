@@ -1,7 +1,6 @@
 import re
+from datetime import date, timedelta
 import string
-import html
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -46,45 +45,45 @@ class SiteAfterSchooljpSpider(BaseSceneScraper):
         for scene in scenes:
             item = SceneItem()
 
-            title = scene.xpath('./div[@class="sample-title"]/text()').get()
+            title = scene.xpath('./div[@class="sample-title"]/text()')
             if title:
-                title = title.strip()
-                title = re.sub(r'^\d{1,2}\.', '', title)
-                item['title'] = html.unescape(string.capwords(title.strip()))
+                item['title'] = self.cleanup_title(re.sub(r'^\d{1,2}\.', '', title.get()))
             else:
                 item['title'] = ''
 
-            description = scene.xpath('./div[@class="sample-description"]/text()').get()
+            description = scene.xpath('./div[@class="sample-description"]/text()')
             if description:
-                item['description'] = html.unescape(description.strip())
+                item['description'] = self.cleanup_description(description.get())
             else:
                 item['description'] = ''
 
             performers = response.xpath('//div[@class="sample-girl center"]/a/text()').getall()
             if performers:
-                item['performers'] = list(map(lambda x: x.strip(), performers))
+                item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
             else:
                 item['performers'] = []
 
             tags = scene.xpath('./div[@class="sample-tags"]/a/text()').getall()
             if tags:
-                item['tags'] = list(map(lambda x: x.strip().title(), tags))
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
             else:
                 item['tags'] = []
 
-            date = scene.xpath('./div[@class="sample-stats"]/text()').get()
-            if date:
-                date = re.search('released on (.*)', date.lower()).group(1)
-                if date:
-                    item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+            scenedate = scene.xpath('./div[@class="sample-stats"]/text()').get()
+            if scenedate:
+                scenedate = re.search('released on (.*)', scenedate.lower())
+                if scenedate:
+                    item['date'] = self.parse_date(scenedate.group(1), date_formats=['%m/%d/%Y']).isoformat()
             else:
-                item['date'] = []
+                item['date'] = self.parse('today').isoformat()
 
             image = scene.xpath('./a[contains(@href,"/scenes/")][3]/@href').get()
             if image:
                 item['image'] = image.strip()
             else:
                 item['image'] = []
+
+            item['image_blob'] = ''
 
             if item['image']:
                 extern_id = re.search(r'\.jp/.*?/(.*?)/', item['image']).group(1)
@@ -103,7 +102,23 @@ class SiteAfterSchooljpSpider(BaseSceneScraper):
 
             item['url'] = response.url
 
-            yield item
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
     def get_site(self, response):
         return "After School.jp"

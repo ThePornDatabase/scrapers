@@ -1,17 +1,8 @@
-import html
 import re
-import warnings
-import dateparser
+from datetime import date, timedelta
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class ChastityBabesFullImportSpider(BaseSceneScraper):
@@ -84,7 +75,6 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
                                  meta={'name': modelname},
                                  headers=self.headers,
                                  cookies=self.cookies)
-        return None
 
     def parse_scenes(self, response):
         item = SceneItem()
@@ -92,13 +82,11 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         item['performers'] = [modelname]
         title = response.xpath('//h1[@id="post-title"]/text()').get()
         if title:
-            item['title'] = title.strip().title()
-            item['title'] = html.unescape(item['title'])
+            item['title'] = self.cleanup_title(title)
 
         description = response.xpath('//div[@class="postcontent"]//p/text()').get()
         if description:
-            item['description'] = description.strip()
-            item['description'] = html.unescape(item['description'])
+            item['description'] = self.cleanup_description(description)
 
         item['site'] = "Chastity Babes"
         item['parent'] = "Chastity Babes"
@@ -108,11 +96,11 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         if postinfo:
             postinfo = postinfo.replace("\r\n", " ")
             postinfo = postinfo.replace("\n", " ")
-            date = re.search(r'Posted\s+on\s?(.*)\s?in', postinfo)
-            if date:
-                date = date.group(1)
-                date = dateparser.parse(date.strip()).isoformat()
-                item['date'] = date
+            scenedate = re.search(r'Posted\s+on\s?(.*)\s?in', postinfo)
+            if scenedate:
+                scenedate = scenedate.group(1)
+                scenedate = self.parse_date(scenedate.strip()).isoformat()
+                item['date'] = scenedate
 
             externalid = re.search(r'Update\s?(.*)\ ?\|', postinfo)
             if externalid:
@@ -145,6 +133,20 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         item['trailer'] = ''
 
         if item['id'] and item['title'] and item['date']:
-            yield item
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
 
-        return None
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

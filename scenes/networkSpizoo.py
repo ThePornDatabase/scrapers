@@ -1,6 +1,4 @@
 import re
-
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -22,10 +20,10 @@ class SpizooSpider(BaseSceneScraper):
         'title': '/',
         'description': '',
         'date': "//p[@class='date']/text()",
-        'image': '',  # Hashed and tokened link.  Will be no good later
+        'image': '',
         'performers': '',
         'tags': "",
-        'external_id': '\\/updates\\/(.*)\\.html$',
+        'external_id': r'/updates/(.*)\.html$',
         'trailer': '',  # Hashed and tokened link.  Will be no good later
         'pagination': '/categories/movies_%s_d.html'
     }

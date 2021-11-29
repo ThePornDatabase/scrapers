@@ -1,6 +1,5 @@
 import re
-import dateparser
-
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -35,7 +34,7 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
             if title:
                 title = re.search(r'fft_(.*)\.', title)
                 if title:
-                    item['title'] = title.group(1).strip().title()
+                    item['title'] = self.cleanup_title(title.group(1))
                     item['id'] = title.group(1).strip()
 
             item['performers'] = []
@@ -46,24 +45,24 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
                     item['performers'] = [performers.group(1).strip()]
 
             item['date'] = ''
-            date = scene.xpath('./preceding-sibling::font[1]/b/text()').getall()
-            if date:
-                date = "".join(date)
-                date = date.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
-                date = re.search(r'(\d{2}/\d{2}/\d{4})', date)
-                if date:
-                    date = date.group(1)
-                    item['date'] = dateparser.parse(date.strip()).isoformat()
+            scenedate = scene.xpath('./preceding-sibling::font[1]/b/text()').getall()
+            if scenedate:
+                scenedate = "".join(scenedate)
+                scenedate = scenedate.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
+                scenedate = re.search(r'(\d{2}/\d{2}/\d{4})', scenedate)
+                if scenedate:
+                    scenedate = scenedate.group(1)
+                    item['date'] = self.parse_date(scenedate.strip()).isoformat()
 
             if not item['date']:
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
             description = scene.xpath('.//div[@align="justify"]/font/text()').getall()
             if description:
                 description = " ".join(description)
                 description = description.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
                 description = re.sub(r'\s{3,100}', ' ', description)
-                item['description'] = description.strip()
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -74,6 +73,7 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
                 item['image'] = "https://jesseloadsmonsterfacials.com/visitors/" + image.strip()
             else:
                 item['image'] = ''
+            item['image_blob'] = ''
 
             trailer = scene.xpath('.//a[contains(@href,"trailer")]/@href').get()
             if trailer:
@@ -87,7 +87,23 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
             item['network'] = "Jesse Loads Monster Facials"
 
             if item['url'] and item['id']:
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
 
     def get_next_page_url(self, base, page):
         page = str(page)

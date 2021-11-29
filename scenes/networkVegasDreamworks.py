@@ -1,5 +1,4 @@
 import re
-import warnings
 from datetime import date
 import tldextract
 import dateparser
@@ -7,17 +6,11 @@ import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
-
 
 def get_scenedate(scene):
     scenedate = scene.xpath('.//div[contains(@class,"fsdate")]/span/text()').get()
     if scenedate:
-        scenedate = dateparser.parse(scenedate.strip()).isoformat()
+        scenedate = dateparser.parse(scenedate.strip(), settings={'TIMEZONE': 'UTC'}).isoformat()
     else:
         poster = scene.xpath('.//amp-video/@poster').get()
         if poster:

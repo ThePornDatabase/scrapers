@@ -1,7 +1,5 @@
-import string
-import html
 import re
-import dateparser
+from datetime import date, timedelta
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -72,7 +70,7 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                 item = SceneItem()
                 title = scene.xpath('./h3/a/text()').get()
                 if title:
-                    item['title'] = html.unescape(string.capwords(title))
+                    item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
 
@@ -86,10 +84,10 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                     item['performers'] = []
 
                 date_xpath = scene.xpath('..//i[contains(@class, "fa-calendar")]/following-sibling::text()')
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
                 if date_xpath:
                     date_xpath = date_xpath.get().strip()
-                    item['date'] = dateparser.parse(date_xpath, date_formats=['%Y-%m-%d']).isoformat()
+                    item['date'] = self.parse_date(date_xpath, date_formats=['%Y-%m-%d']).isoformat()
 
                 image = scene.xpath('./div/a/img/@src')
                 if image:
@@ -116,4 +114,20 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                 if extern_id:
                     item['id'] = extern_id.group(1).lower().strip()
 
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

@@ -1,7 +1,5 @@
 import re
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -18,10 +16,11 @@ class GirlsOutWestSpider(BaseSceneScraper):
         'title': '//meta[@name="twitter:title"]/@content',
         'description': '',
         'date': "//div[@class='centerwrap clear']/p",
+        're_date': r'(\d{2}/\d{2}/\d{4})',
         'image': '//div[@class="videoplayer"]/img/@src0_1x',
         'performers': '//div[@class="centerwrap clear"]/p/a[contains(@href,"/models/")]/text()',
         'tags': "",
-        'external_id': '\\/trailers\\/(.*).ht',
+        'external_id': r'/trailers/(.*).ht',
         'trailer': '',
         'pagination': '/categories/Movies/%s/latest/'
     }
@@ -32,11 +31,3 @@ class GirlsOutWestSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_date(self, response):
-        search = re.search('(\\d{2}\\/\\d{2}\\/\\d{4})', response.text)
-        scenedate = dateparser.parse(search.group(1)).isoformat()
-        return scenedate
-
-    def get_description(self, response):
-        return ''

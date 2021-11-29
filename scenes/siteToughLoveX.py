@@ -1,11 +1,10 @@
-import scrapy
 import re
-import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteToughLoveXSpider(BaseSceneScraper):
+class SiteToughLoveXSpider(BaseSceneScraper):
     name = 'ToughLoveX'
     network = 'Radical Entertainment'
     parent = 'ToughLoveX'
@@ -19,10 +18,10 @@ class siteToughLoveXSpider(BaseSceneScraper):
         'description': '//div[@class="description"]/p/text()',
         'date': '',
         'image': '//div[@class="player-wrap"]/@style',
-        're_image': '(http.*\.jpg)',
+        're_image': r'(http.*\.jpg)',
         'performers': '//dt[contains(text(),"Starring")]/following-sibling::dd/a/text()',
         'tags': '',
-        'external_id': 'view\/(\d+)\/',
+        'external_id': r'view/(\d+)/',
         'trailer': '//div[@class="player-wrap"]//video/source/@src',
         'pagination': '/videos?order=publish_date&sort=desc&page=%s'
     }
@@ -35,10 +34,6 @@ class siteToughLoveXSpider(BaseSceneScraper):
 
     def get_site(self, response):
         return "ToughLoveX"
-        
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):

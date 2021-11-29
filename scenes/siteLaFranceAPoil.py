@@ -1,6 +1,5 @@
 import re
 import html
-import dateparser
 from unidecode import unidecode
 import scrapy
 
@@ -10,6 +9,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class SiteLaFranceAPoilSpider(BaseSceneScraper):
     name = 'LaFranceAPoil'
     network = 'La France a Poil'
+    parent = 'La France a Poil'
+    site = 'La France a Poil'
 
     start_urls = [
         'https://www.lafranceapoil.com',
@@ -42,12 +43,6 @@ class SiteLaFranceAPoilSpider(BaseSceneScraper):
             else:
                 print(f'Didnt pull scene: {scene}')
 
-    def get_site(self, response):
-        return "La France a Poil"
-
-    def get_parent(self, response):
-        return "La France a Poil"
-
     def get_next_page_url(self, base, page):
         page = str(int(page) - 1)
         return self.format_url(base, self.get_selector_map('pagination') % page)
@@ -61,15 +56,9 @@ class SiteLaFranceAPoilSpider(BaseSceneScraper):
     def get_title(self, response):
         title = super().get_title(response)
         title = unidecode(title)
-        return title
+        return self.cleanup_title(title)
 
     def get_description(self, response):
         description = super().get_description(response)
         description = unidecode(description)
-        return description
-
-    def get_date(self, response):
-        date = super().get_date(response)
-        if not date:
-            date = dateparser.parse('today').isoformat()
-        return date
+        return self.cleanup_description(description)

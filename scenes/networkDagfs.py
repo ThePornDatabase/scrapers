@@ -1,8 +1,7 @@
-import scrapy
 import re
-import dateparser
-import tldextract
 from urllib.parse import urlparse
+import tldextract
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -25,7 +24,8 @@ def match_site(argument):
     }
     return match.get(argument, argument)
 
-class networkDaGFsSpider(BaseSceneScraper):
+
+class NetworkDaGFsSpider(BaseSceneScraper):
     name = 'Dagfs'
     network = 'dagfs'
 
@@ -54,7 +54,7 @@ class networkDaGFsSpider(BaseSceneScraper):
         'image': '//section[@class="scene"]/div/meta[@itemprop="thumbnailUrl"]/@content',
         'performers': '//section[@class="scene"]//h2/text()',
         'tags': '',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*/(.*?).html',
         'trailer': '//section[@class="scene"]/div/meta[@itemprop="contentURL"]/@content',
         'pagination': '/categories/updates_%s_d.html'
     }
@@ -70,11 +70,10 @@ class networkDaGFsSpider(BaseSceneScraper):
                 image = base + image.strip()
             else:
                 image = ''
-            
+
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'imageback': image})            
-
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'imageback': image})
 
     def get_site(self, response):
         site = tldextract.extract(response.url).domain
@@ -95,11 +94,10 @@ class networkDaGFsSpider(BaseSceneScraper):
                 trailer = trailer.get()
                 uri = urlparse(response.url)
                 base = uri.scheme + "://" + uri.netloc
-                trailer = base + trailer.strip()                    
+                trailer = base + trailer.strip()
                 return trailer.replace(" ", "%20")
 
         return ''
-
 
     def get_performers(self, response):
         performers = self.process_xpath(response, self.get_selector_map('performers'))
@@ -112,34 +110,16 @@ class networkDaGFsSpider(BaseSceneScraper):
 
         return []
 
-
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                return search.group(1).lower()
-
-        return None
-
+        externid = super().get_id(response)
+        return externid.lower()
 
     def get_image(self, response):
-        meta = response.meta
-        image = self.process_xpath(response, self.get_selector_map('image'))
-        if image:
-            image = self.get_from_regex(image.get(), 're_image')
-
-            if image:
-                image = self.format_link(response, image)
-                
-        if not image or re.search('\/(p\d{1,2}\.jpg)', image):
-            if meta['imageback']:
-                return meta['imageback'].strip().replace(" ", "%20")
-        else:
-            return image.replace(" ", "%20")
-
-
-        return None
-
+        image = super().get_image(response)
+        if not image or re.search(r'/(p\d{1,2}\.jpg)', image):
+            if response.meta['imageback']:
+                return response.meta['imageback'].strip().replace(" ", "%20")
+        return image
 
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date'))
@@ -150,8 +130,6 @@ class networkDaGFsSpider(BaseSceneScraper):
                 date = date.replace('Released:', '').replace('Added:', '').strip()
                 date_formats = self.get_selector_map('date_formats') if 'date_formats' in self.get_selector_map() else None
 
-                return dateparser.parse(date, date_formats=date_formats).isoformat()
+                return self.parse_date(date, date_formats=date_formats).isoformat()
         if not date:
-            return dateparser.parse('today').isoformat()
-
-        return None
+            return self.parse_date('today').isoformat()

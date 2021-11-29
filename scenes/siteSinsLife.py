@@ -1,5 +1,4 @@
 import re
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -41,7 +40,7 @@ class SiteSinsLifeSpider(BaseSceneScraper):
 
             title = scene.xpath('.//div[contains(@class,"item-title")]/a/text()').get()
             if title:
-                item['title'] = title.strip()
+                item['title'] = self.cleanup_title(title)
                 externalid = re.sub('[^a-zA-Z0-9-]', '', item['title'])
                 item['id'] = externalid.lower().strip().replace(" ", "-")
 
@@ -51,9 +50,9 @@ class SiteSinsLifeSpider(BaseSceneScraper):
             if description:
                 description = " ".join(description)
                 description = description.replace("  ", " ")
-                item['description'] = description.strip()
+                item['description'] = self.cleanup_description(description)
 
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
             image = scene.xpath('.//img/@src0_3x').get()
             if not image:

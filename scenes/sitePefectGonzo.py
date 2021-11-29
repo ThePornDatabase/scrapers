@@ -1,7 +1,7 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-import dateparser
+
 
 def match_site(argument):
     match = {
@@ -23,6 +23,8 @@ def match_site(argument):
 class PefectGonzoSpider(BaseSceneScraper):
     name = 'PerfectGonzo'
     network = "DEV8 Entertainment"
+
+    date_trash = ['Released:', 'Added:', 'Published:', 'Added']
 
     start_urls = [
         'https://www.perfectgonzo.com',
@@ -59,7 +61,7 @@ class PefectGonzoSpider(BaseSceneScraper):
             try:
                 site = scene.xpath(
                     './/img[@class="domain-label"]/@src').get().strip()
-                site = re.search('\\/img\\/(.*)\\.com',site).group(1)
+                site = re.search(r'/img/(.*)\.com', site).group(1)
             except BaseException:
                 if "sapphix" in response.url:
                     site = "Sapphix"
@@ -75,12 +77,6 @@ class PefectGonzoSpider(BaseSceneScraper):
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': site})
-
-    def get_date(self, response):
-        date = self.process_xpath(
-            response, self.get_selector_map('date')).get()
-        date = date.replace('Added', '').strip()
-        return dateparser.parse(date.strip()).isoformat()
 
     def get_image(self, response):
         image = self.process_xpath(
@@ -99,30 +95,19 @@ class PefectGonzoSpider(BaseSceneScraper):
             'external_id'), response.url, re.IGNORECASE)
         search = search.group(1)
         if '/?nats' in search:
-            search = re.search ('(.*)\/\\?nats',search).group(1)
-        
+            search = re.search(r'(.*)/\?nats', search).group(1)
+
         return search.strip()
-
-    def get_tags(self, response):
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(
-                response, self.get_selector_map('tags')).getall()
-            tags = list(set(tags))
-            return list(map(lambda x: x.strip(), tags))
-        return []
-
 
     def get_parent(self, response):
         if "sapphix" in response.url:
             return "Sapphix"
-        else:
-            return "Perfect Gonzo"
-            
+        return "Perfect Gonzo"
 
     def get_url(self, response):
         if '?nats' in response.url:
-            url = re.search('(.*)\?nats',response.url).group(1)
+            url = re.search(r'(.*)\?nats', response.url).group(1)
         else:
             url = response.url
-            
+
         return url

@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -37,6 +36,3 @@ class SiteTheNudieSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "The Nudie"
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()

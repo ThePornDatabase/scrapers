@@ -1,7 +1,5 @@
 import re
-import string
-import html
-import dateparser
+from datetime import date, timedelta
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -47,13 +45,13 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
                     title = scene.xpath('./div[@class="content-info"]/a/div/text()').get()
                     if title:
-                        item['title'] = html.unescape(string.capwords(title))
+                        item['title'] = self.cleanup_title(title)
                     else:
                         item['title'] = ''
 
                     description = scene.xpath('./div[@class="content-info"]/a/div/text()').get()
                     if description:
-                        item['description'] = html.unescape(description)
+                        item['description'] = self.cleanup_description(description)
                     else:
                         item['description'] = ''
 
@@ -69,11 +67,11 @@ class SiteLegsJapanSpider(BaseSceneScraper):
                     else:
                         item['tags'] = []
 
-                    date = scene.xpath('.//div[contains(@class,"content-date")]/div[1][not(contains(text(),"photo")) and not(contains(text(),"video"))]/text()').get()
-                    if date:
-                        item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+                    scenedate = scene.xpath('.//div[contains(@class,"content-date")]/div[1][not(contains(text(),"photo")) and not(contains(text(),"video"))]/text()').get()
+                    if scenedate:
+                        item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
                     else:
-                        item['date'] = []
+                        item['date'] = self.parse_date('today').isoformat()
 
                     image = scene.xpath('./div[contains(@class,"content-img")]/@style').get()
                     if image:
@@ -97,4 +95,20 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
                     item['url'] = "https://www.uralesbian.com/en/updates/" + item['id']
 
-                    yield item
+                    days = int(self.days)
+                    if days > 27375:
+                        filterdate = "0000-00-00"
+                    else:
+                        filterdate = date.today() - timedelta(days)
+                        filterdate = filterdate.strftime('%Y-%m-%d')
+
+                    if self.debug:
+                        if not item['date'] > filterdate:
+                            item['filtered'] = "Scene filtered due to date restraint"
+                        print(item)
+                    else:
+                        if filterdate:
+                            if item['date'] > filterdate:
+                                yield item
+                        else:
+                            yield item

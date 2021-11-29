@@ -1,15 +1,7 @@
-import warnings
+from datetime import date, timedelta
 import json
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteFemjoySpider(BaseSceneScraper):
@@ -44,8 +36,8 @@ class SiteFemjoySpider(BaseSceneScraper):
             for model in jsonentry['actors']:
                 item['performers'].append(model['name'].title())
 
-            item['title'] = jsonentry['title']
-            item['description'] = jsonentry['long_description']
+            item['title'] = self.cleanup_title(jsonentry['title'])
+            item['description'] = self.cleanup_description(jsonentry['long_description'])
             if not item['description']:
                 item['description'] = ''
 
@@ -56,14 +48,30 @@ class SiteFemjoySpider(BaseSceneScraper):
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             item['url'] = "https://femjoy.com" + jsonentry['url']
-            item['date'] = dateparser.parse(jsonentry['release_date'].strip()).isoformat()
+            item['date'] = self.parse_date(jsonentry['release_date'].strip()).isoformat()
             item['site'] = "FemJoy"
             item['parent'] = "FemJoy"
             item['network'] = "FemJoy"
 
             item['tags'] = []
 
-            itemlist.append(item.copy())
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        itemlist.append(item.copy())
+                else:
+                    itemlist.append(item.copy())
 
             item.clear()
         return itemlist

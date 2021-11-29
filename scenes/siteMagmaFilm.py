@@ -1,4 +1,3 @@
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -32,8 +31,3 @@ class MagmaFilmNetworkSpider(BaseSceneScraper):
         scenes = response.xpath('//div[contains(@class, "clipbox")]/a[1]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    # no date aviable, is there a better solution?
-    def get_date(self, response):
-        date = '1970-01-01'
-        return dateparser.parse(date).isoformat()

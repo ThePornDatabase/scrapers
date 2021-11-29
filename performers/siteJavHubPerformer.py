@@ -4,42 +4,42 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
 
-class SiteDigitalDesireSpider(BasePerformerScraper):
+class SiteJavHubPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//div[@class="update_details"]/a[1]/text()',
-        'image': "//div[contains(@class,'image_area')]/img[@class='img-responsive']/@src",
-        'pagination': '/tour/models/models_%s_d.html',
+        'pagination': '/models?page=%s',
         'external_id': 'girls/(.+)/?$'
     }
 
-    name = 'DigitalDesirePerformer'
-    network = "Digital Desire"
+    name = 'JavHubPerformer'
 
     start_urls = [
-        'https://digitaldesire.com',
+        'https://tour.javhub.com',
     ]
 
     def get_performers(self, response):
-        performers = response.xpath('//div[@class="update_details"]')
+        performers = response.xpath('//div[@class="model-item"]')
         for performer in performers:
             item = PerformerItem()
 
-            name = performer.xpath('./a[contains(@href, "/models/")][1]/text()').get()
+            name = performer.xpath('./h3/a/text()')
             if name:
-                item['name'] = html.unescape(name.strip().title())
+                item['name'] = html.unescape(name.get().strip().title())
 
-            image = performer.xpath('.//a/img/@src0_1x').get()
+            image = performer.xpath('./div/a/@data-image')
             if image:
-                item['image'] = "https:" + image.replace(" ", "%20")
+                item['image'] = self.format_link(response, image.get())
             else:
                 item['image'] = None
+
             item['image_blob'] = None
 
-            url = performer.xpath('./a[contains(@href, "/models/")][1]/@href').get()
+            url = performer.xpath('./div/a/@href')
             if url:
-                item['url'] = self.format_link(response, url.strip()).replace(" ", "%20")
+                item['url'] = self.format_link(response, url.get().strip()).replace(" ", "%20")
+            else:
+                item['url'] = response.url
 
-            item['network'] = 'Digital Desire'
+            item['network'] = 'JavHub'
 
             item['astrology'] = ''
             item['bio'] = ''

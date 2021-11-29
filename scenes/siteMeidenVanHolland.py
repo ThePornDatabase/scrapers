@@ -1,8 +1,7 @@
 import re
+from datetime import date, timedelta
 import codecs
-import html
 import json
-import dateparser
 import scrapy
 from tpdb.items import SceneItem
 
@@ -37,6 +36,8 @@ def match_tag(argument):
 class SiteMedienVanHolldandSpider(BaseSceneScraper):
     name = 'MeidenVanHolland'
     network = 'Meiden Van Holland'
+    parent = 'Meiden Van Holland'
+    site = 'Meiden Van Holland'
 
     base_url = 'https://meidenvanholland.nl'
 
@@ -142,11 +143,9 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
         if 'description' not in self.get_selector_map():
             return ''
 
-        description = self.process_xpath(response,
-                                         self.get_selector_map('description'))
+        description = self.process_xpath(response, self.get_selector_map('description'))
         if description:
-            description = self.get_from_regex(description.get(),
-                                              're_description')
+            description = self.get_from_regex(description.get(), 're_description')
 
             if description:
                 try:
@@ -156,31 +155,23 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
                 description = re.sub(r'<[^<]+?>', '', description).strip()
                 description = re.sub(
                     r'[^a-zA-Z0-9\-_ \.\?\!]', '', description)
-                return html.unescape(description.strip())
+                return self.cleanup_description(description)
         return ''
 
     def get_date(self, response):
-        datestring = self.process_xpath(
-            response, self.get_selector_map('date'))
+        datestring = self.process_xpath(response, self.get_selector_map('date'))
         if datestring:
-            datestring = datestring.get()
-            date = self.get_from_regex(datestring, 're_date')
+            datestring = datestring.get().replace(r"\u002F", "/")
+            date = re.search(self.get_selector_map('re_date'), datestring)
             if not date:
-                date = re.search(
-                    r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
-                if date:
-                    date = date.group(1)
-
+                date = re.search(r'active_from=\"(\d{4}-\d{2}-\d{2})', datestring)
+            if not date:
+                date = re.search(r'active_from:\"(\d{1,2}/\d{1,2}/\d{2})', datestring)
             if date:
-                return dateparser.parse(date).isoformat()
-            return dateparser.parse('today').isoformat()
+                date = date.group(1)
+                return self.parse_date(date, date_formats=['%Y-%m-%d', '%m/%d/%Y']).isoformat()
+            return self.parse_date('today').isoformat()
         return None
-
-    def get_site(self, response):
-        return "Meiden Van Holland"
-
-    def get_parent(self, response):
-        return "Meiden Van Holland"
 
     def parse_scene(self, response):
         item = SceneItem()
@@ -248,7 +239,20 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
             item['parent'] = self.get_parent(response)
 
         if item['title'] and item['id']:
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
             if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
                 print(item)
             else:
-                yield item
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

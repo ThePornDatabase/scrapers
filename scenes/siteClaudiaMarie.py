@@ -1,17 +1,8 @@
 import re
-import warnings
+from datetime import date, timedelta
 import string
-import html
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteClaudiaMarieSpider(BaseSceneScraper):
@@ -42,13 +33,13 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
 
             title = scene.xpath('.//h2/text()').get()
             if title:
-                item['title'] = html.unescape(string.capwords(title))
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = ''
 
             description = scene.xpath('.//span[contains(@class,"description")]/text()').get()
             if description:
-                item['description'] = html.unescape(description)
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -60,13 +51,13 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
 
             tags = scene.xpath('.//span[contains(@class,"tags")]/a/text()').getall()
             if tags:
-                item['tags'] = list(map(lambda x: x.strip(), tags))
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
             else:
                 item['tags'] = []
 
-            date = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
-            if date:
-                item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+            scenedate = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = []
 
@@ -97,4 +88,20 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
 
             item['url'] = "https://claudiamarie.com/tour/updates/" + item['id'] + ".html"
 
-            yield item
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

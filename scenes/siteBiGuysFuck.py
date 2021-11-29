@@ -1,18 +1,10 @@
 import re
-import warnings
+from datetime import date, timedelta
 import json
-import html
-import dateparser
+import string
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class BiGuysFuckSpider(BaseSceneScraper):
@@ -54,16 +46,16 @@ class BiGuysFuckSpider(BaseSceneScraper):
             print(f'JSON Data: {jsondata}')
         data = data[0]
 
-        item['title'] = html.unescape(data['name'])
-        item['description'] = html.unescape(data['description'].strip())
+        item['title'] = self.cleanup_title(data['name'])
+        item['description'] = self.cleanup_description(data['description'].strip())
 
-        item['date'] = dateparser.parse(data['uploadDate'].strip()).isoformat()
+        item['date'] = self.parse_date(data['uploadDate'].strip()).isoformat()
 
         tags = data['keywords'].split(",")
-        item['tags'] = list(map(lambda x: x.strip().title(), tags))
+        item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
 
         item['performers'] = list(
-            map(lambda x: x['name'].strip(), data['actor']))
+            map(lambda x: string.capwords(x['name'].strip()), data['actor']))
 
         item['url'] = response.url
         item['image'] = data['thumbnailUrl'].replace(" ", "%20")
@@ -74,7 +66,20 @@ class BiGuysFuckSpider(BaseSceneScraper):
         item['network'] = 'Bi Guys Fuck'
         item['id'] = re.search(r'.*/(.*?)$', response.url).group(1)
 
+        days = int(self.days)
+        if days > 27375:
+            filterdate = "0000-00-00"
+        else:
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.strftime('%Y-%m-%d')
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item

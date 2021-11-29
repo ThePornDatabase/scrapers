@@ -1,7 +1,5 @@
-import dateparser
-import scrapy
 import re
-import string
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -23,7 +21,7 @@ class SugarDaddyPornSpider(BaseSceneScraper):
         'date_formats': ['%Y-%m-%d'],
         'image': '//meta[@property="og:image"]/@content',
         'tags': '',
-        'external_id': '.*\/(.*)$',
+        'external_id': r'.*/(.*)$',
         'trailer': '',
         'pagination': '/videos/recent?page=%s'
     }
@@ -33,31 +31,12 @@ class SugarDaddyPornSpider(BaseSceneScraper):
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-
     def get_title(self, response):
         title = self.process_xpath(response, self.get_selector_map('title')).get()
         if title:
-            if re.search('rating: \d{1,2}\/\d{1,2} ', title.lower()):
-                titlebare = re.search('rating: \d{1,2}\/\d{1,2} (.*)', title.lower()).group(1)
+            if re.search(r'rating: \d{1,2}/\d{1,2} ', title.lower()):
+                titlebare = re.search(r'rating: \d{1,2}/\d{1,2} (.*)', title.lower()).group(1)
                 if titlebare:
                     if re.search('^ - ', title.lower()):
-                        titlebare = re.search('^ - (.*)', title.lower()).group(1)                   
-                if titlebare:
-                    titlebare = string.capwords(titlebare)
-                    title = titlebare.strip()
-                
-            if title:
-                return title.strip()
-
-        return None
-
-    def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image'))
-        if image:
-            image = self.get_from_regex(image.get(), 're_image')
-
-            if image:
-                image = image.replace(" ","%20")
-                return self.format_link(response, image)
-
-        return None
+                        title = re.search('^ - (.*)', title.lower()).group(1)
+        return self.cleanup_title(title)

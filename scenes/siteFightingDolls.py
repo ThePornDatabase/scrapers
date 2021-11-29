@@ -1,6 +1,5 @@
 import re
 from datetime import datetime, timedelta
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -22,7 +21,7 @@ class SiteFightingDollsSpider(BaseSceneScraper):
         'image': '//div[@id="sample"]/img/@src',
         'performers': '//div[@class="grid-x"]/div/div/div/h3/a/text()',
         'tags': '//div[@class="categories"]/a/text()',
-        'external_id': r'.*\/(.*?)\/',
+        'external_id': r'.*/(.*?)/',
         'trailer': '',
         'pagination': ''
     }
@@ -61,4 +60,4 @@ class SiteFightingDollsSpider(BaseSceneScraper):
                 date = datetime.now() - timedelta(days=daysago)
                 if date:
                     return date.isoformat()
-        return dateparser.parse('today').isoformat()
+        return self.parse_date('today').isoformat()

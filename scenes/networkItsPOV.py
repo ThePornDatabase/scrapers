@@ -1,7 +1,7 @@
 import re
 import html
 import json
-import dateparser
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -95,7 +95,8 @@ class NetworkItsPOVSpider(BaseSceneScraper):
     def parse_scene(self, response):
         meta = response.meta
         # The site uses a rate limit of 40 requests in a given minute.
-        ratelimit = int(response.headers['X-Ratelimit-Remaining'])
+        if 'X-Ratelimit-Remaining' in response.headers:
+            ratelimit = int(response.headers['X-Ratelimit-Remaining'])
         try:
             jsondata = json.loads(response.text)
         except:
@@ -110,7 +111,7 @@ class NetworkItsPOVSpider(BaseSceneScraper):
             item['url'] = "https://itspov.com/" + data[row]['url']
             item['image'] = data[row]['video_cover']['1500']
             item['image_blob'] = None
-            item['date'] = dateparser.parse(data[row]['translations'][0]['created_at']).isoformat()
+            item['date'] = self.parse_date(data[row]['translations'][0]['created_at']).isoformat()
             item['performers'] = []
             for model in data[row]['models']:
                 item['performers'].append(data[row]['models'][model]['stage_name'])
@@ -124,4 +125,20 @@ class NetworkItsPOVSpider(BaseSceneScraper):
             item['network'] = 'Its POV'
 
             if item['id'] and item['title']:
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

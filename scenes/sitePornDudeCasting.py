@@ -1,21 +1,14 @@
 import re
-import warnings
-import html
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SitePornDudeCastingSpider(BaseSceneScraper):
     name = 'PornDudeCasting'
     network = 'Porn Dude Casting'
+    parent = 'Porn Dude Casting'
+    site = 'Porn Dude Casting'
 
     start_urls = [
         'https://porndudecasting.com',
@@ -54,18 +47,12 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_site(self, response):
-        return "Porn Dude Casting"
-
-    def get_parent(self, response):
-        return "Porn Dude Casting"
-
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description'))
         if description:
             description = description.getall()
             description = " ".join(description)
-            return html.unescape(description.strip())
+            return self.cleanup_description(description)
 
         return ''
 
@@ -80,5 +67,5 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         if date:
             date = date.get()
             date = date.strip().replace(" ", " 1, ")
-            return dateparser.parse(date).isoformat()
-        return None
+            return self.parse_date(date).isoformat()
+        return self.parse_date('today').isoformat()

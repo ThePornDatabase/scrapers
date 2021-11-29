@@ -1,11 +1,10 @@
-import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import dateparser
+import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
-class siteMixedXPerformerSpider(BasePerformerScraper):
+
+class SiteMixedXPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h3[contains(text(),"About")]/text()',
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
@@ -15,11 +14,11 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         'eyecolor': '//strong[contains(text(),"Eye")]/following-sibling::text()',
         'birthday': '//strong[contains(text(),"Birthday")]/following-sibling::text()',
         'bio': '//div[@class="profile-about"]/p/text()',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
-    url = 'http://mixedx.com/'
-    
+    url = 'https://mixedx.com/'
+
     paginations = {
         '/models/%s/latest/?g=f',
         '/models/%s/latest/?g=m',
@@ -56,7 +55,6 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
                                              headers=self.headers,
                                              cookies=self.cookies)
 
-
     def get_next_page_url(self, url, page, pagination):
         return self.format_url(url, pagination % page)
 
@@ -64,10 +62,10 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         name = self.process_xpath(response, self.get_selector_map('name')).get().strip()
         name = name.replace("About", "").strip()
         return name
-        
+
     def get_performers(self, response):
         meta = response.meta
-        performers = response.xpath('//div[@class="item-portrait"]/a/@href').getall()
+        performers = response.xpath('//div[contains(@class,"item-portrait")]/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(
                 url=self.format_link(response, performer),
@@ -78,14 +76,13 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         meta = response.meta
         if 'g=m' in meta['pagination']:
             return "Male"
-        else:
-            return "Female"
+        return "Female"
 
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.search('(\d+\w+-\d+-\d+)', measurements):
-                measurements = re.search('(\d+\w+-\d+-\d+)', measurements)
+            if measurements and re.search(r'(\d+\w+-\d+-\d+)', measurements):
+                measurements = re.search(r'(\d+\w+-\d+-\d+)', measurements)
                 if measurements:
                     measurements = measurements.group(1)
                     measurements = re.sub('[^a-zA-Z0-9-]', '', measurements)
@@ -96,7 +93,7 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             cupsize = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if cupsize:
-                cupsize = re.search('(\d+\w+)-\d+-\d+', cupsize)
+                cupsize = re.search(r'(\d+\w+)-\d+-\d+', cupsize)
                 if cupsize:
                     cupsize = cupsize.group(1)
                     return cupsize.strip().upper()
@@ -107,11 +104,11 @@ class siteMixedXPerformerSpider(BasePerformerScraper):
         if bio:
             bio = " ".join(bio)
             return bio
-            
+
         return ''
 
     def get_birthday(self, response):
         date = self.process_xpath(response, self.get_selector_map('birthday')).get()
         if date:
-            return dateparser.parse(date.strip()).isoformat()
-        return None   
+            return dateparser.parse(date.strip(), settings={'TIMEZONE': 'UTC'}).isoformat()
+        return None

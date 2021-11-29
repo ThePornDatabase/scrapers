@@ -1,6 +1,5 @@
 import re
 import string
-import dateparser
 import tldextract
 import scrapy
 
@@ -86,7 +85,7 @@ class NetworkMoodUniversePagedSpider(BaseSceneScraper):
 
             item['url'] = self.format_link(response, scene.xpath('./a[1]/@href').get())
 
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
             item['id'] = scene.xpath('./@id').get().strip()
 

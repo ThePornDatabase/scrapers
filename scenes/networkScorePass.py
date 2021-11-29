@@ -1,8 +1,7 @@
+import re
 import scrapy
-import dateparser
 from tpdb.BaseSceneScraper import BaseSceneScraper
 import tldextract
-import re
 
 
 def match_site(argument):
@@ -95,7 +94,7 @@ def match_page_scenepath(argument):
         'tnatryouts': "/xxx-teen-videos/?page=%s",
     }
     return match.get(argument, '/videos/?page=%s')
-    
+
 
 class ScorePassSpider(BaseSceneScraper):
     name = 'ScorePass'
@@ -170,7 +169,7 @@ class ScorePassSpider(BaseSceneScraper):
         # 'https://www.yourmomlovesanal.com',
         # 'https://www.yourmomsgotbigtits.com',
         # 'https://www.yourwifemymeat.com',
-        
+
         'https://www.pornmegaload.com',
         # -----------------------------------
         # 'https://www.18eighteen.com',
@@ -185,7 +184,7 @@ class ScorePassSpider(BaseSceneScraper):
         # 'https://www.pornmegaload.com',
         # 'https://www.scoreland.com',
         # 'https://www.scorevideos.com',
-        # 'https://www.xlgirls.com'        
+        # 'https://www.xlgirls.com'
     ]
 
     selector_map = {
@@ -195,7 +194,7 @@ class ScorePassSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': "//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::span//text()",
         'tags': "//a[contains(@href,'videos-tag')]/text()",
-        'external_id': '\/(\d+)',
+        'external_id': r'/(\d+)',
         'trailer': '//div[@class="pos-rel"]//video/source/@src',
         'pagination': 'xxx-teen-videos/?page=%s'
     }
@@ -215,17 +214,17 @@ class ScorePassSpider(BaseSceneScraper):
             scenes = response.css(".video").css('a').xpath("@href")
         for scene in scenes:
             if "pornmegaload" in response.url:
-                    site = scene.xpath('./div[@class="site"]/img/@alt').get()
-                    if site:
-                        site = site.strip()
-                        site = match_site(site)
-                    scene = scene.xpath('./div/div[contains(@class,"i-title")]/a/@href').get()
+                site = scene.xpath('./div[@class="site"]/img/@alt').get()
+                if site:
+                    site = site.strip()
+                    site = match_site(site)
+                scene = scene.xpath('./div/div[contains(@class,"i-title")]/a/@href').get()
             else:
                 scene = scene.get()
-            
-            if re.match('.*\/\?nats=', scene):
-                scene = re.search('(.*)\/\?nats=', scene).group(1)
-            if "step=signup" not in scene:
+
+            if re.match(r'.*/\?nats=', scene):
+                scene = re.search(r'(.*)/\?nats=', scene).group(1)
+            if "step=signup" not in scene and "join." not in scene:
                 if "pornmegaload" in response.url and site:
                     yield scrapy.Request(url=scene, callback=self.parse_scene, meta={'site': site})
                 else:
@@ -244,15 +243,15 @@ class ScorePassSpider(BaseSceneScraper):
         if not title:
             title = response.xpath('//h2[@class="title"]/span/text()').get()
         if not title:
-            title = response.xpath('//main/div/section/div[@class="row"]/div/h1/text()').get() #Milfbundle
-            
+            title = response.xpath('//main/div/section/div[@class="row"]/div/h1/text()').get()  # Milfbundle
+
         if "christymarks" in response.url or "linseysworld" in response.url:
             sitetitle = response.xpath('//h1[@class="m-title row"]/text()').get()
             if sitetitle:
                 if "»" in sitetitle:
-                    sitetitle = re.search('»\s+?(.*)', sitetitle).group(1)
+                    sitetitle = re.search(r'»\s+?(.*)', sitetitle).group(1)
                 title = sitetitle.strip()
-        
+
         if not title:
             title = response.xpath('//meta[@property="og:title"]/@content').get()
         if not title:
@@ -262,9 +261,9 @@ class ScorePassSpider(BaseSceneScraper):
             title = title[3:]
 
         if title:
-            return title.strip()
+            return self.cleanup_title(title)
         return ''
-        
+
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         if not date:
@@ -272,10 +271,8 @@ class ScorePassSpider(BaseSceneScraper):
         if not date:
             date = response.xpath('//div[contains(@class, "stat")]//span[contains(text(),"Date")]/following-sibling::text()').get()
         if date:
-            return dateparser.parse(date.strip()).isoformat()        
-        else:
-            return dateparser.parse("1970-01-01").isoformat()
-
+            return self.parse_date(date.strip()).isoformat()
+        return self.parse_date('today').isoformat()
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
@@ -287,8 +284,7 @@ class ScorePassSpider(BaseSceneScraper):
                     trailer = "https:" + trailer
                 return trailer.strip()
         return ''
-        
-        
+
     def get_performers(self, response):
         if "bigboobspov" in response.url:
             performerlist = response.xpath('//div[@class="stat"]/span[contains(text(),"Featuring")]/following-sibling::text()').get()
@@ -303,8 +299,8 @@ class ScorePassSpider(BaseSceneScraper):
         if not performers:
             performers = response.xpath('//span[contains(text(),"Featuring")]/following-sibling::a/text()').getall()
         if performers:
-            performers = list(map(lambda x: x.replace(",","").strip(), performers))
-            performers = [ x for x in performers if x != 'and' and x != '' ]
+            performers = list(map(lambda x: x.replace(",", "").strip(), performers))
+            performers = [x for x in performers if x != 'and' and x != '']
             return performers
         if "linseysworld" in response.url:
             return ['Linsey McKenzie']
@@ -312,8 +308,7 @@ class ScorePassSpider(BaseSceneScraper):
             return ['Chloe Vevrier']
         if "christymarks" in response.url:
             return ['Christy Marks']
-        return []        
-        
+        return []
 
     def get_site(self, response):
         site = ""
@@ -328,10 +323,10 @@ class ScorePassSpider(BaseSceneScraper):
         subsite = response.xpath('//div[@class="mb-3"]/a[contains(@href,"videos-category")]/text()').get()
         if subsite:
             site = subsite.strip()
-                
+
         if not site:
-            site = tldextract.extract(response.url).domain        
-        
+            site = tldextract.extract(response.url).domain
+
         site = match_site(site)
         return site
 
@@ -342,7 +337,7 @@ class ScorePassSpider(BaseSceneScraper):
         description = self.process_xpath(
             response, self.get_selector_map('description'))
         if description:
-            if len(description)>1:
+            if len(description) > 1:
                 description = description.getall()
                 description = " ".join(description)
             else:
@@ -355,12 +350,10 @@ class ScorePassSpider(BaseSceneScraper):
                 description = description2
 
         if description is not None:
-            return description.replace('Description:', '').strip()
+            return self.cleanup_description(description)
         return ""
-
 
     def get_parent(self, response):
         parent = tldextract.extract(response.url).domain
         parent = match_site(parent)
         return parent
-        

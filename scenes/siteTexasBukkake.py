@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -32,9 +31,9 @@ class SiteTexasBukkakeSpider(BaseSceneScraper):
             scenedate = scene.xpath('.//div[@class="w-1/2 text-right"]/text()')
             if scenedate:
                 scenedate = scenedate.get().strip()
-                scenedate = dateparser.parse(scenedate, date_formats=['%b %d, %Y']).isoformat()
+                scenedate = self.parse_date(scenedate, date_formats=['%b %d, %Y']).isoformat()
             else:
-                scenedate = dateparser.parse('today').isoformat()
+                scenedate = self.parse_date('today').isoformat()
             scene = scene.xpath('./a/@href').get()
             if scene:
                 if re.search(self.get_selector_map('external_id'), scene):

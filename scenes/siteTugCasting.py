@@ -1,12 +1,10 @@
-import scrapy
 import re
-import html
-import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteTugCastingSpider(BaseSceneScraper):
+class SiteTugCastingSpider(BaseSceneScraper):
     name = 'TugCasting'
     network = 'Tug Casting'
 
@@ -23,15 +21,12 @@ class siteTugCastingSpider(BaseSceneScraper):
         'image': '//video/@poster',
         'performers': '//div[@class="model-tags"]/a/text()',
         'tags': '',
-        'external_id': '.*\/(.*?)\/$',
+        'external_id': r'.*/(.*?)/$',
         'trailer': '',
         'pagination': '/page%s'
     }
 
-    
-    cookies = {
-        'SPSI':'d2b59601b4a1158e72076badf4a321a1',
-    }
+    cookies = {'SPSI': 'd2b59601b4a1158e72076badf4a321a1'}
 
     def get_scenes(self, response):
         scenes = response.xpath('//h3/a/@href|//div[@class="video-thumb"]/a/@href').getall()
@@ -44,23 +39,10 @@ class siteTugCastingSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Tug Casting"
-        
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description')).getall()
         if description:
             description = " ".join(description)
-            return html.unescape(description.strip())
+            return self.cleanup_description(description)
         return ''
-
-
-    def get_date(self, response):
-        date = self.process_xpath(response, self.get_selector_map('date'))
-        if date:
-            date = self.get_from_regex(date.get(), 're_date')
-            if date:
-                date = date.replace('Released:', '').replace('Added:', '').strip()
-                date_formats = self.get_selector_map('date_formats') if 'date_formats' in self.get_selector_map() else None
-                return dateparser.parse(date, date_formats=date_formats).isoformat()
-
-        return None

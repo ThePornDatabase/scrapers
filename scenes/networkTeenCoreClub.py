@@ -1,7 +1,7 @@
 import re
+from datetime import date, timedelta
 import json
 from urllib.parse import urlparse
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -88,12 +88,6 @@ class TeenCoreClubSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        if not hasattr(self, 'start_urls'):
-            raise AttributeError('start_urls missing')
-
-        if not self.start_urls:
-            raise AttributeError('start_urls selector missing')
-
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
@@ -165,16 +159,32 @@ class TeenCoreClubSpider(BaseSceneScraper):
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             item['url'] = domain + "video/" + str(jsonentry['id']) + "/" + jsonentry['slug']
-            item['date'] = dateparser.parse(jsonentry['publication_start'].strip()).isoformat()
+            item['date'] = self.parse_date(jsonentry['publication_start'].strip()).isoformat()
             if not item['date']:
-                item['date'] = dateparser.parse(jsonentry['created_at'].strip()).isoformat()
+                item['date'] = self.parse_date(jsonentry['created_at'].strip()).isoformat()
             item['site'] = meta['site']
             item['parent'] = "Teen Core Club"
             item['network'] = "Teen Core Club"
 
             item['tags'] = []
 
-            itemlist.append(item.copy())
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        itemlist.append(item.copy())
+                else:
+                    itemlist.append(item.copy())
 
             item.clear()
         return itemlist

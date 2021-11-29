@@ -1,6 +1,5 @@
 import json
-import dateparser
-
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -19,13 +18,12 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        global json
         movies = json.loads(response.text)
 
         for movie in movies:
             item = SceneItem()
 
-            item['title'] = movie['fullName'].strip().title()
+            item['title'] = self.cleanup_title(movie['fullName'])
             item['description'] = ''
 
             item['performers'] = []
@@ -38,13 +36,12 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
 
             item['image_blob'] = None
 
-            item['date'] = dateparser.parse(movie['publishDate']).isoformat()
+            item['date'] = self.parse_date(movie['publishDate']).isoformat()
 
             item['tags'] = []
             for tag in movie['tags']:
                 item['tags'].append(tag['fullName'].strip().title())
 
-            # ~ item['trailer'] = movie['videoSrc_1920']
             item['trailer'] = ''
 
             item['site'] = "MrBigfatdick"
@@ -53,7 +50,23 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
             item['url'] = "https://www.mrbigfatdick.com/videos/" + movie['permaLink']
             item['id'] = movie['id']
 
-            yield item
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
     def get_next_page_url(self, base, page):
         page = str(int(page) - 1)

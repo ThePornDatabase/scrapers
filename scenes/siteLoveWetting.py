@@ -1,6 +1,6 @@
 import re
+from datetime import date, timedelta
 import string
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -34,19 +34,18 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             title = scene.xpath('./div[@class="box-info"]/h3/text()')
             item['title'] = ''
             if title:
-                item['title'] = string.capwords(title.get().strip())
+                item['title'] = self.cleanup_title(title.get())
 
             description = scene.xpath('./div[@class="box-info"]/article/div[contains(@class, "description")]/text()')
             item['description'] = ''
             if description:
-                item['description'] = description.get().strip()
+                item['description'] = self.cleanup_description(description.get())
 
             scenedate = scene.xpath('./div[@class="box-info"]/p/span/i[contains(@class, "calendar")]/following-sibling::text()')
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             item['date'] = ''
             if scenedate:
-                scenedate = scenedate.get().strip()
-                item['date'] = dateparser.parse(scenedate).isoformat()
+                item['date'] = self.parse_date(scenedate.get().strip()).isoformat()
 
             image = scene.xpath('.//div[@class="imgwrap"]//img/@src')
             item['image'] = None
@@ -76,4 +75,20 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             item['trailer'] = ''
 
             if item['id'] and item['title']:
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

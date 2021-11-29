@@ -1,8 +1,5 @@
 import re
 import json
-import string
-import html
-import dateparser
 import scrapy
 
 
@@ -138,16 +135,13 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         for jsonentry in data:
             meta['id'] = str(jsonentry['galid'])
             meta['url'] = "https://www.puba.com/pornstarnetwork/" + jsonentry['video_url']
-            meta['title'] = jsonentry['description'].title()
-            meta['description'] = jsonentry['description']
+            meta['title'] = self.cleanup_title(jsonentry['description'])
+            meta['description'] = self.cleanup_description(jsonentry['description'])
             meta['parent'] = meta['site']
             meta['network'] = "Puba Network"
             meta['trailer'] = ''
             if meta['url'] and meta['id']:
                 yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta)
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image'))
@@ -162,16 +156,16 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         meta = response.meta
         item = SceneItem()
 
-        item['title'] = string.capwords(html.unescape(meta['title']))
+        item['title'] = self.cleanup_title(meta['title'])
         item['title'] = item['title'].replace("&amp;", "&")
-        item['description'] = html.unescape(meta['title'])
+        item['description'] = self.cleanup_description(meta['title'])
         item['description'] = item['description'].replace("&amp;", "&")
         item['performers'] = self.get_performers(response)
         item['id'] = meta['id']
         item['site'] = meta['site']
         item['parent'] = meta['parent']
         item['network'] = meta['network']
-        item['date'] = dateparser.parse('today').isoformat()
+        item['date'] = self.parse_date('today').isoformat()
         item['trailer'] = ''
         item['url'] = re.search(r'(.*)\&nats', meta['url']).group(1)
 

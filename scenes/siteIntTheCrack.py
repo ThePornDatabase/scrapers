@@ -6,6 +6,7 @@
 
 import os
 import re
+from datetime import date, timedelta
 import warnings
 import json
 import base64
@@ -106,13 +107,13 @@ class InTheCrackSpider(BaseSceneScraper):
         for scene in scenes:
             scenedate = scene.xpath('./span[2]/text()').get()
             if scenedate:
-                date = scenedate.strip()
+                scenedate = scenedate.strip()
             else:
-                date = dateparser.parse('today').isoformat()
+                scenedate = dateparser.parse('today').isoformat()
             scene = scene.xpath('./@href').get()
             url = "https://inthecrack.com" + scene
 
-            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mydate', 'value': date}]}
+            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mydate', 'value': scenedate}]}
             yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def get_title(self, response):
@@ -181,11 +182,11 @@ class InTheCrackSpider(BaseSceneScraper):
 
         for cookie in cookies:
             if cookie['name'] == 'mydate':
-                date = cookie['value']
+                scenedate = cookie['value']
 
         item = SceneItem()
-        if date:
-            item['date'] = dateparser.parse(date).isoformat()
+        if scenedate:
+            item['date'] = dateparser.parse(scenedate).isoformat()
         else:
             item['date'] = dateparser.parse('today').isoformat()
 
@@ -202,7 +203,20 @@ class InTheCrackSpider(BaseSceneScraper):
         item['parent'] = "In The Crack"
         item['site'] = "In The Crack"
 
+        days = int(self.days)
+        if days > 27375:
+            filterdate = "0000-00-00"
+        else:
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.strftime('%Y-%m-%d')
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item

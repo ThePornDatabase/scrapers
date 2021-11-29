@@ -1,8 +1,6 @@
 import json
 import re
-from datetime import datetime
-
-import dateparser
+from datetime import date, timedelta
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -303,9 +301,9 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         item['parent'] = response.meta['site']
 
         if 'publishedDate' in data:
-            item['date'] = dateparser.parse(data['publishedDate']).isoformat()
+            item['date'] = self.parse_date(data['publishedDate']).isoformat()
         else:
-            item['date'] = datetime.now().isoformat()
+            item['date'] = self.parse_date('today').isoformat()
 
         if 'site' in data:
             if 'name' in data['site']:
@@ -325,10 +323,23 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             for model in data['models']:
                 item['performers'].append(model['modelName'])
 
+        days = int(self.days)
+        if days > 27375:
+            filterdate = "0000-00-00"
+        else:
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.strftime('%Y-%m-%d')
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item
 
     def get_scenes(self, response):
         scene_info = json.loads(response.body)

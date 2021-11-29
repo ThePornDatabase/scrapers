@@ -1,6 +1,7 @@
 import re
 import tldextract
 import scrapy
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -258,7 +259,20 @@ class FetishNetworkSpider(BaseSceneScraper):
             else:
                 item['parent'] = self.get_parent(response)
 
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
             if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
                 print(item)
             else:
-                yield item
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

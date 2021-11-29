@@ -1,5 +1,5 @@
 import re
-import dateparser
+from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -57,8 +57,7 @@ class XXXHorrorSpider(BaseSceneScraper):
 
             title = scene.xpath('./header/h2/a/text()').get()
             if title:
-                title = title.strip()
-                item['title'] = title
+                item['title'] = self.cleanup_title(title)
 
             url = scene.xpath('./header/h2/a/@href').get()
             if url:
@@ -67,14 +66,13 @@ class XXXHorrorSpider(BaseSceneScraper):
                 if scene_id:
                     item['id'] = scene_id.strip()
 
-            date = scene.xpath('.//time[contains(@class,"published")]/@datetime').get()
-            if date:
-                date = date.strip()
+            scenedate = scene.xpath('.//time[contains(@class,"published")]/@datetime').get()
+            if scenedate:
+                scenedate = scenedate.strip()
             else:
-                date = "1970-01-01"
-                date = dateparser.parse(date).isoformat()
+                scenedate = self.parse_date(scenedate).isoformat()
 
-            item['date'] = date
+            item['date'] = scenedate
 
             description = scene.xpath('.//div[@class="entry-content"]/p/text()').getall()
             if not description:
@@ -82,7 +80,7 @@ class XXXHorrorSpider(BaseSceneScraper):
             if description:
                 description = list(map(lambda x: x.strip(), description))
                 description = " ".join(description)
-                item['description'] = description
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -118,7 +116,23 @@ class XXXHorrorSpider(BaseSceneScraper):
             item['site'] = "XXX Horror"
 
             if item['id']:
-                scenelist.append(item.copy())
-                item.clear()
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            scenelist.append(item.copy())
+                    else:
+                        scenelist.append(item.copy())
+            item.clear()
 
         return scenelist

@@ -1,14 +1,16 @@
-import scrapy
 import re
-import dateparser
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteSapphixSpider(BaseSceneScraper):
+class SiteSapphixSpider(BaseSceneScraper):
     name = 'Sapphix'
     network = 'Sapphix'
     parent = 'Sapphix'
+    site = 'Sapphix'
+
+    date_trash = ['Released:', 'Added:', 'Published:', 'Added']
 
     start_urls = [
         'https://www.sapphix.com',
@@ -22,7 +24,7 @@ class siteSapphixSpider(BaseSceneScraper):
         'image': '//div[@id="videoPlayer"]//video/@poster',
         'performers': '//h4[contains(text(), "Featured")]/following-sibling::p/a/text()',
         'tags': '//h4[contains(text(), "Tags")]/following-sibling::a/text()',
-        'external_id': 'movies\/(.*)\/',
+        'external_id': r'movies/(.*)/',
         'trailer': '//div[@id="videoPlayer"]//video/source/@src',
         'pagination': '/movies/page-%s/?tag=&q=&model=&sort=recent'
     }
@@ -33,26 +35,8 @@ class siteSapphixSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_site(self, response):
-        return "Sapphix"
-        
-
-    def get_date(self, response):
-        date = self.process_xpath(response, self.get_selector_map('date'))
-        if date:
-            date = self.get_from_regex(date.get(), 're_date')
-
-            if date:
-                date = date.replace('Added', '').strip()
-                date_formats = self.get_selector_map('date_formats') if 'date_formats' in self.get_selector_map() else None
-
-                return dateparser.parse(date, date_formats=date_formats).isoformat()
-
-        return None
-
-
     def get_url(self, response):
-        url = re.search('(.*)\?nats', response.url)
+        url = re.search(r'(.*)\?nats', response.url)
         if url:
             url = url.group(1)
             return url.strip()

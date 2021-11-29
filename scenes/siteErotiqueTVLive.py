@@ -1,14 +1,13 @@
-import scrapy
 import re
-import dateparser
-
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class siteErotiqueTVLiveSpider(BaseSceneScraper):
+class SiteErotiqueTVLiveSpider(BaseSceneScraper):
     name = 'ErotiqueTVLive'
     network = 'ErotiqueTVLive'
     parent = 'ErotiqueTVLive'
+    site = 'ErotiqueTVLive'
 
     start_urls = [
         'https://erotiquetvlive.com',
@@ -21,7 +20,7 @@ class siteErotiqueTVLiveSpider(BaseSceneScraper):
         'image': '//div[@class="player-thumb"]//img/@src0_1x',
         'performers': '//div[contains(@class,"models-list-thumbs")]/ul/li/a/span/text()',
         'tags': '//div[@class="update-info-block"]/ul/li/a/text()',
-        'external_id': '.*\/(.*?).html',
+        'external_id': r'.*/(.*?).html',
         'trailer': '',
         'pagination': '/tour/categories/movies_%s_d.html'
     }
@@ -31,13 +30,3 @@ class siteErotiqueTVLiveSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_site(self, response):
-        return "ErotiqueTVLive"
-
-    def get_parent(self, response):
-        return "ErotiqueTVLive"
-        
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
-        

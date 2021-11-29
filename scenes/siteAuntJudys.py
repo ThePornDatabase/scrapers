@@ -63,9 +63,5 @@ class SiteAuntJudysSpider(BaseSceneScraper):
         return ''
 
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                return search.group(1).lower()
-
-        return None
+        externid = super().get_id(response)
+        return externid.lower()

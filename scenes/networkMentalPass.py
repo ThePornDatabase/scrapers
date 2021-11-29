@@ -1,6 +1,5 @@
 import re
 from urllib.parse import urlparse
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -110,7 +109,7 @@ class NetworkMentalPassSpider(BaseSceneScraper):
             if "czechgf" in response.url:
                 item['tags'].append('Lesbian')
 
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             item['url'] = response.url
             item['trailer'] = ''
             item['site'] = meta['site']

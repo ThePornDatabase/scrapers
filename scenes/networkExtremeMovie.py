@@ -1,11 +1,9 @@
-import scrapy
 import re
-import string
-import html
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class networkExtremeMoviePassSpider(BaseSceneScraper):
+class NetworkExtremeMoviePassSpider(BaseSceneScraper):
     name = 'ExtremeMoviePass'
     network = 'Extreme Movie Pass'
 
@@ -80,20 +78,18 @@ class networkExtremeMoviePassSpider(BaseSceneScraper):
         'twlav': 'This Wife',
         'vpv': 'Voyeur Papy',
         'wgs': 'Wild Group Sex',
-    }      
-
-
+    }
 
     selector_map = {
         'title': '//h2/a/text()',
         'description': '',
         'date': '//li[contains(text(),"Published")]/text()',
-        're_date': '(\d{4}-\d{2}-\d{2})',
+        're_date': r'(\d{4}-\d{2}-\d{2})',
         'date_formats': ['%Y-%m-%d'],
         'image': '//video/@poster',
         'performers': '//section[@id="content"]//center/a[contains(@href,"/models/")]/text()',
         'tags': '//li[contains(text(),"Tags")]/a/text()',
-        'external_id': '.*\/(.*?)\.html',
+        'external_id': r'.*/(.*?)\.html',
         'trailer': '',
         'pagination': '/t7/categories/movies_%s_d.html'
     }
@@ -107,45 +103,15 @@ class networkExtremeMoviePassSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_site(self, response):
-        return "Submissive X"
-        
-
     def get_id(self, response):
-        if 'external_id' in self.regex and self.regex['external_id']:
-            search = self.regex['external_id'].search(response.url)
-            if search:
-                search = search.group(1).replace("_vids","").lower()
-                return search
+        search = super().get_id(response)
+        if search:
+            search = search.replace("_vids", "").lower()
+        return search
 
-        return None
-
-    def get_title(self, response):
-        title = self.process_xpath(response, self.get_selector_map('title')).get()
-        if title:
-            title = string.capwords(html.unescape(title.strip()))
-            return title.title()
-
-        return None
-
-    def get_trailer(self, response):
-        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
-            trailer = self.process_xpath(response, self.get_selector_map('trailer')).get()
-            if trailer:
-                trailer = self.format_link(response, trailer)
-                return trailer.replace(" ", "%20")
-
-        return ''
-
-    def get_description(self, response):
-        return ''
-        
-    def get_network(self,response):
-        return "Extreme Movie Network"
-        
-    def get_site(self,response):
-        extern_id = re.search('.*\/(.*)\.html',response.url)
-        site=''
+    def get_site(self, response):
+        extern_id = re.search(r'.*/(.*)\.html', response.url)
+        site = ''
         if extern_id:
             extern_id = extern_id.group(1)
             extern_id = extern_id.lower()
@@ -154,18 +120,18 @@ class networkExtremeMoviePassSpider(BaseSceneScraper):
                     site = self.matches[match]
             if site:
                 return site
-                
+
             if "flexidolls" in extern_id:
                 return "FlexiDolls"
-                
+
             if "mbv" in extern_id:
                 return "My Bang Van"
-                
+
         return "Extreme Movie Pass"
-        
-    def get_parent(self,response):
-        extern_id = re.search('.*\/(.*)\.html',response.url)
-        site=''
+
+    def get_parent(self, response):
+        extern_id = re.search(r'.*/(.*)\.html', response.url)
+        site = ''
         if extern_id:
             extern_id = extern_id.group(1)
             extern_id = extern_id.lower()
@@ -174,15 +140,14 @@ class networkExtremeMoviePassSpider(BaseSceneScraper):
                     site = self.matches[match]
             if site:
                 return site
-                
+
             if "flexidolls" in extern_id:
                 return "FlexiDolls"
-                
+
             if "mbv" in extern_id:
                 return "My Bang Van"
-                
+
             if "ilikehand" in extern_id:
                 return "I Like Handjobs"
-                
-        return "Extreme Movie Pass"
 
+        return "Extreme Movie Pass"

@@ -1,8 +1,5 @@
 import re
-import string
-import html
-import dateparser
-
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -35,13 +32,13 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
             title = scene.xpath('.//h3[1]/strong/text()').get()
             if title:
-                item['title'] = html.unescape(string.capwords(title))
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = ''
 
             description = scene.xpath('.//h3[1]/strong/text()').get()
             if description:
-                item['description'] = html.unescape(description)
+                item['description'] = self.cleanup_description(description)
             else:
                 item['description'] = ''
 
@@ -57,9 +54,9 @@ class SiteLegsJapanSpider(BaseSceneScraper):
             else:
                 item['tags'] = []
 
-            date = scene.xpath('.//h3[contains(text(),"released")]/strong/text()').get()
-            if date:
-                item['date'] = dateparser.parse(date, date_formats=['%m/%d/%Y']).isoformat()
+            scenedate = scene.xpath('.//h3[contains(text(),"released")]/strong/text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
             else:
                 item['date'] = []
 
@@ -85,4 +82,20 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
             item['url'] = "https://www.legsjapan.com/en/samples/" + item['id']
 
-            yield item
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item

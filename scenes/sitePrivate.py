@@ -1,6 +1,4 @@
 import re
-
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -51,8 +49,7 @@ class PrivateSpider(BaseSceneScraper):
             return site.strip()
         elif "privateblack" in response.url:
             return "Private Black"
-        else:
-            return "Private"
+        return "Private"
 
     def get_parent(self, response):
         site = response.xpath('//span[@class="title-site"]/text()').get()
@@ -60,5 +57,4 @@ class PrivateSpider(BaseSceneScraper):
             return site.strip()
         elif "privateblack" in response.url:
             return "Private Black"
-        else:
-            return "Private"
+        return "Private"

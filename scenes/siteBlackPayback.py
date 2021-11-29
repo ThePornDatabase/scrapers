@@ -1,13 +1,13 @@
 import re
-import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class SiteBlackPaybackSpider(BaseSceneScraper):
     name = 'BlackPayback'
     network = 'Black Payback'
+    parent = 'Black Payback'
+    site = 'Black Payback'
     max_pages = 15
 
     start_urls = [
@@ -22,7 +22,7 @@ class SiteBlackPaybackSpider(BaseSceneScraper):
         're_image': r'poster=\"(.*?\.jpg)',
         'performers': '',
         'tags': '//div[contains(@class,"featuring")]/ul/li/a/text()',
-        'external_id': r'.*\/(.*?).html',
+        'external_id': r'.*/(.*?).html',
         'trailer': '',
         'pagination': '/tour/updates/page_%s.html'
     }
@@ -32,15 +32,3 @@ class SiteBlackPaybackSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene) and response.meta['page'] < self.max_pages:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_site(self, response):
-        return "Black Payback"
-
-    def get_parent(self, response):
-        return "Black Payback"
-
-    def get_date(self, response):
-        return dateparser.parse('today').isoformat()
-
-    def get_performers(self, response):
-        return []

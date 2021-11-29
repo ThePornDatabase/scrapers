@@ -1,5 +1,5 @@
 import re
-import dateparser
+import string
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -20,11 +20,12 @@ class NetworkPOVRSpider(BaseSceneScraper):
         'performers': '//a[contains(@class,"actor")]/text() | //ul/li/a[contains(@class,"btn--eptenary")]/text()',
         'date': '//div[@class="player__meta"]/div[3]/span/text() | //p[contains(@class,"player__date")]/text()',
         'image': '//meta[@property="og:image"]/@content',
+        'image_blob': '//meta[@property="og:image"]/@content',
         'tags': '//a[contains(@class,"tag")]/text() | //ul/li/a[contains(@class,"btn--default")]/text()',
         'site': '//a[contains(@class,"source")]/text() | //ul/li/a[contains(@class,"btn--secondary")]/text()',
         'external_id': r'.*-(\d+)$',
         'trailer': '',
-        'pagination': '/videos?p=%s'
+        'pagination': '/?p=%s'
     }
 
     def get_scenes(self, response):
@@ -44,11 +45,11 @@ class NetworkPOVRSpider(BaseSceneScraper):
             date.replace('Released:', '').replace('Added:', '').strip()
             if "min" in date or "•" in date and "," in date:
                 date = re.search(r'.*\ (\d{1,2}\ .*\d{4})', date).group(1)
-        return dateparser.parse(date.strip()).isoformat()
+        return self.parse_date(date.strip()).isoformat()
 
     def get_performers(self, response):
         performers = self.process_xpath(
             response, self.get_selector_map('performers')).getall()
         if performers:
-            return list(map(lambda x: x.strip(), performers))
+            return list(map(lambda x: string.capwords(x.strip()), performers))
         return ["No Performers Listed"]

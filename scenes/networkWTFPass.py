@@ -1,5 +1,4 @@
 import re
-import html
 import datetime
 import dateparser
 from dateutil.relativedelta import relativedelta
@@ -25,6 +24,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class NetworkWTFPassSpider(BaseSceneScraper):
     name = 'WTFPass'
     network = 'WTF Pass'
+    parent = 'WTF Pass'
 
     start_urls = [
         'https://wtfpass.com',
@@ -68,15 +68,12 @@ class NetworkWTFPassSpider(BaseSceneScraper):
 
         return tldextract.extract(response.url).domain
 
-    def get_parent(self, response):
-        return "WTF Pass"
-
     def get_description(self, response):
-        description = self.process_xpath(response, self.get_selector_map('description')).get()
+        description = super().get_description(response)
         if description:
             if "Reality porn videos from hot college sex" in description:
                 return ''
-            return html.unescape(description.strip())
+            return self.cleanup_description(description)
 
         return ''
 

@@ -1,18 +1,8 @@
 import re
-import warnings
-import html
-import string
-import dateparser
+from datetime import date, timedelta
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class CosmidFullImportSpider(BaseSceneScraper):
@@ -78,8 +68,7 @@ class CosmidFullImportSpider(BaseSceneScraper):
             item['performers'] = [modelname]
             title = scene.xpath('./div[contains(@class,"item-info")]/h4/a/text()').get()
             if title:
-                item['title'] = string.capwords(title.strip())
-                item['title'] = html.unescape(item['title'])
+                item['title'] = self.cleanup_title(title)
             else:
                 item['title'] = 'No Title Available'
 
@@ -89,19 +78,15 @@ class CosmidFullImportSpider(BaseSceneScraper):
             item['parent'] = "Cosmid"
             item['network'] = "Cosmid"
 
-            date = scene.xpath('./div[contains(@class,"item-info")]/div[@class="date"]/text()').get()
-            if date:
-                date = dateparser.parse(date.strip()).isoformat()
-                item['date'] = date
+            scenedate = scene.xpath('./div[contains(@class,"item-info")]/div[@class="date"]/text()').get()
+            if scenedate:
+                item['date'] = self.parse_date(scenedate, date_formats=['%Y-%m-%d']).isoformat()
             else:
-                item['date'] = "1970-01-01T00:00:00"
+                item['date'] = self.parse_date('today').isoformat()
 
             image = scene.xpath('.//div[contains(@class,"videothumb")]/img/@src').get()
             if image:
-                image = image.replace(r'//', '/').strip()
-                image = image.replace(r'#id#', '').strip()
-                image = "https://cosmid.net" + image
-                item['image'] = image.strip()
+                item['image'] = "https://cosmid.net" + image.replace('//', '/').replace('#id#', '').strip()
             else:
                 item['image'] = None
 
@@ -109,10 +94,7 @@ class CosmidFullImportSpider(BaseSceneScraper):
 
             trailer = scene.xpath('.//div[contains(@class,"videothumb")]/video/source/@src').get()
             if trailer:
-                trailer = "https://cosmid.net" + trailer.strip()
-                trailer = trailer.replace(" ", "%20")
-                trailer = trailer.replace(r'#id#', '').strip()
-                item['trailer'] = trailer.strip()
+                item['trailer'] = "https://cosmid.net" + trailer.replace(" ", "%20").replace('#id#', '').strip()
             else:
                 item['trailer'] = ''
 
@@ -130,4 +112,20 @@ class CosmidFullImportSpider(BaseSceneScraper):
             item['url'] = response.url
 
             if item['id'] and item['title'] and item['date']:
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

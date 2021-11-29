@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -8,6 +7,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class ReflectiveDesireSpider(BaseSceneScraper):
     name = 'ReflectiveDesire'
     network = 'Reflective Desire'
+    parent = 'Reflective Desire'
+    site = 'Reflective Desire'
 
     start_urls = [
         'https://reflectivedesire.com/.com/',
@@ -55,8 +56,8 @@ class ReflectiveDesireSpider(BaseSceneScraper):
             date = self.get_from_regex(date.get(), 're_date')
             if date:
                 date = date.replace(" ", " 1, ")
-                return dateparser.parse(date).isoformat()
-        return dateparser.parse('today').isoformat()
+                return self.parse_date(date).isoformat()
+        return self.parse_date('today').isoformat()
 
     def get_performers(self, response):
         performers = self.process_xpath(response, self.get_selector_map('performers'))
@@ -64,9 +65,3 @@ class ReflectiveDesireSpider(BaseSceneScraper):
             performers = performers.getall()
             return list(map(lambda x: x.replace("Follow ", "").strip(), performers))
         return []
-
-    def get_site(self, response):
-        return "Reflective Desire"
-
-    def get_parent(self, response):
-        return "Reflective Desire"

@@ -1,12 +1,13 @@
 import re
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class SiteSubmissiveXSpider(BaseSceneScraper):
     name = 'SubmissiveX'
     network = 'Submissive X'
+    parent = 'Submissive X'
+    site = 'Submissive X'
 
     start_urls = [
         'https://submissivex.com/',
@@ -19,7 +20,7 @@ class SiteSubmissiveXSpider(BaseSceneScraper):
         'image': '//span[@class="model_update_thumb"]/img/@src',
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': r'updates\/(.*).html',
+        'external_id': r'updates/(.*).html',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html#'
     }
@@ -29,9 +30,3 @@ class SiteSubmissiveXSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_site(self, response):
-        return "Submissive X"
-
-    def get_parent(self, response):
-        return "Submissive X"

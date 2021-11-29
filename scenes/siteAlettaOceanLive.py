@@ -1,8 +1,5 @@
 import re
-import html
-import string
-import dateparser
-
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -36,19 +33,17 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
             item['site'] = "Aletta Ocean Live"
             item['parent'] = "Aletta Ocean Live"
             item['network'] = "Aletta Ocean"
-            title = scene.xpath('.//div[contains(@class,"title")]/text()').get()
+            title = scene.xpath('.//div[contains(@class,"title")]/text()')
             if title:
-                item['title'] = string.capwords(title.strip())
-                item['title'] = html.unescape(item['title'])
+                item['title'] = self.cleanup_title(title.get())
             else:
                 item['title'] = 'No Title Available'
 
-            date = scene.xpath('.//div[contains(@class,"date")]/text()').get()
-            if date:
-                date = dateparser.parse(date.strip()).isoformat()
-                item['date'] = date
+            scenedate = scene.xpath('.//div[contains(@class,"date")]/text()')
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.get().strip()).isoformat()
             else:
-                item['date'] = "1970-01-01T00:00:00"
+                item['date'] = self.parse_date('today').isoformat()
 
             item['performers'] = ['Aletta Ocean']
 
@@ -59,6 +54,8 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
                     item['image'] = image.strip()
             else:
                 item['image'] = ''
+
+            item['image_blob'] = ''
 
             item['trailer'] = ''
 
@@ -77,7 +74,23 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
             item['tags'] = []
 
             if item['title'] and item['id']:
-                scenelist.append(item.copy())
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            scenelist.append(item.copy())
+                    else:
+                        scenelist.append(item.copy())
 
             item.clear()
 

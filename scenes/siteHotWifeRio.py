@@ -1,7 +1,6 @@
 import re
+from datetime import date, timedelta
 import string
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -33,17 +32,17 @@ class SiteHotWifeRioSpider(BaseSceneScraper):
             title = scene.xpath('./div/span[@class="update_title"]/text()')
             item['title'] = ''
             if title:
-                item['title'] = string.capwords(title.get().strip())
+                item['title'] = self.cleanup_title(title.get())
 
             description = scene.xpath('.//span[@class="update_description"]/text()')
             item['description'] = ''
             if description:
-                item['description'] = description.get().strip()
+                item['description'] = self.cleanup_description(description.get())
 
             scenedate = scene.xpath('.//span[@class="update_date"]/text()')
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             if scenedate:
-                item['date'] = dateparser.parse(scenedate.get().strip(), date_formats=['%m/%d/%Y']).isoformat()
+                item['date'] = self.parse_date(scenedate.get().strip(), date_formats=['%m/%d/%Y']).isoformat()
 
             image = scene.xpath('./following-sibling::div[@class="update_image"]/img/@src')
             item['image'] = None
@@ -72,4 +71,20 @@ class SiteHotWifeRioSpider(BaseSceneScraper):
                 item['id'] = externid.group(1).strip()
 
             if item['id'] and item['title']:
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item

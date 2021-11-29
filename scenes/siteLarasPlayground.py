@@ -1,8 +1,4 @@
-import string
-import html
 import re
-import dateparser
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -36,7 +32,7 @@ class SiteLarasPlaygroundSpider(BaseSceneScraper):
                 title = scene.xpath(r'./div/div[@class="serie_tekst"]'
                                     '/strong/text()').get()
                 if title:
-                    item['title'] = html.unescape(string.capwords(title))
+                    item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
 
@@ -44,13 +40,13 @@ class SiteLarasPlaygroundSpider(BaseSceneScraper):
                                           '/strong/following-sibling::text()'
                                           ).get()
                 if description:
-                    item['description'] = html.unescape(description)
+                    item['description'] = self.cleanup_description(description)
                 else:
                     item['description'] = ''
 
                 item['performers'] = ['Lara Latex']
                 item['tags'] = []
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
 
                 image = scene.xpath(r'./div/div[@class="serie_pic01"]/img/@src')
                 if image:

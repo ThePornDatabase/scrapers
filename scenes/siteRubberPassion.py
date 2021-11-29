@@ -1,21 +1,15 @@
 import re
-import warnings
 import string
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class SiteRubberPassionSpider(BaseSceneScraper):
     name = 'RubberPassion'
     network = 'Rubber Passion'
+    parent = 'Rubber Passion'
+    site = 'Rubber Passion'
 
     start_urls = [
         'https://tour.rubber-passion.com',
@@ -36,23 +30,17 @@ class SiteRubberPassionSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//li[@class="post"]')
         for scene in scenes:
-            date = dateparser.parse('today').isoformat()
+            date = self.parse_date('today').isoformat()
             datestring = scene.xpath('.//p[@class="video-added"]/text()')
             if datestring:
                 datestring = datestring.get()
                 datestring = re.search(r'(\w+ \d{1,2}, \d{4})', datestring)
                 if datestring:
-                    date = dateparser.parse(datestring.group(1)).isoformat()
-            title = scene.xpath('./div/a/@title').get()
+                    date = self.parse_date(datestring.group(1)).isoformat()
+            title = self.cleanup_title(scene.xpath('./div/a/@title').get())
             scene = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene) and "gallery" not in title.lower():
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date})
-
-    def get_site(self, response):
-        return "Rubber Passion"
-
-    def get_parent(self, response):
-        return "Rubber Passion"
 
     def get_performers(self, response):
         return ['Latex Lucy']

@@ -1,8 +1,7 @@
-import scrapy
-
-from tpdb.BaseSceneScraper import BaseSceneScraper
 import re
+import scrapy
 import dateparser
+from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class HitzefreiSpider(BaseSceneScraper):
@@ -22,14 +21,13 @@ class HitzefreiSpider(BaseSceneScraper):
         'performers': '//div[@class="model-name"]/text()',
         'tags': '',
         'trailer': '//div[@id="trailer-player"]/@data-trailer',
-        'external_id': '\\/view\\/(\\d*)\\/',
+        'external_id': r'/view/(\d*)/',
         'pagination': '/videos?page=%s'
     }
 
     def get_scenes(self, response):
 
-        scenes = response.xpath(
-            '//h1[@class="content-title"]/a/@href').getall()
+        scenes = response.xpath('//h1[@class="content-title"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
@@ -38,5 +36,4 @@ class HitzefreiSpider(BaseSceneScraper):
         date = self.process_xpath(
             response, self.get_selector_map('date')).get()
         date.replace('Released:', '').replace('Added:', '').strip()
-        return dateparser.parse(date.strip(), settings={
-                                'DATE_ORDER': 'DMY'}).isoformat()
+        return dateparser.parse(date.strip(), settings={'DATE_ORDER': 'DMY', 'TIMEZONE': 'UTC'}).isoformat()

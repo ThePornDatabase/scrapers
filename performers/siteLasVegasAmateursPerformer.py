@@ -32,6 +32,8 @@ class SiteLasVegasAmateursPerformerSpider(BasePerformerScraper):
                 item['image'] = None
             item['image'] = None
 
+            item['image_blob'] = None
+
             url = performer.xpath('./a[contains(@href, "/models/")][1]/@href').get()
             if url:
                 item['url'] = self.format_link(response, url.strip()).replace(" ", "%20")

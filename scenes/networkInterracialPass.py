@@ -1,6 +1,6 @@
-import dateparser
-import scrapy
+from datetime import date, timedelta
 import tldextract
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -68,7 +68,7 @@ class InterracialPassSpider(BaseSceneScraper):
     def get_date(self, response):
         date = self.process_xpath(
             response, self.get_selector_map('date')).extract()
-        return dateparser.parse(date[1].strip()).isoformat()
+        return self.parse_date(date[1].strip()).isoformat()
 
     def get_image(self, response):
         meta = response.meta
@@ -148,7 +148,20 @@ class InterracialPassSpider(BaseSceneScraper):
         else:
             item['parent'] = self.get_parent(response)
 
+        days = int(self.days)
+        if days > 27375:
+            filterdate = "0000-00-00"
+        else:
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.strftime('%Y-%m-%d')
+
         if self.debug:
+            if not item['date'] > filterdate:
+                item['filtered'] = "Scene filtered due to date restraint"
             print(item)
         else:
-            yield item
+            if filterdate:
+                if item['date'] > filterdate:
+                    yield item
+            else:
+                yield item

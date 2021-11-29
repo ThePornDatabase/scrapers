@@ -1,7 +1,6 @@
 import re
 import string
 import html
-import dateparser
 import tldextract
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -33,10 +32,11 @@ class SiteGlaminoGirlsSpider(BaseSceneScraper):
         for scene in scenes:
             item = SceneItem()
 
-            item['title'] = ''
-            title = scene.xpath('.//h2/text()').get()
+            title = scene.xpath('.//h2/text()')
             if title:
-                item['title'] = html.unescape(string.capwords(title.strip()))
+                item['title'] = self.cleanup_title(title.get())
+            else:
+                item['title'] = ''
 
             item['image'] = None
             image = scene.xpath('.//div[@class="thumbnail_wrapper"]/img/@src').get()
@@ -59,7 +59,7 @@ class SiteGlaminoGirlsSpider(BaseSceneScraper):
                 item['url'] = "https://" + tldextract.extract(response.url).domain + ".com" + url.strip()
                 item['id'] = re.search(r'.*\/(.*?)\/', url).group(1)
 
-            item['date'] = dateparser.parse('today').isoformat()
+            item['date'] = self.parse_date('today').isoformat()
             item['description'] = ''
             item['tags'] = []
             item['trailer'] = ''

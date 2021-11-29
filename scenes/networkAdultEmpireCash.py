@@ -1,3 +1,4 @@
+import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -7,17 +8,18 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     network = 'AdultEmpireCash'
 
     start_urls = [
-        'https://www.mypervyfamily.com/',
+        # ~ 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
         'https://jayspov.net',
-        'https://www.filthykings.com/',
+        # ~ 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
-        'https://cospimps.com/',
-        'https://pmggirls.com/',
+        'https://cospimps.com',
+        'https://pmggirls.com',
         'https://www.lethalhardcore.com',
         'https://spankmonster.com',
+        'https://www.wcpclub.com'
     ]
 
     selector_map = {
@@ -39,6 +41,10 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta = {}
                 meta['site'] = "Spank Monster"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "latinoguys" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
         else:
             scenes = response.css('.grid-item')
             for scene in scenes:
@@ -53,24 +59,34 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_site(self, response):
         if 'jayspov' in response.url:
             return 'Jays POV'
+        if 'wcpclub' in response.url:
+            return 'West Coast Productions'
+
+        return response.xpath('//div[@class="studio"]//span[2]/text()').get().strip()
+
+    def get_parent(self, response):
+        if 'jayspov' in response.url:
+            return 'Jays POV'
+        if 'wcpclub' in response.url:
+            return 'West Coast Productions'
 
         return response.xpath('//div[@class="studio"]//span[2]/text()').get().strip()
 
     def get_next_page_url(self, base, page):
         pagination = self.get_selector_map('pagination')
 
-        if "mypervyfamily" in base:
-            pagination = "/my-pervy-family.html?page=%s&view=grid"
         if "conorcoxxx" in base:
             pagination = "/conor-coxxx-clips.html?page=%s&hybridview=member"
         if "hornyhousehold" in base:
             pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "jayspov" in base:
             pagination = "/jays-pov-updates.html?page=%s&hybridview=member"
-        if "lantinoguys" in base:
+        if "latinoguys" in base:
             pagination = "/watch-newest-latino-guys-porn-clips-and-scenes.html?page=%s&hybridview=member"
         if "cospimps" in base:
             pagination = "/videos/videos_page=%s"
+        if "filthykings" in base:
+            pagination = "/en/videos/page/%s"
         if "pmggirls" in base:
             pagination = "/videos/videos_page=%s"
         if "lethalhardcore" in base:
@@ -78,3 +94,14 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         if "spankmonster" in base:
             pagination = "/watch-newest-spank-monster-clips-and-scenes.html?page=%s&hybridview=member"
         return self.format_url(base, pagination % page)
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        titlework = super().get_title(response)
+        titlework = re.sub('[^a-zA-Z]', '', titlework)
+        if titlework == "Scene":
+            release = response.xpath('//a[contains(@class, "movie-title")]/text()')
+            if release:
+                release = release.get()
+                title = title + " From " + release.strip()
+        return title

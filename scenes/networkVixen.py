@@ -1,4 +1,5 @@
 import json
+from datetime import date, timedelta
 from urllib.parse import urlparse
 import scrapy
 
@@ -81,8 +82,8 @@ class VixenScraper(BaseSceneScraper):
         scene = SceneItem()
 
         scene['id'] = data['id']
-        scene['title'] = data['title']
-        scene['description'] = data['description'] if 'description' in data else ''
+        scene['title'] = self.cleanup_title(data['title'])
+        scene['description'] = self.cleanup_description(data['description']) if 'description' in data else ''
 
         site = data['site']
         if site.upper() in self.sites:
@@ -119,7 +120,23 @@ class VixenScraper(BaseSceneScraper):
 
         scene['trailer'] = '' if 'trailer' not in scene or not scene['trailer'] else scene['trailer']
 
-        return scene
+        days = int(self.days)
+        if days > 27375:
+            filterdate = "0000-00-00"
+        else:
+            filterdate = date.today() - timedelta(days)
+            filterdate = filterdate.strftime('%Y-%m-%d')
+
+        if self.debug:
+            if not scene['date'] > filterdate:
+                scene['filtered'] = "Scene filtered due to date restraint"
+            print(scene)
+        else:
+            if filterdate:
+                if scene['date'] > filterdate:
+                    yield scene
+            else:
+                yield scene
 
     def get_graphql_search_body(self, per_page, page, link):
         site_name = urlparse(link).hostname.replace('www.', '').replace('.com', '').upper()

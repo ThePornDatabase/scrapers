@@ -1,6 +1,4 @@
 import re
-import html
-import string
 import tldextract
 import scrapy
 
@@ -35,6 +33,8 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Primal', 'Primal\'s Footjobs', '/studio/49351/primal-s-footjobs/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href | //span[@class="thumb_format" and contains(text(),"MKV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Borderland Bound', 'Borderland Bound', '/studio/64171/borderland-bound-/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Ginarys Kinky Adventures', 'Ginarys Kinky Adventures', '/studio/45669/ginary-s-kinky-adventures-/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Ginarys Kinky Adventures', 'Ginarys Giantess Adventures', '/studio/77757/ginary-s-giantess-adventures-/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Ginarys Kinky Adventures', 'Ginarys Tickle Adventures', '/studio/71128/ginary-s-tickle-adventures/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Superbound', 'Superbound', '/studio/8178/superbound/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MOV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Cruel Mistresses', 'Cruel Mistresses', '/studio/39213/cruel-caning-and-whipping-/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"WMV")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'American Mean Girls', 'American Mean Girls', '/studio/32364/american-mean-girl/Cat0-AllCategories/Page%s/ClipDate-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4") and not(contains(following-sibling::span/text(),"4K")) and not(contains(following-sibling::span/text(),"480p"))]/../following-sibling::div/div/a[1]/@href'],
@@ -47,6 +47,19 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Mandy Flores', 'Mandy Flores', '/studio/33729/mandy-flores/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'FM Concepts', 'FM Concepts', '/studio/116614/fm-concepts-1080p-bondage-store/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4") and not(contains(./following-sibling::span/text(), "4K"))]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Mouth Stuffed and Tied Up Girls', 'Mouth Stuffed and Tied Up Girls', '/studio/4458/mouth-stuffed-and-tied-up-girls/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Jon Woods', 'American Damsels', '/studio/6571/american-damsels-by-jon-woods/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Girls Controlled', 'Girls Controlled To Be Bad', '/studio/10982/robo-pimp-girls-trained-to-be-bad/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Mark Rockwell', 'Marks Head Bobbers and Hand Jobbers', '/studio/47321/marks-head-bobbers-and-hand-jobbers/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Aaliyah Taylor', 'Aliyah Taylors Fetish', '/studio/70866/aaliyah-taylor-s-fetish/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cock Ninja Studios', 'Cock Ninja Studios', '/studio/79893/cock-ninja-studios/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Family Therapy (Clips4Sale)', 'Family Therapy (Clips4Sale)', '/studio/81593/family-therapy/Cat0-AllCategories/Page%s/DisplayOrder-asc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Brat Attack', 'Brat Attack', '/studio/83427/brat-attack/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'BlackCow Video', 'BlackCow Video', '/studio/15814/blackcow-video/Cat0-AllCategories/Page%s/DisplayOrder-asc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Got Milked Studios', 'Got Milked Studios', '/studio/16034/black-slave-fantacies-/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cory Chase', 'Corys Super Heroine Adventures', '/studio/32589/cory-s-super-heroine-adventures/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cory Chase', 'Chase Water Babes', '/studio/32587/chase-water-babes/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cory Chase', 'Kinky Cory', '/studio/41549/kinki-cory/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cory Chase', 'Mixed Model Wrestling', '/studio/32588/mixed-model-wrestling/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -135,6 +148,8 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("wmv", "")
             title = title.replace(" xxx", "")
             title = title.replace(" mp4", "")
+            title = title.replace("mp4 ", "")
+            title = title.replace("(mp4)", "")
             title = title.replace("(.mp4)", "")
             title = title.replace("(hd)", "")
             title = title.replace("(1080)", "")
@@ -151,6 +166,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("1080p", "")
             title = title.replace("720p", "")
             title = title.replace("()", "")
+            title = title.replace("( )", "")
             title = title.replace("mf~", "")
             # ~ title = title.replace(" - ", "")
             if re.match(r'.*\(.*? discounted\)', title):
@@ -165,8 +181,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.strip()
             if title[-2:] == " -":
                 title = title[:-2]
-            title = string.capwords(title)
-            return title.strip()
+            return self.cleanup_title(title)
         return ''
 
     def get_tags(self, response):
@@ -174,6 +189,8 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             tags = self.process_xpath(
                 response, self.get_selector_map('tags')).getall()
             if tags:
+                if 'Bondage By Jon Woods' in tags:
+                    tags.remove('Bondage By Jon Woods')
                 return list(map(lambda x: x.strip().title(), tags))
         return []
 
@@ -272,7 +289,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
                     if "this format is" not in desc:
                         if not re.search(r'(\d{3,4}\*\d{3,4})', desc):
                             description = description + " " + desc.strip()
-            return html.unescape(description.strip())
+            return self.cleanup_description(description)
         return ''
 
     def get_site(self, response):

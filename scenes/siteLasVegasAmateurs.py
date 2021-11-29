@@ -1,8 +1,5 @@
-import string
-import html
 import re
-import dateparser
-
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -35,7 +32,7 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
                 item = SceneItem()
                 title = scene.xpath('./div/h5/a/text()').get()
                 if title:
-                    item['title'] = html.unescape(string.capwords(title))
+                    item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
 
@@ -49,10 +46,9 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
                     item['performers'] = []
 
                 scenedate = scene.xpath('./div/p/span[contains(text(), "/")]/text()')
-                item['date'] = dateparser.parse('today').isoformat()
+                item['date'] = self.parse_date('today').isoformat()
                 if scenedate:
-                    scenedate = dateparser.parse(scenedate.get(), date_formats=['%m/%d/%Y']).isoformat()
-                    item['date'] = scenedate
+                    item['date'] = self.parse_date(scenedate.get(), date_formats=['%m/%d/%Y']).isoformat()
 
                 image = scene.xpath('./div/a/img/@src0_3x')
                 if image:
@@ -82,4 +78,20 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
 
                 item['url'] = response.url
 
-                yield item
+                days = int(self.days)
+                if days > 27375:
+                    filterdate = "0000-00-00"
+                else:
+                    filterdate = date.today() - timedelta(days)
+                    filterdate = filterdate.strftime('%Y-%m-%d')
+
+                if self.debug:
+                    if not item['date'] > filterdate:
+                        item['filtered'] = "Scene filtered due to date restraint"
+                    print(item)
+                else:
+                    if filterdate:
+                        if item['date'] > filterdate:
+                            yield item
+                    else:
+                        yield item
