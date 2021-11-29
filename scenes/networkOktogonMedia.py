@@ -5,6 +5,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 def match_site(argument):
     match = {
+        'loveherboobs': "Love Her Boobs",
         'loveherfeet': "Love Her Feet",
         'shelovesblack': "She Loves Black",
     }
@@ -17,6 +18,7 @@ class OktogonMediaSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.shelovesblack.com',
+        'https://www.loveherboobs.com'
         'https://www.loveherfeet.com'
     ]
 
