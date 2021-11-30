@@ -4,7 +4,7 @@ import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class siteBathroomCreepersPerformerSpider(BasePerformerScraper):
+class SiteBathroomCreepersPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[contains(@class,"profile-details")]/h3[1]/text()',
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
