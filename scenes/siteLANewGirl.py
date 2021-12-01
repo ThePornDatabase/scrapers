@@ -41,16 +41,19 @@ class SiteLANewGirlSpider(BaseSceneScraper):
             return title.strip()
         return ''
 
-    def get_date(self, response):
-        image = response.xpath('//ul[@class="slides"]/li[1]/a/img/@src')
-        if image:
-            image = image.get()
-            year = re.search(r'uploads/(\d{4})/', image)
-            month = re.search(r'uploads/\d+/(\d{1,2})/', image)
-            if month and year:
-                date = year.group(1) + "-" + month.group(1) + "-01"
-                return self.parse_date(date).isoformat()
-        return self.parse_date('today').isoformat()
+    #  The date code was used for the initial fill scrape.  It's pretty inaccurate,
+    #  so going forward commenting it out so that current date is used.  Leaving
+    #  the function in as a comment in case it's needed later though.
+    # ~ def get_date(self, response):
+    # ~ image = response.xpath('//ul[@class="slides"]/li[1]/a/img/@src')
+    # ~ if image:
+    # ~ image = image.get()
+    # ~ year = re.search(r'uploads/(\d{4})/', image)
+    # ~ month = re.search(r'uploads/\d+/(\d{1,2})/', image)
+    # ~ if month and year:
+    # ~ date = year.group(1) + "-" + month.group(1) + "-01"
+    # ~ return self.parse_date(date).isoformat()
+    # ~ return self.parse_date('today').isoformat()
 
     def get_tags(self, response):
         tags = []
