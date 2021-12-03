@@ -126,6 +126,5 @@ class NetworkJavHDAltPerformerSpider(BasePerformerScraper):
         fakeboobs = super().get_fakeboobs(response)
         if fakeboobs:
             if fakeboobs == "Silicon":
-                return "Yes"
-            return "No"
-        return fakeboobs
+                return "True"
+        return None
