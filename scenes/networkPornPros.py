@@ -15,6 +15,7 @@ class PornprosSpider(BaseSceneScraper):
         "https://castingcouch-x.com/",
         "https://cum4k.com/",
         "https://exotic4k.com/",
+        "https://facials4k.com/",
         "https://fantasyhd.com/",
         "https://girlcum.com/",
         "https://holed.com/",
