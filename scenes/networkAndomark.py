@@ -121,6 +121,7 @@ class AndomarkSpider(BaseSceneScraper):
         'date': '//span[@class="availdate"]/text()',
         'description': '//span[contains(@class,"description")]/text()',
         'image': '//meta[@property="og:image"]/@content',
+        'image_blob': True,
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
         'external_id': r'updates/(.+)\.html',
