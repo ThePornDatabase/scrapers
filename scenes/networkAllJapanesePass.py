@@ -1,8 +1,10 @@
 import re
-import string
-import tldextract
 import scrapy
+import tldextract
+import string
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
+
 
 
 def match_site(argument):
@@ -30,8 +32,7 @@ def match_site(argument):
     }
     return match.get(argument, '')
 
-
-class NetworkAllJapanesePassSpider(BaseSceneScraper):
+class networkAllJapanesePassSpider(BaseSceneScraper):
     name = 'AllJapanesePass'
     network = "All Japanese Pass"
     parent = "All Japanese Pass"
@@ -65,9 +66,10 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
         'date': '//div[contains(text(),"Added")]/following-sibling::div[1]/text()',
         'date_formats': ['%d %b %Y'],
         'image': '//div[@class="b-player-body"]/div/img/@src',
+        'image_blob': True,
         'performers': '//p[@itemprop="actor"]/a/span/text()',
         'tags': '//p[@class="b-video-info__text"]/a[contains(@href,"/category/") or contains(@href,"/tag/")]/text()',
-        'external_id': r'.*\/(.*?)$',
+        'external_id': '.*\/(.*?)$',
         'trailer': '',
         'pagination': '/videos/newest/%s'
     }
@@ -94,6 +96,7 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
             site = tldextract.extract(response.url).domain
 
         return site
+
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
