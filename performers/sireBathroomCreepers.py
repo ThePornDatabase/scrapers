@@ -10,7 +10,7 @@ class SiteBathroomCreepersPerformerSpider(BasePerformerScraper):
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
         'bio': '//strong[contains(text(), "Fun Fact")]/following-sibling::text()',
         'height': '//strong[contains(text(), "Height")]/following-sibling::text()',
-        'pagination': '/creeper/models/%s/latest/?g=',
+        'pagination': '/creeper/models/%s/latest/?g=f',
         'external_id': r'model/(.*)/'
     }
 
