@@ -140,7 +140,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.webmature.com',
         # 'https://www.whiteghetto.com',
 
-        'https://www.fantasymassage.com',
+        # ~ 'https://www.fantasymassage.com',  Moved to Adult Time API
         # 'https://www.allgirlmassage.com',
         # 'https://www.nurumassage.com',
 

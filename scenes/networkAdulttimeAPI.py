@@ -48,6 +48,7 @@ def match_site(argument):
         'dominatedgirls': 'Dominated Girls',
         # 'dpfanatics': 'DPFanatics', Pulled from Gamma
         'evilangel': 'Evil Angel',
+        'fantasymassage': 'Fantasy Massage',
         'femalesubmission': 'Female Submission',
         'footsiebabes': 'Footsie Babes',
         'gapeland': 'Gapeland',
@@ -70,6 +71,7 @@ def match_site(argument):
         'mandyiskinky': 'Mandy Is Kinky',
         'marcusmojo': 'Marcus Mojo',
         'masonwyler': 'Mason Wyler',
+        'massageparlor': 'Massage Parlor',
         'mightymistress': 'Mighty Mistress',
         'modeltime': 'Model Time',
         'mommysgirl': 'Mommys Girl',
@@ -85,6 +87,7 @@ def match_site(argument):
         'nextdoorstudios': 'Nextdoor Studios',
         'nextdoortwink': 'Nextdoor Twink',
         # 'nudefightclub': 'Nude Fight Club', Pulled from Gamma
+        'nurumassage': 'Nuru Massage',
         'oldyounglesbianlove': 'Old Young Lesbian Love',
         'oralexperiment': 'Oral Experiment',
         'outofthefamily': 'Out of the Family',
@@ -96,6 +99,7 @@ def match_site(argument):
         'sistertrick': 'Sister Trick',
         'sextapelesbians': 'Sextape Lesbians',
         'sexwithkathianobili': 'Sex With Kathia Nobili',
+        'soapymassage': 'Soapy Massage',
         'speculumplays': 'Speculum Plays',
         'squirtalicious': 'Squirtalicious',
         'stagcollectivesolos': 'Stag Collective Solos',
@@ -137,6 +141,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.devilsfilm.com',
         'https://www.diabolic.com',
         'https://www.evilangel.com',
+        'https://www.fantasymassage.com',
         'https://www.filthykings.com',
         'https://www.genderx.com',
         'https://www.girlsway.com',
@@ -289,6 +294,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if 'evilangel' in referrerurl:
                 item['parent'] = "Evil Angel"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'fantasymassage' in referrerurl:
+                item['parent'] = "Fantasy Massage"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'filthykings' in referrerurl:
                 item['parent'] = "Filthy Kings"
                 item['site'] = scene['serie_name']
@@ -392,6 +400,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming"}]}'
         if 'evilangel' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=36&maxValuesPerFacet=100&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=true&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&facets=%5B%22categories.name%22%2C%22directors.name%22%2C%22actors.name%22%2C%22serie_name%22%2C%22length_range_15min%22%2C%22download_sizes%22%2C%22bisex%22%2C%22shemale%22%2C%22upcoming%22%2C%22lesbian%22%5D&tagFilters=&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=lesbian&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22shemale%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=shemale&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22bisex%3A0%22%5D%5D"},{"indexName":"all_scenes","params":"query=&hitsPerPage=1&maxValuesPerFacet=100&page=0&analytics=false&analyticsTags=%5B%22device%3Adesktop%22%2C%22instantsearch%22%2C%22site%3Aevilangel%22%2C%22section%3Afreetour%22%2C%22page%3Avideos%22%5D&clickAnalytics=false&filters=NOT%20serie_name%3A%20%22Member%20Compilations%22%20AND%20NOT%20categories.name%3A%20%22EA%20Short%22%20AND%20NOT%20clip_id%3A%20181315&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=bisex&facetFilters=%5B%5B%22lesbian%3A%22%5D%2C%5B%22upcoming%3A0%22%5D%2C%5B%22shemale%3A0%22%5D%5D"}]}'
+        if 'fantasymassage' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facets=%5B%22availableOnSite%22%2C%22sitename%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3Anurumassage%22%2C%22availableOnSite%3Aallgirlmassage%22%2C%22availableOnSite%3Asoapymassage%22%2C%22availableOnSite%3Amassage-parlor%22%2C%22availableOnSite%3Amilkingtable%22%2C%22availableOnSite%3Afantasymassage%22%2C%22availableOnSite%3Atrickyspa%22%5D%5D"},{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&hitsPerPage=1&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite"}]}'
         if 'devilsfilm' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facets=%5B%22availableOnSite%22%2C%22categories.name%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3Adevilsfilm%22%2C%22availableOnSite%3Asquirtalicious%22%2C%22availableOnSite%3Ahairyundies%22%2C%22availableOnSite%3Alesbianfactor%22%2C%22availableOnSite%3Adevilsfilmparodies%22%2C%22availableOnSite%3Agivemeteens%22%2C%22availableOnSite%3Aoutofthefamily%22%2C%22availableOnSite%3Adevilsgangbangs%22%2C%22availableOnSite%3AJaneDoePictures%22%2C%22availableOnSite%3Adevilstgirls%22%5D%5D"},{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&hitsPerPage=1&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite"}]}'
         if 'diabolic' in referrer:
