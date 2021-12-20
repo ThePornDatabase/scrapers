@@ -16,6 +16,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
         'https://cospimps.com',
+        'https://www.jonathanjordanxxx.com',
+        'https://www.kingsoffetish.com',
         'https://pmggirls.com',
         'https://www.lethalhardcore.com',
         'https://spankmonster.com',
@@ -47,6 +49,18 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Stephouse XXX"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "kingsoffetish" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Kings of Fetish"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "jonathanjordanxxx" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Jonathan Jordan XXX"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "latinoguys" in response.url:
             scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
@@ -102,6 +116,10 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/watch-newest-spank-monster-clips-and-scenes.html?page=%s&hybridview=member"
         if "stephousexxx" in base:
             pagination = "/watch-newest-step-house-xxx-clips-and-scenes.html?page=%s&hybridview=member"
+        if "jonathanjordanxxx" in base:
+            pagination = "/watch-newest-jonathan-jordan-xxx-clips-and-scenes.html?page=%s&hybridview=member"
+        if "kingsoffetish" in base:
+            pagination = "/kings-of-fetish-newest-perverted-clips.html?page=%s&hybridview=member"
         return self.format_url(base, pagination % page)
 
     def get_title(self, response):
