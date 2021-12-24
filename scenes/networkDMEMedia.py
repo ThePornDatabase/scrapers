@@ -5,16 +5,25 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 def match_site(argument):
     match = {
+        'adultdoorway': "Adult Doorway",
         'amateurthroats': "Amateur Throats",
         'analrecruiters': "Anal Recruiters",
+        'bustyamateurboobs': "Busty Amateur Boobs",
+        'clubamberrayne': "Club Amber Rayne",
+        'facialabuse': "Facial Abuse",
         'hardcoredoorway': "Hardcore Doorway",
         'herfirstporn': "Her First Porn",
         'hugerubberdicks': "Huge Rubber Dicks",
+        'joethepervert': "Joe the Pervert",
         'latinaabuse': "Latina Abuse",
         'lesbianslovesex': "Lesbians Love Sex",
         'monstercockmadness': "Monster Cock Madness",
+        'nastylittlefacials': "Nasty Little Facials",
+        'pinkkittygirls': "Pink Kitty Girls",
         'sexysuckjobs': "Sexy Suck Jobs",
         'spermsuckers': "Sperm Suckers",
+        'thehandjobsite': "The Handjob Site",
+        'thepantyhosesite': "The Pantyhose Site",
     }
     return match.get(argument, argument)
 
@@ -24,16 +33,25 @@ class NetworkDMEMediaSpider(BaseSceneScraper):
     network = 'DME Media'
 
     start_urls = [
+        'https://tour5m.adultdoorway.com',
         'https://tour5m.amateurthroats.com',
         'https://tour5m.analrecruiters.com',
+        'https://tour5m.bustyamateurboobs.com',
+        'https://tour5m.clubamberrayne.com',
+        'https://tour5m.facialabuse.com',
         'https://tour5m.hardcoredoorway.com',
         'https://tour5m.herfirstporn.com',
         'https://tour5m.hugerubberdicks.com',
+        'https://tour5m.joethepervert.com',
         'https://tour5m.latinaabuse.com',
         'https://tour5m.lesbianslovesex.com',
         'https://tour5m.monstercockmadness.com',
+        'https://tour5m.nastylittlefacials.com',
+        'https://tour5m.pinkkittygirls.com',
         'https://tour5m.sexysuckjobs.com',
         'https://tour5m.spermsuckers.com',
+        'https://tour5m.thehandjobsite.com',
+        'https://tour5m.thepantyhosesite.com',
     ]
 
     selector_map = {
