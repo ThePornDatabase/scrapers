@@ -56,6 +56,11 @@ class TugPassSpider(BaseSceneScraper):
                 except BaseException:
                     site = "TugPass"
 
+                if date:
+                    date = self.parse_date(date).isoformat()
+                else:
+                    date = self.parse_date('today').isoformat()
+
                 if ".com" in site:
                     site = re.search('(.*?)\\.com', site).group(1).strip()
 
