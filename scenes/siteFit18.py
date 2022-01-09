@@ -45,7 +45,8 @@ class SiteFit18Spider(BaseSceneScraper):
         jsondata = response.json()['data']['video']['list']['result']['edges']
         for jsonrow in jsondata:
             item = SceneItem()
-            item['id'] = jsonrow['node']['videoId'].replace(":", "-")
+            sceneid = jsonrow['node']['videoId']
+            item['id'] = sceneid.replace(":", "-")
             item['title'] = self.cleanup_title(jsonrow['node']['title'])
             item['description'] = self.cleanup_description(jsonrow['node']['description']['long'])
             item['performers'] = []
@@ -55,7 +56,7 @@ class SiteFit18Spider(BaseSceneScraper):
             item['site'] = "Fit 18"
             item['network'] = "Fit 18"
             item['parent'] = "Fit 18"
-            item['url'] = "https://fit18.com/videos/" + item['id']
+            item['url'] = "https://fit18.com/videos/" + sceneid.replace(':', '%3A')
             item['date'] = self.parse_date('today').isoformat()
             item['trailer'] = ''
             item['tags'] = []
