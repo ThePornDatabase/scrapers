@@ -61,6 +61,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Cory Chase', 'Kinky Cory', '/studio/41549/kinki-cory/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Cory Chase', 'Mixed Model Wrestling', '/studio/32588/mixed-model-wrestling/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'GwenMedia', 'GwenMedia', '/studio/16700/gwenmedia-femdom-latex-fetish/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Sinn Sage Dreams', 'Sinn Sage Dreams', '/studio/96823/sinn-sage-dreams/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -278,6 +279,9 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
 
         if meta['site'] == "Mandy Flores":
             return ['Mandy Flores']
+
+        if meta['site'] == "Sinn Sage Dreams":
+            return ['Sinn Sage']
 
         return []
 
