@@ -24,7 +24,7 @@ class SiteThicc18Spider(BaseSceneScraper):
             },
             "query": "query ListVideo($order: [OrderEntry!], $after: ID, $limit: Int) {\n  video {\n    list(input: {order: $order, after: $after, first: $limit}) {\n      result {\n        edges {\n          node {\n            videoId\n            title\n            description {\n              long\n            }\n            talent {\n              type\n              talent {\n                talentId\n                name\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
         }
-        url = "https://fit18.team18.app/graphql"
+        url = "https://thicc18.team18.app/graphql"
         scenequery = json.dumps(scenequery)
         yield Request(url, headers=self.headers, body=scenequery, method="POST", callback=self.get_scenes)
 
@@ -71,7 +71,7 @@ class SiteThicc18Spider(BaseSceneScraper):
                     ]
                 },
                 "query": "query BatchFindAssetQuery($paths: [String!]!) {\n  asset {\n    batch(input: {paths: $paths}) {\n      result {\nserve {\n uri\n}\n}\n}\n}\n}\n"}
-            url = "https://fit18.team18.app/graphql"
+            url = "https://thicc18.team18.app/graphql"
             imagequery = json.dumps(imagequery)
             yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
 
