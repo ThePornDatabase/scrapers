@@ -33,6 +33,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         'https://fallinlovia.com',
         'https://bigjohnnyxxx.com',
         'https://dillionation.com',
+        'https://isinxxx.com',
         'https://katie71.com',
         'https://peghim.com',
         'https://cleagaultier-official.com',
@@ -130,6 +131,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "dillionation" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "isinxxx" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "natashanice" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=natashahomemade&transitParameters[preset]=videos'
         if "katie71" in base:
@@ -288,6 +291,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['site'] = 'Daddys Cowgirl'
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
+            item['performers'] = []
+            yield item
+
+        if "isinxxx" in response.url:
+            item['site'] = 'I Sin XXX'
+            item['parent'] = 'I Sin XXX'
+            item['network'] = 'I Sin XXX'
             item['performers'] = []
             yield item
 
