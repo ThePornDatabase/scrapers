@@ -40,3 +40,15 @@ class NetworkKinkBombSpider(BaseSceneScraper):
             site = site.get()
             title = string.capwords(site.strip()) + ": " + title
         return title
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image:
+            image = response.xpath('//meta[@property="og:image"]/@content')
+            if not image:
+                image = response.xpath('//div[@class="clip-preview-inner"]/video/@poster')
+            if image:
+                image = self.format_link(response, image.get())
+            else:
+                image = ''
+        return image
