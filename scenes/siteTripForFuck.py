@@ -38,7 +38,7 @@ class Spider(BaseSceneScraper):
     def get_date(self, response):
         datestring = response.xpath('//div[contains(@class, "movie-status")]/p/text()')
         if datestring:
-            datestring = datestring.get().strip()
+            datestring = datestring.get().strip().replace(",", "")
             today = datetime.datetime.now()
             datestring = datestring.lower()
             intervalcount = re.search(r'(\d+)', datestring).group(1)
