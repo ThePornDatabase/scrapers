@@ -69,7 +69,7 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
         'title': '//h2[@class="update-info-title"]/text()',
         'description': '//p[contains(@class,"ap-limited-description-text")]/text()',
         'date': '//p[contains(@class,"update-info-line")]/i[@class="fa fa-calendar"][1]/following-sibling::b[1]/text()',
-        'date_formats': ['%m.%d.%Y'],
+        'date_formats': ['%d.%m.%Y'],
         'image': '//div[contains(@class,"update-video-wrapper")]/a/div/@style',
         're_image': r'(http.*\.jpg)',
         'performers': '//b[contains(text(), "Performer")]/following-sibling::a/text()',
