@@ -1,7 +1,8 @@
 import re
+import string
 import json
-import tldextract
 from datetime import date, timedelta
+import tldextract
 from chompjs import chompjs
 from extruct.jsonld import JsonLdExtractor
 import scrapy
@@ -18,6 +19,7 @@ def match_site(argument):
         'activeduty': "Active Duty",
         'allblackx': "All BlackX",
         'allgirlmassage': "All Girl Massage",
+        'analacrobats': "Anal Acrobats",
         'bearback': "Bear Back",
         'bigfatcreampie': "Big Fat Creampie",
         'bigtoyxxx': "Big Toy XXX",
@@ -112,7 +114,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # Network Sites
         ##############################
-        # ~ 'https://www.21sextreme.com',  Moved to Adult Time API
+        # 'https://www.21sextreme.com',  Moved to Adult Time API
         # 'https://www.lustygrandmas.com',
         # 'https://www.teachmefisting.com',
         # 'https://www.trannyfrombrazil.com',
@@ -140,7 +142,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.webmature.com',
         # 'https://www.whiteghetto.com',
 
-        # ~ 'https://www.fantasymassage.com',  Moved to Adult Time API
+        # 'https://www.fantasymassage.com',  Moved to Adult Time API
         # 'https://www.allgirlmassage.com',
         # 'https://www.nurumassage.com',
 
@@ -168,6 +170,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # 'https://www.21naturals.com', Moved to AdultTime API
         'https://www.activeduty.com',
+        'https://www.analacrobats.com',
         'https://www.bigfatcreampie.com',
         'https://www.bskow.com',
         'https://www.burningangel.com',
@@ -185,6 +188,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.girlstryanal.com',
         'https://www.grannyghetto.com',
         'https://www.hothouse.com',
+        'https://www.immorallive.com', # Originally part of Blowpass, moved out of group
         'https://www.jakemalone.com',
         'https://www.jaysinxxx.com',
         'https://www.joeysilvera.com',
@@ -213,7 +217,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
 
         #  API or Comments
-        # 'https://www.analacrobats.com' -> page links go to signup page
         # 'https://www.adulttime.com' -> No videos listed on site
         # 'https://www.bisexdigital.com' -> page links go to signup page
         # 'https://www.grandpasfuckteens.com' -> page links go to signup page
@@ -274,6 +277,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             if totalpages:
                 totalpages = int(totalpages.group(1))
             else:
+                totalpages = 99999
+
+            if "analacrobats" in response.url:
                 totalpages = 99999
 
             if 'page' in response.meta and response.meta['page'] < self.limit_pages and response.meta['page'] <= totalpages:
@@ -443,6 +449,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             else:
                 item['tags'] = self.get_tags(response)
 
+            if item['tags']:
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), item['tags']))
+
             if 'id' in response.meta:
                 item['id'] = response.meta['id']
             else:
@@ -470,6 +479,8 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
             if item['description']:
                 item['description'] = self.cleanup_description(item['description'])
+
+            if item['id'] and item['title']:
                 days = int(self.days)
                 if days > 27375:
                     filterdate = "0000-00-00"
@@ -505,6 +516,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'allgirlmassage' in base:
             selector = '/en/videos/page/%s'
+
+        if 'analacrobats' in base:
+            selector = '/en/videos/updates/%s/All/0/Pornstar/0'
 
         if 'blowpass' in base:
             selector = '/en/videos/blowpass/latest/All-Categories/0/All-Pornstars/0/%s'
