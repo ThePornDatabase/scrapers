@@ -188,7 +188,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.girlstryanal.com',
         'https://www.grannyghetto.com',
         'https://www.hothouse.com',
-        'https://www.immorallive.com', # Originally part of Blowpass, moved out of group
+        'https://www.immorallive.com',  # Originally part of Blowpass, moved out of group
         'https://www.jakemalone.com',
         'https://www.jaysinxxx.com',
         'https://www.joeysilvera.com',
