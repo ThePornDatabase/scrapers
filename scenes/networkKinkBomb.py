@@ -28,6 +28,26 @@ class NetworkKinkBombSpider(BaseSceneScraper):
         'pagination': '/all?sort=age&page=%s'
     }
 
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if self.limit_pages < 5000000:
+                kb_max_pages = self.limit_pages * 25
+            if 'page' in response.meta and response.meta['page'] < kb_max_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']),
+                                     callback=self.parse,
+                                     meta=meta,
+                                     headers=self.headers,
+                                     cookies=self.cookies)
+
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="item card"]/a/@href').getall()
         for scene in scenes:
