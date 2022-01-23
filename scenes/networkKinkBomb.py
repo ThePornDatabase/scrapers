@@ -20,6 +20,7 @@ class NetworkKinkBombSpider(BaseSceneScraper):
         'date': '//span[contains(text(), "Posted:")]/following-sibling::text()',
         'date_formats': ['%m/%d/%Y'],
         'image': '//div[@class="clip-preview-inner"]/video/@poster',
+        'image_blob': True,
         'performers': '',
         'tags': '//span[contains(text(), "categories")]/following-sibling::a/text()|//span[contains(text(), "Category")]/following-sibling::a/text()',
         'external_id': r'.*/(\d+)',
