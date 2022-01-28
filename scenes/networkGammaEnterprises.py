@@ -522,7 +522,6 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'blowpass' in base:
             selector = '/en/videos/blowpass/latest/All-Categories/0/All-Pornstars/0/%s'
-            # ~ selector = '/en/videos/immorallive/latest/All-Categories/0/All-Pornstars/0/%s'  # Immoral Live isn't listed with the rest of the Blowpass sites on the index, will need to be manual
 
         if 'bskow' in base or 'lexingtonsteele' in base:
             selector = '/en/videos/updates/%s/All/0/Pornstar/0'
@@ -563,6 +562,9 @@ class GammaEnterprisesSpider(BaseSceneScraper):
 
         if 'hothouse' in base:
             selector = '/en/videos/latest/All-Studios/0/All-categories/0/All-stars/0/All-movies/0/%s'
+
+        if 'immorallive' in base:
+            selector = '/en/videos/All-Categories/0/All-Pornstars/0/All/0/%s'
 
         if 'jaysinxxx' in base or 'jonnidarkkoxxx' in base or 'pantypops' in base:
             selector = '/en/scenes/All/0/latest/%s'
