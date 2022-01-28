@@ -1,16 +1,18 @@
 import re
+import string
 import scrapy
+from googletrans import Translator
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SiteModelMediaUSSpider(BaseSceneScraper):
-    name = 'ModelMediaUS'
+class SiteModelMediaAsiaSpider(BaseSceneScraper):
+    name = 'ModelMediaAsia'
     network = 'Model Media'
     parent = 'Model Media'
-    site = 'Model Media US'
+    site = 'Model Media Asia'
 
     start_urls = [
-        'https://www.modelmediaus.com',
+        'https://www.modelmediaasia.com',
     ]
 
     selector_map = {
@@ -42,3 +44,34 @@ class SiteModelMediaUSSpider(BaseSceneScraper):
             scene = scene.xpath('./@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'trailer': trailer})
+
+
+    def get_title(self, response):
+        translator = Translator()
+        title = super().get_title(response).lower()
+        if title:
+            title = translator.translate((title.lower()), src='zh-tw', dest='en')
+            title = string.capwords(title.text)
+        return title
+
+    def get_description(self, response):
+        translator = Translator()
+        description = super().get_description(response).lower()
+        if description:
+            description = translator.translate((description.lower()), src='zh-tw', dest='en')
+            description = string.capwords(description.text)
+        return description
+
+    def get_performers(self, response):
+        translator = Translator()
+        performers = super().get_performers(response)
+        performers = list(map(lambda x: translator.translate((x.strip()), src='zh-tw', dest='en').text, performers))
+        performerlist = []
+        for performer in performers:
+            if "/" in performer:
+                performerbreak = re.search(r'/(.*)', performer)
+                if performerbreak:
+                    performer = performerbreak.group(1)
+            performerlist.append(string.capwords(performer.strip()))
+
+        return performerlist
