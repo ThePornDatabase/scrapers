@@ -36,8 +36,10 @@ class NetworkKinkBombSpider(BaseSceneScraper):
             yield scene
 
         if count:
-            if self.limit_pages < 5000000:
+            if self.limit_pages < 100:
                 kb_max_pages = self.limit_pages * 25
+            else:
+                kb_max_pages = self.limit_pages
             if 'page' in response.meta and response.meta['page'] < kb_max_pages:
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
