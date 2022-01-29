@@ -26,7 +26,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'IXXVICOM'],
         ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Jay Bank Presents'],
         ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Undercover Sluts'],
-        ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Submissive Teen POV'],
+        # ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Submissive Teen POV'],  # Seems to have gone away, leaving for reference
         ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Sloppy Toppy'],
         ['https://www.manyvids.com', '/api/model/69353/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Natalia Grey'],
         ['https://www.manyvids.com', '/api/model/97815/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Hidori'],
@@ -162,10 +162,10 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         if not date:
             date = response.xpath('//div[@class="mb-1"]/span[2]/text()')
             if date:
-               date = date.get()
-               date = re.search(r'(\w{3} \d{1,2})', date)
-               if date:
-                   date = date.group(1)
+                date = date.get()
+                date = re.search(r'(\w{3} \d{1,2})', date)
+                if date:
+                    date = date.group(1)
         if date:
             date = date.strip()
             if re.search(r'([a-zA-Z]{3} \d{1,2})', date):
