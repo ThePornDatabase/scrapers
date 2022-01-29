@@ -26,15 +26,22 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'IXXVICOM'],
         ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Jay Bank Presents'],
         ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Undercover Sluts'],
-        # ~ ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Submissive Teen POV'],
+        ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Submissive Teen POV'],
         ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Sloppy Toppy'],
         ['https://www.manyvids.com', '/api/model/69353/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Natalia Grey'],
+        ['https://www.manyvids.com', '/api/model/97815/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Hidori'],
+        ['https://www.manyvids.com', '/api/model/1001123043/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Paige Steele'],
+        ['https://www.manyvids.com', '/api/model/1001317123/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Jaybbgirl'],
+        ['https://www.manyvids.com', '/api/model/1001673578/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: FreyaJade'],
+        ['https://www.manyvids.com', '/api/model/304591/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: 420SexTime'],
+        ['https://www.manyvids.com', '/api/model/217682/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: OmankoVivi'],
+        ['https://www.manyvids.com', '/api/model/1000304351/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Haylee Love'],
     ]
 
     selector_map = {
         'title': '',
-        'description': '//div[@class="desc-text"]/text()',
-        'date': '//div[@class="mb-1"]/span[2]/text()',
+        'description': '//div[contains(@class, "desc-text")]/text()',
+        'date': '//div[@class="mb-1"]/span[1]/span[2]|//div[@class="mb-1"]/span[2]/text()',
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '',
         'tags': '//script[contains(text(),"tagListApp")]/text()',
@@ -118,24 +125,47 @@ class NetworkManyVidsSpider(BaseSceneScraper):
 
     def get_date(self, response):
         meta = response.meta
-        imagestring = response.xpath('//meta[@name="twitter:image"]/@content').get()
-        if imagestring:
-            imagestring = re.search(r'.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
+        videostring = response.xpath('//meta[@property="og:video"]/@content')
+        if videostring:
+            videostring = videostring.get()
+            datestring = re.search(r'_(\d{10,13})\.', videostring)
+            if datestring:
+                datestring = datestring.group(1)
+                if len(datestring) > 10:
+                    datestring = int(datestring) / 1000
+                date = datetime.utcfromtimestamp(int(datestring)).isoformat()
+                return date
+        else:
+            imagestring = response.xpath('//meta[@name="twitter:image"]/@content').get()
             if imagestring:
-                imagestring = imagestring.group(1)
-                imagestringhex = imagestring[:8]
-                if imagestringhex and "386D43BC" <= imagestringhex <= "83AA7EBC":
-                    imagedate = int(imagestringhex, 16)
-                    date = datetime.utcfromtimestamp(imagedate).isoformat()
-                    return date
-                if imagestring and 946684860 <= int(imagestring) <= 2208988860:
-                    date = datetime.utcfromtimestamp(int(imagestring)).isoformat()
-                    return date
+                imagestring = re.search(r'.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
+                if imagestring:
+                    imagestring = imagestring.group(1)
+                    imagestringhex = imagestring[:8]
+                    if imagestringhex and "386D43BC" <= imagestringhex <= "83AA7EBC":
+                        imagedate = int(imagestringhex, 16)
+                        date = datetime.utcfromtimestamp(imagedate).isoformat()
+                        return date
+                    if imagestring and 946684860 <= int(imagestring) <= 2208988860:
+                        date = datetime.utcfromtimestamp(int(imagestring)).isoformat()
+                        return date
 
         # If no valid image string available to pull date from
         # print(f'Guessing date for: {response.url}')
         page = int(meta['page'])
-        date = self.process_xpath(response, self.get_selector_map('date')).get()
+        date = response.xpath('//div[@class="mb-1"]/span[@class="d-none"]/span[2]/text()')
+        if date:
+            date = date.get()
+            date = re.search(r'(\w{3} \d{1,2})', date)
+            if date:
+                date = date.group(1)
+        if not date:
+            date = response.xpath('//div[@class="mb-1"]/span[2]/text()')
+            if date:
+               date = date.get()
+               date = re.search(r'(\w{3} \d{1,2})', date)
+               if date:
+                   date = date.group(1)
         if date:
             date = date.strip()
             if re.search(r'([a-zA-Z]{3} \d{1,2})', date):
@@ -219,6 +249,20 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Natalia Grey']
         if meta['site'] == "Cattie":
             return ['Cattie Candescent']
+        if "Hidori" in meta['site']:
+            return ['Hidori']
+        if "Jaybbgirl" in meta['site']:
+            return ['Jaybbgirl']
+        if "FreyaJade" in meta['site']:
+            return ['Freya Jade']
+        if "420SexTime" in meta['site']:
+            return ['Asteria']
+        if "OmankoVivi" in meta['site']:
+            return ['Omanko Vivi']
+        if "Haylee Love" in meta['site']:
+            return ['Haylee Love']
+        if "Paige Steele" in meta['site']:
+            return ['Paige Steele']
         return []
 
     def get_site(self, response):
@@ -258,3 +302,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             if scenetags:
                 return list(map(lambda x: x.strip().title(), scenetags))
         return []
+
+    def get_description(self, response):
+        description = super().get_description(response)
+        description = description.replace("[custom video] ", "")
+        return description
