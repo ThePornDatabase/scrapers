@@ -45,7 +45,6 @@ class SiteModelMediaAsiaSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'trailer': trailer})
 
-
     def get_title(self, response):
         translator = Translator()
         title = super().get_title(response).lower()
