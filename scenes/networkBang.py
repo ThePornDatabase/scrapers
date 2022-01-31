@@ -1,4 +1,6 @@
 import json
+import requests
+import base64
 from datetime import date, timedelta
 import scrapy
 
@@ -82,7 +84,9 @@ class BangSpider(BaseSceneScraper):
                 json['dvd']['id'], json['order'], json['screenshots'][0]['screenId'])
         except BaseException:
             print(f"Index out of Range: {item['id']}")
-        item['image_blob'] = None
+        # ~ item['image_blob'] = None
+        imagereq = requests.get(item['image'])
+        item['image_blob'] = base64.b64encode(imagereq.content).decode('utf-8')
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'
         item['parent'] = 'Bang'

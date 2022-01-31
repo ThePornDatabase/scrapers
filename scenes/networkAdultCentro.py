@@ -27,11 +27,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         'https://cospimps.com',
         'https://daddyscowgirl.com',
         'https://jerkoffwithme.com',
+        'https://kinkyrubberworld.com',
         'https://realagent.xxx',
         'https://facialcasting.com',
         'https://fallinlovia.com',
         'https://bigjohnnyxxx.com',
         'https://dillionation.com',
+        'https://isinxxx.com',
         'https://katie71.com',
         'https://peghim.com',
         'https://cleagaultier-official.com',
@@ -117,6 +119,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
         if "daddyscowgirl" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "kinkyrubberworld" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "realagent" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=extra&transitParameters[preset]=videos'
         if "facialcasting" in base:
@@ -127,6 +131,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "dillionation" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "isinxxx" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "natashanice" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=natashahomemade&transitParameters[preset]=videos'
         if "katie71" in base:
@@ -206,6 +212,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 tagname = tags[tag]['alias'].strip().title()
                 if tagname and "Model - " not in tagname:
                     item['tags'].append(tagname)
+            item['tags'] = self.clean_tags(item['tags'])
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url']
@@ -236,6 +243,14 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['parent'] = 'Aussie XXX Hookups'
             item['network'] = 'Aussie XXX Hookups'
             modelurl = "https://aussiexxxhookups.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+            meta['item'] = item
+            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+
+        if "kinkyrubberworld" in response.url:
+            item['site'] = 'Kinky Rubber World'
+            item['parent'] = 'Kinky Rubber World'
+            item['network'] = 'Kinky Rubber World'
+            modelurl = "https://kinkyrubberworld.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
@@ -276,6 +291,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['site'] = 'Daddys Cowgirl'
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
+            item['performers'] = []
+            yield item
+
+        if "isinxxx" in response.url:
+            item['site'] = 'I Sin XXX'
+            item['parent'] = 'I Sin XXX'
+            item['network'] = 'I Sin XXX'
             item['performers'] = []
             yield item
 
@@ -410,7 +432,65 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         if "therealscarletred" in response.url:
             item['performers'].append('Scarlet Red')
 
+        if "kinkyrubberworld" in response.url:
+            item['performers'].append('Latex Lara')
+
         if "trinitystclair" in response.url:
             item['performers'].append('Trinity St Clair')
 
         yield item
+
+    def clean_tags(self, tags):
+        cleanlist = [
+            'Latex Lara',
+            'Latex Lea',
+            'Nadira Diamond',
+            'Lola_Noir',
+            'Freja Dottier',
+            'Kinky Alice',
+            'Nyxi_Leon',
+            'Anita Divina',
+            'Anitadivana',
+            'Bizarr',
+            'Bizarrlady Estelle',
+            'Constace Chaos',
+            'Constance Chaos',
+            'Constancechaos',
+            'Courtney Morgan',
+            'Courtneymorgan',
+            'Daniela Benatta',
+            'Danielabenatta',
+            'Ezada Sinn',
+            'Ezada',
+            'Ezadasinn',
+            'Frejadottir',
+            'Freja_Dottir',
+            'Freya',
+            'Goddess Ezada',
+            'Goddess Maya',
+            'Governess Painless',
+            'Governesspainless',
+            'Kinkyalice',
+            'Koneko',
+            'Lady Alshari',
+            'Lady Estelle',
+            'Ladyalshari',
+            'Ladyluciana',
+            'Lara',
+            'Latex Lucy',
+            'Lucy',
+            'Miss Courtney',
+            'Misscourtney',
+            'Misswhitneymorgan',
+            'Mistress Courtney',
+            'Mistress Ezada',
+            'Mistresscourtney',
+            'Mistressluciana',
+            'Rubber_Jeff',
+            'Whitney Morgan'
+        ]
+        newlist = []
+        for word in tags:
+            if word not in cleanlist:
+                newlist.append(word)
+        return newlist

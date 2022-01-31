@@ -15,6 +15,7 @@ class VIP4KSpider(BaseSceneScraper):
         'https://fist4k.com',
         'https://mature4k.com',
         'https://old4k.com',
+        'https://rim4k.com',
     ]
 
     selector_map = {
@@ -54,6 +55,8 @@ class VIP4KSpider(BaseSceneScraper):
             scenes = response.xpath('//div[@class="thumb"]/div[@class="th"]/a[contains(@href,"/en/videos/")]/@href').getall()
         if "old4k" in response.url:
             scenes = response.xpath('//div[@class="thumbs_items"]/div[@class="th_item"]/a[contains(@href,"/en/videos/")]/@href').getall()
+        if "rim4k" in response.url:
+            scenes = response.xpath('//a[contains(@class, "item__main")]/@href').getall()
         if not scenes:
             scenes = response.xpath('//a[@class="item__title"]/@href').getall()
         for scene in scenes:
@@ -84,6 +87,16 @@ class VIP4KSpider(BaseSceneScraper):
             performers = response.xpath('//a[@class="item-info__item item-info__item--hid2"]/div[@class="item-info__text"]/text()').get()
             if performers:
                 performer = performers.strip()
+        if "rim4k" in response.url:
+            performers = response.xpath('//div[@class="player-item__about"]/ul/li[3]/div[@class="item-info__text"]/text()').getall()
+            if performers:
+                performers = "".join(performers)
+                performers = performers.replace('\n', '').replace('\r', '').replace('  ', ' ')
+                if ',' in performers:
+                    performers = performers.split(',')
+                    performers = list(map(lambda x: x.strip().title(), performers))
+                    return performers
+                performer = performers.strip()
         if "daddy4k" in response.url:
             return []
         if performers:
@@ -98,7 +111,8 @@ class VIP4KSpider(BaseSceneScraper):
         if "daddy4k" in response.url or "old4k" in response.url:
             tags = response.xpath('//a[@class="item_tag"]/span/text()').getall()
             tags = list(map(lambda x: x.strip().title(), tags))
-
+        if "rim4k" in response.url:
+            tags.append('Rimming')
         if tags:
             return tags
         return []
@@ -115,6 +129,7 @@ class VIP4KSpider(BaseSceneScraper):
         return search
 
     def get_next_page_url(self, base, page):
+        pagination = False
         if "black4k" in base or "daddy4k" in base or "old4k" in base:
             if page == 1:
                 pagination = "/en/videos/publish"

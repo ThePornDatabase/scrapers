@@ -8,17 +8,20 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     network = 'AdultEmpireCash'
 
     start_urls = [
-        # ~ 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
+        # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
         'https://jayspov.net',
-        # ~ 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
+        # 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
         'https://cospimps.com',
+        'https://www.jonathanjordanxxx.com',
+        'https://www.kingsoffetish.com',
         'https://pmggirls.com',
         'https://www.lethalhardcore.com',
         'https://spankmonster.com',
+        'https://www.stephousexxx.com',
         'https://www.wcpclub.com'
     ]
 
@@ -40,6 +43,24 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Spank Monster"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "stephousexxx" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Stephouse XXX"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "kingsoffetish" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Kings of Fetish"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "jonathanjordanxxx" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Jonathan Jordan XXX"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "latinoguys" in response.url:
             scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
@@ -93,6 +114,12 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/watch-lethal-hardcore-streaming-video-scenes.html?page=%s&hybridview=member"
         if "spankmonster" in base:
             pagination = "/watch-newest-spank-monster-clips-and-scenes.html?page=%s&hybridview=member"
+        if "stephousexxx" in base:
+            pagination = "/watch-newest-step-house-xxx-clips-and-scenes.html?page=%s&hybridview=member"
+        if "jonathanjordanxxx" in base:
+            pagination = "/watch-newest-jonathan-jordan-xxx-clips-and-scenes.html?page=%s&hybridview=member"
+        if "kingsoffetish" in base:
+            pagination = "/kings-of-fetish-newest-perverted-clips.html?page=%s&hybridview=member"
         return self.format_url(base, pagination % page)
 
     def get_title(self, response):

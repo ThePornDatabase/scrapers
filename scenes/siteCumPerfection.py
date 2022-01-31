@@ -12,8 +12,6 @@ class CumPerfectionSpider(BaseSceneScraper):
         'http://cum-fun.com'
     ]
 
-    page=7
-
     selector_map = {
         'title': '//span[contains(@class,"title_bar")]/text()',
         'description': '//span[@class="update_description"]/text()',
@@ -21,7 +19,7 @@ class CumPerfectionSpider(BaseSceneScraper):
         'image': '//script[contains(text(),"thumbnail")]',
         'performers': '//div[@class="gallery_info"]/span[@class="update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': '.*\\/(.*?)\\.html',
+        'external_id': r'.*/(.*?)\.html',
         'trailer': '//script[contains(text(),"thumbnail")]',
         'pagination': '/categories/movies_%s_d.html'
     }
@@ -45,7 +43,6 @@ class CumPerfectionSpider(BaseSceneScraper):
                 return trailer
         return ''
 
-
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
@@ -56,7 +53,6 @@ class CumPerfectionSpider(BaseSceneScraper):
                 image = "http://www.cum-fun.com/" + image
                 return self.format_link(response, image)
         return ''
-
 
     def get_site(self, response):
         return "Cum Perfection"

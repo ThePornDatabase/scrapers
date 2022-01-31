@@ -17,7 +17,7 @@ class SiteBrattyMILFSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h2/text()',
         'description': '//div[contains(@class, "collapse")]/p/text()',
-        'date': '//figcaption/span[@class="date"]/text()',
+        'date': '//div[@class="container"]/div/div/div[@class="clearfix"]/span[@class="date"]/text()',
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="content-pane-performers"]/a/text()',

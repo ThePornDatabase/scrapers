@@ -4,21 +4,22 @@ import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class SiteBathroomCreepersPerformerSpider(BasePerformerScraper):
+class SiteAdultAuditionsPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[contains(@class,"profile-details")]/h3[1]/text()',
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
-        'bio': '//strong[contains(text(), "Fun Fact")]/following-sibling::text()',
+        'bio': '//div[@class="profile-about"]/p/text()',
         'height': '//strong[contains(text(), "Height")]/following-sibling::text()',
-        'pagination': '/creeper/models/%s/latest/?g=f',
+        'measurements': '//strong[contains(text(), "Measurements")]/following-sibling::text()',
+        'pagination': '/tour/models/%s/latest/?g=f',
         'external_id': r'model/(.*)/'
     }
 
-    name = 'BathroomCreepersPerformer'
-    network = 'Bathroom Creepers'
+    name = 'BlackBullChallengePerformer'
+    network = 'Black Bull Challenge'
 
     start_urls = [
-        'https://www.bathroomcreepers.com',
+        'https://www.blackbullchallenge.com',
     ]
 
     def get_gender(self, response):
@@ -45,7 +46,25 @@ class SiteBathroomCreepersPerformerSpider(BasePerformerScraper):
                 return heighttext.group(1).replace(" ", "").lower().strip()
         return height
 
+    def get_cupsize(self, response):
+        if 'measurements' in self.selector_map:
+            cupsize = self.process_xpath(response, self.get_selector_map('measurements'))
+            if cupsize:
+                cupsize = cupsize.get()
+                if re.search(r'(\d+\w+)-\d+-\d+', cupsize):
+                    cupsize = re.search(r'(\d+\w+)-\d+-\d+', cupsize).group(1)
+                    if cupsize:
+                        return cupsize.strip().upper()
+        return ''
+
     def get_bio(self, response):
-        bio = super().get_bio(response)
-        bio = re.sub(r"(\A\w)|(?<!\.\w)([\.?!] )\w|\w(?:\.\w)|(?<=\w\.)\w", lambda x: x.group().upper(), bio.lower())
-        return bio
+        bio_xpath = self.process_xpath(response, self.get_selector_map('bio'))
+        if bio_xpath:
+            if len(bio_xpath) > 1:
+                bio = list(map(lambda x: x.strip(), bio_xpath.getall()))
+                bio = ' '.join(bio)
+            else:
+                bio = bio_xpath.get()
+            return bio
+
+        return ''

@@ -1,5 +1,5 @@
 import re
-
+import string
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -33,7 +33,7 @@ class SteppedUpSpider(BaseSceneScraper):
         for scene in scenes:
             link = scene.css('a::attr(href)').get()
 
-            if re.search(self.get_selector_map('external_id'), link) is not None:
+            if re.search(self.get_selector_map('external_id'), link) is not None or (re.search(r'.*/(.*?)', link) is not None and 'trueanal' in response.url):
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene)
 
     def get_image(self, response):
@@ -53,3 +53,27 @@ class SteppedUpSpider(BaseSceneScraper):
                     return image
 
         return None
+
+    def get_next_page_url(self, base, page):
+        print(base)
+        if 'trueanal' in base:
+            pagination = '/scenes?page=%s'
+        else:
+            pagination = self.get_selector_map('pagination')
+        return self.format_url(base, pagination % page)
+
+    def get_id(self, response):
+        if 'trueanal' in response.url:
+            return self.get_from_regex(response.url, r'.*/(.*?)')
+        return self.get_from_regex(response.url, 'external_id')
+
+    def get_tags(self, response):
+        tags = super().get_tags(response)
+        if 'anal' in response.url and 'Anal' not in tags:
+            tags.append('Anal')
+        return tags
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        title = string.capwords(title)
+        return title

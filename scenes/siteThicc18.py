@@ -4,12 +4,12 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class SiteFit18Spider(BaseSceneScraper):
-    name = 'Fit18'
+class SiteThicc18Spider(BaseSceneScraper):
+    name = 'Thicc18'
 
     headers = {
         "Content-Type": "application/json",
-        "apollographql-client-name": "fit18:site",
+        "apollographql-client-name": "thicc18:site",
         "apollographql-client-version": "1.0",
         "argonath-api-key": "77cd9282-9d81-4ba8-8868-ca9125c76991",
     }
@@ -24,7 +24,7 @@ class SiteFit18Spider(BaseSceneScraper):
             },
             "query": "query ListVideo($order: [OrderEntry!], $after: ID, $limit: Int) {\n  video {\n    list(input: {order: $order, after: $after, first: $limit}) {\n      result {\n        edges {\n          node {\n            videoId\n            title\n            description {\n              long\n            }\n            talent {\n              type\n              talent {\n                talentId\n                name\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
         }
-        url = "https://fit18.team18.app/graphql"
+        url = "https://thicc18.team18.app/graphql"
         scenequery = json.dumps(scenequery)
         yield Request(url, headers=self.headers, body=scenequery, method="POST", callback=self.get_scenes)
 
@@ -53,13 +53,13 @@ class SiteFit18Spider(BaseSceneScraper):
             for performer in jsonrow['node']['talent']:
                 item['performers'].append(performer['talent']['name'])
 
-            item['site'] = "Fit 18"
-            item['network'] = "Fit 18"
-            item['parent'] = "Fit 18"
-            item['url'] = "https://fit18.com/videos/" + sceneid.replace(':', '%3A')
+            item['site'] = "Thicc 18"
+            item['network'] = "Thicc 18"
+            item['parent'] = "Thicc 18"
+            item['url'] = "https://thicc18.com/videos/" + sceneid.replace(':', '%3A')
             item['date'] = self.parse_date('today').isoformat()
             item['trailer'] = ''
-            item['tags'] = []
+            item['tags'] = ['Big Ass']
             meta['item'] = item.copy()
             imagedata = jsonrow['node']['videoId'].split(":")
 
@@ -71,7 +71,7 @@ class SiteFit18Spider(BaseSceneScraper):
                     ]
                 },
                 "query": "query BatchFindAssetQuery($paths: [String!]!) {\n  asset {\n    batch(input: {paths: $paths}) {\n      result {\nserve {\n uri\n}\n}\n}\n}\n}\n"}
-            url = "https://fit18.team18.app/graphql"
+            url = "https://thicc18.team18.app/graphql"
             imagequery = json.dumps(imagequery)
             yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
 

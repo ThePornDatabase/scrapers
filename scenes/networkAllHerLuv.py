@@ -18,6 +18,7 @@ class AllHerLuvSpider(BaseSceneScraper):
         'title': '//meta[@name="twitter:title"]/@content',
         'description': '//div[@class="container"]/p[contains(@class,"text")]/strong/text()',
         'image': '//img[contains(@class,"update_thumb")]/@src0_1x',  # Image is tokened
+        'image_blob': True,
         'performers': '//p[@class="dvd-scenes__data"]/a[contains(@href,"/models/")]/text()',
         'tags': '//p[@class="dvd-scenes__data"]/a[contains(@href,"/categories/")]/text()',
         'external_id': 'trailers/(.+)\\.html',

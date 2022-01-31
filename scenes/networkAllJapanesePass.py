@@ -1,7 +1,8 @@
 import re
 import string
-import tldextract
 import scrapy
+import tldextract
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -65,6 +66,7 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
         'date': '//div[contains(text(),"Added")]/following-sibling::div[1]/text()',
         'date_formats': ['%d %b %Y'],
         'image': '//div[@class="b-player-body"]/div/img/@src',
+        'image_blob': True,
         'performers': '//p[@itemprop="actor"]/a/span/text()',
         'tags': '//p[@class="b-video-info__text"]/a[contains(@href,"/category/") or contains(@href,"/tag/")]/text()',
         'external_id': r'.*\/(.*?)$',
