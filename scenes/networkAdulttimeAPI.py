@@ -17,6 +17,7 @@ def match_site(argument):
         '21naturals': '21Naturals',
         '21sextury': '21Sextury',
         '21sextreme': '21Sextreme',
+        '3rddegreefilms': '3rd Degree Films',
         'addicted2girls': 'Addicted2Girls',
         'adulttime': 'AdultTime',
         'agentredgirl': 'Agent Red Girl',
@@ -121,7 +122,7 @@ def match_site(argument):
         'welikegirls': 'We Like Girls',
         'wheretheboysarent': 'Where the Boys Arent',
         'wicked': 'Wicked',
-        'zerotolerance': 'Zero Tolerance',
+        'zerotolerancefilms': 'Zero Tolerance',
         'zoliboy': 'Zoliboy',
     }
     return match.get(argument, argument)
@@ -157,7 +158,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.touchmywife.com',
         'https://www.transfixed.com',
         'https://www.wicked.com',
-        'https://www.zerotolerance.com',
+        'https://www.zerotolerancefilms.com',
     ]
 
     image_sizes = [
@@ -197,7 +198,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
                                  meta={'page': 0, 'url': link})
 
     def get_next_page_url(self, base, page):
-        if "isthisreal" in base or "touchmywife" in base:
+        if "isthisreal" in base or "touchmywife" in base or "zerotolerance" in base:
             pagination = '/en/videos/page/%s'
         else:
             pagination = self.get_selector_map('pagination')
