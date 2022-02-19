@@ -47,6 +47,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         'https://therealscarletred.com',
         'https://psychohenessy.com',
         'https://natashanice.com',
+        'https://facialkings.com',
     }
 
     selector_map = {
@@ -159,6 +160,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "cleagaultier" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "facialkings" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
 
         return self.format_url(base, page_url.format(page))
 
@@ -215,7 +218,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['tags'] = self.clean_tags(item['tags'])
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
-        item['image'] = data['_resources']['primary'][0]['url']
+        item['image'] = data['_resources']['primary'][0]['url'].strip()
         item['image_blob'] = None
 
         if "cospimps" in response.url:
@@ -225,7 +228,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         elif "jerkoff" in response.url:
             item['trailer'] = ''
         else:
-            item['trailer'] = data['_resources']['hoverPreview']
+            item['trailer'] = data['_resources']['hoverPreview'].strip()
 
         if not item['trailer']:
             item['trailer'] = ''
@@ -355,6 +358,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             modelurl = "https://therealscarletred.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+
+        if "facialkings" in response.url:
+            item['site'] = 'Facial Kings'
+            item['parent'] = 'Facial Kings'
+            item['network'] = 'Facial Kings'
+            item['performers'] = []
+            yield item
 
         if "santalatina" in response.url:
             item['site'] = 'Santa Latina'
