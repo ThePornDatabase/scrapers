@@ -9,6 +9,7 @@ def match_site(argument):
         'firstclasspov': "First Class POV",
         'mrluckypov': "Mr Lucky POV",
         'mrluckyraw': "Mr Lucky Raw",
+        'mrluckyvip': "Mr Lucky VIP",
         'rawattack': "Raw Attack",
         'realsensual': "Real Sensual",
         'spizoo': "Spizoo",
@@ -22,11 +23,12 @@ class SpizooSpider(BaseSceneScraper):
 
     start_urls = [
         'https://firstclasspov.com/',
-        # ~ 'https://mrluckypov.com/',
+        'https://mrluckypov.com/',
         'https://mrluckyraw.com/',
-        # ~ 'https://rawattack.com/',
-        # ~ 'https://realsensual.com/',
-        # ~ 'https://www.spizoo.com',
+        'https://mrluckyvip.com/',
+        'https://rawattack.com/',
+        'https://realsensual.com/',
+        'https://www.spizoo.com',
     ]
 
     selector_map = {
@@ -42,7 +44,9 @@ class SpizooSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        if "mrluckyraw" in response.url:
+        if "mrluckyvip" in response.url:
+            scenes = response.xpath('//div[@class="thumb-pic"]/a/@href').getall()
+        elif "mrluckyraw" in response.url:
             scenes = response.xpath("//div[@class='thumb-title']/a/@href").getall()
         else:
             scenes = response.xpath("//a[@data-event='106']/@href").getall()
@@ -51,7 +55,8 @@ class SpizooSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_title(self, response):
-        if "spizoo" in response.url or "mrluckyraw" in response.url:
+        matches = ["spizoo", "mrluckyraw", "mrluckyvip"]
+        if any(x in response.url for x in matches):
             titlexpath = '//div[@class="title"]/h1/text()'
         matches = ["firstclasspov", "mrluckypov"]
         if any(x in response.url for x in matches):
@@ -76,3 +81,8 @@ class SpizooSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return match_site(super().get_parent(response))
+
+    def get_next_page_url(self, base, page):
+        if "spizoo" in base and page == 1:
+            return 'https://www.spizoo.com/categories/movies.html'
+        return self.format_url(base, self.get_selector_map('pagination') % page)
