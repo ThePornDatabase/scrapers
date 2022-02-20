@@ -56,6 +56,12 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta = {}
                 meta['site'] = "Kings of Fetish"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "jayspov" in response.url:
+            scenes = response.xpath('//a[contains(@class, "scene-update-details")]/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Jays POV"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "jonathanjordanxxx" in response.url:
             scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
             for scene in scenes:
