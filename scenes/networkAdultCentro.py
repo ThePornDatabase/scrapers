@@ -48,6 +48,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         'https://psychohenessy.com',
         'https://natashanice.com',
         'https://facialkings.com',
+        'https://thiccvision.com',
     }
 
     selector_map = {
@@ -162,6 +163,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "facialkings" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
+        if "thiccvision" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
 
         return self.format_url(base, page_url.format(page))
 
@@ -294,6 +297,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['site'] = 'Daddys Cowgirl'
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
+            item['performers'] = []
+            yield item
+
+        if "thiccvision" in response.url:
+            item['site'] = 'Thiccvision'
+            item['parent'] = 'Thiccvision'
+            item['network'] = 'Thiccvision'
             item['performers'] = []
             yield item
 
