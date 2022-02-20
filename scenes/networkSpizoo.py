@@ -83,6 +83,6 @@ class SpizooSpider(BaseSceneScraper):
         return match_site(super().get_parent(response))
 
     def get_next_page_url(self, base, page):
-        if "spizoo" in base and page == 1:
-            return 'https://www.spizoo.com/categories/movies.html'
+        if page == 1:
+            return base + 'categories/Movies.html'
         return self.format_url(base, self.get_selector_map('pagination') % page)
