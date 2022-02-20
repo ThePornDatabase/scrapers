@@ -34,6 +34,9 @@ def match_site(argument):
         'shefucksonthefirstdate': 'She Fucks on the First Date',
         'sisterjoi': 'Sister JOI',
         'slutinspection': 'Slut Inspection',
+        'slutsbts': 'Sluts BTS',
+        'slutspov': 'Sluts POV',
+        'sluttybbws': 'Slutty BBWs',
         'teenageanalsluts': 'Teenage Anal Sluts',
         'teenagecorruption': 'Teenage Corruption',
         'teenagetryouts': 'Teenage Tryouts',
@@ -58,7 +61,7 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'https://analviolation.com',
         'https://badbrotherpov.com',
         'https://baddaddypov.com',
-        # ~ 'https://badfamilypov.com',  # Sites pulled from the sub-sites
+        # ~ #'https://badfamilypov.com',  # Sites pulled from the sub-sites
         'https://badmommypov.com',
         'https://badsisterpov.com',
         'https://daughterjoi.com',
@@ -79,6 +82,9 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'https://shefucksonthefirstdate.com',
         'https://sisterjoi.com',
         'https://slutinspection.com',
+        'https://slutsbts.com',
+        'https://slutspov.com',
+        'https://sluttybbws.com',
         'https://teenageanalsluts.com',
         'https://teenagecorruption.com',
         'https://teenagetryouts.com',
