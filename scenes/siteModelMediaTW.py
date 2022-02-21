@@ -1,7 +1,8 @@
 import re
 import string
 import scrapy
-from googletrans import Translator
+# ~ from googletrans import Translator
+from deep_translator import GoogleTranslator
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -46,25 +47,34 @@ class SiteModelMediaAsiaSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'trailer': trailer})
 
     def get_title(self, response):
-        translator = Translator()
+        # ~ translator = Translator()
         title = super().get_title(response).lower()
         if title:
-            title = translator.translate((title.lower()), src='zh-tw', dest='en')
-            title = string.capwords(title.text)
+            # ~ try:
+            title = GoogleTranslator(source='auto', target='en').translate(title.lower())
+            title = string.capwords(title)
+            # ~ except:
+                # ~ title = string.capwords(title)
         return title
 
     def get_description(self, response):
-        translator = Translator()
+        # ~ translator = Translator()
         description = super().get_description(response).lower()
         if description:
-            description = translator.translate((description.lower()), src='zh-tw', dest='en')
-            description = string.capwords(description.text)
+            try:
+                description = GoogleTranslator(source='auto', target='en').translate(description.lower())
+                description = string.capwords(description)
+            except:
+                description = string.capwords(description)
         return description
 
     def get_performers(self, response):
-        translator = Translator()
+        # ~ translator = Translator()
         performers = super().get_performers(response)
-        performers = list(map(lambda x: translator.translate((x.strip()), src='zh-tw', dest='en').text, performers))
+        try:
+            performers = list(map(lambda x: translator.translate((x.strip()), src='zh-tw', dest='en').text, performers))
+        except:
+            performers = list(map(lambda x: x.strip(), performers))
         performerlist = []
         for performer in performers:
             if "/" in performer:
