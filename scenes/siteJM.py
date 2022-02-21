@@ -39,7 +39,8 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1/text()',
         'description': '//meta[@property="og:description"]/@content',
-        'date': '//span[@class="publication"]/text()',
+        'date': '//span[@class="video-detail__date"]/text()',
+        're_date': r'(\d{2}/\d{2}/\d{4})',
         'date_formats': ['%m/%d/%Y'],
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': '//meta[@property="og:image"]/@content',
@@ -105,7 +106,7 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
         response = indexdata['response']
         headers = self.headers
         headers['Content-Type'] = 'application/json'
-        scenes = response.xpath('//div[@class="row video-list"]//div[contains(@class,"video-item")]/a/@href').getall()
+        scenes = response.xpath('//div[@class="video-list" and not(./a/h2)]//a[@class="video-item__thumb"]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'session': 'jacquie', 'url': "https://www.jacquieetmicheltv.net" + scene}
