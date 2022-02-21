@@ -81,6 +81,8 @@ class SiteCumLouderSpider(BaseSceneScraper):
             intervalcount = 0
         else:
             intervalcount = int(intervalcount)
+        if "hour" in datestring:
+            date = today - relativedelta(hours=intervalcount)
         if "day" in datestring:
             date = today - relativedelta(days=intervalcount)
         if "today" in datestring:

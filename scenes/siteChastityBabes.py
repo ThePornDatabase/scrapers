@@ -17,6 +17,8 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         },
         'DOWNLOADER_MIDDLEWARES': {
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            'tpdb.mymiddlewares.CustomProxyMiddleware': 350,
+            'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400
         }
     }
 

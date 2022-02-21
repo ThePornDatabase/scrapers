@@ -7,6 +7,10 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     name = 'AdultEmpireCash'
     network = 'AdultEmpireCash'
 
+    custom_settings = {
+        'CONCURRENT_REQUESTS': 1
+    }
+
     start_urls = [
         # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',

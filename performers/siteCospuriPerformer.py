@@ -60,9 +60,10 @@ class siteCospuriPerformerSpider(BasePerformerScraper):
                 hips = re.search('H(\d{2,3})', measurements).group(1)
                 if hips:
                     hips = round(int(hips)/2.54)
-                
-                cupsize = re.search('B\d+-([a-zA-Z]+)', measurements).group(1)
+
+                cupsize = re.search('B\d+-([a-zA-Z]+)', measurements)
                 if cupsize:
+                    cupsize = cupsize.group(1)
                     if cupsize == "N/A":
                         cupsize = ''
                     else:
@@ -84,8 +85,9 @@ class siteCospuriPerformerSpider(BasePerformerScraper):
                 if bust:
                     bust = round(int(bust)/2.54)
 
-                cupsize = re.search('B\d+-([a-zA-Z]+)', measurements).group(1)
+                cupsize = re.search('B\d+-([a-zA-Z]+)', measurements)
                 if cupsize:
+                    cupsize = cupsize.group(1)
                     if cupsize == "N/A":
                         cupsize = ''
                     else:
