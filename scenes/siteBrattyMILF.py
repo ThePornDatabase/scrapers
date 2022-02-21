@@ -10,7 +10,7 @@ class SiteBrattyMILFSpider(BaseSceneScraper):
     parent = 'Bratty MILF'
     network = 'Nubiles'
 
-    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.mymiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
 
     start_urls = [
         'https://brattymilf.com/',

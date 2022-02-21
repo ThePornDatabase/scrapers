@@ -6,7 +6,7 @@ class DeepLushSpider(BaseSceneScraper):
     network = 'Deep Lush'
     parent = 'Deep Lush'
 
-    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.mymiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
 
     start_urls = ["https://deeplush.com"]
 
