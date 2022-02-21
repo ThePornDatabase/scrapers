@@ -19,6 +19,8 @@ class LegalPornoPerformerSpider(BasePerformerScraper):
         'external_id': r'model\/(\d*)\/',
     }
 
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+
     name = 'LegalPornoPerformer'
     network = 'Legal Porno'
     parent = 'Legal Porno'

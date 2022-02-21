@@ -18,7 +18,7 @@ class OktogonMediaSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.shelovesblack.com',
-        'https://www.loveherboobs.com'
+        'https://www.loveherboobs.com',
         'https://www.loveherfeet.com'
     ]
 

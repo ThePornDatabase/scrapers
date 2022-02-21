@@ -8,6 +8,8 @@ class LegalPornoSpider(BaseSceneScraper):
     name = 'LegalPornoPornworld'
     network = 'Legal Porno'
 
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+
     start_urls = [
         # ~ 'https://www.analvids.com',  # Located in netowkrLegalPorno.py
         'https://pornworld.com'

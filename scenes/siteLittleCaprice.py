@@ -7,6 +7,8 @@ class LittleCapriceSpider(BaseSceneScraper):
     name = 'LittleCaprice'
     network = 'Little Caprice Dreams'
 
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+
     start_urls = [
         'https://www.littlecaprice-dreams.com'
     ]
