@@ -28,7 +28,7 @@ class SpizooSpider(BaseSceneScraper):
         'https://mrluckyvip.com/',
         'https://rawattack.com/',
         'https://realsensual.com/',
-        'https://www.spizoo.com',
+        'https://www.spizoo.com/',
     ]
 
     selector_map = {

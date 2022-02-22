@@ -8,6 +8,8 @@ class TeenMegaWorldSpider(BaseSceneScraper):
     name = 'TeenMegaWorld'
     network = 'teenmegaworld'
 
+    custom_settings = {'CONCURRENT_REQUESTS': '1'}
+
     start_urls = [
         'https://teenmegaworld.net',
         'http://rawcouples.com/',
