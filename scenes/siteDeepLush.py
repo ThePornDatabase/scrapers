@@ -1,12 +1,11 @@
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
+
 class DeepLushSpider(BaseSceneScraper):
     name = 'DeepLush'
     network = 'Deep Lush'
     parent = 'Deep Lush'
-
-    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
 
     start_urls = ["https://deeplush.com"]
 
@@ -24,7 +23,7 @@ class DeepLushSpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page):
-        return self.format_url(base, self.get_selector_map('pagination') % ((page-1) * 12))
+        return self.format_url(base, self.get_selector_map('pagination') % ((page - 1) * 12))
 
     def get_scenes(self, response):
         for scene in response.xpath('//a[contains(@href, "/video/watch/")]/@href').getall():

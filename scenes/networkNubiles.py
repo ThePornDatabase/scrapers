@@ -9,7 +9,7 @@ class NubilesSpider(BaseSceneScraper):
     name = 'Nubiles'
     network = 'nubiles'
 
-    custom_settings = {'CONCURRENT_REQUESTS': '1','DOWNLOADER_MIDDLEWARES': {'tpdb.custommiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+    custom_settings = {'CONCURRENT_REQUESTS': '1'}
 
     start_urls = [
         "https://anilos.com/video/gallery",
