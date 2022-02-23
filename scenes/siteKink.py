@@ -17,6 +17,13 @@ class KinkFeaturedSpider(BaseSceneScraper):
         '/shoots/partner?page=%s',
     ]
 
+    cookies = {
+        'ct': 1,
+        'ktvc': 0,
+        '_privy_83DCC55BDFCD05EB0CBCF79C': '%7B%22uuid%22%3A%22e02b79b2-739c-4a54-bfa4-b6ce5ebc8997%22%7D',
+        'amp_54ec17': 'rms7dX-UcWd9HEcDIt1hs4...1fsi1o49m.1fsi1o49p.4.4.8',
+    }
+
     selector_map = {
         'title': '//title/text()',
         'description': '//span[@class="description-text"]/p/text()',
@@ -32,7 +39,7 @@ class KinkFeaturedSpider(BaseSceneScraper):
     custom_scraper_settings = {
         'AUTOTHROTTLE_ENABLED': True,
         'AUTOTHROTTLE_START_DELAY': 1,
-        'AUTOTHROTTLE_MAX_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
         'DOWNLOADER_MIDDLEWARES': {
             'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
