@@ -47,33 +47,27 @@ class SiteModelMediaAsiaSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'trailer': trailer})
 
     def get_title(self, response):
-        # ~ translator = Translator()
         title = super().get_title(response).lower()
         if title:
-            # ~ try:
             title = GoogleTranslator(source='auto', target='en').translate(title.lower())
             title = string.capwords(title)
-            # ~ except:
-                # ~ title = string.capwords(title)
         return title
 
     def get_description(self, response):
-        # ~ translator = Translator()
         description = super().get_description(response).lower()
         if description:
             try:
                 description = GoogleTranslator(source='auto', target='en').translate(description.lower())
                 description = string.capwords(description)
-            except:
+            except Exception:
                 description = string.capwords(description)
         return description
 
     def get_performers(self, response):
-        # ~ translator = Translator()
         performers = super().get_performers(response)
         try:
-            performers = list(map(lambda x: translator.translate((x.strip()), src='zh-tw', dest='en').text, performers))
-        except:
+            performers = list(map(lambda x: string.capwords(GoogleTranslator(source='auto', target='en').translate(x.lower())), performers))
+        except Exception:
             performers = list(map(lambda x: x.strip(), performers))
         performerlist = []
         for performer in performers:

@@ -10,7 +10,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
     network = 'Chastity Babes'
     parent = 'Chastity Babes'
 
-    custom_settings = {'CONCURRENT_REQUESTS': '1',}
+    custom_settings = {'CONCURRENT_REQUESTS': '1', }
 
     start_urls = [
         'https://www.chastitybabes.com/'

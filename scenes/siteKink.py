@@ -24,7 +24,7 @@ class KinkFeaturedSpider(BaseSceneScraper):
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '//p[@class="starring"]/span/a/text()',
         'tags': "//a[@class='tag']/text()",
-        'external_id': '\\/shoot\\/(\d+)',
+        'external_id': r'/shoot/(\d+)',
         'trailer': '//meta[@name="twitter:player"]/@content',
         'pagination': '/shoots/latest?page=%s'
     }
