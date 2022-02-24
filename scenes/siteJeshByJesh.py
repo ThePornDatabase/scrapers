@@ -41,7 +41,7 @@ class SiteJeshByJeshSpider(BaseSceneScraper):
                 meta['trailer'] = self.format_link(response, trailer.get())
             else:
                 meta['trailer'] = ''
-            meta['id'] = scene.xpath('./@class').get()
+            meta['id'] = re.search(r'(.*?)_', scene.xpath('./@class').get()).group(1)
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene) and "jeshbyjesh" in scene:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
