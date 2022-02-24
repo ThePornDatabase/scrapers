@@ -71,11 +71,22 @@ class SiteJeshByJeshSpider(BaseSceneScraper):
         title = super().get_title(response)
         tags = super().get_tags(response)
         for tag in tags:
-            if tag in title:
+            if tag in title and "Eyes Wide" not in tag and "Day In The" not in tag and tag != "Gold":
                 return [tag]
 
+        if re.search(r'(\w+ \w+ & \w+ \w+) ', title):
+            performer = re.search(r'(\w+ \w+ & \w+ \w+) ', title).group(1)
+            return performer.split(" & ")
         if re.search(r'^(Season)', title.strip()):
             performer = re.search(r'season.*?• ?(\w+ \w+)', title.lower())
+            if performer:
+                return [string.capwords(performer.group(1).strip())]
+        if re.search(r'^(Behind)', title.strip()):
+            performer = re.search(r'behind.*?• ?(\w+ \w+)', title.lower())
+            if performer:
+                return [string.capwords(performer.group(1).strip())]
+        if re.search(r'^(Gold)', title.strip()):
+            performer = re.search(r'gold.*?• ?(\w+ \w+)', title.lower())
             if performer:
                 return [string.capwords(performer.group(1).strip())]
         performer = re.search(r'^(\w+ \w+)', title.lower())
@@ -98,8 +109,20 @@ class SiteJeshByJeshSpider(BaseSceneScraper):
         for tag in tags2:
             if tag in title:
                 tags.remove(tag)
-            if " Id " in tag:
+            if "season" in tag.lower():
+                tags.remove(tag)
+            if " id " in tag.lower():
                 tags.remove(tag)
             if "id:" in tag.lower():
                 tags.remove(tag)
+            if "bts" in tag.lower() and "interview" in tag.lower():
+                tags.remove(tag)
+                tags.append('BTS')
+                tags.append('Interview')
+            elif "bts" in tag.lower():
+                tags.remove(tag)
+                tags.append('BTS')
+            elif "interview" in tag.lower():
+                tags.remove(tag)
+                tags.append('Interview')
         return tags
