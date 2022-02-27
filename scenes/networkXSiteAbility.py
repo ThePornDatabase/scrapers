@@ -702,6 +702,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                         tags.append(category_item)
                 tags = list(set(tags))
                 tags = list(map(lambda x: x.strip().title(), tags))
+                tags = [string for string in tags if string != ""]
                 return tags
 
         if meta['site'] == "Nyxons Bondage Files":
