@@ -87,6 +87,8 @@ class BangSpider(BaseSceneScraper):
         # ~ item['image_blob'] = None
         imagereq = requests.get(item['image'])
         item['image_blob'] = base64.b64encode(imagereq.content).decode('utf-8')
+        if len(item['image_blob']) < 500:
+            item['image_blob'] = ''
         item['url'] = 'https://bang.com/video/%s' % item['id']
         item['network'] = 'Bang'
         item['parent'] = 'Bang'
