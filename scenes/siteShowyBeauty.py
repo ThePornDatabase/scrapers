@@ -46,17 +46,19 @@ class SiteShowyBeautySpider(BaseSceneScraper):
         return self.format_url(base, pagination)
 
     def get_performers(self, response):
-        performer = response.xpath('//div[@class="see-model-info"]//a[contains(@href, "model")]/text()')
-        if performer:
-            performer = performer.get()
-        performer_id = response.xpath('//div[@class="see-model-info"]//a[contains(@href, "model")]/@href')
-        if performer_id:
-            performer_id = re.search(r'model_(\d+).html', performer_id.get())
-            if performer_id:
-                performer_id = performer_id.group(1)
-        if performer and performer_id:
-            return [string.capwords(performer + " " + performer_id)]
-        return []
+        performer_list = []
+        performers = response.xpath('//div[@class="see-model-info"]//a[contains(@href, "model")]')
+        if performers:
+            for performer in performers:
+                performer_name = performer.xpath('./text()').get()
+                performer_id = performer.xpath('./@href').get()
+                if performer_id:
+                    performer_id = re.search(r'model_(\d+).html', performer_id)
+                    if performer_id:
+                        performer_id = performer_id.group(1)
+                if performer and performer_id:
+                    performer_list.append(string.capwords(performer_name + " " + performer_id))
+        return performer_list
 
     def get_description(self, response):
         model_link = response.xpath('//div[@class="see-model-info"]//a[contains(@href, "model")]/@href')
@@ -68,3 +70,9 @@ class SiteShowyBeautySpider(BaseSceneScraper):
             if description:
                 return description.get().replace("\n", "").strip()
         return ""
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        title = string.capwords(title.lower().replace("<b>", "").replace("</b>", ""))
+        title = re.sub(r'( Video)$', '', title)
+        return string.capwords(title)

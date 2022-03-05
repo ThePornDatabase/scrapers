@@ -47,21 +47,24 @@ class SiteAmourAngelsSpider(BaseSceneScraper):
 
     def get_title(self, response):
         title = super().get_title(response)
-        title = title.lower().replace("<b>", "").replace("</b>", "")
+        title = string.capwords(title.lower().replace("<b>", "").replace("</b>", ""))
+        title = re.sub(r'( Video)$', '', title)
         return string.capwords(title)
 
     def get_performers(self, response):
-        performer = response.xpath('//comment()[contains(.,"Info and Buttons")]/following-sibling::table//a[contains(@href, "model")]/b/text()')
-        if performer:
-            performer = performer.get()
-        performer_id = response.xpath('//comment()[contains(.,"Info and Buttons")]/following-sibling::table//a[contains(@href, "model")]/@href')
-        if performer_id:
-            performer_id = re.search(r'model_(\d+).html', performer_id.get())
-            if performer_id:
-                performer_id = performer_id.group(1)
-        if performer and performer_id:
-            return [string.capwords(performer + " " + performer_id)]
-        return []
+        performer_list = []
+        performers = response.xpath('//comment()[contains(.,"Info and Buttons")]/following-sibling::table//a[contains(@href, "model")]')
+        if performers:
+            for performer in performers:
+                performer_name = performer.xpath('./b/text()').get()
+                performer_id = performer.xpath('./@href').get()
+                if performer_id:
+                    performer_id = re.search(r'model_(\d+).html', performer_id)
+                    if performer_id:
+                        performer_id = performer_id.group(1)
+                if performer and performer_id:
+                    performer_list.append(string.capwords(performer_name + " " + performer_id))
+        return performer_list
 
     def get_description(self, response):
         model_link = response.xpath('//comment()[contains(.,"Info and Buttons")]/following-sibling::table//a[contains(@href, "model")]/@href')
