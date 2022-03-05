@@ -6,7 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from scrapy import Selector
 
 
-class Spider(BaseSceneScraper):
+class SiteSugarcookieSpider(BaseSceneScraper):
     name = 'Sugarcookie'
     network = 'Sugarcookie'
     parent = 'Sugarcookie'
