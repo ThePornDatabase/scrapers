@@ -49,4 +49,3 @@ class SitePJGirlsPerformerSpider(BasePerformerScraper):
 
     def get_nationality(self, response):
         return "Czech"
-
