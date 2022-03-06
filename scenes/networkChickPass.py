@@ -35,6 +35,14 @@ class SiteChickPassSpider(BaseSceneScraper):
                 meta['site'] = site.get().strip()
             else:
                 meta['site'] = False
+            meta['date'] = self.parse_date('today').isoformat()
+            date = scene.xpath('.//div[@class="date"]/text()')
+            if date:
+                date = " ".join(date.getall())
+                date = re.search(r'(\w+ \d{1,2}, \d{4})', date)
+                if date:
+                    meta['date'] = self.parse_date(date.group(1), date_formats=['%b %d, %Y']).isoformat()
+
             scene = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
