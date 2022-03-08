@@ -35,23 +35,23 @@ class SiteJeshByJeshSpider(BaseSceneScraper):
                 meta['image'] = self.format_link(response, image.get()).replace("1x", "2x")
             else:
                 meta['image'] = ''
-            meta['date'] = self.search_date(scene, response)
             trailer = scene.xpath('.//source/@src')
             if trailer:
                 meta['trailer'] = self.format_link(response, trailer.get())
             else:
                 meta['trailer'] = ''
             meta['id'] = re.search(r'(.*?)_', scene.xpath('./@class').get()).group(1)
-            scene = scene.xpath('./a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene) and "jeshbyjesh" in scene:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+            sceneurl = scene.xpath('./a/@href').get()
+            meta['url'] = sceneurl
+            meta['date'] = self.search_date(scene, response, meta)
+            if re.search(self.get_selector_map('external_id'), sceneurl) and "jeshbyjesh" in sceneurl:
+                yield scrapy.Request(url=self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta)
 
-    def search_date(self, scene, response):
-        date = scene.xpath('.//source/@src')
-        if date:
-            date = date.get()
-            if re.search(r'/(20[12][0-9][01]\d{3})', date):
-                return self.parse_date(re.search(r'/(20[12][0-9][01]\d{3})', date).group(1), date_formats=['%Y%m%d']).isoformat()
+    def search_date(self, scene, response, meta):
+        if re.search(r'/(20[12][0-9][01]\d{3})', meta['trailer']):
+            return self.parse_date(re.search(r'/(20[12][0-9][01]\d{3})', meta['trailer']).group(1), date_formats=['%Y%m%d']).isoformat()
+        if re.search(r'/(20[12][0-9][01]\d{3})', meta['url']):
+            return self.parse_date(re.search(r'/(20[12][0-9][01]\d{3})', meta['url']).group(1), date_formats=['%Y%m%d']).isoformat()
         return self.parse_date('today').isoformat()
 
     def get_description(self, response):
