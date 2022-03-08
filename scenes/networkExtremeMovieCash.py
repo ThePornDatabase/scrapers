@@ -116,16 +116,8 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
         'pagination': '/tour/categories/movies/%s/latest/'
     }
 
-    def start_requests(self):
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page),
-                                 callback=self.get_scenes,
-                                 meta={'page': self.page},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
-
     def get_next_page_url(self, base, page):
-        pagination = self.get_selector_map('pagination')
+        pagination = '/tour/categories/movies/%s/latest/'
         if "crazyfetishpass" in base:
             pagination = "/tour/categories/movies_%s_d.html"
         return self.format_url(base, pagination % page)
@@ -150,7 +142,7 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
                 external_id = external_id.get().replace("set-target-", "").strip()
             else:
                 external_id = scene.xpath('./div[@class="product-image"]/a/img/@src').get()
-                external_id = re.search(r'.*/(\d*)-', external_id).group(1)
+            external_id = re.search(r'(\d*)-', external_id).group(1)
             item['id'] = external_id
             item['url'] = response.url
             performers = scene.xpath('.//span[@class="update_models"]/a/text()|.//a[contains(@href, "/models")]/text()')
