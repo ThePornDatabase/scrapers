@@ -10,8 +10,9 @@ def match_site(argument):
         '03': 'XTime Eros Art',
         '04': 'XTime Lethal Hardcore',
         '05': 'XTime Filly Films',
-        '06': 'XTime Lady Boy',
-        '08': 'XTime Combat-Zone',
+        '06': 'XTime Samurai',
+        '08': 'XTime Lady Boy',
+        '09': 'XTime Combat-Zone',
         '10': 'XTime Alexander DeVoe',
         '11': 'XTime Mercenary Pictures',
         '12': 'XTime Nacho Vidal',
@@ -31,13 +32,14 @@ def match_site(argument):
         '26': 'XTime El Matador',
         '27': 'XTime Jessica Rizzo',
         '28': 'XTime Download Channel',
+        '43': 'XTime Great Classics',
     }
-    return match.get(argument, argument)
+    return match.get(argument, "XTime")
 
 
 class SiteXTimeSpider(BaseSceneScraper):
     name = 'XTime'
-    network = 'Xtime TV'
+    network = 'XTime'
 
     start_urls = [
         'http://xtime.tv',
@@ -53,7 +55,7 @@ class SiteXTimeSpider(BaseSceneScraper):
         'tags': '//div[@id="div-dettagli-categorie"]/text()',
         'external_id': r'trailer/(\d+)/',
         'trailer': '',
-        'pagination': '/?act=Scenes&pageID=%s&order=data_pubblicazione&datapub=anno?act=Disclaimer&accept=1'
+        'pagination': '/?act=Scenes&pageID=%s&order=data_pubblicazione&datapub=anno'
     }
 
     def start_requests(self):
@@ -87,19 +89,19 @@ class SiteXTimeSpider(BaseSceneScraper):
         site = response.xpath('//a[@class="video-label-canale"]/@href')
         if site:
             site = site.get()
-            if re.search(r'canali/(\d+).*?/', site):
-                site = re.search(r'canali/(\d+).*?/', site).group(1)
-        else:
-            site = ''
+            if re.search(r'canali/.*?(\d+).*?/', site):
+                site = re.search(r'canali/.*?(\d+).*?/', site).group(1)
+            else:
+                site = 'XTime'
         return match_site(site)
 
     def get_parent(self, response):
         parent = response.xpath('//a[@class="video-label-canale"]/@href')
         if parent:
             parent = parent.get()
-            if re.search(r'canali/(\d+).*?/', parent):
-                parent = re.search(r'canali/(\d+).*?/', parent).group(1)
-        else:
-            parent = ''
+            if re.search(r'canali/.*?(\d+).*?/', parent):
+                parent = re.search(r'canali/.*?(\d+).*?/', parent).group(1)
+            else:
+                parent = 'XTime'
 
         return match_site(parent)
