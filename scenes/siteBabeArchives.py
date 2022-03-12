@@ -16,6 +16,7 @@ class BabeArchivesWhoresSpider(BaseSceneScraper):
         'description': '//div[contains(@class,"videoDetails")]/h3/text()',  # No description on site, just using title for filler
         'date': '//span[contains(text(),"Added:")]/following-sibling::text()',
         'image': '//div[@class="player-thumb"]/img/@src0_1x',
+        'image_blob': True,
         'performers': '//li[@class="update_models"]/a/text()',
         'tags': '',
         'external_id': r'\/trailers\/(.+)\.html',

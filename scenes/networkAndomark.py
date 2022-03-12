@@ -1,7 +1,6 @@
 import re
 import string
 from urllib.parse import urlparse
-import dateparser
 import tldextract
 import scrapy
 
@@ -199,9 +198,9 @@ class AndomarkSpider(BaseSceneScraper):
             if date:
                 date = date.strip()
                 date = re.search(r'(\d{2}\/\d{2}\/\d{4})', date).group(1)
-
         if date:
-            return dateparser.parse(date).isoformat()
+            return self.parse_date(date).isoformat()
+        return self.parse_date('today').isoformat()
 
     def get_title(self, response):
         if 'minkaxxx' in response.url or 'sexykaren' in response.url:
@@ -211,7 +210,7 @@ class AndomarkSpider(BaseSceneScraper):
         elif 'meanawolf' in response.url:
             titlesearch = '//h3/text()'
         else:
-            titlesearch = '//span[@class="update_title"]/text()'
+            titlesearch = '//span[@class="update_title"]/text()|//div[@class="updatesBlock"][1]/div[@class="title clear"]/h2/text()'
 
         title = response.xpath(titlesearch).get()
         if not title:
@@ -301,13 +300,7 @@ class AndomarkSpider(BaseSceneScraper):
         return parent
 
     def get_id(self, response):
-        if 'minkaxxx' in response.url or 'sexykaren' in response.url:
-            idsearch = r'trailers\/(.+)\.html'
-        elif 'meanawolf' in response.url:
-            idsearch = r'scenes\/(.+)\.html'
-        else:
-            idsearch = r'updates\/(.+)\.html'
-
+        idsearch = r'.*/(.*?)\.html'
         search = re.search(idsearch, response.url, re.IGNORECASE)
         return search.group(1)
 
