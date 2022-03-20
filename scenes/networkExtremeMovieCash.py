@@ -1,7 +1,6 @@
 import string
 import re
 import tldextract
-import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 

@@ -69,6 +69,7 @@ class NetworkSeriousPartnersSpider(BaseSceneScraper):
     def get_site(self, response):
         return match_site(tldextract.extract(response.url).domain)
 
+
 def parse_date(datestring):
     today = datetime.datetime.now()
     datestring = datestring.lower()
