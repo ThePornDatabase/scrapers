@@ -1,8 +1,10 @@
 import re
 from datetime import date, timedelta
 import string
+import base64
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+from tpdb.helpers.http import Http
 
 
 class SiteCumEatingCuckoldsSpider(BaseSceneScraper):
@@ -58,10 +60,10 @@ class SiteCumEatingCuckoldsSpider(BaseSceneScraper):
             image = scene.xpath('./a/img/@src').get()
             if image:
                 item['image'] = image.strip().replace(" ", "%20")
+                item['image_blob'] = self.get_image_blob(item['image'])
             else:
                 item['image'] = None
-
-            item['image_blob'] = None
+                item['image_blob'] = None
 
             item['trailer'] = ''
 
@@ -94,3 +96,10 @@ class SiteCumEatingCuckoldsSpider(BaseSceneScraper):
                             yield item
                     else:
                         yield item
+
+    def get_image_blob(self, image):
+        if image:
+            req = Http.get(image, headers=self.headers, cookies=self.cookies)
+            if req and req.ok:
+                return base64.b64encode(req.content).decode('utf-8')
+        return None

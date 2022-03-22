@@ -32,6 +32,7 @@ class NetworkPervCitySpider(BaseSceneScraper):
         'description': '//div[@class="videoInfo"]/div[@class="infoMBox"]/div[@class="infoBox clear"]/p/text()',
         'date': '',
         'image': '//img[contains(@class, "posterimg")]/@src0_2x',
+        'image_blob': True,
         'performers': '//div[@class="infoBox clear"]/h3/span[@class="tour_update_models"]/a/text()',
         'tags': '',
         'external_id': r'.*/(.*?)\.html',

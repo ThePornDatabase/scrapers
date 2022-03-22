@@ -30,6 +30,7 @@ class NetworkDreamCashSpider(BaseSceneScraper):
         're_date': r'(\d{4}-\d{2}-\d{2})',
         'date_formats': ['%Y-%m-%d'],
         'image': '//script[contains(text(), "poster")]/text()',
+        'image_blob': True,
         're_image': r'poster=\"(.*?)\"',
         'performers': '//h3[@class="item-name"]/span/text()',
         'tags': '',
