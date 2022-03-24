@@ -145,7 +145,7 @@ link_to_info = {
         "contentText": movies_content_text,
         "v2": False
     },
-    "organic-momswap-chie0Ge5%20": {
+    "organic-momswap-6fkccwxhi0": {
         "site": "Mom Swap",
         "navText": movies_nav_text,
         "contentText": movies_content_text,
@@ -183,6 +183,12 @@ link_to_info = {
     },
     "organic-swp-Jo4daep7": {
         "site": "Sis Swap",
+        "navText": movies_nav_text,
+        "contentText": movies_content_text,
+        "v2": False
+    },
+    "organic-1-saeXae9v": {
+        "site": "Tiny Sis",
         "navText": movies_nav_text,
         "contentText": movies_content_text,
         "v2": False

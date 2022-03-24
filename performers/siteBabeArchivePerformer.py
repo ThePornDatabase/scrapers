@@ -8,6 +8,7 @@ class BabeArchivePerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[@class="profile-details clear"]/h3[1]/text()',
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
+        'image_blob': True,
         'birthplace': '//li/strong[contains(text(),"Birthplace")]/following-sibling::text()',
         'measurements': '//li/strong[contains(text(),"Measurements")]/following-sibling::text()',
         'height': '//li/strong[contains(text(),"Height")]/following-sibling::text()',

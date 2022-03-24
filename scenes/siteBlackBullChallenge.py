@@ -18,6 +18,7 @@ class SiteBlackBullChallengeSpider(BaseSceneScraper):
         'description': '//div[contains(@class,"videoDetails")]/p/text()',
         'date': '',
         'image': '//script[contains(text(), "/trailers/")]/text()',
+        'image_blob': True,
         're_image': r'src0_3x=\"(http.*?)\".*',
         'performers': '//li[@class="update_models"]/a/text()',
         'tags': '//li[contains(text(), "Tags:")]/following-sibling::li/a/text()',

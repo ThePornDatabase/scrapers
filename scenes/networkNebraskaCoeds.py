@@ -107,22 +107,13 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
                 item['trailer'] = ''
 
             url = scene.xpath('./div[@class="updateThumb"]/a/@href|./a/@href').get()
-            if "pussycat" in response.url and item['date'] > "2021-11-25":
-                if url:
-                    item['url'] = response.url
-                    item['id'] = re.search(r'content/(\d+)', url).group(1)
-                    item['id'] = item['id'].lower().strip()
-                else:
-                    item['url'] = ''
-                    item['id'] = ''
+            if url:
+                item['url'] = url.strip()
+                item['id'] = re.search(r'.*/(.*).html', item['url']).group(1)
+                item['id'] = item['id'].lower().strip()
             else:
-                if url:
-                    item['url'] = url.strip()
-                    item['id'] = re.search(r'.*/(.*).html', item['url']).group(1)
-                    item['id'] = item['id'].lower().strip()
-                else:
-                    item['url'] = ''
-                    item['id'] = ''
+                item['url'] = ''
+                item['id'] = ''
 
             item['description'] = ''
             item['tags'] = []

@@ -58,7 +58,7 @@ class SiteLegsJapanSpider(BaseSceneScraper):
             if scenedate:
                 item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
             else:
-                item['date'] = []
+                item['date'] = self.parse_date('today').isoformat()
 
             image = scene.xpath('./preceding-sibling::div[1]/@style').get()
             if image:

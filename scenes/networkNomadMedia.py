@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 from urllib.parse import urlparse
 import scrapy
 
@@ -32,9 +31,11 @@ class NomadMediaSpider(BaseSceneScraper):
 
         sceneresponses = response.xpath('//div[@class="details"]')
         for sceneresponse in sceneresponses:
-            date = sceneresponse.xpath('./p/strong/text()').get().strip()
-            if not date:
-                date = datetime.now()
+            date = sceneresponse.xpath('./p/strong/text()')
+            if date:
+                date = self.parse_date(date.get().strip()).isoformat()
+            else:
+                date = self.parse_date('today').isoformat()
 
             scene = sceneresponse.xpath('./h5/a/@href').get().strip()
             if re.search(self.get_selector_map('external_id'), scene):

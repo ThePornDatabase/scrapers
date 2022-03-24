@@ -16,6 +16,8 @@ class BrattyMILFPerformerSpider(BasePerformerScraper):
         'external_id': r'model/(.*)/'
     }
 
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.mymiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
+
     name = 'BrattyMILFPerformer'
     network = 'Nubiles'
 

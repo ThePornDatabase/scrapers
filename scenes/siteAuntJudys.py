@@ -11,6 +11,7 @@ class SiteAuntJudysSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.auntjudys.com',
+        'https://www.auntjudysxxx.com',
     ]
 
     selector_map = {
@@ -46,9 +47,13 @@ class SiteAuntJudysSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image})
 
     def get_site(self, response):
+        if "xxx" in response.url:
+            return "Aunt Judys XXX"
         return "Aunt Judys"
 
     def get_parent(self, response):
+        if "xxx" in response.url:
+            return "Aunt Judys XXX"
         return "Aunt Judys"
 
     def get_trailer(self, response):

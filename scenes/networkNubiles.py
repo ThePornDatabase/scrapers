@@ -9,6 +9,8 @@ class NubilesSpider(BaseSceneScraper):
     name = 'Nubiles'
     network = 'nubiles'
 
+    custom_settings = {'CONCURRENT_REQUESTS': '1'}
+
     start_urls = [
         "https://anilos.com/video/gallery",
         "https://badteenspunished.com/video/gallery",

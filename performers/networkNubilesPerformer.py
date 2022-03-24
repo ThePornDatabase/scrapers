@@ -13,8 +13,10 @@ class NubilesPerformerSpider(BasePerformerScraper):
         'astrology': '//div[contains(@class, "model-profile-desc")]//p[4]/text()',
         'measurements': '//div[contains(@class, "model-profile-desc")]//p[5]/text()',
         'pagination': '/model/gallery/%s',
-        'external_id': 'profile/\d+/.+$'
+        'external_id': r'profile/\d+/.+$'
     }
+
+    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.mymiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
 
     name = 'NubilesPerformer'
     network = "Nubiles"

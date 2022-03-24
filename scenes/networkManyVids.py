@@ -239,7 +239,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
                     return dateparser.parse(scenedate, date_formats=['%m%d%Y']).isoformat()
                 except Exception:
                     return dateparser.parse('today').isoformat()
-        return None
+        return dateparser.parse('today').isoformat()
 
     def get_performers(self, response):
         meta = response.meta

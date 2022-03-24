@@ -7,6 +7,10 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     name = 'AdultEmpireCash'
     network = 'AdultEmpireCash'
 
+    custom_settings = {
+        'CONCURRENT_REQUESTS': 1
+    }
+
     start_urls = [
         # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
@@ -55,6 +59,12 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Kings of Fetish"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "jayspov" in response.url:
+            scenes = response.xpath('//a[contains(@class, "scene-update-details")]/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Jays POV"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "jonathanjordanxxx" in response.url:
             scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
