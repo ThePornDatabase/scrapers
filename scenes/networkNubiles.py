@@ -16,6 +16,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://badteenspunished.com/video/gallery",
         "https://bountyhunterporn.com/video/gallery",
         "https://brattysis.com/video/gallery",
+        "https://cumswappingsis.com/video/gallery",
         "https://daddyslilangel.com/video/gallery",
         "https://deeplush.com/video/gallery",
         "https://detentiongirls.com/video/gallery",
@@ -65,6 +66,9 @@ class NubilesSpider(BaseSceneScraper):
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
                     meta['parent'] = "Bratty Sis"
+                if "cumswappingsis" in response.url:
+                    meta['site'] = "Cum Swapping Sis"
+                    meta['parent'] = "Cum Swapping Sis"
                 elif "anilos" in response.url:
                     meta['site'] = "Anilos"
                     meta['parent'] = "Anilos"
