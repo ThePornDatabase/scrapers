@@ -20,6 +20,7 @@ class NetworkTheFlourishSpider(BaseSceneScraper):
         'description': '//div[@class="description"]/p/text()',
         'date': '',
         'image': '//script[contains(text(), "video_content")]/text()',
+        'image_blob': True,
         're_image': r'poster=.*?\"(/content.*\.jpg)',
         'performers': '//div[@class="info"]//a[contains(@href, "/models/")]/text()',
         'tags': '//ul[@class="tags"]/li/a/text()',
@@ -33,16 +34,17 @@ class NetworkTheFlourishSpider(BaseSceneScraper):
         meta = response.meta
         scenes = response.xpath('//div[contains(@class,"item-video")]')
         for scene in scenes:
-            date = scene.xpath('.//div[@class="timeDate"]/text()')
             meta['date'] = self.parse_date('today').isoformat()
-            if date:
-                date = re.search(r'(\d{4}-\d{2}-\d{2})', date.get())
-                if date:
-                    meta['date'] = self.parse_date(date.group(1), date_formats=['%Y-%m-%d']).isoformat()
+            scenedate = scene.xpath('.//div[@class="timeDate"]/text()')
+            if scenedate:
+                scenedate = "".join(scenedate.getall())
+                scenedate = re.search(r'(\d{4}-\d{2}-\d{2})', scenedate)
+                if scenedate:
+                    meta['date'] = self.parse_date(scenedate.group(1), date_formats=['%Y-%m-%d']).isoformat()
             scene = scene.xpath('./div[@class="item-thumb"]/a/@href').get()
 
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
         origtags = super().get_tags(response)
