@@ -16,6 +16,7 @@ class PenthouseSpider(BaseSceneScraper):
         'description': '//meta[@itemprop="name"]/@content',  # No description on site, just using title for filler
         'date': '//meta[@itemprop="uploadDate"]/@content',
         'image': '//meta[@itemprop="thumbnailUrl"]/@content',
+        'image_blob': True,
         'performers': '//ul[@class="scene-models-list"]/li/a/text()',
         'tags': '//ul[@class="scene-tags"]/li/a/text()',
         'external_id': r'\/scenes\/(.+)\.html',
