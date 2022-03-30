@@ -19,6 +19,7 @@ class SiteFightingDollsSpider(BaseSceneScraper):
         'description': '//h3[contains(text(),"Description")]/following-sibling::p//text()',
         'date': '//div[@class="categories"]/text()',
         'image': '//div[@id="sample"]/img/@src',
+        'image_blob': True,
         'performers': '//div[@class="grid-x"]/div/div/div/h3/a/text()',
         'tags': '//div[@class="categories"]/a/text()',
         'external_id': r'.*/(.*?)/',

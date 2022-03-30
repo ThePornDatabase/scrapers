@@ -24,6 +24,7 @@ class Spider(BaseSceneScraper):
         're_date': r'(\d{4}-\d{2}-\d{2})',
         'date_formats': ['%Y-%m-%d'],
         'image': '//meta[@property="og:image"]/@content',
+        'image_blob': True,
         'performers': '',
         'tags': '//div[@class="tags-wrapper"]/a/text()',
         'external_id': r'.*/(.*?).html',

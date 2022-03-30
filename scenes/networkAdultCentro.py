@@ -5,17 +5,10 @@ import json
 import html
 import string
 from urllib.parse import urlparse
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class NetworkAdultCentroSpider(BaseSceneScraper):
@@ -24,6 +17,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
     sites = {
         'https://aussiefellatioqueens.com',
         'https://www.mylifeinmiami.com',
+        'https://brookelynnebriar.com',
         'https://cospimps.com',
         'https://daddyscowgirl.com',
         'https://jerkoffwithme.com',
@@ -113,6 +107,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         page = str((int(page) - 1) * 10)
         if "miami" in base:
             page_url = base + '/sapi/' + token + '/event.last?_method=event.last&offset={}&limit=10&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[showOnHome]=true'
+        if "brookelynnebriar" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
         if "cospimps" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "jerkoff" in base:
@@ -197,7 +193,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         item['id'] = data['id']
         item['title'] = string.capwords(html.unescape(data['title']))
         item['description'] = html.unescape(data['description'].strip())
-        item['date'] = dateparser.parse(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
+        item['date'] = self.parse_date(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
 
         if "fallinlovia" in response.url:
             item['performers'] = ['Eva Lovia']
@@ -222,7 +218,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url'].strip()
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
         if "cospimps" in response.url:
             item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
@@ -298,6 +294,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
             item['performers'] = []
+            yield item
+
+        if "brookelynnebriar" in response.url:
+            item['site'] = 'BrookelynneBriar'
+            item['parent'] = 'BrookelynneBriar'
+            item['network'] = 'BrookelynneBriar'
+            item['performers'] = ['Brookelynne Briar']
             yield item
 
         if "thiccvision" in response.url:

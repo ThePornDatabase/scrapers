@@ -294,7 +294,8 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         item['title'] = data['title']
         item['description'] = data['description']
         item['image'] = data['img']
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
         if 'tags' in data:
             item['tags'] = data['tags']
         else:
