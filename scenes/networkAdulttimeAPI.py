@@ -328,10 +328,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['parent'] = "Next Door Studios"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'puretaboo' in referrerurl:
-                item['parent'] = "Taboo Heat"
+                item['parent'] = "Pure Taboo"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'tabooheat' in referrerurl:
-                item['parent'] = "Pure Taboo"
+                item['parent'] = "Taboo Heat"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'touchmywife' in referrerurl:
                 item['parent'] = "Touch My Wife"
