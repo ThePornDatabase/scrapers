@@ -1,6 +1,5 @@
 import re
 import sys
-import warnings
 import json
 import html
 import string
@@ -108,7 +107,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         if "miami" in base:
             page_url = base + '/sapi/' + token + '/event.last?_method=event.last&offset={}&limit=10&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[showOnHome]=true'
         if "brookelynnebriar" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=50&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
         if "cospimps" in base:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "jerkoff" in base:
