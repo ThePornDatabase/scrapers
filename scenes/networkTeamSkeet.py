@@ -235,6 +235,17 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
     name = 'TeamSkeetNetwork'
     network = 'teamskeet'
 
+    custom_scraper_settings = {
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
+        'CONCURRENT_REQUESTS': 1,
+        'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+        }
+    }
+
     selector_map = {
         'external_id': '\\/(.+)\\.json'
     }
@@ -262,7 +273,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         meta = response.meta
         highwater = ""
         if not meta['is_v2']:
-            scene_list = json.loads(response.body)
+            scene_list = re.search(r'({.*})', response.text)
+            if scene_list:
+                scene_list = scene_list.group(1)
+                scene_list = json.loads(scene_list)
             if scene_list:
                 for key, scene in scene_list.items():
                     if key > highwater:
@@ -285,7 +299,12 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def parse_scene(self, response):
-        data = response.json()
+        body = re.search(r'({.*})', response.text)
+        if body:
+            body = body.group(1)
+            data = json.loads(body)
+        else:
+            date = ''
         item = SceneItem()
         is_v2 = "store2" in response.url
 
@@ -355,24 +374,29 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 yield item
 
     def get_scenes(self, response):
-        scene_info = json.loads(response.body)
-        is_v2 = "store2" in response.url
-        site_link = get_site_link_text(response.url, is_v2)
+        body = re.search(r'({.*})', response.text)
+        if body:
+            body = body.group(1)
+            scene_info = json.loads(body)
+            is_v2 = "store2" in response.url
+            site_link = get_site_link_text(response.url, is_v2)
+            meta = response.meta
+            meta['body'] = body
 
-        if is_v2:
-            for scene in scene_info['hits']['hits']:
-                scene = scene['_source']
-                if "id" in scene:
-                    scene_id = scene["id"]
-                    scene_url = format_scene_url(site_link, scene_id, is_v2)
-                    yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=response.meta)
-        else:
-            if scene_info:
-                for key, scene in scene_info.items():
+            if is_v2:
+                for scene in scene_info['hits']['hits']:
+                    scene = scene['_source']
                     if "id" in scene:
                         scene_id = scene["id"]
                         scene_url = format_scene_url(site_link, scene_id, is_v2)
-                        yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=response.meta)
+                        yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=meta)
+            else:
+                if scene_info:
+                    for key, scene in scene_info.items():
+                        if "id" in scene:
+                            scene_id = scene["id"]
+                            scene_url = format_scene_url(site_link, scene_id, is_v2)
+                            yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=meta)
 
     def get_next_page_url(self, base, page, highwater):
         limit = 250
