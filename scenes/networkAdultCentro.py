@@ -14,6 +14,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
 
     sites = {
+        'https://allofaveryjane.com',
         'https://aussiefellatioqueens.com',
         'https://www.mylifeinmiami.com',
         'https://brookelynnebriar.com',
@@ -104,6 +105,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             uri = urlparse(base)
             base = uri.scheme + "://" + uri.netloc
         page = str((int(page) - 1) * 10)
+        if "averyjane" in base:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
         if "miami" in base:
             page_url = base + '/sapi/' + token + '/event.last?_method=event.last&offset={}&limit=10&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[showOnHome]=true'
         if "brookelynnebriar" in base:
@@ -293,6 +296,14 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['parent'] = 'Daddys Cowgirl'
             item['network'] = 'Daddys Cowgirl'
             item['performers'] = []
+            yield item
+
+        if "averyjane" in response.url:
+            item['site'] = 'All of Avery Jane'
+            item['parent'] = 'All of Avery Jane'
+            item['network'] = 'All of Avery Jane'
+            item['performers'] = ['Avery Jane']
+            item['trailer'] = ''
             yield item
 
         if "brookelynnebriar" in response.url:
