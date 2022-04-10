@@ -305,6 +305,7 @@ class AndomarkSpider(BaseSceneScraper):
         return search.group(1)
 
     def get_performers(self, response):
+        performersearch = self.get_selector_map('performers')
         if 'minkaxxx' in response.url:
             return ["Minka"]
         if 'sexykaren' in response.url:
@@ -313,7 +314,6 @@ class AndomarkSpider(BaseSceneScraper):
             performersearch = '//div[@class="update_block_info"]/span[@class="tour_update_models"]/a/text()'
         if 'meanawolf' in response.url:
             performersearch = '//span[contains(text(),"FEATURING:")]/following-sibling::a[contains(@href,"/models/")]/text()'
-        performersearch = self.get_selector_map('performers')
 
         performers = response.xpath(performersearch).getall()
         return list(map(lambda x: x.strip(), performers))
