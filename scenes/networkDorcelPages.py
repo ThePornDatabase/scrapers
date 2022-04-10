@@ -18,6 +18,20 @@ class SiteDorcelPagesSpider(BaseSceneScraper):
         ['https://api.africa-xxx.com/24api/v1/sites/106/homepage/freetour?is_mobile=false&take=14&page=%s', 'Africa XXX', 'https://africa-xxx.com', 'https://api.africa-xxx.com/24api/v1/sites/106/freetour/videos/%s']
     ]
 
+    custom_settings = {'CONCURRENT_REQUESTS': '1',
+                       'AUTOTHROTTLE_ENABLED': 'True',
+                       'AUTOTHROTTLE_DEBUG': 'False',
+                       'DOWNLOAD_DELAY': '2',
+                       'CONCURRENT_REQUESTS_PER_DOMAIN': '1',
+
+                       'ITEM_PIPELINES': {
+                           'tpdb.pipelines.TpdbApiScenePipeline': 400,
+                       },
+                       'DOWNLOADER_MIDDLEWARES': {
+                           'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+                       }
+                       }
+
     headers = {
         'token': 'mysexmobile',
         'siteId': '103',
