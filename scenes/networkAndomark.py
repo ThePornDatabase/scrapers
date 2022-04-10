@@ -19,6 +19,7 @@ def match_site(argument):
         'bradsterling': "Brad Sterling",
         'britstudio': "BritStudio",
         'brittanysbubbles': "Brittany Andrews",
+        'charlieforde': "Charlie Forde",
         'chocolatepov': "Chocolate POV",
         'furrychicks': "Furry Chicks",
         'hollyhotwife': "Holly Hotwife",
@@ -82,6 +83,7 @@ class AndomarkSpider(BaseSceneScraper):
         'https://bradsterling.elxcomplete.com',
         'https://britstudio.xxx',
         'https://brittanysbubbles.com',
+        'https://charlieforde.com',
         'https://chocolatepov.com',
         'https://furrychicks.elxcomplete.com',
         'https://hollyhotwife.elxcomplete.com',
@@ -147,7 +149,7 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/tour2/categories/movies_%s_d.html'
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
-        elif 'shiny' in base or '4k' in base:
+        elif 'shiny' in base or '4k' in base or 'charlieforde' in base:
             selector = '/categories/updates_%s_d.html'
         else:
             selector = '/categories/movies_%s_d.html'
@@ -174,7 +176,7 @@ class AndomarkSpider(BaseSceneScraper):
 
     def get_trailer(self, response):
         trailerxpath = self.get_selector_map('trailer')
-        if 'laurenphillips' in response.url or 'shiny' in response.url or '4k' in response.url:
+        if 'laurenphillips' in response.url or 'shiny' in response.url or '4k' in response.url or 'charlieforde' in response.url:
             trailerxpath = '//div[@class="update_image"]/a[1]/@onclick'
         parsed_uri = urlparse(response.url)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
