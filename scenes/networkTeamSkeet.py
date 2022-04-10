@@ -304,7 +304,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             body = body.group(1)
             data = json.loads(body)
         else:
-            date = ''
+            data = ''
         item = SceneItem()
         is_v2 = "store2" in response.url
 
