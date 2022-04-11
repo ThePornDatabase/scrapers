@@ -13,7 +13,7 @@ class VIP4KPagedSpider(BaseSceneScraper):
     start_urls = [
         'https://debt4k.com',
         'https://hunt4k.com',
-        'https://law4k.com',
+        # ~ 'https://law4k.com',
         'https://loan4k.com',
         'https://shame4k.com',
         'https://stuck4k.com',
