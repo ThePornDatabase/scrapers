@@ -14,6 +14,20 @@ from tpdb.items import SceneItem
 class NetworkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
 
+    custom_settings = {'CONCURRENT_REQUESTS': '1',
+                       'AUTOTHROTTLE_ENABLED': 'True',
+                       'AUTOTHROTTLE_DEBUG': 'False',
+                       'DOWNLOAD_DELAY': '2',
+                       'CONCURRENT_REQUESTS_PER_DOMAIN': '1',
+
+                       'ITEM_PIPELINES': {
+                           'tpdb.pipelines.TpdbApiScenePipeline': 400,
+                       },
+                       'DOWNLOADER_MIDDLEWARES': {
+                           'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+                       }
+                       }
+
     sites = [
         ['https://allofaveryjane.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'All of Avery Jane', 'Avery Jane'],
         ['https://www.amberspanks.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Amber Spanks', 'Amber Dawn'],
