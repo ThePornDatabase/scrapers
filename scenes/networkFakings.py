@@ -1,4 +1,5 @@
 import dateparser
+import urllib.parse
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -33,9 +34,16 @@ class FakingsSpider(BaseSceneScraper):
             meta['date'] = dateparser.parse(
                 date, settings={'DATE_ORDER': 'DMY'}).isoformat()
             meta['image'] = scene.css('.bordeimagen::attr(src)').get()
+            meta['image'] = urllib.parse.quote_plus(meta['image'])
+            meta['image'] = meta['image'].replace('%2F', '/').replace('%3A', ':')
+            meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
 
             yield scrapy.Request(url=self.format_link(response, scene.css('a::attr(href)').get()), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        return response.xpath(
-            '//strong[contains(., "Serie")]//following-sibling::a/text()').get().strip()
+        site = response.xpath('//strong[contains(., "Serie")]//following-sibling::a/text()')
+        if site:
+            site = site.get()
+        else:
+            site = "FaKings"
+        return site.strip()
