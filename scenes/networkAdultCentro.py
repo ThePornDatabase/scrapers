@@ -4,6 +4,7 @@ import json
 import html
 import string
 from urllib.parse import urlparse
+import unidecode
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -13,37 +14,64 @@ from tpdb.items import SceneItem
 class NetworkAdultCentroSpider(BaseSceneScraper):
     name = 'AdultCentro'
 
-    sites = {
-        'https://allofaveryjane.com',
-        'https://aussiefellatioqueens.com',
-        'https://www.mylifeinmiami.com',
-        'https://brookelynnebriar.com',
-        'https://cospimps.com',
-        'https://daddyscowgirl.com',
-        'https://jerkoffwithme.com',
-        'https://kinkyrubberworld.com',
-        'https://realagent.xxx',
-        'https://facialcasting.com',
-        'https://fallinlovia.com',
-        'https://bigjohnnyxxx.com',
-        'https://dillionation.com',
-        'https://isinxxx.com',
-        'https://katie71.com',
-        'https://peghim.com',
-        'https://cleagaultier-official.com',
-        'https://danidaniels.com',
-        'https://santalatina.com',
-        'https://porntugal.com',
-        'https://trinitystclair.com',
-        'https://aussiexxxhookups.com',
-        'https://nordiskaporrfilmer.com',
-        'https://ninnworx.com',
-        'https://therealscarletred.com',
-        'https://psychohenessy.com',
-        'https://natashanice.com',
-        'https://facialkings.com',
-        'https://thiccvision.com',
-    }
+    sites = [
+        ['https://allofaveryjane.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'All of Avery Jane', 'Avery Jane'],
+        ['https://www.amberspanks.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Amber Spanks', 'Amber Dawn'],
+        ['https://andreagarcia.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Andrea Garcia', 'Andrea Garcia'],
+        ['https://aussiefellatioqueens.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Aussie Fellatio Queens', ''],
+        ['https://www.baileyrayne.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bailey Rayne', 'Bailey Rayne'],
+        ['https://aussiexxxhookups.com', '&transitParameters[v1]=OBoiu4zYsP', 'Aussie XXX Hookups', ''],
+        ['https://www.backalleytoonzonline.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Back Alley Toonz', ''],
+        ['https://bhalasada.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bhala Sada', ''],
+        ['https://bigjohnnyxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Big Johnny XXX', ''],
+        ['https://brookelynnebriar.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Brookelynne Briar', 'Brookelynne Briar'],
+        ['https://bunnyscout.tv', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bunny Scout', ''],
+        ['https://cleagaultier-official.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Clea Gaultier', 'Clea Gaultier'],
+        ['https://cospimps.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Cospimps', ''],
+        ['https://daddyscowgirl.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Daddys Cowgirl', ''],
+        ['https://danidaniels.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Dani Daniels', 'Dani Daniels'],
+        ['https://dillionation.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Dillion Harper', 'Dillion Harper'],
+        ['https://www.esperanzaplus.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Esperanza Plus', 'Esperanza Gomez'],
+        ['https://facialcasting.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Facial Casting', ''],
+        ['https://facialkings.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Facial Kings', ''],
+        ['https://fallinlovia.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Fall in Lovia', 'Eva Lovia'],
+        ['https://www.hollandswing.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Holland Swing', 'Nikki Holland'],
+        ['https://www.honeygoldxxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Honey Gold', 'Honey Gold'],
+        ['https://isinxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'I Sin XXX', ''],
+        ['https://jerkoffwithme.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Jerk Off With Me', ''],
+        ['https://katie71.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Katie71', 'Katie71'],
+        ['https://www.kelleycabbana.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Kelley Cabbana', 'Kelley Cabbana'],
+        ['https://kinkyrubberworld.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Kinky Rubber World', 'Latex Lara'],
+        ['https://www.ladysublime.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Lady Sublime', 'Lady Sublime'],
+        ['https://www.matthiaschrist.com', '&transitParameters[v1]=OBoiu4zYsP', 'Matthias Christ', ''],
+        ['https://www.monstermalesprod.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Monster Males Productions', ''],
+        ['https://natashanice.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Natasha Nice', 'Natasha Nice'],
+        ['https://www.crystaldenison.com', '&transitParameters[v1]=OBoiu4zYsP', 'Crystal Denison', 'Crystal Denison'],
+        ['https://www.gingerfans.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Ginger Fans', 'Ginger St Cyr'],
+        ['https://iadorejessicacho.live', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'I Adore Jessica Cho', 'Jessica Cho'],
+        ['https://www.jazziequexxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Jazzie Que XXX', 'Jacquelyn Jaxx'],
+        ['https://www.ladyfoxxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Lady Foxxx', 'Lisa Fox'],
+        ['https://www.lalaiveyxxx.com', '&transitParameters[v1]=OBoiu4zYsP', 'La La Ivey XXX', 'La La Ivey'],
+        ['https://www.naughtyayla.com', '&transitParameters[v1]=OBoiu4zYsP', 'Naughty Ayla', 'Naughty Ayla'],
+        ['https://www.patriciagoddess.com', '&transitParameters[v1]=uaKV7hnDcF', 'Patricia Goddess', 'Patricia Goddess'],
+        ['https://ninnworx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Ninn Worx', ''],
+        ['https://nordiskaporrfilmer.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Svenska Porrfilmer', ''],
+        ['https://www.nudechrissy.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Nude Chrissy', ''],
+        ['https://peghim.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'PegHim', ''],
+        ['https://porntugal.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Porntugal', ''],
+        ['https://www.primalbang.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Primal Bang', ''],
+        ['https://psychohenessy.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Psycho Henessy', 'Henessy'],
+        ['https://realagent.xxx', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Real Agent', ''],
+        ['https://www.sabrinasabrokvideos.com','&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Sabrina Sabrok', 'Sabrina Sabrok'],
+        ['https://santalatina.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Santa Latina', ''],
+        ['https://sukmydick.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Suk My Dick', ''],
+        ['https://therealscarletred.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Scarlet Red', 'Scarlet Red'],
+        ['https://thiccvision.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Thiccvision', ''],
+        ['https://www.ticklehotness.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Tickle Hotness', ''],
+        ['https://trinitystclair.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Trinity St Clair', 'Trinity St Clair'],
+        ['https://www.viscontivip.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Visconti VIP', ''],
+        ['https://www.mylifeinmiami.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'My Life In Miami', ''],
+    ]
 
     selector_map = {
         'title': '',
@@ -59,7 +87,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
     def start_requests(self):
         for link in self.sites:
-            yield scrapy.Request(link + '/videos/', callback=self.start_requests_2, meta={'link': link})
+            yield scrapy.Request(link[0] + '/videos/', callback=self.start_requests_2, meta={'link': link[0], 'transit': link[1], 'site': link[2], 'performer': link[3]})
 
     def start_requests_2(self, response):
 
@@ -80,7 +108,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             else:
                 meta['token'] = token
 
-            url = self.get_next_page_url(meta['link'], self.page, meta['token'])
+            url = self.get_next_page_url(meta['link'], self.page, meta['token'], meta['transit'])
             meta['page'] = self.page
             yield scrapy.Request(url, callback=self.parse, meta=meta)
 
@@ -96,73 +124,19 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['token']),
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['token'], meta['transit']),
                                      callback=self.parse,
                                      meta=meta)
 
-    def get_next_page_url(self, base, page, token):
+    def get_next_page_url(self, base, page, token, transit):
         if "sapi" in base:
             uri = urlparse(base)
             base = uri.scheme + "://" + uri.netloc
         page = str((int(page) - 1) * 10)
-        if "averyjane" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "miami" in base:
-            page_url = base + '/sapi/' + token + '/event.last?_method=event.last&offset={}&limit=10&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[showOnHome]=true'
-        if "brookelynnebriar" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=50&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "cospimps" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "jerkoff" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "aussiefellatio" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "daddyscowgirl" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "kinkyrubberworld" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "realagent" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=extra&transitParameters[preset]=videos'
-        if "facialcasting" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "fallinlovia" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "bigjohnnyxxx" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "dillionation" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "isinxxx" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&fields[0]=generatedContentLink&fields[1]=cName&fields[2]=title&fields[3]=_resources.primary.url&fields[4]=sites.publishDate&fields[5]=type&fields[6]=_resources.base.url&fields[7]=_resources.base&fields[8]=length&limit=21&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "natashanice" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[exceptTags]=natashahomemade&transitParameters[preset]=videos'
-        if "katie71" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "peghim" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "danidaniels" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[socialParams]=likes&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "santalatina" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "psychohenessy" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "ninnworx" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[socialParams]=likes&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "therealscarletred" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[socialParams]=likes&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "porntugal" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
-        if "trinitystclair" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "aussiexxxhookups" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[totalCount]=1&transitParameters[preset]=videos&transitParameters[v1]=OBoiu4zYsP'
-        if "nordiskaporrfilmer" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "cleagaultier" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&class=Adultcentro%5CAmc%5CObject%5CContent&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "facialkings" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD&transitParameters[preset]=videos'
-        if "thiccvision" in base:
-            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-5&limit=10&offset={}&metaFields[resources][thumb]=baseline.sprite.w225i&metaFields[totalCount]=1&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD&transitParameters[preset]=videos'
+        if 'mylifeinmiami' in base:
+            page_url = base + '/sapi/' + token + '/event.last?_method=event.last&tz=-4&limit=10&offset={}&transitParameters[showOnHome]=true' + transit
+        else:
+            page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[preset]=videos' + transit
 
         return self.format_url(base, page_url.format(page))
 
@@ -187,21 +161,16 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         jsondata = jsondata.replace('\r\n', '')
         try:
             data = json.loads(jsondata.strip())
-        except:
-            print(f'JSON Data: {jsondata}')
+        except Exception as ex:
+            print(f'Exception: {ex} --> JSON Data: {jsondata}')
 
         data = data['response']['collection'][0]
 
         item['id'] = data['id']
-        item['title'] = string.capwords(html.unescape(data['title']))
+        item['title'] = unidecode.unidecode(html.unescape(string.capwords(data['title']).strip()))
         item['description'] = html.unescape(data['description'].strip())
         item['date'] = self.parse_date(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
-
-        if "fallinlovia" in response.url:
-            item['performers'] = ['Eva Lovia']
-        else:
-            item['performers'] = []
-
+        item['performers'] = []
         item['tags'] = []
 
         if "jerkoff" in response.url or "dillionation" in response.url:
@@ -218,233 +187,19 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                     item['tags'].append(tagname)
             item['tags'] = self.clean_tags(item['tags'])
 
+        if "backalleytoonz" in response.url:
+            item['tags'].append("Animation")
+
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url'].strip()
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        item['trailer'] = ''
 
-        if "cospimps" in response.url:
-            item['trailer'] = "https://cospimps.com/api/download/{}/hd1080/stream?video=1".format(item['id'])
-        if "facialcasting" in response.url:
-            item['trailer'] = "https://facialcasting.com/api/download/{}/hd1080/stream".format(item['id'])
-        elif "jerkoff" in response.url:
-            item['trailer'] = ''
-        else:
-            item['trailer'] = data['_resources']['hoverPreview'].strip()
-
-        if not item['trailer']:
-            item['trailer'] = ''
-
-        if "aussiefellatio" in response.url:
-            item['site'] = 'Aussie Fellatio Queens'
-            item['parent'] = 'Aussie Fellatio Queens'
-            item['network'] = 'Aussie Fellatio Queens'
-            modelurl = "https://aussiefellatioqueens.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "aussiexxxhookups" in response.url:
-            item['site'] = 'Aussie XXX Hookups'
-            item['parent'] = 'Aussie XXX Hookups'
-            item['network'] = 'Aussie XXX Hookups'
-            modelurl = "https://aussiexxxhookups.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "kinkyrubberworld" in response.url:
-            item['site'] = 'Kinky Rubber World'
-            item['parent'] = 'Kinky Rubber World'
-            item['network'] = 'Kinky Rubber World'
-            modelurl = "https://kinkyrubberworld.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "nordiskaporrfilmer" in response.url:
-            item['site'] = 'Svenska Porrfilmer'
-            item['parent'] = 'Svenska Porrfilmer'
-            item['network'] = 'Svenska Porrfilmer'
-            modelurl = "https://nordiskaporrfilmer.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "jerkoff" in response.url:
-            item['site'] = 'Jerk Off With Me'
-            item['parent'] = 'Jerk Off With Me'
-            item['network'] = 'Jerk Off With Me'
-            yield item
-
-        if "fallinlovia" in response.url:
-            item['site'] = 'Fall in Lovia'
-            item['parent'] = 'Fall in Lovia'
-            item['network'] = 'Fall in Lovia'
-            yield item
-
-        if "dillionation" in response.url:
-            item['site'] = 'Dillion Harper'
-            item['parent'] = 'Dillion Harper'
-            item['network'] = 'Dillion Harper'
-            yield item
-
-        if "miami" in response.url:
-            item['site'] = 'My Life In Miami'
-            item['parent'] = 'My Life In Miami'
-            item['network'] = 'My Life In Miami'
-            item['performers'] = []
-            yield item
-
-        if "daddyscowgirl" in response.url:
-            item['site'] = 'Daddys Cowgirl'
-            item['parent'] = 'Daddys Cowgirl'
-            item['network'] = 'Daddys Cowgirl'
-            item['performers'] = []
-            yield item
-
-        if "averyjane" in response.url:
-            item['site'] = 'All of Avery Jane'
-            item['parent'] = 'All of Avery Jane'
-            item['network'] = 'All of Avery Jane'
-            item['performers'] = ['Avery Jane']
-            item['trailer'] = ''
-            yield item
-
-        if "brookelynnebriar" in response.url:
-            item['site'] = 'BrookelynneBriar'
-            item['parent'] = 'BrookelynneBriar'
-            item['network'] = 'BrookelynneBriar'
-            item['performers'] = ['Brookelynne Briar']
-            yield item
-
-        if "thiccvision" in response.url:
-            item['site'] = 'Thiccvision'
-            item['parent'] = 'Thiccvision'
-            item['network'] = 'Thiccvision'
-            item['performers'] = []
-            yield item
-
-        if "isinxxx" in response.url:
-            item['site'] = 'I Sin XXX'
-            item['parent'] = 'I Sin XXX'
-            item['network'] = 'I Sin XXX'
-            item['performers'] = []
-            yield item
-
-        if "cleagaultier" in response.url:
-            item['site'] = 'Clea Gaultier'
-            item['parent'] = 'Clea Gaultier'
-            item['network'] = 'Clea Gaultier'
-            item['performers'] = ['Clea Gaultier']
-            item['tags'] = []
-            yield item
-
-        if "realagent" in response.url:
-            item['site'] = 'Real Agent'
-            item['parent'] = 'Real Agent'
-            item['network'] = 'Real Agent'
-            item['performers'] = []
-            yield item
-
-        if "trinitystclair" in response.url:
-            item['site'] = 'Trinity St Clair'
-            item['parent'] = 'Trinity St Clair'
-            item['network'] = 'Trinity St Clair'
-            modelurl = "https://trinitystclair.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "psychohenessy" in response.url:
-            item['site'] = 'Psycho Henessy'
-            item['parent'] = 'Psycho Henessy'
-            item['network'] = 'Psycho Henessy'
-            modelurl = "https://psychohenessy.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "porntugal" in response.url:
-            item['site'] = 'Porntugal'
-            item['parent'] = 'Porntugal'
-            item['network'] = 'Porntugal'
-            modelurl = "https://porntugal.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "ninnworx" in response.url:
-            item['site'] = 'Ninn Worx'
-            item['parent'] = 'Ninn Worx'
-            item['network'] = 'Ninn Worx'
-            modelurl = "https://ninnworx.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "therealscarletred" in response.url:
-            item['site'] = 'Scarlet Red'
-            item['parent'] = 'Scarlet Red'
-            item['network'] = 'Scarlet Red'
-            modelurl = "https://therealscarletred.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "facialkings" in response.url:
-            item['site'] = 'Facial Kings'
-            item['parent'] = 'Facial Kings'
-            item['network'] = 'Facial Kings'
-            item['performers'] = []
-            yield item
-
-        if "santalatina" in response.url:
-            item['site'] = 'Santa Latina'
-            item['parent'] = 'Santa Latina'
-            item['network'] = 'Santa Latina'
-            item['performers'] = []
-            yield item
-
-        if "bigjohnnyxxx" in response.url:
-            item['site'] = 'Big Johnny XXX'
-            item['parent'] = 'Big Johnny XXX'
-            item['network'] = 'Big Johnny XXX'
-            item['performers'] = []
-            yield item
-
-        if "danidaniels" in response.url:
-            item['site'] = 'Dani Daniels'
-            item['parent'] = 'Dani Daniels'
-            item['network'] = 'Dani Daniels'
-            item['performers'] = ['Dani Daniels']
-            item['tags'] = []
-            yield item
-
-        if "peghim" in response.url:
-            item['site'] = 'PegHim'
-            item['parent'] = 'PegHim'
-            item['network'] = 'PegHim'
-            item['performers'] = []
-            yield item
-
-        if "katie71" in response.url:
-            item['site'] = 'Katie71'
-            item['parent'] = 'Katie71'
-            item['network'] = 'Katie71'
-            item['performers'] = ['Katie71']
-            yield item
-
-        if "natashanice" in response.url:
-            item['site'] = 'Natasha Nice'
-            item['parent'] = 'Natasha Nice'
-            item['network'] = 'Natasha Nice'
-            item['performers'] = ['Natasha Nice']
-            yield item
-
-        if "cospimps" in response.url:
-            item['site'] = 'Cospimps'
-            item['parent'] = 'Cospimps'
-            item['network'] = 'Cospimps'
-            modelurl = "https://cospimps.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
-
-        if "facialcasting" in response.url:
-            item['site'] = 'Facial Casting'
-            item['parent'] = 'Facial Casting'
-            item['network'] = 'Facial Casting'
-            modelurl = "https://facialcasting.com/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+        if 'site' in meta and meta['site']:
+            item['site'] = meta['site']
+            item['parent'] = meta['site']
+            item['network'] = meta['site']
+            modelurl = meta['link'] + "/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
             meta['item'] = item
             yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
@@ -459,17 +214,36 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         else:
             item['performers'] = []
 
-        if "psychohenessy" in response.url:
-            item['performers'].append('Henessy')
+        if "sukmydick" in response.url:
+            item['performers'] = []
+            if "Don Whoe" in item['tags']:
+                item['tags'].remove("Don Whoe")
+                item['performers'].append("Don Whoe")
+            if "Lisa Rivera" in item['tags']:
+                item['tags'].remove("Lisa Rivera")
+                item['performers'].append("Lisa Rivera")
+            if "Nina Rivera" in item['tags']:
+                item['tags'].remove("Nina Rivera")
+                item['performers'].append("Nina Rivera")
+            if "Nadia White" in item['tags']:
+                item['tags'].remove("Nadia White")
+                item['performers'].append("Nadia White")
+            if "Don And Lisa" in item['tags']:
+                item['tags'].remove("Don And Lisa")
+            if "Don And Nina" in item['tags']:
+                item['tags'].remove("Don And Nina")
+            if "Nina And Don" in item['tags']:
+                item['tags'].remove("Nina And Don")
 
-        if "therealscarletred" in response.url:
-            item['performers'].append('Scarlet Red')
+        if item['performers']:
+            for performer in item['performers']:
+                if performer in item['tags']:
+                    item['tags'].remove(performer)
+                if performer.lower() in item['tags']:
+                    item['tags'].remove(performer.lower())
 
-        if "kinkyrubberworld" in response.url:
-            item['performers'].append('Latex Lara')
-
-        if "trinitystclair" in response.url:
-            item['performers'].append('Trinity St Clair')
+        if meta['performer'] and meta['performer'] not in item['performers']:
+            item['performers'].append(meta['performer'])
 
         yield item
 
@@ -503,10 +277,15 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             'Goddess Maya',
             'Governess Painless',
             'Governesspainless',
+            'Jazziemania',
+            'Jazzieque',
+            'Jazziequexxx',
+            'Jacquelynjaxx',
             'Kinkyalice',
             'Koneko',
             'Lady Alshari',
             'Lady Estelle',
+            'Lady Sublime',
             'Ladyalshari',
             'Ladyluciana',
             'Lara',
@@ -525,5 +304,9 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         newlist = []
         for word in tags:
             if word not in cleanlist:
-                newlist.append(word)
+                matches = ['dani ', 'deni ', 'daniel', 'deniels', 'kaite']
+                if any(x in word.lower() for x in matches):
+                    word = ''
+                else:
+                    newlist.append(word)
         return newlist
