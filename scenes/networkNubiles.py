@@ -56,7 +56,7 @@ class NubilesSpider(BaseSceneScraper):
         scenes = response.css(".content-grid-item>figure")
         for scene in scenes:
             link = scene.css('.img-wrapper > a::attr(href)').extract_first()
-            if re.search('video\\/watch', link) is not None:
+            if re.search(r'video/watch', link) is not None:
                 meta = {
                     'title': scene.css('.title a::text').get().strip(),
                     'date': dateparser.parse(
@@ -81,11 +81,9 @@ class NubilesSpider(BaseSceneScraper):
                 elif "nubiles.net" in response.url:
                     meta['site'] = "Nubiles"
                     meta['parent'] = "Nubiles"
-                else:
-                    meta['site'] = scene.xpath(
-                        './/a[@class="site-link"]/text()'
-                    )
-                    meta['site'] = meta['site'].get().strip()
+                if 'site' not in meta or not meta['site']:
+                    meta['site'] = scene.xpath('.//a[@class="site-link"]/text()')
+                    meta['parent'] = scene.xpath('.//a[@class="site-link"]/text()')
                 yield scrapy.Request(
                     url=self.format_link(response, link),
                     callback=self.parse_scene, meta=meta)
@@ -121,7 +119,7 @@ class NubilesSpider(BaseSceneScraper):
                 if descrow:
                     description = description + descrow
 
-        if not description or (description and len(description.strip())):
+        if not description or (description and not description.strip()):
             description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()')
             description = description.getall()
             if description:
