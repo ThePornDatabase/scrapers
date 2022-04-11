@@ -16,9 +16,6 @@ class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
         'https://www.trans500.com/',
     ]
 
-    def get_gender(self, response):
-        return 'Trans'
-
     def get_performers(self, response):
         performers = response.xpath('//div[contains(@class,"text-center pad_bottom_15")]')
         for performer in performers:
@@ -33,7 +30,7 @@ class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
                 item['image'] = image.strip()
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             url = performer.xpath('./a/@href').get()
             if url:
@@ -49,7 +46,7 @@ class NetworkJoshStoneProductionsPerformerSpider(BasePerformerScraper):
             item['ethnicity'] = ''
             item['eyecolor'] = ''
             item['fakeboobs'] = ''
-            item['gender'] = 'Trans'
+            item['gender'] = ''
             item['haircolor'] = ''
             item['height'] = ''
             item['measurements'] = ''

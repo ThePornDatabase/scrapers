@@ -31,6 +31,7 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h1/text()',
         'image': '//div[@class="model-contr"]//amp-img/@src',
+        'image_blob': True,
         'birthday': '//span[contains(text(),"Age")]/following-sibling::text()',
         'measurements': '//span[contains(text(),"Measurements")]/following-sibling::text()',
         'cupsize': '//span[contains(text(),"Measurements")]/following-sibling::text()',

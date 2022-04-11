@@ -6,6 +6,7 @@ class SiteZFilmzPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h1/text()',
         'image': '',
+        'image_blob': True,
         'haircolor': '//dt[contains(text(), "Hair")]/following-sibling::dd[1]/text()',
         'eyecolor': '//dt[contains(text(), "Eye")]/following-sibling::dd[1]/text()',
         'pagination': '/en/collections/page/%s?media=video',

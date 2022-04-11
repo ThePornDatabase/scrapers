@@ -19,13 +19,6 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                        'AUTOTHROTTLE_DEBUG': 'False',
                        'DOWNLOAD_DELAY': '2',
                        'CONCURRENT_REQUESTS_PER_DOMAIN': '1',
-
-                       'ITEM_PIPELINES': {
-                           'tpdb.pipelines.TpdbApiScenePipeline': 400,
-                       },
-                       'DOWNLOADER_MIDDLEWARES': {
-                           'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-                       }
                        }
 
     sites = [
