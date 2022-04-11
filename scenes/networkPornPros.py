@@ -21,7 +21,7 @@ class PornprosSpider(BaseSceneScraper):
         "https://holed.com/",
         "https://lubed.com/",
         "https://myveryfirsttime.com/",
-        "https://nannyspy.com/"
+        "https://nannyspy.com/",
         "https://passion-hd.com/",
         "https://pornpros.com/",
         "https://povd.com/",
