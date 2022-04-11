@@ -1,7 +1,6 @@
 from tpdb.BaseSceneScraper import BaseSceneScraper
 import dateparser
 import scrapy
-from slugify import slugify
 
 
 class PornprosSpider(BaseSceneScraper):
