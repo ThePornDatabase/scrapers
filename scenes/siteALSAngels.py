@@ -107,7 +107,7 @@ class SiteALSAngelsSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             scenedate = scene.xpath('./td[@class="videotext"]/span[@class="videodate"]/text()').get()
             if scenedate:

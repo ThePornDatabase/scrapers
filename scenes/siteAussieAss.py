@@ -66,7 +66,7 @@ class AussieAssSpider(BaseSceneScraper):
                     item['image'] = "https://aussiepov.com/" + image.strip()
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             performers = child.xpath('.//span[@class="update_models"]/a/text()').getall()
             if performers:

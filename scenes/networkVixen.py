@@ -92,7 +92,6 @@ class VixenScraper(BaseSceneScraper):
 
         scene['network'] = 'Vixen'
         scene['parent'] = site
-        scene['image_blob'] = None
 
         scene['date'] = self.parse_date(data['releaseDate']).isoformat()
         scene['url'] = self.format_link(response, '/videos/' + data['slug'])
@@ -113,6 +112,8 @@ class VixenScraper(BaseSceneScraper):
             largest = image['width']
 
         largest = 0
+        scene['image_blob'] = self.get_image_blob_from_link(scene['image'])
+
         for trailer in data['previews']['poster']:
             if trailer['width'] > largest:
                 scene['trailer'] = trailer['src']

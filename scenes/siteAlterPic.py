@@ -63,7 +63,7 @@ class SiteAlterPicSpider(BaseSceneScraper):
             item['tags'].append(string.capwords(tag['name']))
 
         item['image'] = jsonrow['poster_src']
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
         if item['id'] and item['title']:
             days = int(self.days)

@@ -44,7 +44,7 @@ class SiteFemjoySpider(BaseSceneScraper):
             item['image'] = jsonentry['thumb']['image']
             if not item['image']:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             item['url'] = "https://femjoy.com" + jsonentry['url']

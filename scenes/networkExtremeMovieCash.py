@@ -150,7 +150,7 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
             else:
                 item['performers'] = []
             item['image'] = self.format_link(response, scene.xpath('.//img[contains(@id, "set-target")]/@src0_3x|.//img[contains(@id, "set-target")]/@src0_2x|.//img[contains(@id, "set-target")]/@src0_1x|./div[@class="product-image"]/a/img/@src').get())
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['trailer'] = None
             item['description'] = None
             item['tags'] = []

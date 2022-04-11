@@ -77,7 +77,7 @@ class MontysPOVSpider(BaseSceneScraper):
                 image = None
             item['image'] = image.replace(" ", "%20").strip()
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             # URL
             url = sceneresponse.xpath('./a/img/@src').get()

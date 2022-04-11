@@ -57,7 +57,7 @@ class SiteLoveWettingSpider(BaseSceneScraper):
                 item['id'] = re.search(r'\d{4}\/(.*)\&', item['image']).group(1)
                 item['url'] = re.search(r'(.*\d{4}\/.*)\&', item['image']).group(1)
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             performers = scene.xpath('.//p[@class="tags"]/strong[contains(text(), "Models")]/following-sibling::a/text()')
             item['performers'] = []

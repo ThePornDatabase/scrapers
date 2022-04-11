@@ -87,7 +87,7 @@ class NetworkMentalPassSpider(BaseSceneScraper):
                 item['image'] = None
                 item['id'] = ''
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             description = scene.xpath('.//div[@id="Text"]/div[@class="getAccess"]/following-sibling::text()').getall()
             if description:

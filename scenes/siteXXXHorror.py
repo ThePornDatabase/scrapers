@@ -94,7 +94,7 @@ class XXXHorrorSpider(BaseSceneScraper):
                 image = None
 
             item['image'] = image
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             performers = scene.xpath('.//span[@class="cat-links"]/a/text()').getall()
             if performers:

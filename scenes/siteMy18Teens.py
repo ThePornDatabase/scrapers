@@ -63,10 +63,10 @@ class SiteMy18TeensSpider(BaseSceneScraper):
             image = scene.xpath('./div[contains(@class, "video-preview__image")]/@data-lazy-bgr')
             if image:
                 item['image'] = self.format_link(response, image.get())
-                item['image_blob'] = self.get_image_blob(item['image'])
             else:
                 item['image'] = None
-                item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
             item['url'] = self.format_link(response, scene.xpath('./@href').get())
             item['id'] = re.search(r'.*/(.*?)$', item['url']).group(1)
             item['network'] = "My 18 Teens"

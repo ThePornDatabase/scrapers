@@ -62,7 +62,7 @@ class TopWebModelsSpider(BaseSceneScraper):
                 item['image'] = None
             else:
                 item['image'] = item['image'].replace(" ", "%20")
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             urltext = re.sub(r'[^A-Za-z0-9 ]+', '', jsonentry['title']).lower()

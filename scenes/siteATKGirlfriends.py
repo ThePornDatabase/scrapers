@@ -32,7 +32,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
         'description': '//b[contains(text(),"Description")]/following-sibling::text()[1]',
         'date': '',
         'image': '//div[contains(@style,"background")]/@style',
-        'image_blob': '//div[contains(@style,"background")]/@style',
+        'image_blob': True,
         're_image': r'url\(\'(http.*)\'\)',
         'performers': '//div[contains(@class,"model-profile-wrap")]/text()[1]',
         'tags': '//b[contains(text(),"Tags")]/following-sibling::text()',
@@ -105,10 +105,10 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
                 image = scene.xpath('./div/a/img/@src').get()
                 if image:
                     item['image'] = image.strip().replace("/sm_", "/")
-                    item['image_blob'] = base64.b64encode(requests.get(item['image']).content).decode('utf-8')
                 else:
                     item['image'] = None
-                    item['image_blob'] = None
+
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
                 url = scene.xpath('./div/a[contains(@href,"/model/")]/@href').get()
                 if url:

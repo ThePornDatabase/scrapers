@@ -32,7 +32,7 @@ class SiteDigicreationsSpider(BaseSceneScraper):
             item['title'] = string.capwords(scene.xpath('./text()').get())
             image = scene.xpath('./following-sibling::a/img/@src').get()
             item['image'] = self.format_link(response, image)
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['description'] = ''
             item['trailer'] = ''
             item['tags'] = []

@@ -34,7 +34,7 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
             if not item['image']:
                 item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['date'] = self.parse_date(movie['publishDate']).isoformat()
 

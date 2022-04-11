@@ -432,7 +432,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             else:
                 item['image'] = self.get_image(response)
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             if 'performers' in response.meta:
                 item['performers'] = response.meta['performers']

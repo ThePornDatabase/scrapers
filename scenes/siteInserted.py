@@ -38,7 +38,7 @@ class SiteInsertedSpider(BaseSceneScraper):
                 item['id'] = scene['id']
                 item['description'] = re.sub('<[^<]+?>', '', scene['description'])
                 item['image'] = scene['trailer']['poster']
-                item['image_blob'] = None
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 item['trailer'] = scene['trailer']['src']
                 scene_date = self.parse_date(scene['release_date']).isoformat()
                 if scene_date:

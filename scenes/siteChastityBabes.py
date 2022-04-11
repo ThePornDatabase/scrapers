@@ -110,7 +110,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         else:
             item['image'] = None
 
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
         tags = response.xpath('//a[@rel="category tag"]/text()').getall()
         if tags:

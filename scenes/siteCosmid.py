@@ -90,7 +90,7 @@ class CosmidFullImportSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             trailer = scene.xpath('.//div[contains(@class,"videothumb")]/video/source/@src').get()
             if trailer:
