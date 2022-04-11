@@ -62,7 +62,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://www.primalbang.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Primal Bang', ''],
         ['https://psychohenessy.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Psycho Henessy', 'Henessy'],
         ['https://realagent.xxx', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Real Agent', ''],
-        ['https://www.sabrinasabrokvideos.com','&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Sabrina Sabrok', 'Sabrina Sabrok'],
+        ['https://www.sabrinasabrokvideos.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Sabrina Sabrok', 'Sabrina Sabrok'],
         ['https://santalatina.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Santa Latina', ''],
         ['https://sukmydick.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Suk My Dick', ''],
         ['https://therealscarletred.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Scarlet Red', 'Scarlet Red'],
