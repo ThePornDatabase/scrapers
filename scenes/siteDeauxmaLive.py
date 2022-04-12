@@ -40,6 +40,7 @@ class SiteDeauxmaLiveSpider(BaseSceneScraper):
             performers = re.sub(r"[^a-zA-Z0-9, -]", "", performers.get())
             performers = performers.lower().replace("nbsp", "").split(",")
             performers = list(map(lambda x: string.capwords(x.strip()), performers))
+            performers = [i for i in performers if i]
             return performers
         return []
 
@@ -48,5 +49,6 @@ class SiteDeauxmaLiveSpider(BaseSceneScraper):
         if tags:
             tags = tags.get().split(",")
             tags = list(map(lambda x: string.capwords(x.strip()), tags))
+            tags = [i for i in tags if i]
             return tags
         return []
