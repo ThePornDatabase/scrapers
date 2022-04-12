@@ -60,7 +60,7 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             image_url = scene['_links']['wp:featuredmedia'][0]['href']
             item['id'] = str(scene['id'])
             item['date'] = scene['date']
-            item['title'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).strip()).replace(" - Demo", "")
+            item['title'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).strip())
             item['tags'] = ['Asian', 'Interracial']
             item['trailer'] = None
             item['description'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['excerpt']['rendered'])).strip())
@@ -88,4 +88,5 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             item['image'] = imagerow['guid']['rendered']
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-            yield item
+            if " - Demo" not in item['title']:
+                yield item
