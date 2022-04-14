@@ -53,15 +53,14 @@ class NubilesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css(".content-grid-item>figure")
+        scenes = response.xpath('//figcaption')
         for scene in scenes:
-            link = scene.css('.img-wrapper > a::attr(href)').extract_first()
+            link = scene.xpath('./div/span/a/@href').get()
             if re.search(r'video/watch', link) is not None:
+                scenedate = response.xpath('.//span[@class="date"]/text()').get()
                 meta = {
-                    'title': scene.css('.title a::text').get().strip(),
-                    'date': dateparser.parse(
-                        scene.css('.date::text')
-                        .extract_first()).isoformat(),
+                    'title': scene.xpath('./div/span/a/text()').get().strip(),
+                    'date': dateparser.parse(scenedate, date_formats=['%b %d, %Y']).isoformat(),
                 }
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
@@ -82,25 +81,11 @@ class NubilesSpider(BaseSceneScraper):
                     meta['site'] = "Nubiles"
                     meta['parent'] = "Nubiles"
                 if 'site' not in meta or not meta['site']:
-                    meta['site'] = scene.xpath('.//a[@class="site-link"]/text()')
-                    meta['parent'] = scene.xpath('.//a[@class="site-link"]/text()')
+                    meta['site'] = scene.xpath('.//a[@class="site-link"]/text()').get()
+                    meta['parent'] = scene.xpath('.//a[@class="site-link"]/text()').get()
                 yield scrapy.Request(
                     url=self.format_link(response, link),
                     callback=self.parse_scene, meta=meta)
-
-    def get_site(self, response):
-        site = response.xpath(
-            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
-        if site:
-            return site
-        return super().get_site(response)
-
-    def get_parent(self, response):
-        parent = response.xpath(
-            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
-        if parent:
-            return parent
-        return super().get_parent(response)
 
     def get_next_page_url(self, base, page):
         page = (page - 1) * 10

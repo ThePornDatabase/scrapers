@@ -68,7 +68,7 @@ class SiteBananaFeverSpider(BaseSceneScraper):
                 item['description'] = ''
             item['performers'] = []
             for category in scene['portfolio_category']:
-                if '105' not in str(category) and '106' not in str(category) and '170' not in str(category):
+                if '105' not in str(category) and '106' not in str(category) and '170' not in str(category) and '163' not in str(category):
                     for tag in meta['tagdata']:
                         if tag['id'] == category:
                             item['performers'].append(tag['name'])
