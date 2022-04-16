@@ -1,5 +1,6 @@
 import re
 import json
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -54,5 +55,22 @@ class SiteInsertedSpider(BaseSceneScraper):
                 item['performers'] = []
                 for model in scene['models']:
                     item['performers'].append(model['name'])
-                if item['title'] and item['id']:
-                    yield item
+
+                if item['id'] and item['title']:
+                    days = int(self.days)
+                    if days > 27375:
+                        filterdate = "0000-00-00"
+                    else:
+                        filterdate = date.today() - timedelta(days)
+                        filterdate = filterdate.strftime('%Y-%m-%d')
+
+                    if self.debug:
+                        if not item['date'] > filterdate:
+                            item['filtered'] = "Scene filtered due to date restraint"
+                        print(item)
+                    else:
+                        if filterdate:
+                            if item['date'] > filterdate:
+                                yield item
+                        else:
+                            yield item
