@@ -8,6 +8,7 @@ class SiteFirstAnalQuestPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//div[@class="page-header"]/h3[@class="title"]/strong/text()',
         'image': '//div[@class="model-box"]/img/@src',
+        'image_blob': True,
         'bio': '//div[@class="model-biography"]/p/text()',
         'haircolor': '//span[contains(text(), "Hair")]/following-sibling::span/text()',
         'eyecolor': '//span[contains(text(), "Eye")]/following-sibling::span/text()',
@@ -57,7 +58,8 @@ class SiteFirstAnalQuestPerformerSpider(BasePerformerScraper):
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
         if image:
-            image = "https:" + image
+            if 'http' not in image:
+                image = "https:" + image
             return self.format_link(response, image)
         return ''
 

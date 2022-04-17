@@ -1,3 +1,4 @@
+import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -41,3 +42,11 @@ class BangBrosSpider(BaseSceneScraper):
         if 'casting' in site:
             return 'Bang Bros Casting'
         return site
+
+    def get_id(self, response):
+        external_id = response.xpath('//img[@id="player-overlay-image"]/@src')
+        if external_id:
+            external_id = re.search(r'shoots/(.*?)/', external_id.get())
+            if external_id:
+                return external_id.group(1)
+        return super().get_id(response)
