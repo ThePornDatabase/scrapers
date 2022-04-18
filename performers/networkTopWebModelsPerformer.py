@@ -95,7 +95,7 @@ class TopWebModelsSpider(BasePerformerScraper):
             item['piercings'] = ''
             item['fakeboobs'] = ''
             item['tattoos'] = ''
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link[item['image']]
 
             if self.debug:
                 print(item)

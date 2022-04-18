@@ -66,7 +66,7 @@ class SiteGenuineSinPerformerSpider(BasePerformerScraper):
                 item['image'] = image.strip()
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link[item['image']]
 
             url = performer.xpath('./a[1]/@href').get()
             if url:

@@ -32,7 +32,7 @@ class SiteLasVegasAmateursPerformerSpider(BasePerformerScraper):
                 item['image'] = None
             item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link[item['image']]
 
             url = performer.xpath('./a[contains(@href, "/models/")][1]/@href').get()
             if url:

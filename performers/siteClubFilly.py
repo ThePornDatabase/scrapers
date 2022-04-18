@@ -30,7 +30,7 @@ class SiteClubFillyPerformerSpider(BasePerformerScraper):
                 item['image'] = self.format_link(response, image).replace(" ", "%20")
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link[item['image']]
 
             url = performer.xpath('./p[1]/a/@href').get()
             if url:

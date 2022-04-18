@@ -36,7 +36,7 @@ class SiteMySexMobilePerformerSpider(BasePerformerScraper):
                 item['image'] = image.group(1)
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link[item['image']]
 
             item['url'] = performer.xpath('./@href').get()
             item['network'] = 'My Sex Mobile'

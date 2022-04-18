@@ -22,7 +22,7 @@ class SiteXConfessionsPerformerSpider(BasePerformerScraper):
     ]
 
     def get_performers(self, response):
-        performers = response.xpath('//div[contains(@class,"overflow-hidden") and ./a[contains(@href,"/performers/")]]')
+        performers = response.xpath('//div[contains(@class,"object-cover") and ./a[contains(@href,"/performers/")]]')
         for performer in performers:
             item = PerformerItem()
 
@@ -40,7 +40,7 @@ class SiteXConfessionsPerformerSpider(BasePerformerScraper):
 
             if not image:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link[item['image']]
 
             url = performer.xpath('./div/a/@href').get()
             if url:
