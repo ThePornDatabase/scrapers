@@ -24,6 +24,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://www.kingsoffetish.com',
         'https://pmggirls.com',
         'https://www.lethalhardcore.com',
+        'https://www.smutfactor.com/',
         'https://spankmonster.com',
         'https://www.stephousexxx.com',
         'https://www.wcpclub.com'
@@ -90,6 +91,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_site(self, response):
         if 'jayspov' in response.url:
             return 'Jays POV'
+        if 'smutfactor' in response.url:
+            return 'Smut Factor'
         if 'wcpclub' in response.url:
             return 'West Coast Productions'
 
@@ -98,6 +101,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_parent(self, response):
         if 'jayspov' in response.url:
             return 'Jays POV'
+        if 'smutfactor' in response.url:
+            return 'Smut Factor'
         if 'wcpclub' in response.url:
             return 'West Coast Productions'
 
@@ -122,6 +127,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/videos/videos_page=%s"
         if "lethalhardcore" in base:
             pagination = "/watch-lethal-hardcore-streaming-video-scenes.html?page=%s&hybridview=member"
+        if "smutfactor" in base:
+            pagination = "/watch-newest-smut-factor-clips-and-scenes.html?page=%s&hybridview=member"
         if "spankmonster" in base:
             pagination = "/watch-newest-spank-monster-clips-and-scenes.html?page=%s&hybridview=member"
         if "stephousexxx" in base:
