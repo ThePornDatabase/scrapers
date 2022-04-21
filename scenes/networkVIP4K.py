@@ -16,10 +16,11 @@ class VIP4KSpider(BaseSceneScraper):
         'https://mature4k.com',
         'https://old4k.com',
         'https://rim4k.com',
+        'https://sis.porn',
     ]
 
     selector_map = {
-        'title': '//div[contains(@class,"item__title")]/text() | //h1[contains(@class,"info__title")]/text() | //div[@class="title_player"]/text() | //div[@class="title"]/text()',
+        'title': '//div[contains(@class,"item__title")]/text() | //h1[contains(@class,"info__title")]/text() | //div[@class="title_player"]/text() | //div[@class="title"]/text()|//h1[@class="player-item__title"]/text()',
         'description': '//div[contains(@class,"player-item__text")]/text() | //span[@class="player-info__text-area"]/text() | //div[@class="desc_frame"]/p/text() | //div[@class="wrap_post"]/p/text() | //div[@class="wrap_player_desc"]/p/text()',
         'date': '',
         'image': '//div[@class="player-item__block"]//img/@data-src | //div[@class="player_watch"]/img/@src',
@@ -57,6 +58,8 @@ class VIP4KSpider(BaseSceneScraper):
             scenes = response.xpath('//div[@class="thumbs_items"]/div[@class="th_item"]/a[contains(@href,"/en/videos/")]/@href').getall()
         if "rim4k" in response.url:
             scenes = response.xpath('//a[contains(@class, "item__main")]/@href').getall()
+        if "sis.porn" in response.url:
+            scenes = response.xpath('//div[@class="episode__gallery"]/ul/li[1]/a/@href').getall()
         if not scenes:
             scenes = response.xpath('//a[@class="item__title"]/@href').getall()
         for scene in scenes:
@@ -87,6 +90,10 @@ class VIP4KSpider(BaseSceneScraper):
             performers = response.xpath('//a[@class="item-info__item item-info__item--hid2"]/div[@class="item-info__text"]/text()').get()
             if performers:
                 performer = performers.strip()
+        if "sis.porn" in response.url:
+            performers = response.xpath('//div[@class="player-item__about"]/div[@class="player-item__row"][2]/div/span/text()').get()
+            if performers:
+                performer = performers.strip()
         if "rim4k" in response.url:
             performers = response.xpath('//div[@class="player-item__about"]/ul/li[3]/div[@class="item-info__text"]/text()').getall()
             if performers:
@@ -113,6 +120,8 @@ class VIP4KSpider(BaseSceneScraper):
             tags = list(map(lambda x: x.strip().title(), tags))
         if "rim4k" in response.url:
             tags.append('Rimming')
+        if "sis.porn" in response.url:
+            tags.append('Family Roleplay')
         if tags:
             return tags
         return []
@@ -145,3 +154,15 @@ class VIP4KSpider(BaseSceneScraper):
             pagination = self.get_selector_map('pagination') % page
 
         return self.format_url(base, pagination)
+
+    def get_site(self, response):
+        site = super().get_site(response)
+        if "sis.porn" in response.url:
+            site = "Sis Porn"
+        return site
+
+    def get_parent(self, response):
+        parent = super().get_parent(response)
+        if "sis.porn" in response.url:
+            parent = "Sis Porn"
+        return parent
