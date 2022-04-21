@@ -3,6 +3,7 @@ Scraper for ManyVids network.
 """
 import re
 import json
+import string
 from datetime import datetime
 import dateparser
 import scrapy
@@ -39,6 +40,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['1002322838', 'Manyvids: Jewelz Blu'],
         ['1003298627', 'Manyvids: Molly Redwolf'],
         ['1003004427', 'Manyvids: Sweetie Fox'],
+        ['32539', 'Manyvids: Cherry Crush'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -103,9 +105,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta['page'] = meta['page'] + 1
-                pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(meta['page'], pagination),
+                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta),
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
@@ -125,7 +126,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             if jsonentry['preview']['videoPreview']:
                 meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
             meta['id'] = jsonentry['id']
-            meta['title'] = jsonentry['title']
+            meta['title'] = string.capwords(jsonentry['title'])
             if scene and meta['id']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
@@ -275,6 +276,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Molly Redwolf']
         if "Sweetie Fox" in meta['site']:
             return ['Sweetie Fox']
+        if "Cherry Crush" in meta['site']:
+            return ['Cherry Crush']
         return []
 
     def get_site(self, response):
