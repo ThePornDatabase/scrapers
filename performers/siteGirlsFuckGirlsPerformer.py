@@ -36,7 +36,7 @@ class SiteGirlsFuckGirlsPerformerSpider(BasePerformerScraper):
                 item['image'] = "http://girlsfuckgirls.com" + image.strip()
             else:
                 item['image'] = None
-            item['image_blob'] = self.get_image_blob_from_link[item['image']]
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             url = performer.xpath('./a[1]/@href').get()
             if url:

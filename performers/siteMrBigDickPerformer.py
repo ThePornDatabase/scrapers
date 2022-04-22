@@ -34,7 +34,7 @@ class SiteMrBigfatdickPerformerSpider(BasePerformerScraper):
             item['image'] = performer['previewImage960']
             if not item['image']:
                 item['image'] = None
-            item['image_blob'] = self.get_image_blob_from_link[item['image']]
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['url'] = "https://www.mrbigfatdick.com/models/" + performer['permaLink']
             item['height'] = str(performer['height']) + "cm"
             item['weight'] = str(performer['weight']) + "kg"

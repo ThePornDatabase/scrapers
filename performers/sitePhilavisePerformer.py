@@ -24,7 +24,7 @@ class PhilavisePerformerSpider(BasePerformerScraper):
                 item['image'] = "https://www.philavise.com" + image.strip()
             else:
                 image = None
-            item['image_blob'] = self.get_image_blob_from_link[item['image']]
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             performer = performerrow.xpath('./p/a/text()').get()
             if performer:
                 item['name'] = performer.strip()

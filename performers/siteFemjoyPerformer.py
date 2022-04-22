@@ -26,7 +26,7 @@ class SiteFemJoyPerformerSpider(BasePerformerScraper):
 
             item['name'] = jsonentry['name']
             item['image'] = jsonentry['thumb']['image']
-            item['image_blob'] = self.get_image_blob_from_link[item['image']]
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['url'] = "https://femjoy.com" + jsonentry['url']
 
             if jsonentry['astrology']:

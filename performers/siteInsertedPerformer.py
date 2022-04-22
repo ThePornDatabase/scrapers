@@ -31,7 +31,7 @@ class SiteInsertedPerformerSpider(BasePerformerScraper):
                 item = PerformerItem()
                 item['name'] = string.capwords(row['name'])
                 item['image'] = self.format_link(response, row['thumb'])
-                item['image_blob'] = self.get_image_blob_from_link[item['image']]
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 short_name = row['name'].lower().replace(" ", "-")
                 item['url'] = f"https://inserted.com/tour/models/{row['id']}/{short_name}"
                 item['network'] = 'Inserted'

@@ -1,43 +1,38 @@
-import html
 import string
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
 
-class SiteModelMediaUSPerformerSpider(BasePerformerScraper):
+class SiteBangBrosPornstarSpider(BasePerformerScraper):
     selector_map = {
-        'pagination': '/models?gender=female&sort=published_at&page=%s',
-        'external_id': 'girls/(.+)/?$'
+        'name': '',
+        'image': "",
+        'pagination': '/girls/new/%s',
+        'external_id': ''
     }
 
-    name = 'ModelMediaUSPerformer'
+    name = 'BangBrosPerformer'
+    network = 'Bang Bros'
 
     start_urls = [
-        'https://www.modelmediaus.com',
+        'https://bangbros.com',
     ]
 
     def get_performers(self, response):
-        performers = response.xpath('//div[contains(@class, "portfolio-item")]')
+        performers = response.xpath('//div[@class="echThumb"]')
         for performer in performers:
             item = PerformerItem()
 
-            name = performer.xpath('./a/div/div/text()').get()
-            if name:
-                item['name'] = string.capwords(html.unescape(name.strip()))
-
-            image = performer.xpath('./a/div/img/@src').get()
+            item['name'] = string.capwords(performer.xpath('./a/span[@class="thmb_ttl"]/text()').get().strip())
+            image = performer.xpath('./a//span[@class="thmb_pic"]/img/@src|./a//span[@class="thmb_pic"]/img/@data-original')
             if image:
-                item['image'] = self.format_link(response, image).replace(" ", "%20")
+                item['image'] = self.format_link(response, image.get().strip())
             else:
                 item['image'] = None
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-            url = performer.xpath('./a/@href').get()
-            if url:
-                item['url'] = self.format_link(response, url.strip()).replace(" ", "%20")
-
-            item['network'] = 'Model Media US'
-
+            item['gender'] = "Female"
+            item['url'] = self.format_link(response, performer.xpath('./a/@href').get().strip())
+            item['network'] = 'Bang Bros'
             item['astrology'] = ''
             item['bio'] = ''
             item['birthday'] = ''
@@ -46,7 +41,6 @@ class SiteModelMediaUSPerformerSpider(BasePerformerScraper):
             item['ethnicity'] = ''
             item['eyecolor'] = ''
             item['fakeboobs'] = ''
-            item['gender'] = 'Female'
             item['haircolor'] = ''
             item['height'] = ''
             item['measurements'] = ''
