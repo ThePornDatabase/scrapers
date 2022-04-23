@@ -1,5 +1,8 @@
 """
 Scraper for ManyVids network.
+If adding sites, please use the 'Manyvids: <site/performername>' format
+This helps keep them together on the site without mixing in what are
+usually more or less camgirls into the regular sites
 """
 import re
 import json
@@ -46,6 +49,19 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['65933', 'Manyvids: Little Miss Elle'],
         ['216064', 'Manyvids: Lena Spanks'],
         ['251896', 'Manyvids: Submissive Lexi'],
+        ['1004407943', 'Manyvids: Sloansmoans'],
+        ['491714', 'Manyvids: ImMeganLive'],
+        ['577443', 'Manyvids: Emmas Secret Life'],
+        ['375403', 'Manyvids: Natashas Bedroom'],
+        ['102036', 'Manyvids: Ashley Alban'],
+        ['147843', 'Manyvids: Penny Barber'],
+        ['38793', 'Manyvids: Princess Leia'],
+        ['1003527333', 'Manyvids: Kathia Nobili'],
+        ['1004207044', 'Manyvids: Mrs Mischief'],
+        ['1000997612', 'Manyvids: MistressT'],
+        ['1005123610', 'Manyvids: Tara Tainton'],
+        ['1001836304', 'Manyvids: Siena Rose'],
+        ['273124', 'Manyvids: Courtney Scott'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -293,6 +309,24 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Lena Spanks']
         if "Submissive Lexi" in meta['site']:
             return ['Submissive Lexi']
+        if "Ashley Alban" in meta['site']:
+            return ['Ashley Alban']
+        if "Penny Barber" in meta['site']:
+            return ['Penny Barber']
+        if "Princess Leia" in meta['site']:
+            return ['Princess Leia']
+        if "Kathia Nobili" in meta['site']:
+            return ['Kathia Nobili']
+        if "Mrs Mischief" in meta['site']:
+            return ['Mrs Mischief']
+        if "MistressT" in meta['site']:
+            return ['MistressT']
+        if "Tara Tainton" in meta['site']:
+            return ['Tara Tainton']
+        if "Siena Rose" in meta['site']:
+            return ['Siena Rose']
+        if "Courtney Scott" in meta['site']:
+            return ['Courtney Scott']
         return []
 
     def get_site(self, response):
