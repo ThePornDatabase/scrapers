@@ -36,6 +36,19 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['https://www.manyvids.com', '/api/model/304591/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: 420SexTime'],
         ['https://www.manyvids.com', '/api/model/217682/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: OmankoVivi'],
         ['https://www.manyvids.com', '/api/model/1000304351/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Haylee Love'],
+        ['https://www.manyvids.com', '/api/model/1004407943/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Sloansmoans'],
+        ['https://www.manyvids.com', '/api/model/491714/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'ImMeganLive'],
+        ['https://www.manyvids.com', '/api/model/577443/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Emmas Secret Life'],
+        ['https://www.manyvids.com', '/api/model/375403/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Natashas Bedroom'],
+        ['https://www.manyvids.com', '/api/model/102036/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Ashley Alban'],
+        ['https://www.manyvids.com', '/api/model/147843/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Penny Barber'],
+        ['https://www.manyvids.com', '/api/model/38793/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Princess Leia'],
+        ['https://www.manyvids.com', '/api/model/1003527333/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Kathia Nobili'],
+        ['https://www.manyvids.com', '/api/model/1004207044/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Mrs Mischief'],
+        ['https://www.manyvids.com', '/api/model/1000997612/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'MistressT'],
+        ['https://www.manyvids.com', '/api/model/1005123610/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Tara Tainton'],
+        ['https://www.manyvids.com', '/api/model/1001836304/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Siena Rose'],
+        ['https://www.manyvids.com', '/api/model/273124/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Courtney Scott'],
     ]
 
     selector_map = {
