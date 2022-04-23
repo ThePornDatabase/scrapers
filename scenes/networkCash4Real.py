@@ -24,6 +24,7 @@ class NetworkCash4RealSpider(BaseSceneScraper):
         'external_id': r'trailers/(.*).html',
         'pagination': '/tour/categories/Movies_%s_d.html'
     }
+
     def get_next_page_url(self, base, page):
         pagination = self.get_selector_map('pagination')
         if "spytug" in base:
