@@ -39,8 +39,9 @@ class SiteAltEroticSpider(BaseSceneScraper):
     def get_id(self, response):
         sceneid = self.get_element(response, 'image')
         if sceneid:
-            sceneid = re.search(r'.*?\/\/.*?\/.*?\/.*?\/.*?\/.*?\/(.*?)_', sceneid)
-            if sceneid:
-                return sceneid.group(1).strip()
-        else:
-            return super().get_id(response)
+            idsearch = re.search(r'.*?\/\/.*?\/.*?\/.*?\/.*?\/.*?\/(.*?)_', sceneid)
+            if idsearch:
+                idsearch = idsearch.group(1)
+                if re.search(r'(\d{3,6})', idsearch):
+                    return idsearch.strip()
+        return super().get_id(response)
