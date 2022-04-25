@@ -11,9 +11,10 @@ class NetworkMentalPassSpider(BaseSceneScraper):
     network = 'Mental Pass'
 
     paginations = [
-        ['http://www.amateursexteens.com', '/home?next=%s', 10, 'Amateur Sex Teens'],
+        ['http://www.amateursexteens.com', '/?next=%s', 10, 'Amateur Sex Teens'],
         ['https://www.bitchstop.com', '/?next=%s', 10, 'Bitch Stop'],
         ['http://www.czasting.com', '/?next=%s', 7, 'Czasting'],
+        ['https://www.czechgfs.com', '/?next=%s', 7, 'Czech GFs'],
         ['http://www.lesbianpickups.com', '/?&next=%s', 5, 'Lesbian Pickups']
     ]
 

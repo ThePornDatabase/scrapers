@@ -5,6 +5,7 @@ This helps keep them together on the site without mixing in what are
 usually more or less camgirls into the regular sites
 """
 import re
+import html
 import json
 import string
 from datetime import datetime
@@ -62,6 +63,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['1005123610', 'Manyvids: Tara Tainton'],
         ['1001836304', 'Manyvids: Siena Rose'],
         ['273124', 'Manyvids: Courtney Scott'],
+        ['1000856699', 'Manyvids: Kiittenymph'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -147,7 +149,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             if jsonentry['preview']['videoPreview']:
                 meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
             meta['id'] = jsonentry['id']
-            meta['title'] = string.capwords(jsonentry['title'])
+            meta['title'] = string.capwords(html.unescape(jsonentry['title']))
             if scene and meta['id']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
@@ -327,6 +329,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Siena Rose']
         if "Courtney Scott" in meta['site']:
             return ['Courtney Scott']
+        if "Kiittenymph" in meta['site']:
+            return ['Lex Kiittenymph']
         return []
 
     def get_site(self, response):
@@ -351,18 +355,18 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         taglist = meta['taglist']
         if self.get_selector_map('tags'):
             tags = self.process_xpath(response, self.get_selector_map('tags')).get()
+            scenetags = []
             if tags:
                 tags = re.search('\"(.*)\"', tags).group(1)
                 if tags:
                     tags = tags.split(",")
-                    scenetags = []
                     for tag in tags:
                         for alltags in taglist:
                             if alltags['id'] == tag:
                                 scenetags.append(alltags['label'])
                                 break
-            if meta['site'] and "ManyVids" in meta['site']:
-                scenetags.append("ManyVids")
+            if meta['site'] and "Manyvids" in meta['site']:
+                scenetags.append("Manyvids")
             if scenetags:
                 return list(map(lambda x: x.strip().title(), scenetags))
         return []
