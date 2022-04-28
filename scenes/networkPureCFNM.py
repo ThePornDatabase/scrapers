@@ -16,8 +16,8 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
         ['https://www.purecfnm.com', '/categories/purecfnm_%s_d.html', 'Pure CFNM'],
         ['https://www.ladyvoyeurs.com', '/categories/lady-voyeurs_%s_d.html', 'Lady Voyeurs'],
         ['https://www.amateurcfnm.com', '/categories/amateur-cfnm_%s_d.html', 'Amateur CFNM'],
-        ['https://www.cfnmgames.com', '/categories/cfnm-games_%s_d.html', 'CFNM Games'],
-        ['https://www.girlsabuseguys.com', '/categories/girls-use-guys_%s_d.html', 'Girls Abuse Guys'],
+        ['https://www.cfnmgames.com', 'categories/movies_%s_d.html', 'CFNM Games'],
+        ['https://www.girlsabuseguys.com', '/categories/movies_%s_d.html', 'Girls Abuse Guys'],
         ['https://littledick.club', '/categories/movies_%s_d.html', 'Little Dick Club'],
     ]
 
@@ -117,7 +117,14 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
             item['id'] = scene.xpath('./@data-setid').get()
             item['url'] = response.url
             item['description'] = ''
-            item['tags'] = []
+            if "Girls Abuse Guys" in meta['site']:
+                item['tags'] = ['Female Domination']
+            elif "cfnm" in meta['site'].lower():
+                item['tags'] = ['CFNM']
+            elif "voyeur" in meta['site'].lower():
+                item['tags'] = ['Voyeur']
+            else:
+                item['tags'] = []
             item['site'] = meta['site']
             item['parent'] = meta['site']
             item['network'] = "Pure CFNM"

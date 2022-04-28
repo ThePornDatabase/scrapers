@@ -56,7 +56,8 @@ class InsexSitesSpider(BaseSceneScraper):
         'date': '//div[@class="is-size-6 has-text-white-ter"]/span[@class="tag is-dark"]/text()',
         'image': '//video-js[1]/@poster',
         'performers': '//div[contains(@class, "has-text-white-ter")][1]//a[contains(@class, "is-dark")][position() < last()]/text() | //a[@class="tag is-dark" and contains(@href,"home.php?s=")]/text()',
-        'tags': '//div[@class="is-size-6 has-text-white-ter"]/span/text()',
+        # ~ 'tags': '//div[@class="is-size-6 has-text-white-ter"]/span/text()',
+        'tags': '',  # Tags removed due to how badly they suck at using tags
         'external_id': 'play.php\\?id\\=(\\w+)',
         'trailer': '//video-js[1]//source/@src',
         'pagination': ''
@@ -119,15 +120,15 @@ class InsexSitesSpider(BaseSceneScraper):
         date.replace('Released:', '').replace('Added:', '').strip()
         return dateparser.parse(date.strip()).isoformat()
 
-    def get_tags(self, response):
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(response, self.get_selector_map('tags')).getall()
-            for tag in tags:
-                if re.search(r'\d{4}-\d{2}-\d{2}', tag):
-                    tags.remove(tag)
-            if tags:
-                return list(map(lambda x: x.replace(u'\xa0', u' ').replace("&nbsp;", " ").strip().title(), tags))
-        return []
+    # ~ def get_tags(self, response):
+    # ~ if self.get_selector_map('tags'):
+    # ~ tags = self.process_xpath(response, self.get_selector_map('tags')).getall()
+    # ~ for tag in tags:
+    # ~ if re.search(r'\d{4}-\d{2}-\d{2}', tag):
+    # ~ tags.remove(tag)
+    # ~ if tags:
+    # ~ return list(map(lambda x: x.replace(u'\xa0', u' ').replace("&nbsp;", " ").strip().title(), tags))
+    # ~ return []
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()
@@ -136,13 +137,6 @@ class InsexSitesSpider(BaseSceneScraper):
 
         if image:
             return self.format_link(response, image)
-        return ''
-
-    def get_title(self, response):
-        title = self.process_xpath(
-            response, self.get_selector_map('title')).get()
-        if title:
-            return title.strip().title()
         return ''
 
     def get_trailer(self, response):

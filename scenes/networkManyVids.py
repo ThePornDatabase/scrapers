@@ -67,6 +67,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['1004388117', 'Manyvids: ForbiddenFruitsFilms'],
         ['1004388132', 'Manyvids: Jodi West'],
         ['320527', 'Manyvids: Diane Andrews'],
+        ['97815', 'Manyvids: Midori Rose'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -340,6 +341,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Jodi West']
         if "Diane Andrews" in meta['site']:
             return ['Diane Andrews']
+        if "Midori Rose" in meta['site']:
+            return ['Midori Rose']          
         return []
 
     def get_site(self, response):
