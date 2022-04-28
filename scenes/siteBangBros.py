@@ -41,6 +41,8 @@ class BangBrosSpider(BaseSceneScraper):
             "//div[@class='vdoAllDesc']//div[@class='vdoCast']//a[1]/text()").get()
         if 'casting' in site:
             return 'Bang Bros Casting'
+        if 'party of 3' in site.lower():
+            return 'Party of Three'
         return site
 
     def get_id(self, response):
