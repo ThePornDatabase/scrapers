@@ -170,7 +170,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         item['url'] = re.search(r'(.*)\&nats', meta['url']).group(1)
 
         item['image'] = self.get_image(response)
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['tags'] = self.get_tags(response)
 
         if self.debug:

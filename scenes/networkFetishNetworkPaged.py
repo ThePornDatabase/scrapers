@@ -162,7 +162,7 @@ class FetishNetworkPagedSpider(BaseSceneScraper):
                 image = None
 
             item['image'] = image
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             idcode = ''
             if re.search(r'p\d{3,4}_s\d{3,4}_\d{3,4}_', item['image']):

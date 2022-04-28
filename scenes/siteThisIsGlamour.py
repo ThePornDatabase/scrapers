@@ -1,8 +1,6 @@
 import re
 from datetime import date, timedelta
 import string
-import base64
-import requests
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -58,12 +56,8 @@ class SiteThisIsGlamourSpider(BaseSceneScraper):
                 image = image.get().strip().replace("https://", "http://")
                 item['image'] = image
                 item['id'] = re.search(r'galid\/(\d+)\/', item['image']).group(1)
-                if self.phpsessid:
-                    imagereq = requests.get(image, cookies={'PHPSESSID': self.phpsessid})
-                    item['image_blob'] = base64.b64encode(imagereq.content).decode('utf-8')
 
-            if not item['image_blob']:
-                item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             performers = scene.xpath('./div[@class="pi-model"]/a/text()')
             item['performers'] = []

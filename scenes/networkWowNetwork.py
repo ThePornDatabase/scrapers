@@ -1,6 +1,5 @@
+import string
 import scrapy
-import html
-import re
 import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -14,7 +13,8 @@ def match_site(argument):
     }
     return match.get(argument, argument)
 
-class networkWowNetworkSpider(BaseSceneScraper):
+
+class NetworkWowNetworkSpider(BaseSceneScraper):
     name = 'WowNetwork'
     network = 'Wow Girls'
 
@@ -26,14 +26,15 @@ class networkWowNetworkSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//meta[@property="og:title"]/@content',
+        'title': '//h1[@class="entry-title"]/text()',
         'description': '',
         'date': '//meta[@itemprop="uploadDate"]/@content',
         'image': '//meta[@property="og:image"]/@content',
+        'image_blob': True,
         'performers': '//div[@id="video-about"]/div[@id="video-actors"]/a/text()',
         'tags': '//div[@class="tags-list"]/a[@class="label"]/text()',
         'external_id': '/([a-z0-9-]+?)/?$',
-        'trailer': '//meta[@property="og:description"]/@content',
+        'trailer': '//video/source/@src',
         'pagination': '/category/movies/page/%s/?filter=latest'
     }
 
@@ -42,14 +43,9 @@ class networkWowNetworkSpider(BaseSceneScraper):
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_site(self, response):
-        site = response.xpath(
-            '//span[@itemprop="name"]/text()').extract_first()
-        return site
-
     def get_tags(self, response):
         performers = response.xpath(self.get_selector_map('performers')).getall()
-        
+
         if self.get_selector_map('tags'):
             tags = self.process_xpath(
                 response, self.get_selector_map('tags')).getall()
@@ -63,26 +59,27 @@ class networkWowNetworkSpider(BaseSceneScraper):
                 for tag in tags2:
                     matches = ['1080p', '4k / uhd', '60 frames', 'hd', 'sd', 'movies', '6k']
                     if any(x in tag.lower() for x in matches):
-                        tags.remove(tag)                   
+                        tags.remove(tag)
             if tags:
                 tags = list(map(lambda x: x.strip().title(), tags))
                 return tags
         return []
 
-    def get_trailer(self, response):
-        trailer = response.xpath(self.get_selector_map('trailer')).get()
-        if trailer:
-            trailer = re.search('(http.*\.mp4)', trailer).group(1)
-            if trailer:
-                return trailer.strip()
-        return ''
-
-
     def get_description(self, response):
         return ''
-        
+
     def get_site(self, response):
         return match_site(tldextract.extract(response.url).domain)
-        
+
     def get_parent(self, response):
         return match_site(tldextract.extract(response.url).domain)
+
+    def get_title(self, response):
+        #  This is split out due to it sometimes grabbing the incorrect result if both are present.
+        #  The og:title entry can have unwanted text
+        title = super().get_title(response)
+        if not title:
+            title = response.xpath('//meta[@property="og:title"]/@content')
+        if title:
+            return string.capwords(title.strip())
+        return None

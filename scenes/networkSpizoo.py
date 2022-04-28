@@ -36,6 +36,7 @@ class SpizooSpider(BaseSceneScraper):
         'description': '',
         'date': "//p[@class='date']/text()",
         'image': '//video/@poster|//div[@id="hpromo"]/a/img[contains(@src,".jpg")]/@src',
+        'image_blob': True,
         'performers': '//div[@class="col-12"]//a[contains(@href, "/models")]/@title|//div[@class="col-3"]//a[contains(@href, "/models")]/@title',
         'tags': '//a[contains(@class,"category-tag")]/@title|//a[contains(@href,"/categories/")]/text()',
         'external_id': r'/updates/(.*)\.html$',

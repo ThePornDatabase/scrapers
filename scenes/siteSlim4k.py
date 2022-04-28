@@ -47,6 +47,8 @@ class SiteSlim4kSpider(BaseSceneScraper):
             intervalcount = 0
         else:
             intervalcount = int(intervalcount)
+        if "minute" in datestring:
+            date = today - relativedelta(minutes=intervalcount)
         if "day" in datestring:
             date = today - relativedelta(days=intervalcount)
         if "today" in datestring:

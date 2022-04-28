@@ -155,7 +155,7 @@ class TeenCoreClubSpider(BaseSceneScraper):
                 item['image'] = "https:" + item['image']
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['id'] = jsonentry['id']
             item['trailer'] = ''
             item['url'] = domain + "video/" + str(jsonentry['id']) + "/" + jsonentry['slug']

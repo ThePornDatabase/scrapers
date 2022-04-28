@@ -45,7 +45,7 @@ class POVRPerformerSpider(BasePerformerScraper):
         item['network'] = 'POVR'
         item['url'] = data['mainEntityOfPage']
         item['image'] = data['image']
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         bio = response.xpath('//div[contains(@class, "player__description")]/p/text()')
         if bio:
             item['bio'] = bio.get().strip()

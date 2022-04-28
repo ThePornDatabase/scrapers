@@ -69,7 +69,7 @@ class SiteJavHubSpider(BaseSceneScraper):
                     item['performers'] = []
 
                 item['description'] = ''
-                item['image_blob'] = None
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 item['tags'] = ['Asian']
                 item['trailer'] = ''
                 item['url'] = response.url

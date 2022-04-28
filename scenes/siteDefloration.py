@@ -84,13 +84,7 @@ class SiteDeflorationSpider(BaseSceneScraper):
         if 'image' not in item or not item['image']:
             item['image'] = None
 
-        if 'image_blob' in response.meta:
-            item['image_blob'] = response.meta['image_blob']
-        else:
-            item['image_blob'] = self.get_image_blob(response)
-
-        if 'image_blob' not in item or not item['image_blob']:
-            item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
         if 'performers' in response.meta:
             item['performers'] = response.meta['performers']

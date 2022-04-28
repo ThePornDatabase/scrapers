@@ -37,6 +37,7 @@ class NetworkDollsHubSpider(BaseSceneScraper):
         'description': '//h4[contains(text(), "Description")]/following-sibling::p/text()',
         'date': '',
         'image': '//video/@data-poster',
+        'image_blob': True,
         'performers': '//text()[contains(., "Featuring")]/following-sibling::span/a/text()',
         'tags': '',
         'external_id': r'name=(.*)',

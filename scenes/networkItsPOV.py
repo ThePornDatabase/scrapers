@@ -109,8 +109,12 @@ class NetworkItsPOVSpider(BaseSceneScraper):
             item['title'] = html.unescape(re.sub('<[^<]+?>', '', data[row]['title']))
             item['description'] = html.unescape(re.sub('<[^<]+?>', '', data[row]['story']))
             item['url'] = "https://itspov.com/" + data[row]['url']
-            item['image'] = data[row]['video_cover']['1500']
-            item['image_blob'] = None
+            if '1500' in data[row]['video_cover']:
+                item['image'] = data[row]['video_cover']['1500']
+            else:
+                item['image'] = data[row]['video_cover']['original']
+
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['date'] = self.parse_date(data[row]['translations'][0]['created_at']).isoformat()
             item['performers'] = []
             for model in data[row]['models']:

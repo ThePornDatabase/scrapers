@@ -49,7 +49,7 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
         item['image'] = jsondata['video']['thumbnail']
         if not item['image']:
             item['image'] = None
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['trailer'] = ''
         item['url'] = jsondata['video']['url']
         item['id'] = re.search(r'videos/(.*)', item['url']).group(1)

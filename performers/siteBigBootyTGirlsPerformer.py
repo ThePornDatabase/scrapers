@@ -34,7 +34,7 @@ class SiteBigBootyTGirlsPerformerSpider(BasePerformerScraper):
                 item['image'] = "https://www.bigbootytgirls.com/" + image.strip()
             else:
                 item['image'] = None
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             url = performer.xpath('./a/@href').get()
             if url:
@@ -50,7 +50,7 @@ class SiteBigBootyTGirlsPerformerSpider(BasePerformerScraper):
             item['ethnicity'] = ''
             item['eyecolor'] = ''
             item['fakeboobs'] = ''
-            item['gender'] = 'Trans'
+            item['gender'] = ''
             item['haircolor'] = ''
             item['height'] = ''
             item['measurements'] = ''

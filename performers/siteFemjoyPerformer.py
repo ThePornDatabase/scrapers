@@ -18,7 +18,6 @@ class SiteFemJoyPerformerSpider(BasePerformerScraper):
     }
 
     def get_performers(self, response):
-        global json
         jsondata = json.loads(response.text)
         data = jsondata['results']
         for jsonentry in data:
@@ -26,7 +25,7 @@ class SiteFemJoyPerformerSpider(BasePerformerScraper):
 
             item['name'] = jsonentry['name']
             item['image'] = jsonentry['thumb']['image']
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['url'] = "https://femjoy.com" + jsonentry['url']
 
             if jsonentry['astrology']:

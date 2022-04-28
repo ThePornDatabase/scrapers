@@ -90,7 +90,7 @@ class NetworkAndomarkIndexSpider(BaseSceneScraper):
                 image = image.get()
                 item['image'] = self.format_link(response, image.strip())
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             # URL
             url = sceneresponse.xpath('./a/img/@src').get()

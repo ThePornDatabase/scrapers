@@ -136,7 +136,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                 item['image'] = None
                 item['id'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             if meta['site'] == "Brendas Bound":
                 description = scene.xpath('.//span[contains(@style,"font-size: medium;")]/em/text()')

@@ -1,8 +1,13 @@
 """
 Scraper for ManyVids network.
+If adding sites, please use the 'Manyvids: <site/performername>' format
+This helps keep them together on the site without mixing in what are
+usually more or less camgirls into the regular sites
 """
 import re
+import html
 import json
+import string
 from datetime import datetime
 import dateparser
 import scrapy
@@ -14,29 +19,58 @@ class NetworkManyVidsSpider(BaseSceneScraper):
     name = 'ManyVids'
 
     start_urls = [
-        ['https://www.manyvids.com', '/api/model/1001216419/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'YouthLust'],
-        ['https://www.manyvids.com', '/api/model/214657/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Lana Rain'],
-        ['https://www.manyvids.com', '/api/model/423053/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'MySweetApple'],
-        ['https://www.manyvids.com', '/api/model/1001495638/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Jack and Jill'],
-        ['https://www.manyvids.com', '/api/model/325962/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Dirty Princess'],
-        ['https://www.manyvids.com', '/api/model/312711/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Cattie'],
-        ['https://www.manyvids.com', '/api/model/1000286888/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'A Taboo Fantasy'],
-        ['https://www.manyvids.com', '/api/model/694469/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Adult Candy Store'],
-        ['https://www.manyvids.com', '/api/model/1000159044/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Fuck Club'],
-        ['https://www.manyvids.com', '/api/model/1000380769/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'IXXVICOM'],
-        ['https://www.manyvids.com', '/api/model/806007/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Jay Bank Presents'],
-        ['https://www.manyvids.com', '/api/model/1001483477/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Undercover Sluts'],
-        # ['https://www.manyvids.com', '/api/model/574529/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Submissive Teen POV'],  # Seems to have gone away, leaving for reference
-        ['https://www.manyvids.com', '/api/model/1002638751/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Sloppy Toppy'],
-        ['https://www.manyvids.com', '/api/model/69353/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Natalia Grey'],
-        ['https://www.manyvids.com', '/api/model/97815/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Hidori'],
-        ['https://www.manyvids.com', '/api/model/1001123043/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Paige Steele'],
-        ['https://www.manyvids.com', '/api/model/1001317123/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Jaybbgirl'],
-        ['https://www.manyvids.com', '/api/model/1001673578/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: FreyaJade'],
-        ['https://www.manyvids.com', '/api/model/304591/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: 420SexTime'],
-        ['https://www.manyvids.com', '/api/model/217682/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: OmankoVivi'],
-        ['https://www.manyvids.com', '/api/model/1000304351/videos?category=all&offset=%s&sort=0&limit=30&mvtoken=6199def482315613508608', 'Manyvids: Haylee Love'],
+        ['1001216419', 'YouthLust'],
+        ['214657', 'Manyvids: Lana Rain'],
+        ['423053', 'MySweetApple'],
+        ['1001495638', 'Manyvids: Jack and Jill'],
+        ['325962', 'Manyvids: Dirty Princess'],
+        ['312711', 'Manyvids: Cattie'],
+        ['1000286888', 'A Taboo Fantasy'],
+        ['694469', 'Adult Candy Store'],
+        ['1000159044', 'Fuck Club'],
+        ['1000380769', 'IXXVICOM'],
+        ['806007', 'Jay Bank Presents'],
+        ['1001483477', 'Undercover Sluts'],
+        # ~ # ['574529', 'Submissive Teen POV'],  # Seems to have gone away, leaving for reference
+        ['1002638751', 'Sloppy Toppy'],
+        ['69353', 'Natalia Grey'],
+        ['97815', 'Manyvids: Hidori'],
+        ['1001123043', 'Manyvids: Paige Steele'],
+        ['1001317123', 'Manyvids: Jaybbgirl'],
+        ['1001673578', 'Manyvids: FreyaJade'],
+        ['304591', 'Manyvids: 420SexTime'],
+        ['217682', 'Manyvids: OmankoVivi'],
+        ['1000304351', 'Manyvids: Haylee Love'],
+        ['1002322838', 'Manyvids: Jewelz Blu'],
+        ['1003298627', 'Manyvids: Molly Redwolf'],
+        ['1003004427', 'Manyvids: Sweetie Fox'],
+        ['32539', 'Manyvids: Cherry Crush'],
+        ['35990', 'Manyvids: Charlette Webb'],
+        ['91512', 'Manyvids: Alli Leigh'],
+        ['65933', 'Manyvids: Little Miss Elle'],
+        ['216064', 'Manyvids: Lena Spanks'],
+        ['251896', 'Manyvids: Submissive Lexi'],
+        ['1004407943', 'Manyvids: Sloansmoans'],
+        ['491714', 'Manyvids: ImMeganLive'],
+        ['577443', 'Manyvids: Emmas Secret Life'],
+        ['375403', 'Manyvids: Natashas Bedroom'],
+        ['102036', 'Manyvids: Ashley Alban'],
+        ['147843', 'Manyvids: Penny Barber'],
+        ['38793', 'Manyvids: Princess Leia'],
+        ['1003527333', 'Manyvids: Kathia Nobili'],
+        ['1004207044', 'Manyvids: Mrs Mischief'],
+        ['1000997612', 'Manyvids: MistressT'],
+        ['1005123610', 'Manyvids: Tara Tainton'],
+        ['1001836304', 'Manyvids: Siena Rose'],
+        ['273124', 'Manyvids: Courtney Scott'],
+        ['1000856699', 'Manyvids: Kiittenymph'],
+        ['1004388117', 'Manyvids: ForbiddenFruitsFilms'],
+        ['1004388132', 'Manyvids: Jodi West'],
+        ['320527', 'Manyvids: Diane Andrews'],
+        ['97815', 'Manyvids: Midori Rose'],
     ]
+
+    custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
 
     selector_map = {
         'title': '',
@@ -54,10 +88,6 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         'X-Requested-With': 'XMLHttpRequest'
     }
 
-    cookies = {
-        'PHPSESSID': '1i3dnqaq575hvn72antt9ugmm2jf3l0t7m81bve1'
-    }
-
     def start_requests(self):
         url = "https://www.manyvids.com/Profile/1001216419/YouthLust/Store/Videos/"
         yield scrapy.Request(url,
@@ -67,6 +97,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
 
     def get_taglist(self, response):
         meta = response.meta
+        meta['mvtoken'] = response.xpath('//html/@data-mvtoken').get()
+        meta['headers'] = self.headers
         url = "https://d3e1078hs60k37.cloudfront.net/site_files/json/vid_categories.json"
         yield scrapy.Request(url,
                              callback=self.start_requests2,
@@ -75,20 +107,22 @@ class NetworkManyVidsSpider(BaseSceneScraper):
 
     def start_requests2(self, response):
         meta = response.meta
+        self.headers['referer'] = 'https://www.manyvids.com/Profile/1003004427/Sweetie-Fox/Store/Videos/'
         taglist = json.loads(response.text)
         meta['taglist'] = taglist
 
         for link in self.start_urls:
             meta['page'] = self.page
-            meta['pagination'] = link[1]
-            meta['site'] = link[2]
-            yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
+            meta['siteid'] = link[0]
+            meta['site'] = link[1]
+            yield scrapy.Request(url=self.get_next_page_url(self.page, meta),
                                  callback=self.parse,
                                  meta=meta,
                                  headers=self.headers,
                                  cookies=self.cookies)
 
     def parse(self, response):
+        # ~ print(response.text)
         meta = response.meta
         scenes = self.get_scenes(response)
         count = 0
@@ -98,17 +132,17 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta['page'] = meta['page'] + 1
-                pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], pagination),
+                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta),
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
                                      cookies=self.cookies)
 
-    def get_next_page_url(self, base, page, pagination):
+    def get_next_page_url(self, page, meta):
         offset = str((int(page) - 1) * 30)
-        return self.format_url(base, pagination % offset)
+        link = f"https://www.manyvids.com/api/model/{meta['siteid']}/videos?category=all&offset={offset}&sort=0&limit=30&mvtoken={meta['mvtoken']}"
+        return link
 
     def get_scenes(self, response):
         meta = response.meta
@@ -119,7 +153,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             if jsonentry['preview']['videoPreview']:
                 meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
             meta['id'] = jsonentry['id']
-            meta['title'] = jsonentry['title']
+            meta['title'] = string.capwords(html.unescape(jsonentry['title']))
             if scene and meta['id']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
@@ -263,6 +297,52 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Haylee Love']
         if "Paige Steele" in meta['site']:
             return ['Paige Steele']
+        if "Jewelz Blu" in meta['site']:
+            return ['Jewelz Blu']
+        if "Molly Redwolf" in meta['site']:
+            return ['Molly Redwolf']
+        if "Sweetie Fox" in meta['site']:
+            return ['Sweetie Fox']
+        if "Cherry Crush" in meta['site']:
+            return ['Cherry Crush']
+        if "Charlette Webb" in meta['site']:
+            return ['Charlette Webb']
+        if "Alli Leigh" in meta['site']:
+            return ['Alli Leigh']
+        if "Little Miss Elle" in meta['site']:
+            return ['Little Miss Elle']
+        if "Lena Spanks" in meta['site']:
+            return ['Lena Spanks']
+        if "Submissive Lexi" in meta['site']:
+            return ['Submissive Lexi']
+        if "Ashley Alban" in meta['site']:
+            return ['Ashley Alban']
+        if "Penny Barber" in meta['site']:
+            return ['Penny Barber']
+        if "Princess Leia" in meta['site']:
+            return ['Princess Leia']
+        if "Kathia Nobili" in meta['site']:
+            return ['Kathia Nobili']
+        if "Mrs Mischief" in meta['site']:
+            return ['Mrs Mischief']
+        if "MistressT" in meta['site']:
+            return ['MistressT']
+        if "Tara Tainton" in meta['site']:
+            return ['Tara Tainton']
+        if "Siena Rose" in meta['site']:
+            return ['Siena Rose']
+        if "Courtney Scott" in meta['site']:
+            return ['Courtney Scott']
+        if "Kiittenymph" in meta['site']:
+            return ['Lex Kiittenymph']
+        if "ForbiddenFruitsFilms" in meta['site']:
+            return ['Jodi West']
+        if "Jodi West" in meta['site']:
+            return ['Jodi West']
+        if "Diane Andrews" in meta['site']:
+            return ['Diane Andrews']
+        if "Midori Rose" in meta['site']:
+            return ['Midori Rose']
         return []
 
     def get_site(self, response):
@@ -287,18 +367,18 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         taglist = meta['taglist']
         if self.get_selector_map('tags'):
             tags = self.process_xpath(response, self.get_selector_map('tags')).get()
+            scenetags = []
             if tags:
                 tags = re.search('\"(.*)\"', tags).group(1)
                 if tags:
                     tags = tags.split(",")
-                    scenetags = []
                     for tag in tags:
                         for alltags in taglist:
                             if alltags['id'] == tag:
                                 scenetags.append(alltags['label'])
                                 break
-            if meta['site'] and "ManyVids" in meta['site']:
-                scenetags.append("ManyVids")
+            if meta['site'] and "Manyvids" in meta['site']:
+                scenetags.append("Manyvids")
             if scenetags:
                 return list(map(lambda x: x.strip().title(), scenetags))
         return []

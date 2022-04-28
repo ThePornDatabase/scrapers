@@ -26,7 +26,7 @@ class SitePervfectPerformerSpider(BasePerformerScraper):
             item = PerformerItem()
             item['name'] = string.capwords(row['name'])
             item['image'] = self.format_link(response, row['imageMediumPath'])
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['url'] = f"http://www.pervfect.net/models/{row['alias']}/{row['_id']}"
             item['network'] = 'Pervfect'
             item['astrology'] = ''

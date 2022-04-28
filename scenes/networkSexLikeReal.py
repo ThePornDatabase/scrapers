@@ -47,7 +47,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         item['title'] = self.cleanup_title(data['name'])
         item['description'] = self.cleanup_description(data['description'])
         item['image'] = data['thumbnail']
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['id'] = self.get_id(response)
         item['trailer'] = data['contentUrl']
         item['url'] = response.url

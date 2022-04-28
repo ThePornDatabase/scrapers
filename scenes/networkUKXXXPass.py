@@ -95,7 +95,7 @@ class NetworkUKXXXPassSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             trailer = scene.xpath('.//div[@class="update_image"]/a/@onclick').get()
             if trailer:

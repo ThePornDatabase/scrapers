@@ -55,7 +55,7 @@ class NetworkARXBucksSpider(BaseSceneScraper):
                 prefix = "https://transdayspa.com"
             item['url'] = prefix + jsonrow['node']['url']
             item['image'] = jsonrow['node']['primaryPhotoUrl']
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['date'] = jsonrow['node']['createdAt']
             item['trailer'] = jsonrow['node']['videoUrls']['trailer']
             item['description'] = jsonrow['node']['summary']

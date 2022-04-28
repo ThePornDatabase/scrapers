@@ -45,7 +45,7 @@ class SiteGlaminoGirlsSpider(BaseSceneScraper):
                 if image:
                     item['image'] = image.group(1).strip()
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['performers'] = []
             performers = scene.xpath('.//span[@class="episode__artist__name"]/text()').get()

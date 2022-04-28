@@ -96,7 +96,7 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                 else:
                     item['image'] = None
 
-                item['image_blob'] = None
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
                 item['tags'] = []
                 if "behind-the-scenes" in response.url:

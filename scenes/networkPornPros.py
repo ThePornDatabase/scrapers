@@ -1,7 +1,6 @@
 from tpdb.BaseSceneScraper import BaseSceneScraper
 import dateparser
 import scrapy
-from slugify import slugify
 
 
 class PornprosSpider(BaseSceneScraper):
@@ -21,7 +20,7 @@ class PornprosSpider(BaseSceneScraper):
         "https://holed.com/",
         "https://lubed.com/",
         "https://myveryfirsttime.com/",
-        "https://nannyspy.com/"
+        "https://nannyspy.com/",
         "https://passion-hd.com/",
         "https://pornpros.com/",
         "https://povd.com/",

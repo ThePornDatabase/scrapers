@@ -12,39 +12,38 @@ class NubilesSpider(BaseSceneScraper):
     custom_settings = {'CONCURRENT_REQUESTS': '1'}
 
     start_urls = [
-        "https://anilos.com/video/gallery",
-        "https://badteenspunished.com/video/gallery",
-        "https://bountyhunterporn.com/video/gallery",
-        "https://brattysis.com/video/gallery",
-        "https://cumswappingsis.com/video/gallery",
-        "https://daddyslilangel.com/video/gallery",
-        "https://deeplush.com/video/gallery",
-        "https://detentiongirls.com/video/gallery",
-        "https://driverxxx.com/video/gallery",
-        "https://familyswap.xxx/video/gallery",
-        "https://momsteachsex.com/video/gallery",
-        "https://myfamilypies.com/video/gallery",
-        "https://nfbusty.com/video/gallery",
-        "https://nubilefilms.com/video/gallery",
-        "https://nubiles-casting.com/video/gallery",
-        "https://nubiles-porn.com/video/gallery",
-        "https://nubiles.net/video/gallery",
-        "https://nubileset.com/video/gallery",
-        "https://nubilesunscripted.com/video/gallery",
-        "https://petitehdporn.com/video/gallery",
-        "https://petiteballerinasfucked.com/video/gallery",
-        "https://princesscum.com/video/gallery",
-        "https://stepsiblingscaught.com/video/gallery",
-        "https://teacherfucksteens.com/video/gallery",
-        "https://thatsitcomshow.com/video/gallery",
+        "https://anilos.com",
+        "https://badteenspunished.com",
+        "https://bountyhunterporn.com",
+        "https://brattysis.com",
+        "https://cumswappingsis.com",
+        "https://daddyslilangel.com",
+        "https://deeplush.com",
+        "https://detentiongirls.com",
+        "https://driverxxx.com",
+        "https://familyswap.xxx",
+        "https://momsteachsex.com",
+        "https://myfamilypies.com",
+        "https://nfbusty.com",
+        "https://nubilefilms.com",
+        "https://nubiles-casting.com",
+        "https://nubiles-porn.com",
+        "https://nubiles.net",
+        "https://nubileset.com",
+        "https://nubilesunscripted.com",
+        "https://petitehdporn.com",
+        "https://petiteballerinasfucked.com",
+        "https://princesscum.com",
+        "https://stepsiblingscaught.com",
+        "https://teacherfucksteens.com",
+        "https://thatsitcomshow.com",
     ]
 
     selector_map = {
         'title': '//*[contains(@class, "content-pane-title")]/h2/text()',
         'description': '.row .collapse::text',
         'date': '//span[@class="date"]/text()',
-        'image': '//video/@poster | '
-                 '//img[@class="fake-video-player-cover"]/@src',
+        'image': '//video/@poster|//img[@class="fake-video-player-cover"]/@src',
         'performers': '//a[@class="content-pane-performer model"]/text()',
         'tags': '//*[@class="categories"]//a/text()',
         'external_id': '(\\d+)',
@@ -53,15 +52,14 @@ class NubilesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css(".content-grid-item>figure")
+        scenes = response.xpath('//figcaption')
         for scene in scenes:
-            link = scene.css('.img-wrapper > a::attr(href)').extract_first()
-            if re.search('video\\/watch', link) is not None:
+            link = scene.xpath('./div/span/a/@href').get()
+            if re.search(r'video/watch', link) is not None:
+                scenedate = response.xpath('.//span[@class="date"]/text()').get()
                 meta = {
-                    'title': scene.css('.title a::text').get().strip(),
-                    'date': dateparser.parse(
-                        scene.css('.date::text')
-                        .extract_first()).isoformat(),
+                    'title': scene.xpath('./div/span/a/text()').get().strip(),
+                    'date': dateparser.parse(scenedate, date_formats=['%b %d, %Y']).isoformat(),
                 }
                 if "brattysis" in response.url:
                     meta['site'] = "Bratty Sis"
@@ -81,28 +79,12 @@ class NubilesSpider(BaseSceneScraper):
                 elif "nubiles.net" in response.url:
                     meta['site'] = "Nubiles"
                     meta['parent'] = "Nubiles"
-                else:
-                    meta['site'] = scene.xpath(
-                        './/a[@class="site-link"]/text()'
-                    )
-                    meta['site'] = meta['site'].get().strip()
+                if 'site' not in meta or not meta['site']:
+                    meta['site'] = scene.xpath('.//a[@class="site-link"]/text()').get()
+                    meta['parent'] = scene.xpath('.//a[@class="site-link"]/text()').get()
                 yield scrapy.Request(
                     url=self.format_link(response, link),
                     callback=self.parse_scene, meta=meta)
-
-    def get_site(self, response):
-        site = response.xpath(
-            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
-        if site:
-            return site
-        return super().get_site(response)
-
-    def get_parent(self, response):
-        parent = response.xpath(
-            '//meta[@property="og:site_name"]/@content').get().replace("'", "")
-        if parent:
-            return parent
-        return super().get_parent(response)
 
     def get_next_page_url(self, base, page):
         page = (page - 1) * 10
@@ -121,7 +103,7 @@ class NubilesSpider(BaseSceneScraper):
                 if descrow:
                     description = description + descrow
 
-        if not description or (description and len(description.strip())):
+        if not description or (description and not description.strip()):
             description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()')
             description = description.getall()
             if description:

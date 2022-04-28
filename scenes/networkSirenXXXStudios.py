@@ -69,7 +69,7 @@ class NetworkSirenXXXStudiosSpider(BaseSceneScraper):
                     item['image'] = image.strip()
                 else:
                     item['image'] = None
-                item['image_blob'] = None
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
                 performers = scene.xpath('./p/a/text()').getall()
                 if performers:

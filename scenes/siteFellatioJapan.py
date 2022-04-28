@@ -81,7 +81,7 @@ class SiteFellatioJapanSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             extern_id = scene.xpath('.//div[@class="scene-hover"]/@data-path').get()
             if extern_id:

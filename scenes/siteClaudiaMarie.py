@@ -67,7 +67,7 @@ class SiteClaudiaMarieSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             trailer = scene.xpath('.//div[contains(@class,"update_image")]/a[1]/@onclick').get()
             if trailer:

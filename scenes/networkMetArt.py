@@ -63,7 +63,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
         else:
             item['image'] = None
 
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
         if 'hustler' in response.url:
             item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']

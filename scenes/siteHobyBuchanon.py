@@ -77,7 +77,6 @@ class HobyBuchanonSpider(BaseSceneScraper):
             item['tags'] = []
             item['trailer'] = ''
             item['image'] = None
-            item['image_blob'] = None
             item['description'] = ''
             item['network'] = "Hoby Buchanon"
             item['parent'] = "Hoby Buchanon"
@@ -114,6 +113,8 @@ class HobyBuchanonSpider(BaseSceneScraper):
 
             if image:
                 item['image'] = image.strip()
+
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             if item['id'] and item['title'] and item['date']:
                 days = int(self.days)

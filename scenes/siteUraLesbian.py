@@ -81,7 +81,7 @@ class SiteLegsJapanSpider(BaseSceneScraper):
                     else:
                         item['image'] = None
 
-                    item['image_blob'] = None
+                    item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
                     if item['image']:
                         extern_id = re.search(r'\.com/.*?/(.*?)/', item['image']).group(1)

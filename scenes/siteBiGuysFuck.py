@@ -59,7 +59,7 @@ class BiGuysFuckSpider(BaseSceneScraper):
 
         item['url'] = response.url
         item['image'] = data['thumbnailUrl'].replace(" ", "%20")
-        item['image_blob'] = None
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['trailer'] = ''
         item['site'] = 'Bi Guys Fuck'
         item['parent'] = 'Bi Guys Fuck'

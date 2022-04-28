@@ -30,7 +30,7 @@ class SiteMPLStudiosSpider(BaseSceneScraper):
             item['title'] = scene.xpath('.//span[@class="ellipsis"]/@title').get()
             item['performers'] = scene.xpath('.//span[@class="ellipsis"]/a[contains(@href, "portfolio")]/text()').getall()
             item['image'] = self.format_link(response, scene.xpath('./div/a/img/@data-src').get())
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['id'] = scene.xpath('./@data-id').get()
             pathsegment = re.search(r'videoPreview/(\d+)/', item['image'])
             if pathsegment:

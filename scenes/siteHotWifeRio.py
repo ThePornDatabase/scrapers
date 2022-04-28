@@ -49,7 +49,7 @@ class SiteHotWifeRioSpider(BaseSceneScraper):
             if image:
                 item['image'] = "https://hotwiferio.com/new-tour/" + image.get().strip()
 
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['performers'] = ['Rio Blaze']
 

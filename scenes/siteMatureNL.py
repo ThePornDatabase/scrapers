@@ -20,6 +20,7 @@ class SiteMatureNLSpider(BaseSceneScraper):
         're_date': r'(\d{1,2}-\d{1,2}-\d{4})',
         'date_formats': ['%d-%m-%Y'],
         'image': '//span[@id="spnPageUpdateTrailer"]//img/@data-src',
+        'image_blob': True,
         'performers': '//div[@class="box-cnt"]//div[@class="grid-tile-model"]/div[@class="name"]/span/text()',
         'tags': '//div[@class="box-cnt"]//a[contains(@href, "/niche/")]/text()',
         'external_id': r'update\/(\d+)\/',
