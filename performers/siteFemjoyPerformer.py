@@ -18,7 +18,6 @@ class SiteFemJoyPerformerSpider(BasePerformerScraper):
     }
 
     def get_performers(self, response):
-        global json
         jsondata = json.loads(response.text)
         data = jsondata['results']
         for jsonentry in data:

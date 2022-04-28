@@ -19,7 +19,6 @@ class TopWebModelsSpider(BasePerformerScraper):
     }
 
     def get_performers(self, response):
-        global json
         responseresult = response.xpath('//script[contains(text(),"window.__DATA__")]/text()').get()
         responsedata = re.search(r'__DATA__\ =\ (.*)', responseresult).group(1)
         jsondata = json.loads(responsedata)

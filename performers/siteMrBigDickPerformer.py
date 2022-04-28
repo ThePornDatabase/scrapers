@@ -24,7 +24,6 @@ class SiteMrBigfatdickPerformerSpider(BasePerformerScraper):
                              cookies=self.cookies)
 
     def get_performers(self, response):
-        global json
         performers = json.loads(response.text)
 
         for performer in performers:

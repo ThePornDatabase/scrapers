@@ -41,7 +41,6 @@ class SiteFootFetishDailyPerformerSpider(BasePerformerScraper):
                 callback=self.parse_performer
             )
 
-
     def get_height(self, response):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height'))
