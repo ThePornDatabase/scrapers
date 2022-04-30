@@ -11,14 +11,14 @@ class SteppedUpSpider(BaseSceneScraper):
 
     start_urls = [
         'https://tour.swallowed.com',
-        'https://tour.nympho.com',
-        'https://tour.trueanal.com',
-        'https://tour.allanal.com',
-        'https://tour.analonly.com',
+        # ~ 'https://tour.nympho.com', # Moved to JSON scraper
+        # ~ 'https://tour.trueanal.com', # Moved to JSON scraper
+        # ~ 'https://tour.allanal.com', # Moved to JSON scraper
+        # ~ 'https://tour.analonly.com', # Moved to JSON scraper
     ]
 
     selector_map = {
-        'title': '//*[@class="title"]/text()',
+        'title': '//h2[@class="title"]/text()|//*[@class="title"]/text()',
         'description': '//div[contains(@class, "desc")]/p/text()',
         'date': '//div[@class="content-page-info"]//span[@class="post-date"]/text() | //div[@class="content-meta"]//span[contains(@class, "date")]/text()',
         'performers': '//div[@class="content-meta-wrap"]//h4[@class="models"]/a/text()',

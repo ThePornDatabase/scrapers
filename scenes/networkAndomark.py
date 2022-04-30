@@ -143,6 +143,8 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/tour/categories/updates_%s_d.html'
         elif 'britstudio' in base or 'houseoffyre' in base:
             selector = '/categories/updates_%s_p.html'
+        elif 'charlie' in base or 'houseoffyre' in base:
+            selector = '/categories/updates_%s_d.html'
         elif 'minkaxxx' in base:
             selector = '/tour/categories/movies_%s_d.html'
         elif 'sexykaren' in base:
@@ -150,7 +152,8 @@ class AndomarkSpider(BaseSceneScraper):
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
         elif 'shiny' in base or '4k' in base or 'charlieforde' in base:
-            selector = '/categories/updates_%s_d.html'
+            # ~ selector = '/categories/updates_%s_d.html'
+            selector = '/updates/page_%s.html'
         else:
             selector = '/categories/movies_%s_d.html'
 
@@ -167,6 +170,8 @@ class AndomarkSpider(BaseSceneScraper):
             scenes = response.xpath('//div[@class="modeldata"]/h3/a/@href').getall()
         elif '4k' in response.url:
             scenes = response.xpath('//h5/a/@href').getall()
+        elif 'shiny' in response.url:
+            scenes = response.xpath('//div[contains(@class,"updatesAreaTop")]/div[@class="updateItem"]/a/@href').getall()
         else:
             scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
         for scene in scenes:
