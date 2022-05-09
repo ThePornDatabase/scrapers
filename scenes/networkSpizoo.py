@@ -1,4 +1,5 @@
 import re
+import string
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -6,6 +7,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 def match_site(argument):
     match = {
+        'creamher': "Cream Her",
         'firstclasspov': "First Class POV",
         'mrluckypov': "Mr Lucky POV",
         'mrluckyraw': "Mr Lucky Raw",
@@ -22,6 +24,7 @@ class SpizooSpider(BaseSceneScraper):
     network = "Spizoo"
 
     start_urls = [
+        'https://www.creamher.com/',
         'https://firstclasspov.com/',
         'https://mrluckypov.com/',
         'https://mrluckyraw.com/',
@@ -37,7 +40,7 @@ class SpizooSpider(BaseSceneScraper):
         'date': "//p[@class='date']/text()",
         'image': '//video/@poster|//div[@id="hpromo"]/a/img[contains(@src,".jpg")]/@src',
         'image_blob': True,
-        'performers': '//div[@class="col-12"]//a[contains(@href, "/models")]/@title|//div[@class="col-3"]//a[contains(@href, "/models")]/@title',
+        'performers': '//div[@class="col-12"]//a[contains(@href, "/models")]/@title|//div[@class="col-3"]//a[contains(@href, "/models")]/@title|//span[@class="update_models"]/a/text()',
         'tags': '//a[contains(@class,"category-tag")]/@title|//a[contains(@href,"/categories/")]/text()',
         'external_id': r'/updates/(.*)\.html$',
         'trailer': '',  # Hashed and tokened link.  Will be no good later
@@ -45,7 +48,7 @@ class SpizooSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        if "mrluckyvip" in response.url:
+        if "mrluckyvip" in response.url or "creamher" in response.url:
             scenes = response.xpath('//div[@class="thumb-pic"]/a/@href').getall()
         elif "mrluckyraw" in response.url:
             scenes = response.xpath("//div[@class='thumb-title']/a/@href").getall()
@@ -56,7 +59,7 @@ class SpizooSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_title(self, response):
-        matches = ["spizoo", "mrluckyraw", "mrluckyvip"]
+        matches = ["spizoo", "mrluckyraw", "mrluckyvip", "creamher"]
         if any(x in response.url for x in matches):
             titlexpath = '//div[@class="title"]/h1/text()'
         matches = ["firstclasspov", "mrluckypov"]
@@ -87,3 +90,11 @@ class SpizooSpider(BaseSceneScraper):
         if page == 1:
             return base + 'categories/Movies.html'
         return self.format_url(base, self.get_selector_map('pagination') % page)
+
+    def get_tags(self, response):
+        tags = super().get_tags(response)
+        if "creamher" in response.url:
+            tags = response.xpath('//div[@class="categories-holder"]/a[contains(@class,"category-tag")]/text()').getall()
+            tags = list(map(lambda x: string.capwords(x.strip()), tags))
+        tags = list(filter(None, tags))
+        return tags
