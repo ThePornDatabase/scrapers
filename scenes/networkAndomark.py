@@ -152,7 +152,6 @@ class AndomarkSpider(BaseSceneScraper):
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
         elif 'shiny' in base or '4k' in base or 'charlieforde' in base:
-            # ~ selector = '/categories/updates_%s_d.html'
             selector = '/updates/page_%s.html'
         else:
             selector = '/categories/movies_%s_d.html'
@@ -250,6 +249,9 @@ class AndomarkSpider(BaseSceneScraper):
             image = response.xpath(imagesearch).get()
             if image:
                 image = re.search(r'useimage\ =\ \"(.*?)\";', image).group(1)
+        elif 'shinybound.com' in response.url:
+            imagesearch = '//img[@class="stdimage promo_thumb left thumbs"]/@src0_1x'
+            image = response.xpath(imagesearch).get()
         else:
             imagesearch = '//meta[@property="og:image"]/@content'
             image = response.xpath(imagesearch).get()
