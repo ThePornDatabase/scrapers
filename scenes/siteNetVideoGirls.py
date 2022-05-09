@@ -46,7 +46,7 @@ class SiteNetVideoGirlsSpider(BaseSceneScraper):
             item['url'] = 'https://netvideogirls.com/home'
 
             item['image'] = "https://netvideogirls.com/" + scene['node']['tour_thumbs']['localFile']['childImageSharp']['fluid']['src']
-            item['image_blob'] = False
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['description'] = ''
             item['performers'] = []
