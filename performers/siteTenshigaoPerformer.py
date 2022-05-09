@@ -145,7 +145,7 @@ class SiteTenshigaoSpider(BasePerformerScraper):
                     if weight:
                         weight = weight.group(1).strip()
                         weight = weight.replace(" ", "")
-                        return weight + "kg"
+                        return weight
                     weight = ''
                     return weight.strip()
         return ''
