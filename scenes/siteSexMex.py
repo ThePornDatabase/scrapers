@@ -42,6 +42,10 @@ class SexMexSpider(BaseSceneScraper):
             image = image.replace(" ", "%20")
             if "transform.php" in image or "url=" in image:
                 image = re.search(r'url=(.*)', image).group(1)
+            if image:
+                image_blob = self.get_image_blob_from_link(image)
+            else:
+                image_blob = None
             performers = scene.xpath(
                 './div/div/p[@class="cptn-model"]/a/text()').getall()
 
@@ -50,7 +54,7 @@ class SexMexSpider(BaseSceneScraper):
             scene = scene.xpath('./div/a/@href').get()
             if sceneid:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
-                                     meta={'date': date, 'title': title, 'description': description, 'image': image, 'performers': performers, 'id': sceneid})
+                                     meta={'date': date, 'title': title, 'description': description, 'image': image, 'performers': performers, 'id': sceneid, 'image_blob': image_blob})
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
@@ -60,3 +64,6 @@ class SexMexSpider(BaseSceneScraper):
                     trailer = "https://sexmex.xxx/" + trailer
                 return trailer
         return ''
+
+    def get_tags(self, response):
+        return ['Latina', 'South American']
