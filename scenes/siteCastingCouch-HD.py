@@ -55,8 +55,8 @@ class SiteCastingCouchHDSpider(BaseSceneScraper):
             if scene['pinned_thumb'] and scene['pinned_thumb']['thumb']['thumb_name']:
                 item['image'] = "https://media.castingcouch-hd.com/web-images/" + scene['pinned_thumb']['thumb']['thumb_name']
             else:
-                item['image'] = "https://media.castingcouch-hd.com/web-images/%s-1-med.jpg" % item['id']
-            item['image_blob'] = False
+                item['image'] = f"https://media.castingcouch-hd.com/web-images/{item['id']}-1-med.jpg"
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['description'] = ''
             performers = []
@@ -64,6 +64,6 @@ class SiteCastingCouchHDSpider(BaseSceneScraper):
                 performers.append(model['model_name'])
             item['performers'] = performers
             item['tags'] = ['Amateur', 'Audition']
-            item['trailer'] = "https://media.castingcouch-hd.com/video-thumbs/%s-video.mp4" % item['id']
+            item['trailer'] = f"https://media.castingcouch-hd.com/video-thumbs/{item['id']}-video.mp4"
             if item['date'] > "2020-10-01":
                 yield item

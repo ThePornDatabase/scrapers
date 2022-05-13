@@ -25,16 +25,16 @@ class BiGuysFuckSpider(BaseSceneScraper):
         'tags': '',
         'trailer': '',
         'external_id': r'.*/(.*?)$',
-        'pagination': '/videos?page=%s'
+        'pagination': '/videos/%s'
     }
 
     def get_scenes(self, response):
 
         scenes = response.xpath(
-            '//div[contains(@class,"videoPreview")]/a/@href').getall()
+            '//div[contains(@class,"image-container")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=scene.strip(), callback=self.parse_scene)
 
     def parse_scene(self, response):
         item = SceneItem()

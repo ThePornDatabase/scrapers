@@ -51,10 +51,10 @@ class SiteNetGirlSpider(BaseSceneScraper):
             item['url'] = 'https://www.netgirl.com/'
 
             if "loading" in scene['thumb']:
-                item['image'] = "https://cdn2.netgirl.com/images/web/%s-1-med.jpg" % item['id']
+                item['image'] = f"https://cdn2.netgirl.com/images/web/{item['id']}-1-med.jpg"
             else:
-                item['image'] = "https://cdn2.netgirl.com/images/web/" + scene['thumb']
-            item['image_blob'] = False
+                item['image'] = f"https://cdn2.netgirl.com/images/web/{scene['thumb']}"
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['description'] = ''
             item['performers'] = scene['pretty_models']
