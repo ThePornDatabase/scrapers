@@ -9,8 +9,8 @@ class NetworkCash4RealSpider(BaseSceneScraper):
     parent = 'Cash4Real'
 
     start_urls = [
-        # ~ 'https://www.cumclinic.com',
-        # ~ 'https://www.gloryholeswallow.com',
+        'https://www.cumclinic.com',
+        'https://www.gloryholeswallow.com',
         'https://www.spytug.com',
     ]
 
@@ -54,3 +54,13 @@ class NetworkCash4RealSpider(BaseSceneScraper):
         if "spytug" in response.url:
             return "Spy Tug"
         return super().get_parent(response)
+
+    def get_date(self, response):
+        xdate = response.xpath('//meta[@name="twitter:title"]/@content')
+        if xdate:
+            xdate = xdate.get()
+            if re.search(r'(\w+\.? \d{1,2}, \d{4})', xdate):
+                date = re.search(r'(\w+\.? \d{1,2}, \d{4})', xdate).group(1)
+                date = date.replace(".", "")
+                return self.parse_date(date, date_formats=['%b %d, %Y']).isoformat()
+        return self.parse_date('today').isoformat()

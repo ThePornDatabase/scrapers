@@ -31,3 +31,11 @@ class GirlsOutWestSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+    def get_date(self, response):
+        date = response.xpath(self.get_selector_map('date'))
+        if date:
+            date = re.search(self.get_selector_map('re_date'), date.get())
+            if date:
+                return self.parse_date(date.group(1)).isoformat()
+        return self.parse_date('today').isoformat()
