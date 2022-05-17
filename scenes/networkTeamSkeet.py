@@ -349,6 +349,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
             item['url'] = "https://www.teamskeet.com/movies/" + data['id']
         else:
             item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
+        item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
 
         item['performers'] = []
         if 'models' in data:
