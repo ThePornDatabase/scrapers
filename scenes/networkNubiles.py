@@ -22,6 +22,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://detentiongirls.com",
         "https://driverxxx.com",
         "https://familyswap.xxx",
+        "https://momlover.com",
         "https://momsteachsex.com",
         "https://myfamilypies.com",
         "https://nfbusty.com",

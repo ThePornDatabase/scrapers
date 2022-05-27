@@ -1,4 +1,8 @@
 import re
+import base64
+import html
+from tpdb.helpers.http import Http
+
 import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -33,8 +37,10 @@ class SiteJeshByJeshSpider(BaseSceneScraper):
             image = scene.xpath('./img/@src')
             if image:
                 meta['image'] = self.format_link(response, image.get()).replace("1x", "2x")
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
             else:
                 meta['image'] = ''
+                meta['image_blob'] = ''
             trailer = scene.xpath('.//source/@src')
             if trailer:
                 meta['trailer'] = self.format_link(response, trailer.get())
