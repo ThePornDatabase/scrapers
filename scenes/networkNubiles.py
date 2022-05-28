@@ -57,7 +57,7 @@ class NubilesSpider(BaseSceneScraper):
         for scene in scenes:
             link = scene.xpath('./div/span/a/@href').get()
             if re.search(r'video/watch', link) is not None:
-                scenedate = response.xpath('.//span[@class="date"]/text()').get()
+                scenedate = scene.xpath('.//span[@class="date"]/text()').get()
                 meta = {
                     'title': scene.xpath('./div/span/a/text()').get().strip(),
                     'date': dateparser.parse(scenedate, date_formats=['%b %d, %Y']).isoformat(),
