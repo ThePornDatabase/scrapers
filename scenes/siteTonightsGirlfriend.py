@@ -25,9 +25,13 @@ class TonightsGirlfriendSpider(BaseSceneScraper):
     }
 
     def get_title(self, response):
-        externid = self.get_id(response).replace('-', ' ')
-        externid = re.sub(r"(\d+)$", "", externid)
-        return externid.title()
+        title = response.xpath('//h1[contains(@class, "title")]/text()')
+        if title:
+            return self.cleanup_title(title.get())
+        else:
+            externid = self.get_id(response).replace('-', ' ')
+            externid = re.sub(r"(\d+)$", "", externid)
+            return externid.title()
 
     def get_scenes(self, response):
         scenes = response.css(
