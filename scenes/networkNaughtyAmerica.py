@@ -15,7 +15,7 @@ class NaughtyAmericaSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//title/text()',
-        'description': '//div[contains(@class, "synopsis grey-text")]/span/following-sibling::text()',
+        'description': '//div[contains(@class, "synopsis grey-text")]/span/following-sibling::text()|//div[contains(@class, "synopsis grey-text")]/text()',
         'date': '//div[@class="date-tags"]/span[contains(@class,"entry-date")]/text()',
         'image': '//a[@class="play-trailer"]/picture//img/@data-srcset',
         'performers': '//a[@class="scene-title grey-text link"]/text()',
@@ -46,7 +46,7 @@ class NaughtyAmericaSpider(BaseSceneScraper):
 
     def get_site(self, response):
         site = response.xpath(
-            '//div[@class="scene-info"]/a[contains(@class,"site-title")]/text()').get()
+            '//div[@class="scene-info"]//a[contains(@class,"site-title")]/text()').get()
         if site:
             return site.strip()
-        return super.get_site(response)
+        return super().get_site(response)
