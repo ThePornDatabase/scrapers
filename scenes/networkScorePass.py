@@ -192,7 +192,7 @@ class ScorePassSpider(BaseSceneScraper):
         'description': "//meta[@itemprop='description']/@content | //*[@class='p-desc']/text()",
         'date': "//div[contains(@class, 'stat')]//span[contains(text(),'Date')]/following-sibling::span/text()",
         'image': '//meta[@property="og:image"]/@content',
-        'performers': "//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::span//text()",
+        'performers': "//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::span//text()|//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::a//text()",
         'tags': "//a[contains(@href,'videos-tag')]/text()",
         'external_id': r'/(\d+)',
         'trailer': '//div[@class="pos-rel"]//video/source/@src',
