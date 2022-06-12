@@ -201,7 +201,7 @@ class ScorePassSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         if "pornmegaload" in response.url:
-            scenes = response.xpath('//div[@class="info h-100 p-2 p-md-4"]')
+            scenes = response.xpath('//div[contains(@class, "li-item video")]')
         elif "tnatryouts" in response.url:
             scenes = response.xpath('//div[@class="box group"]/div[@class="info"]/a/@href')
         elif "titsandtugs" in response.url or "bigboobspov" in response.url or "bigtithooker" in response.url:
@@ -214,11 +214,15 @@ class ScorePassSpider(BaseSceneScraper):
             scenes = response.css(".video").css('a').xpath("@href")
         for scene in scenes:
             if "pornmegaload" in response.url:
-                site = scene.xpath('./div[@class="site"]/img/@alt').get()
+                site = scene.xpath('.//video/source[1]/@src')
                 if site:
-                    site = site.strip()
-                    site = match_site(site)
-                scene = scene.xpath('./div/div[contains(@class,"i-title")]/a/@href').get()
+                    site = re.search(r'\.com/(.*?)/', site.get())
+                    if site:
+                        site = site.group(1).strip()
+                        site = match_site(site)
+                if not site:
+                    site = "Pornmegaload"
+                scene = scene.xpath('./div/div/a/@href').get()
             else:
                 scene = scene.get()
 
