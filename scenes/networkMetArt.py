@@ -10,19 +10,19 @@ class MetArtNetworkSpider(BaseSceneScraper):
     network = 'metart'
 
     start_urls = [
-        "https://www.sexart.com/",
-        "https://www.metart.com/",
-        "https://www.vivthomas.com/",
-        "https://www.metartx.com/",
-        "https://www.thelifeerotic.com/",
-        "https://www.errotica-archives.com/",
         "https://www.alsscan.com",
         "https://www.eroticbeauty.com",
+        "https://www.errotica-archives.com",
         "https://www.eternaldesire.com",
         "https://www.lovehairy.com",
+        "https://www.metart.com",
+        "https://www.metartx.com",
         "https://www.rylskyart.com",
+        "https://www.sexart.com",
+        "https://www.straplez.com",
         "https://www.stunning18.com",
         "https://www.thelifeerotic.com",
+        "https://www.vivthomas.com",
         'https://www.hustler.com'
     ]
 
@@ -63,14 +63,15 @@ class MetArtNetworkSpider(BaseSceneScraper):
         else:
             item['image'] = None
 
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
         if 'hustler' in response.url:
             item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']
-        elif 'lovehairy' in response.url:
+        elif 'lovehairy' in response.url or 'straplez' in response.url:
             item['image'] = 'https://cdn.metartnetwork.com/' + movie['siteUUID'] + movie['splashImagePath']
         else:
             item['image'] = self.format_link(response, item['image'])
+
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
 
         item['date'] = self.parse_date(movie['publishedAt']).isoformat()
         item['tags'] = movie['tags']
