@@ -53,4 +53,4 @@ class SiteNetVideoGirlsSpider(BaseSceneScraper):
             item['tags'] = ['Amateur', 'Audition']
             item['trailer'] = ''
             if item['date'] > "2021-01-01":
-                yield item
+                yield self.check_item(item, self.days)
