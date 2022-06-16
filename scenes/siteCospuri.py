@@ -22,7 +22,7 @@ class SiteCospuriSpider(BaseSceneScraper):
         'title': '//div[@class="sample-model"]/a/text()',
         'description': '//div[@class="description"]/text()',
         'date': '//div[@class="date"]/text()',
-        'image': '//div[@class="vid cosplay"]/div/@style',
+        'image': '//div[contains(@class, "vid ")]/div[contains(@style, "background")]/@style',
         're_image': r'\((http.*.jpg)\)',
         'performers': '//div[@class="sample-model"]/a/text()',
         'tags': '//div[@class="tags"]/a/text()',
@@ -64,7 +64,7 @@ class SiteCospuriSpider(BaseSceneScraper):
         return self.format_url(url, pagination % page)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="scene cosplay"]/div/a/@href').getall()
+        scenes = response.xpath('//div[contains(@class,"scene ")]/div/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

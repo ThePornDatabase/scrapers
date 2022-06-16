@@ -14,11 +14,11 @@ class TonightsGirlfriendSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'description': ".scenepage-description::text",
-        'performers': "//div[@class='scenepage-info']/p/a/text()",
+        'description': "//p[contains(@class, 'scene-description')]/text()",
+        'performers': "//p[contains(@class, 'performers')]/a/text()",
         'date': "//span[@class='scenepage-date']/text()",
         'image': "//img[@class='playcard']/@src",
-        'tags': '',
+        'tags': '//div[contains(@class, "category")]/a/text()',
         'external_id': r'scene/(.+)',
         'trailer': '',
         'pagination': r'/scenes?page=%s'
@@ -28,10 +28,9 @@ class TonightsGirlfriendSpider(BaseSceneScraper):
         title = response.xpath('//h1[contains(@class, "title")]/text()')
         if title:
             return self.cleanup_title(title.get())
-        else:
-            externid = self.get_id(response).replace('-', ' ')
-            externid = re.sub(r"(\d+)$", "", externid)
-            return externid.title()
+        externid = self.get_id(response).replace('-', ' ')
+        externid = re.sub(r"(\d+)$", "", externid)
+        return externid.title()
 
     def get_scenes(self, response):
         scenes = response.css(

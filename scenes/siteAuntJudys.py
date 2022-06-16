@@ -70,3 +70,10 @@ class SiteAuntJudysSpider(BaseSceneScraper):
     def get_id(self, response):
         externid = super().get_id(response)
         return externid.lower()
+
+    def get_image(self, response):
+        if "image" in response.meta:
+            image = response.meta['image']
+        else:
+            image = super().get_image(response)
+        return image
