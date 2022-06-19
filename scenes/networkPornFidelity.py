@@ -19,7 +19,7 @@ class PornFidelitySpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//div[@class="level-item"]/text()',
-        'description': '//div[@class="column is-three-fifths"]',
+        'description': '//div[@class="column is-three-fifths"]/text()',
         'date': "",
         'image': '',
         'performers': '//a[@class="is-underlined"]/text()',
@@ -67,3 +67,8 @@ class PornFidelitySpider(BaseSceneScraper):
             return 'Kelly Madison'
         else:
             return 'PornFidelity'
+
+    def get_description(self, response):
+        description = super().get_description(response)
+        description = description.replace("Episode Summary", "").strip()
+        return description
