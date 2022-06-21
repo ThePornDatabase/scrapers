@@ -1,3 +1,5 @@
+# This has been moved to AdultTime API Scraper
+
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -8,7 +10,7 @@ class JoyMiiSpider(BaseSceneScraper):
     parent = 'JoyMii'
 
     start_urls = [
-        'https://joymii.com'
+        # ~ 'https://joymii.com'
     ]
 
     selector_map = {
