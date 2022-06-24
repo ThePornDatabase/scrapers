@@ -59,10 +59,14 @@ class TeenMegaWorldSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = ''
-        if "noboring" in response.url:
-            image = response.xpath('//deo-video/@poster | //video/@poster')
+        image = response.xpath('//deo-video/@poster | //video/@poster')
+        if image:
+            image = self.format_link(response, image.get())
+        else:
+            image = response.xpath('//meta[@property="og:image"]/@content')
             if image:
                 image = self.format_link(response, image.get())
+
         if not image:
             image = super().get_image(response)
         return image
