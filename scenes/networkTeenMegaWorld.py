@@ -56,3 +56,13 @@ class TeenMegaWorldSpider(BaseSceneScraper):
         site = response.xpath(
             '//div[contains(@class, "site")]//a[starts-with(@href, "/search")]/text()').extract_first()
         return tldextract.extract(site).domain
+
+    def get_image(self, response):
+        image = ''
+        if "noboring" in response.url:
+            image = response.xpath('//deo-video/@poster | //video/@poster')
+            if image:
+                image = self.format_link(response, image.get())
+        if not image:
+            image = super().get_image(response)
+        return image
