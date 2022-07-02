@@ -79,4 +79,6 @@ class SexLikeRealSpider(BaseSceneScraper):
             else:
                 matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr']
                 if not any(x in item['id'] for x in matches):
-                    yield item
+                    matches = ['swallowbay', 'wankitnowvr']
+                    if not any(x in item['site'].lower() for x in matches):
+                        yield item
