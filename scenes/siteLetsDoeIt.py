@@ -22,8 +22,8 @@ class LetsDoeItSpider(BaseSceneScraper):
         'title': '//div[contains(@class,"module-video-details")]//h1/text()',
         'description': '//meta[@name="description"]/@content',
         'date': '//meta[@itemprop="uploadDate"]/@content',
-        'image': '//meta[@itemprop="thumbnailUrl"]/@content',
-        'performers': '//div[@class="actors"]/h2/span/a/strong/text()',
+        'image': '//meta[@itemprop="thumbnailUrl"]/@content|//img[@class="-vcc-img"]/@src',
+        'performers': '//div[@class="actors"]/h2/span/a[contains(@href, "models")]/strong/text()',
         'tags': "//a[contains(@href,'/tags/') or contains(@href,'/categories/')]/text()",
         'external_id': r'/watch/(.*)/',
         'trailer': '//meta[@itemprop="contentURL"]/@content',
@@ -39,7 +39,7 @@ class LetsDoeItSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//div[@class="actors"]/h2/a/strong/text()').get().strip()
+        site = response.xpath('//div[@class="actors"]/h2/a/strong/text()|//div[@class="actors"]/h2/span/a[contains(@href, "/channels/")]/strong/text()').get().strip()
         return site
 
     def get_parent(self, response):
