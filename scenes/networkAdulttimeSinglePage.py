@@ -14,6 +14,7 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
         'https://cardiogasm.net',
         'https://caughtfapping.net',
         'https://joimom.net',
+        'https://gangbangaccidents.com',
         'https://gostuckyourself.net',
     ]
 
@@ -60,6 +61,9 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
         if "stuck" in response.url:
             return "Go Stuck Yourself"
 
+        if "accident" in response.url:
+            return "Accidental Gangbang"
+
     def get_parent(self, response):
         return "AdultTime"
 
@@ -76,3 +80,15 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
             return date
 
         return None
+
+    def get_tags(self, response):
+        tags =[]
+        if "accident" in response.url:
+            tags = ['Gangbang']
+        if "joi" in response.url:
+            tags = ['JOI', 'Family Roleplay']
+        if "mommy" in response.url:
+            tags = ['Family Roleplay']
+        if "stuck" in response.url:
+            tags = ['Stuck Sex']
+        return tags
