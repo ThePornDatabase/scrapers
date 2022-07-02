@@ -102,3 +102,13 @@ class VnaNetworkSpider(BaseSceneScraper):
         if "vickyathome" in base:
             return self.format_url(base, "/milf-videos/page/%s" % page)
         return self.format_url(base, self.get_selector_map('pagination') % page)
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        image = image.replace("sd3.php?show=file&path=/", "")
+        return image
+
+    def get_image_blob(self, response):
+        image = super().get_image(response)
+        image_blob = self.get_image_blob_from_link(image)
+        return image_blob
