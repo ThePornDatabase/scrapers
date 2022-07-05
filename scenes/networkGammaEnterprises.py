@@ -128,7 +128,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.throated.com',
 
 
-        'https://www.famedigital.com',
+        # 'https://www.famedigital.com',  Moved to Adult Time API
         # 'https://www.devilsfilm.com',
         # 'https://www.ebonycafe.com',
         # 'https://www.givemeteens.com',
@@ -146,14 +146,14 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.allgirlmassage.com',
         # 'https://www.nurumassage.com',
 
-        'https://www.xempire.com',
+        # 'https://www.xempire.com',  Moved to Adult Time API
         # 'https://www.allblackx.com/',
         # 'https://www.darkx.com/',
         # 'https://www.eroticaX.com/',
         # 'https://www.hardx.com/',
         # 'https://www.lesbianx.com/',
 
-        'https://www.pridestudios.com',
+        # 'https://www.pridestudios.com',  Moved to Adult Time API
         # 'https://www.familycreep.com',
         # 'https://www.circlejerkboys.com',
         # 'https://www.cockvirgins.com',
@@ -170,7 +170,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         ##############################
         # 'https://www.21naturals.com', Moved to AdultTime API
         'https://www.activeduty.com',
-        'https://www.analacrobats.com',
+        # 'https://www.analacrobats.com', No longer active
         'https://www.bigfatcreampie.com',
         'https://www.bskow.com',
         'https://www.burningangel.com',
@@ -615,7 +615,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             selector = '/en/videos/updates/%s/All/0/Pornstar/0'
 
         if 'xempire' in base:
-            selector = '/en/videos/xempire/latest/%s'
+            selector = '/en/videos/sort/latest/page/%s'
 
         returnurl = selector % page
         return self.format_url(base, returnurl)
