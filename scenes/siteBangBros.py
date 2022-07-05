@@ -20,7 +20,7 @@ class BangBrosSpider(BaseSceneScraper):
         'performers': "//div[@class='vdoAllDesc']//div[@class='vdoCast']//a[position()>1]/text()",
         'tags': "//div[@class='vdoTags']//a/text()",
         'external_id': r'/([A-Za-z0-9-_+=%]+)$',
-        'trailer': '//video//source/@src',
+        'trailer': '//video//source[contains(@src, "mp4") and not(contains(@src, "mpd")) and not(contains(@src, "m3u8"))]/@src',
         'pagination': '/videos/%s'
     }
 

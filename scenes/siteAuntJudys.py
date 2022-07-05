@@ -37,14 +37,12 @@ class SiteAuntJudysSpider(BaseSceneScraper):
                 image = scene.xpath('./a/img/@src0_1x').get()
             if not image:
                 image = scene.xpath('./a/img/@src').get()
-            if image:
-                image = "https://www.auntjudys.com" + image.strip()
-            else:
-                image = ""
+            image = self.format_link(response, image)
+            image_blob = self.get_image_blob_from_link(image)
 
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image})
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'image_blob': image_blob})
 
     def get_site(self, response):
         if "xxx" in response.url:
@@ -70,10 +68,3 @@ class SiteAuntJudysSpider(BaseSceneScraper):
     def get_id(self, response):
         externid = super().get_id(response)
         return externid.lower()
-
-    def get_image(self, response):
-        if "image" in response.meta:
-            image = response.meta['image']
-        else:
-            image = super().get_image(response)
-        return image
