@@ -1,4 +1,5 @@
 import scrapy
+import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -33,3 +34,17 @@ class SiteDesperateAmateursSpider(BaseSceneScraper):
         for scene in scenes:
             scene = "https://www.desperateamateurs.com/fintour/" + scene
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+
+    def get_date(self, response):
+        if 'date' in self.get_selector_map():
+            scenedate = self.get_element(response, 'date', 're_date')
+            if scenedate:
+                if isinstance(scenedate, list):
+                    scenedate = scenedate[0]
+                date_formats = self.get_selector_map('date_formats') if 'date_formats' in self.get_selector_map() else None
+                scenedate = re.search(r'(\d{2}/\d{2}/\d{4})', scenedate)
+                if scenedate:
+                    scenedate = scenedate.group(1)
+                return self.parse_date(self.cleanup_text(scenedate), date_formats=date_formats).isoformat()
+        return self.parse_date('today').isoformat()
