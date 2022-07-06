@@ -47,7 +47,6 @@ def match_site(argument):
         'famedigital': "Fame Digital",
         'fantasymassage': "Fantasy Massage",
         'familycreep': "Family Creep",
-        'footsiebabes': "Footsie Babes",
         'gapingangels': "Gaping Angels",
         'girlfriendsfilms': "Girlfriends Films",
         'girlsandstuds': "Girls and Studs",
@@ -64,7 +63,6 @@ def match_site(argument):
         'jonnidarkkoxxx': "Jonni Darkkoxxx",
         'lesbianfactor': "Lesbian Factor",
         'lesbianx': "LesbianX",
-        'lewood': "Lewood",
         'lexingtonsteele': "Lexington Steele",
         'maledigital': "Male Digital",
         'maskurbate': "Maskurbate",
@@ -82,10 +80,8 @@ def match_site(argument):
         'outofthefamily': "Out of the Family",
         'pantypops': "Panty Pops",
         'pridestudios': "Pride Studios",
-        'prettydirty': "Pretty Dirty",
         'povblowjobs': "POV Blowjobs",
         'povmassage': "POV Massage",
-        'povthis': "POV This",
         'ragingstallion': "Raging Stallion",
         'roccosiffredi': "Rocco Siffredi",
         'seemyflixxx': "SeeMyFlixxx",
@@ -181,7 +177,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.currycreampie.com',
         'https://www.dpfanatics.com',
         'https://www.falconstudios.com',
-        'https://www.footsiebabes.com',
+        # 'https://www.footsiebabes.com', Moved to Adult Time API
         'https://www.gapingangels.com',
         'https://www.girlfriendsfilms.com',
         'https://www.girlsandstuds.com',
@@ -190,10 +186,10 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.hothouse.com',
         'https://www.immorallive.com',  # Originally part of Blowpass, moved out of group
         'https://www.jakemalone.com',
-        'https://www.jaysinxxx.com',
+        # 'https://www.jaysinxxx.com', No longer active
         'https://www.joeysilvera.com',
         'https://www.jonnidarkkoxxx.com',
-        'https://www.lewood.com',
+        # 'https://www.lewood.com', Moved to Adult Time API
         'http://www.lexingtonsteele.com',
         'https://www.maledigital.com',
         'https://www.maskurbate.com',
@@ -203,17 +199,17 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.nudefightclub.com',
         'https://www.pantypops.com',
         'https://www.povblowjobs.com',
-        'https://www.povthis.com',
-        'https://www.prettydirty.com',
+        # 'https://www.povthis.com', Moved to Adult Time API
+        # 'https://www.prettydirty.com', Moved to Adult Time API
         'https://www.ragingstallion.com',
         'http://www.seemyflixxx.com',
         'https://www.soapymassage.com',
         'https://www.squirtingorgies.com',
         'https://www.strapattackers.com',
         'https://www.tittycreampies.com',
-        'https://www.transsexualroadtrip.com',
+        # 'https://www.transsexualroadtrip.com', Moved to Adulttime API
         'https://www.trickyspa.com',
-        'https://www.tsfactor.com',
+        # 'https://www.tsfactor.com', Moved to Adulttime API
 
 
         #  API or Comments
