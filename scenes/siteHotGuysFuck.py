@@ -14,7 +14,7 @@ class HotGuysFuckSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//meta[@property="og:title"]/@content',
-        'description': '//div[@class="descriptionIntro"]/p/text()',
+        'description': '//section[contains(@name, "descriptionIntro")]/p/text()',
         'date': '//meta[@property="og:video:release_date"]/@content',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//meta[@property="og:video:actor"]/@content',
@@ -27,8 +27,9 @@ class HotGuysFuckSpider(BaseSceneScraper):
     def get_scenes(self, response):
 
         scenes = response.xpath(
-            '//div[@class="thumbWrapper"]/a/@href').getall()
+            '//h3/a[contains(@href, "/video/")]/@href').getall()
         for scene in scenes:
+            scene = scene.strip()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 

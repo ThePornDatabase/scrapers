@@ -14,7 +14,7 @@ class BangBrosAltSpider(BaseSceneScraper):
         'http://xxxpawn.com',
         'http://blackpatrol.com',
         'http://blacksonmoms.com',
-        'https://filthyfamily.com',
+        # ~ 'https://filthyfamily.com',
     ]
 
     selector_map = {

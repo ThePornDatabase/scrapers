@@ -18,7 +18,7 @@ class NetworkARXBucksSpider(BaseSceneScraper):
         data = {
             "operationName": "Scenes",
             "variables": {
-                "first": 18,
+                "first": 50,
                 "after": "",
                 "siteId": null,
                 "isAvailable": true,
