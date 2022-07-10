@@ -21,7 +21,7 @@ class HotGuysFuckSpider(BaseSceneScraper):
         'tags': '//meta[@property="og:video:tag"]/@content',
         'trailer': '',
         'external_id': r'video\/(.*)',
-        'pagination': '/videos/recent?page=%s'
+        'pagination': '/videos/recent/%s'
     }
 
     def get_scenes(self, response):

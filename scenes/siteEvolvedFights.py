@@ -54,5 +54,5 @@ class EvolvedFightsSpider(BaseSceneScraper):
 
     def get_site(self, response):
         if "evolvedfightslez" in response.url:
-            return "Evolved Fights Lesbian Edition"
+            return "Evolved Fights Lez"
         return "Evolved Fights"

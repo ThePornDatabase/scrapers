@@ -60,7 +60,7 @@ class NetworkTwoWebMediaSpider(BaseSceneScraper):
 
     def get_image(self, response):
         imageurl = super().get_image(response)
-        if not imageurl:
+        if not imageurl or ".jpg" not in imageurl:
             image = response.xpath('//div[contains(@class,"wpfp_custom_background")]/@style')
             if image:
                 image = image.get()

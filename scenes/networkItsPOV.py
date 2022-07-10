@@ -1,7 +1,9 @@
 import re
 import html
 import json
+import base64
 from datetime import date, timedelta
+import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -24,8 +26,11 @@ class NetworkItsPOVSpider(BaseSceneScraper):
     ]
 
     headers = {
-        'Siteid': '102',
-        'Token': 'mysexmobile',
+        'siteId': '102',
+        'token': 'mysexmobile',
+        'Referer': 'https://itspov.com/',
+        'Origin': 'https://itspov.com',
+        'locale': 1,
     }
 
     custom_settings = {'CONCURRENT_REQUESTS': '1',
@@ -59,7 +64,8 @@ class NetworkItsPOVSpider(BaseSceneScraper):
 
     def start_requests2(self, response):
         for site in self.sites:
-            url = "https://content-api.itspov.com/24api/v1/sites/{}/freetour".format(site[1])
+            # ~ url = "https://content-api.itspov.com/24api/v1/sites/{}/freetour".format(site[1])
+            url = "https://api.itspov.com/24api/v1/sites/{}/freetour".format(site[1])
             yield scrapy.Request(url,
                                  callback=self.get_scenes,
                                  meta={'page': self.page, 'site': site[0], 'group': site[1]},
@@ -85,7 +91,7 @@ class NetworkItsPOVSpider(BaseSceneScraper):
             if counter > (limit_pages * 5):
                 break
 
-            url = "https://content-api.itspov.com/24api/v1/sites/{}/freetour/videos/".format(meta['group']) + str(jsondata['payload']['sites'][meta['group']]['scenes'][data]['id'])
+            url = "https://api.itspov.com/24api/v1/sites/{}/freetour/videos/".format(meta['group']) + str(jsondata['payload']['sites'][meta['group']]['scenes'][data]['id'])
             yield scrapy.Request(url,
                                  callback=self.parse_scene,
                                  meta=meta,
@@ -108,7 +114,7 @@ class NetworkItsPOVSpider(BaseSceneScraper):
             item['id'] = data[row]['id']
             item['title'] = html.unescape(re.sub('<[^<]+?>', '', data[row]['title']))
             item['description'] = html.unescape(re.sub('<[^<]+?>', '', data[row]['story']))
-            item['url'] = "https://itspov.com/" + data[row]['url']
+            item['url'] = "https://itspov.com/" + data[row]['routePaths'][f'scene({row})']['en']
             if '1500' in data[row]['video_cover']:
                 item['image'] = data[row]['video_cover']['1500']
             else:
@@ -146,3 +152,10 @@ class NetworkItsPOVSpider(BaseSceneScraper):
                             yield item
                     else:
                         yield item
+
+    def get_image_blob_from_link(self, image):
+
+        header_dict = {'Referer': 'https://itspov.com/'}
+        if image:
+            return base64.b64encode(requests.get(image, headers=header_dict).content).decode('utf-8')
+        return None

@@ -2,14 +2,18 @@ import re
 import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from scrapy.utils.project import get_project_settings
 
 
 class LegalPornoSpider(BaseSceneScraper):
     name = 'LegalPornoPornworld'
     network = 'Legal Porno'
 
+    settings = get_project_settings()
+    proxy_address = settings.get('PROXY_ADDRESS')
+
     start_urls = [
-        # ~ 'https://www.analvids.com',  # Located in netowkrLegalPorno.py
+        # ~ 'https://www.analvids.com',  # Located in networkLegalPorno.py
         'https://pornworld.com'
     ]
 
@@ -33,13 +37,14 @@ class LegalPornoSpider(BaseSceneScraper):
         return "Porn World"
 
     def get_scenes(self, response):
+        meta = response.meta
         """ Returns a list of scenes
         @url https://pornworld.com/new-videos/1
         @returns requests 50 150
         """
         scenes = response.xpath('//div[@class="card-scene__view"]/a/@href').getall()
         for scene in scenes:
-            yield scrapy.Request(url=scene, callback=self.parse_scene)
+            yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):
         title = self.process_xpath(response, self.get_selector_map('title'))

@@ -20,7 +20,7 @@ class SiteBigBootyTGirlsSpider(BaseSceneScraper):
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
         'external_id': r'updates\/(.*).html',
-        'trailer': '//div[@class="update_image"]/a/@onclick',
+        'trailer': '//div[@class="update_image"]/a[1]/@onclick',
         're_trailer': r'(trailer.*\.mp4)',
         'pagination': '/categories/updates_%s_d.html'
     }
