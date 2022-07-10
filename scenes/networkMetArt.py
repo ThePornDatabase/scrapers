@@ -65,7 +65,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
         if 'hustler' in response.url:
             item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']
-        elif 'lovehairy' in response.url or 'straplez' in response.url:
+        elif 'lovehairy' in response.url or 'straplez' in response.url or 'alsscan' in response.url:
             item['image'] = 'https://cdn.metartnetwork.com/' + movie['siteUUID'] + movie['splashImagePath']
         else:
             item['image'] = self.format_link(response, item['image'])

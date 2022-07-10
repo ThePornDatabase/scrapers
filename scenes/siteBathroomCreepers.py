@@ -45,3 +45,12 @@ class SiteBathroomCreeperSpider(BaseSceneScraper):
         if image:
             return self.format_link(response, image.get())
         return None
+
+    def get_date(self, response):
+        scenedate = response.xpath(self.get_selector_map('date'))
+        if scenedate:
+            scenedate = " ".join(scenedate.getall())
+            scenedate = re.search(self.get_selector_map('re_date'), scenedate)
+            if scenedate:
+                return self.parse_date(scenedate.group(1), date_formats=['%B %d, %Y']).isoformat()
+        return self.parse_date('today').isoformat()
