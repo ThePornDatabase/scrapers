@@ -58,8 +58,8 @@ class NetworkDMEMediaSpider(BaseSceneScraper):
         'title': '//span[@class="update_title"]/text()|//h1[@class="update_title"]/text()',
         'description': '//span[contains(@class, "latest_update_description")]//text()',
         'date': '//span[contains(@class,"update_date")]/text()',
-        'image': '//script[contains(text(), "poster=")]/text()',
-        'image_blob': True,
+        'image1': '//script[contains(text(), "poster=")]/text()',
+        'image2': '//div[@id="fakeplayer"]//img/@src',
         're_image': r'poster=\"(.*?)\".*',
         'performers': '',
         'tags': '//span[@class="update_tags"]/a/text()',
@@ -84,11 +84,16 @@ class NetworkDMEMediaSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
+        scenes = response.xpath('//div[@class="updateItem"]/a')
         for scene in scenes:
-            scene = "/tour/" + scene
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            imageholder = scene.xpath('./img/@src')
+            if imageholder:
+                imageholder = imageholder.get()
+            else:
+                imageholder = None
+            scene = "/tour/" + scene.xpath('./@href').get()
+            if re.search(self.get_selector_map('external_id'), scene) and "404-error" not in response.url:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'imageholder': imageholder})
 
     def get_site(self, response):
         return match_site(super().get_site(response))
@@ -106,3 +111,18 @@ class NetworkDMEMediaSpider(BaseSceneScraper):
         if "Ss - Photos" in tags:
             tags.remove("Ss - Photos")
         return tags
+
+    def get_image(self, response):
+        image = response.xpath(self.get_selector_map('image2'))
+        if image:
+            return image.get()
+        else:
+            image = response.xpath(self.get_selector_map('image1'))
+            if image:
+                image = re.search(self.get_selector_map('re_image'), image.get())
+                if image:
+                    return image.group(1)
+        if response.meta['imageholder']:
+            return response.meta['imageholder']
+        else:
+            return ''

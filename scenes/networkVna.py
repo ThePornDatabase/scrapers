@@ -61,17 +61,35 @@ class VnaNetworkSpider(BaseSceneScraper):
         'image': '//center//img/@src',
         'performers': '//h3[@class="customhcolor"]/text()',
         'tags': '//h4[@class="customhcolor"]/text()',
-        'external_id': 'videos/(\\d+)/(.+)',
+        'external_id': r'videos/(\d+)/(.+)',
         'trailer': '',
 
         'pagination': '/videos/page/%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.css('a::attr(href)').getall()
-        for scene in scenes:
-            if re.search(self.selector_map['external_id'], scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        if "romemajor" in response.url:
+            scenes = response.xpath('//div[contains(@class, "videoarea clear")]')
+            for scene in scenes:
+                image = scene.xpath('.//img[contains(@src, "thumb_2")]/@src')
+                if image:
+                    image = image.get()
+                else:
+                    image = scene.xpath('.//img[contains(@src, "thumb")/@src').get()
+                if not image:
+                    image = None
+                else:
+                    imageorig = self.format_link(response, image)
+                    image = imageorig.replace("sd3.php?show=file&path=/", "")
+
+                scene = scene.xpath('.//h3/a/@href').get()
+                if re.search(self.selector_map['external_id'], scene):
+                    yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'imageorig': imageorig})
+        else:
+            scenes = response.css('a::attr(href)').getall()
+            for scene in scenes:
+                if re.search(self.selector_map['external_id'], scene):
+                    yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_tags(self, response):
         taglink = self.process_xpath(
@@ -106,9 +124,15 @@ class VnaNetworkSpider(BaseSceneScraper):
     def get_image(self, response):
         image = super().get_image(response)
         image = image.replace("sd3.php?show=file&path=/", "")
+        if "jpg" not in image:
+            return None
         return image
 
     def get_image_blob(self, response):
+        meta = response.meta
         image = super().get_image(response)
-        image_blob = self.get_image_blob_from_link(image)
+        if "imageorig" in meta:
+            image_blob = self.get_image_blob_from_link(meta['imageorig'])
+        else:
+            image_blob = self.get_image_blob_from_link(image)
         return image_blob
