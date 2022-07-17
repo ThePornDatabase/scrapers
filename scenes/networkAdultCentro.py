@@ -32,6 +32,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://bhalasada.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bhala Sada', ''],
         ['https://bigjohnnyxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Big Johnny XXX', ''],
         ['https://brookelynnebriar.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Brookelynne Briar', 'Brookelynne Briar'],
+        # ['https://bruceandmorgan.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Bruce and Morgan', ''],  Closed site, historical only
         ['https://bunnyscout.tv', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bunny Scout', ''],
         ['https://cleagaultier-official.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Clea Gaultier', 'Clea Gaultier'],
         ['https://cospimps.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Cospimps', ''],

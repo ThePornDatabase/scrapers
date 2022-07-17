@@ -41,6 +41,8 @@ class SiteNetVideoGirlsSpider(BaseSceneScraper):
             item['site'] = 'NetVideoGirls'
 
             item['date'] = scene['node']['tour_thumbs']['updates']['release_date']
+            if not item['date']:
+                item['date'] = self.parse_date('today').isoformat()
             item['title'] = scene['node']['tour_thumbs']['updates']['short_title']
             item['id'] = scene['node']['tour_thumbs']['updates']['mysqlId']
             item['url'] = 'https://netvideogirls.com/home'
