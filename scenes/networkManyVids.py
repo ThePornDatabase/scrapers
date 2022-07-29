@@ -68,7 +68,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['1004388132', 'Manyvids: Jodi West'],
         ['320527', 'Manyvids: Diane Andrews'],
         ['97815', 'Manyvids: Midori Rose'],
-        ['97815', 'Manyvids: Blissed XXX'],
+        ['1000324638', 'Manyvids: Blissed XXX'],
+        ['1004131603', 'Manyvids: Chris And Mari'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}

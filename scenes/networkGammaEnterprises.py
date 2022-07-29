@@ -175,7 +175,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.christophclarkonline.com/',
         'https://www.cumshotoasis.com',
         'https://www.currycreampie.com',
-        'https://www.dpfanatics.com',
+        # ~ 'https://www.dpfanatics.com', Moved to AdultTime API
         'https://www.falconstudios.com',
         # 'https://www.footsiebabes.com', Moved to Adult Time API
         'https://www.gapingangels.com',

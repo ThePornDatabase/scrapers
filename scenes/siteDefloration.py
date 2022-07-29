@@ -1,5 +1,4 @@
 import re
-from datetime import date, timedelta
 import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -13,7 +12,8 @@ class SiteDeflorationSpider(BaseSceneScraper):
     site = 'Defloration'
 
     start_urls = [
-        'https://blog.defloration.com',
+        # ~ 'https://www.defloration.com',
+        'file:///scrapy/scrapyProduction/tpdb/defloration.html',
     ]
 
     selector_map = {
@@ -27,21 +27,60 @@ class SiteDeflorationSpider(BaseSceneScraper):
         'tags': '',
         'external_id': r'.*/(.*?)/',
         'trailer': '',
-        'pagination': '/page/%s/'
+        'pagination': '/freetour.php?page=%s'
     }
 
+    def start_requests(self):
+
+        for link in self.start_urls:
+            yield scrapy.Request(url=link,
+                                 callback=self.parse,
+                                 headers=self.headers,
+                                 cookies=self.cookies)
+
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class, "post-")]//a[contains(text(), "Read More")]/@href').getall()
+        scenes = response.xpath('//div[@class="textblock1"]/p/strong/../..')
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            item = SceneItem()
 
-    def get_tags(self, response):
-        tags = ['Hymen', 'Defloration', 'Virgin']
-        return tags
+            title = scene.xpath('./p/strong/text()')
+            if title:
+                item['title'] = title.get().strip()
+            else:
+                item['title'] = None
 
-    def get_performers(self, response):
-        title = super().get_performers(response)[0]
+            item['date'] = self.parse_date('today').isoformat()
+
+            item['performers'] = self.parse_performer(item['title'])
+            item['tags'] = ['Hymen', 'Defloration', 'Virgin']
+
+            image = scene.xpath('.//img/@src')
+            if image:
+                item['image'] = "https://www.defloration.com/" + image.get().strip()
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                # ~ item['image_blob'] = None
+                item['id'] = re.search(r'.*/(.*?)\.jpg', item['image']).group(1)
+            else:
+                item['image'] = None
+                item['image_blob'] = None
+                item['id'] = None
+
+            description = scene.xpath('./p[2]//text()')
+            if description:
+                description = description.getall()
+                item['description'] = " ".join(description).replace("\n", "").replace("\r", "").replace("\t", "").replace("  ", "").strip()
+            else:
+                item['description'] = None
+
+            item['trailer'] = None
+            item['url'] = "https://www.defloration.com/freetour.php"
+            item['network'] = 'Defloration'
+            item['parent'] = 'Defloration'
+            item['site'] = 'Defloration'
+
+            yield item
+
+    def parse_performer(self, title):
         performer = ''
         if title:
             if re.search(r'(\w+ \w+)\.', title):
@@ -49,94 +88,6 @@ class SiteDeflorationSpider(BaseSceneScraper):
             else:
                 if len(re.findall(r'\w+', title)) == 2:
                     performer = title.strip()
-        return [string.capwords(performer)]
-
-    def parse_scene(self, response):
-        item = SceneItem()
-
-        if 'title' in response.meta and response.meta['title']:
-            item['title'] = response.meta['title']
-        else:
-            item['title'] = self.get_title(response)
-
-        if 'description' in response.meta:
-            item['description'] = response.meta['description']
-        else:
-            item['description'] = self.get_description(response)
-
-        if hasattr(self, 'site'):
-            item['site'] = self.site
-        elif 'site' in response.meta:
-            item['site'] = response.meta['site']
-        else:
-            item['site'] = self.get_site(response)
-
-        if 'date' in response.meta:
-            item['date'] = response.meta['date']
-        else:
-            item['date'] = self.get_date(response)
-
-        if 'image' in response.meta:
-            item['image'] = response.meta['image']
-        else:
-            item['image'] = self.get_image(response)
-
-        if 'image' not in item or not item['image']:
-            item['image'] = None
-
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-        if 'performers' in response.meta:
-            item['performers'] = response.meta['performers']
-        else:
-            item['performers'] = self.get_performers(response)
-
-        if 'tags' in response.meta:
-            item['tags'] = response.meta['tags']
-        else:
-            item['tags'] = self.get_tags(response)
-
-        if 'id' in response.meta:
-            item['id'] = response.meta['id']
-        else:
-            item['id'] = self.get_id(response)
-
-        if 'trailer' in response.meta:
-            item['trailer'] = response.meta['trailer']
-        else:
-            item['trailer'] = self.get_trailer(response)
-
-        item['url'] = self.get_url(response)
-
-        if hasattr(self, 'network'):
-            item['network'] = self.network
-        elif 'network' in response.meta:
-            item['network'] = response.meta['network']
-        else:
-            item['network'] = self.get_network(response)
-
-        if hasattr(self, 'parent'):
-            item['parent'] = self.parent
-        elif 'parent' in response.meta:
-            item['parent'] = response.meta['parent']
-        else:
-            item['parent'] = self.get_parent(response)
-
-        if self.days > 27375:
-            filter_date = '0000-00-00'
-        else:
-            days = self.days
-            filter_date = date.today() - timedelta(days)
-            filter_date = filter_date.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filter_date:
-                item['filtered'] = 'Scene filtered due to date restraint'
-            print(item)
-        else:
-            if filter_date and item['image']:
-                if item['date'] > filter_date:
-                    yield item
-            else:
-                if item['image']:
-                    yield item
+        if performer:
+            return [string.capwords(performer)]
+        return[]

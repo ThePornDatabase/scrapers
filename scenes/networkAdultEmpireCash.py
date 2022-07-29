@@ -44,7 +44,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
 
     def get_scenes(self, response):
         if "spankmonster" in response.url:
-            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            scenes = response.xpath('//a[@class="grid-item-details"]/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Spank Monster"
@@ -130,7 +130,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         if "smutfactor" in base:
             pagination = "/watch-newest-smut-factor-clips-and-scenes.html?page=%s&hybridview=member"
         if "spankmonster" in base:
-            pagination = "/watch-newest-spank-monster-clips-and-scenes.html?page=%s&hybridview=member"
+            pagination = "/spank-monster-updates.html?page=%s&hybridview=member"
         if "stephousexxx" in base:
             pagination = "/watch-newest-step-house-xxx-clips-and-scenes.html?page=%s&hybridview=member"
         if "jonathanjordanxxx" in base:

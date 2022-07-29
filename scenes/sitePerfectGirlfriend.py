@@ -29,9 +29,10 @@ class SitePerfectGirlfriendSpider(BaseSceneScraper):
         scenes = response.xpath('//article/div[1]/a')
         for scene in scenes:
             image = scene.xpath('./img/@src').get()
+            image_blob = self.get_image_blob_from_link(image)
             scene = scene.xpath('./@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image})
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'image_blob': image_blob})
 
     def get_site(self, response):
         return "Perfect Girlfriend"
