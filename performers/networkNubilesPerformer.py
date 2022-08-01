@@ -8,15 +8,15 @@ class NubilesPerformerSpider(BasePerformerScraper):
         'name': '.model-profile-desc h2::text',
         'image': ".model-profile img::attr(src)",
         'bio': '.model-bio::text',
-        'nationality': '//div[contains(@class, "model-profile-desc")]//p[1]/text()',
-        'height': '//div[contains(@class, "model-profile-desc")]//p[3]/text()',
-        'astrology': '//div[contains(@class, "model-profile-desc")]//p[4]/text()',
-        'measurements': '//div[contains(@class, "model-profile-desc")]//p[5]/text()',
+        'nationality': '//p[contains(text(), "Location")]/following-sibling::p[1]/text()',
+        'height': '//p[contains(text(), "Height")]/following-sibling::p[1]/text()',
+        'astrology': '//p[contains(text(), "Zodiac")]/following-sibling::p[1]/text()',
+        'measurements': '//p[contains(text(), "Figure")]/following-sibling::p[1]/text()',
+        'cupsize': '//p[contains(text(), "Figure")]/following-sibling::p[1]/text()',
+        're_cupsize': r'(\d{1,3}\w+?)-\d',
         'pagination': '/model/gallery/%s',
         'external_id': r'profile/\d+/.+$'
     }
-
-    custom_settings = {'DOWNLOADER_MIDDLEWARES': {'tpdb.mymiddlewares.CustomProxyMiddleware': 350, 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 400}}
 
     name = 'NubilesPerformer'
     network = "Nubiles"

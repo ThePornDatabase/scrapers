@@ -70,6 +70,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['97815', 'Manyvids: Midori Rose'],
         ['1000324638', 'Manyvids: Blissed XXX'],
         ['1004131603', 'Manyvids: Chris And Mari'],
+        ['1000829435', 'Manyvids: RhiannonRyder1995'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -299,6 +300,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Haylee Love']
         if "Paige Steele" in meta['site']:
             return ['Paige Steele']
+        if "RhiannonRyder1995" in meta['site']:
+            return ['Rhiannon Ryder']
         if "Jewelz Blu" in meta['site']:
             return ['Jewelz Blu']
         if "Molly Redwolf" in meta['site']:

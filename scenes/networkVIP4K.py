@@ -29,7 +29,7 @@ class NetworkVIP4KSpider(BaseSceneScraper):
         for scene in scenes:
             trailer = response.xpath('.//video/source/@src')
             if trailer:
-                trailer = trailer.get()
+                trailer = self.format_link(response, trailer.get())
             else:
                 trailer = None
             scene = scene.xpath('./a[@class="item__main"]/@href').get()

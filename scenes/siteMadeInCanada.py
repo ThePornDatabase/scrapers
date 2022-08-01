@@ -10,7 +10,7 @@ class MadeInCanadaSpider(BaseSceneScraper):
     parent = "MadeInCanada"
 
     start_urls = [
-        'http://tour.madeincanada.xxx/'
+        # 'http://tour.madeincanada.xxx/' # Completely paywalled 2022-08-01
     ]
 
     selector_map = {

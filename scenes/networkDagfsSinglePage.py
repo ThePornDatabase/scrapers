@@ -9,8 +9,8 @@ class NetworkDaGFsSpider(BaseSceneScraper):
 
     start_urls = [
         ['https://www.filf.com', 'FILF'],
-        ['https://www.shedoesanal.com', 'She Does Anal'],
-        ['https://www.steplesbians.com', 'Step Lesbians'],
+        # ~ ['https://www.shedoesanal.com', 'She Does Anal'],
+        # ~ ['https://www.steplesbians.com', 'Step Lesbians'],
     ]
 
     def start_requests(self):

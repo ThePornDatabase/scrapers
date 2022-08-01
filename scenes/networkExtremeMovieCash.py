@@ -85,7 +85,7 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
         'https://www.herfirstkisses.com',
         'https://www.hotrubberbabes.com',
         'https://www.juicynudists.com',
-        'https://www.kellyinspandex.com',
+        # 'https://www.kellyinspandex.com',  # Paywalled 2022-08-01
         'https://www.latinlesbea.com',
         'https://www.lookiamhairy.com',
         'https://www.lynnhd.com',
@@ -117,7 +117,7 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page):
         pagination = '/tour/categories/movies/%s/latest/'
-        if "crazyfetishpass" in base:
+        if "crazyfetishpass" in base or "kellyinspandex" in base:
             pagination = "/tour/categories/movies_%s_d.html"
         return self.format_url(base, pagination % page)
 

@@ -8,7 +8,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 class siteLetsDoeItPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h1/text()',
-        'image': '//div[contains(@class,"poster-item")]/img/@data-src',
+        'image': '//div[contains(@class,"poster-item")]/img/@src|//div[contains(@class,"poster-item")]/img/@data-src',
         'nationality': '//div[contains(@class,"list-item") and contains(text(),"Nationality")]/span/text()',
         'birthday': '//div[contains(@class,"list-item") and contains(text(),"Birth Date")]/span/text()',
         'birthplace': '//div[contains(@class,"list-item") and contains(text(),"Birth Place")]/span/text()',
@@ -96,7 +96,7 @@ class siteLetsDoeItPerformerSpider(BasePerformerScraper):
                     return "Yes"
                 return fakeboobs.strip()
         return ''
-        
+
 
     def get_bio(self, response):
         if 'bio' in self.selector_map:
@@ -105,4 +105,4 @@ class siteLetsDoeItPerformerSpider(BasePerformerScraper):
                 bio = " ".join(bio)
                 bio = bio.replace("  "," ")
                 return bio.strip()
-        return ''        
+        return ''

@@ -219,6 +219,7 @@ class AndomarkSpider(BaseSceneScraper):
             titlesearch = '//span[@class="update_title"]/text()|//div[@class="updatesBlock"][1]/div[@class="title clear"]/h2/text()'
 
         title = response.xpath(titlesearch).get()
+        title = title.strip()
         if not title:
             title = response.xpath('//meta[@property="og:title"]/@content').get()
             if " - " in title:
@@ -252,6 +253,9 @@ class AndomarkSpider(BaseSceneScraper):
         elif 'shinybound.com' in response.url:
             imagesearch = '//img[@class="stdimage promo_thumb left thumbs"]/@src0_1x'
             image = response.xpath(imagesearch).get()
+        elif 'ariellynn.com' in response.url:
+            imagesearch = '//div[@class="model_update_block_image"]/a//img/@src0_2x'
+            image = "tour/" + response.xpath(imagesearch).get()
         else:
             imagesearch = '//meta[@property="og:image"]/@content'
             image = response.xpath(imagesearch).get()
@@ -319,6 +323,8 @@ class AndomarkSpider(BaseSceneScraper):
             return ["Minka"]
         if 'sexykaren' in response.url:
             return ["Karen Fisher"]
+        if 'ariellynn' in response.url:
+            return ["Ariel Lynn"]
         if 'houseofyre' in response.url:
             performersearch = '//div[@class="update_block_info"]/span[@class="tour_update_models"]/a/text()'
         if 'meanawolf' in response.url:

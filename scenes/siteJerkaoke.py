@@ -5,12 +5,12 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class SiteJerkaokeSpider(BaseSceneScraper):
     name = 'Jerkaoke'
-    network = 'Jerkaoke'
-    parent = 'Jerkaoke'
-    site = 'Jerkaoke'
+    network = 'Model Media'
 
     start_urls = [
-        'https://www.jerkaoke.com',
+        'https://www.delphinefilms.com',
+        # ~ 'https://www.jerkaoke.com',
+        # ~ 'https://www.povadventure.com/',
     ]
 
     selector_map = {
@@ -32,3 +32,30 @@ class SiteJerkaokeSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_site(self, response):
+        if "delphine" in response.url:
+            return "Delphine Films"
+        if "jerkaoke" in response.url:
+            return "Jerkaoke"
+        if "povadventure" in response.url:
+            return "POV Adventure"
+        return super().get_site(response)
+
+    def get_parent(self, response):
+        if "delphine" in response.url:
+            return "Delphine Films"
+        if "jerkaoke" in response.url:
+            return "Jerkaoke"
+        if "povadventure" in response.url:
+            return "POV Adventure"
+        return super().get_parent(response)
+
+    def get_tags(self, response):
+        tags = super().get_tags(response)
+        if "Delphine" in tags:
+            tags.remove("Delphine")
+        if "POV Adventure" in tags:
+            tags.remove("POV Adventure")
+        if "Jerkaoke" in tags:
+            tags.remove("Jerkaoke")

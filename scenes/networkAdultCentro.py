@@ -44,7 +44,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://facialkings.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Facial Kings', ''],
         ['https://fallinlovia.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Fall in Lovia', 'Eva Lovia'],
         ['https://www.hollandswing.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Holland Swing', 'Nikki Holland'],
-        ['https://www.honeygoldxxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Honey Gold', 'Honey Gold'],
+        # ['https://www.honeygoldxxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Honey Gold', 'Honey Gold'],  # Site non-responsive (2022-08-01)
         ['https://isinxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'I Sin XXX', ''],
         ['https://jerkoffwithme.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Jerk Off With Me', ''],
         ['https://katie71.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Katie71', 'Katie71'],
@@ -76,9 +76,10 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://therealscarletred.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Scarlet Red', 'Scarlet Red'],
         ['https://thiccvision.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Thiccvision', ''],
         ['https://www.ticklehotness.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Tickle Hotness', ''],
-        ['https://trinitystclair.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Trinity St Clair', 'Trinity St Clair'],
+        # ['https://trinitystclair.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Trinity St Clair', 'Trinity St Clair'],  # Site non-responsive (2022-08-01)
         ['https://www.viscontivip.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Visconti VIP', ''],
         ['https://www.mylifeinmiami.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'My Life In Miami', ''],
+        ['https://www.throatwars.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Throat Wars', ''],
     ]
 
     selector_map = {
@@ -197,6 +198,12 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
         if "backalleytoonz" in response.url:
             item['tags'].append("Animation")
+
+        if "throatwars" in response.url:
+            item['tags'].append("Interracial")
+            item['tags'].append("Blowjob")
+            item['tags'].append("Face Fuck")
+            item['tags'].append("Deepthroat")
 
         item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
         item['image'] = data['_resources']['primary'][0]['url'].strip()

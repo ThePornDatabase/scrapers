@@ -57,3 +57,9 @@ class DorcelClubSpider(BaseSceneScraper):
         scenes = response.css('div.scene a.thumb::attr(href)').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), cookies=self.cookies, callback=self.parse_scene, headers=self.headers)
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        trash = '_' + image.split('_', 3)[-1].rsplit('.', 1)[0]
+        image = image.replace(trash, '', 1)
+        return image
