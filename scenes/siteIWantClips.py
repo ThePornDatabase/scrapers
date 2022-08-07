@@ -6,10 +6,6 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
-# NOTE!   This scraper _ONLY_ pulls scenes from AdultTime sites with publicly available video index pages.
-#         It will not pull any scenes or images that are unavailable if you simply go to the specific site
-#         as a guest user in an incognito browser
-
 
 class SiteIWantClipsSpider(BaseSceneScraper):
     name = 'IWantClips'
