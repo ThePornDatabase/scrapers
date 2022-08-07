@@ -18,7 +18,7 @@ class networkManojobSpider(BaseSceneScraper):
         ['https://www.finishesthejob.com', '/updates/thedicksuckers/%s', 'The Dick Suckers'],
 
     ]
-    
+
     selector_map = {
         'title': '//h1/text()',
         'description': '//div[@class="row"]/div/div[@class="text-center"]/preceding-sibling::p[1]/text()',
@@ -62,7 +62,7 @@ class networkManojobSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page, pagination):
         return self.format_url(base, pagination % page)
-        
+
     def get_scenes(self, response):
         meta = response.meta
         scenes = response.xpath('//div[@class="card scene"]/a/@href').getall()
@@ -78,3 +78,13 @@ class networkManojobSpider(BaseSceneScraper):
         meta = response.meta
         return meta['site']
 
+    def get_title(self, response):
+        title = super().get_title(response)
+        title = title.rstrip('.').strip()
+        return title
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if ".com/" not in image:
+            return None
+        return image

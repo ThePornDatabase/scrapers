@@ -71,6 +71,12 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['1000324638', 'Manyvids: Blissed XXX'],
         ['1004131603', 'Manyvids: Chris And Mari'],
         ['1000829435', 'Manyvids: RhiannonRyder1995'],
+        ['1001194277', 'Manyvids: Legendarylootz'],
+        ['1002393375', 'Manyvids: Natasha Nixx'],
+        ['208703', 'Manyvids: Tatum Christine'],
+        ['150576', 'Manyvids: xxxCaligulaxxx'],
+        ['1004057036', 'Manyvids: Amber Hallibell'],
+        ['1000691111', 'Manyvids: Purple Bitch'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -320,8 +326,14 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Lena Spanks']
         if "Submissive Lexi" in meta['site']:
             return ['Submissive Lexi']
+        if "Tatum Christine" in meta['site']:
+            return ['Tatum Christine']
         if "Ashley Alban" in meta['site']:
             return ['Ashley Alban']
+        if "Natasha Nixx" in meta['site']:
+            return ['Natasha Nixx']
+        if "Legendary" in meta['site']:
+            return ['Legendarylootz']
         if "Penny Barber" in meta['site']:
             return ['Penny Barber']
         if "Princess Leia" in meta['site']:
@@ -340,10 +352,16 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Courtney Scott']
         if "Kiittenymph" in meta['site']:
             return ['Lex Kiittenymph']
+        if "xxxCaligulaxxx" in meta['site']:
+            return ['xxxCaligulaxxx']
         if "ForbiddenFruitsFilms" in meta['site']:
             return ['Jodi West']
         if "Jodi West" in meta['site']:
             return ['Jodi West']
+        if "Purple Bitch" in meta['site']:
+            return ['Purple Bitch']
+        if "Amber Hallibell" in meta['site']:
+            return ['Amber Hallibell']
         if "Diane Andrews" in meta['site']:
             return ['Diane Andrews']
         if "Midori Rose" in meta['site']:

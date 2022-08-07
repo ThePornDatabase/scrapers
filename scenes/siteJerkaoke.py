@@ -8,8 +8,9 @@ class SiteJerkaokeSpider(BaseSceneScraper):
     network = 'Model Media'
 
     start_urls = [
-        'https://www.delphinefilms.com',
+        # ~ 'https://www.delphinefilms.com',
         # ~ 'https://www.jerkaoke.com',
+        'https://www.modelmediaasia.com',
         # ~ 'https://www.povadventure.com/',
     ]
 
@@ -36,6 +37,8 @@ class SiteJerkaokeSpider(BaseSceneScraper):
     def get_site(self, response):
         if "delphine" in response.url:
             return "Delphine Films"
+        if "modelmediaasia" in response.url:
+            return "Model Media Asia"
         if "jerkaoke" in response.url:
             return "Jerkaoke"
         if "povadventure" in response.url:
@@ -47,6 +50,8 @@ class SiteJerkaokeSpider(BaseSceneScraper):
             return "Delphine Films"
         if "jerkaoke" in response.url:
             return "Jerkaoke"
+        if "modelmediaasia" in response.url:
+            return "Model Media Asia"
         if "povadventure" in response.url:
             return "POV Adventure"
         return super().get_parent(response)
@@ -59,3 +64,29 @@ class SiteJerkaokeSpider(BaseSceneScraper):
             tags.remove("POV Adventure")
         if "Jerkaoke" in tags:
             tags.remove("Jerkaoke")
+        if "modelmediaasia" in response.url:
+            tags.append("Asian")
+        return tags
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        if "modelmediaasia" in response.url and "/" in title:
+            title = re.search(r'(.*)/', title).group(1)
+        return title
+
+    def get_description(self, response):
+        description = super().get_description(response)
+        if "modelmediaasia" in response.url and "/" in description:
+            description = re.search(r'(.*)/', description).group(1)
+        return description
+
+    def get_performers(self, response):
+        performers = super().get_performers(response)
+        if "modelmediaasia" in response.url:
+            performers_asia = []
+            for performer in performers:
+                if "/" in performer:
+                    performer = re.search(r'/(.*)', performer).group(1)
+                    performers_asia.append(performer.strip())
+            return performers_asia
+        return performers

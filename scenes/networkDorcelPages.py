@@ -133,9 +133,19 @@ class SiteDorcelPagesSpider(BaseSceneScraper):
 
         item['tags'] = []
         for tag in scene['mainScenetags']:
-            for lang in scene['mainScenetags'][tag]['translations']:
-                if lang['language'] == 'en':
-                    item['tags'].append(string.capwords(lang['name']))
-        item['url'] = meta['base'] + scene['hreflang']['en']
+            if 'translations' in scene['mainScenetags'][tag]:
+                for lang in scene['mainScenetags'][tag]['translations']:
+                    if lang['language'] == 'en':
+                        item['tags'].append(string.capwords(lang['name']))
+            else:
+                if '/en/' in scene['mainScenetags'][tag]['url']:
+                    item['tags'].append(string.capwords(scene['mainScenetags'][tag]['name']))
 
-        yield item
+        if 'hreflang' in scene:
+            item['url'] = meta['base'] + scene['hreflang']['en']
+        elif 'routePaths' in scene:
+            for scenepath in scene['routePaths']:
+                if 'en' in scenepath:
+                    item['url'] = meta['base'] + scene['routePaths'][scenepath]['en']
+
+        yield self.check_item(item, self.days)

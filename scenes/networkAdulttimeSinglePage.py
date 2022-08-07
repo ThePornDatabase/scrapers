@@ -16,6 +16,21 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
         'https://joimom.net',
         'https://gangbangaccidents.com',
         'https://gostuckyourself.net',
+        'https://youngerloverofmine.com',
+        'https://adulttimepilots.com',
+        'https://dareweshare.net',
+        'https://watchyoucheat.net',
+
+
+        # To be done in another scraper, not standard format
+        # 'https://www.adulttime.com/series/kiss-me-fuck-me', *
+        # 'https://www.adulttime.com/series/naked-yoga-life', *
+        # https://www.ladygonzo.com/en/videos *
+        # https://www.adulttime.com/series/she-wants-him
+        # https://www.adulttime.com/series/shower-solos *
+        # https://www.adulttime.com/series/teen-sneaks *
+        # https://www.adulttime.com/series/the-mike-and-joanna-show *
+
     ]
 
     selector_map = {
@@ -64,6 +79,18 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
         if "accident" in response.url:
             return "Accidental Gangbang"
 
+        if "youngerloverofmine" in response.url:
+            return "My Younger Lover"
+
+        if "adulttimepilots" in response.url:
+            return "Adult Time Pilots"
+
+        if "dareweshare" in response.url:
+            return "Dare We Share"
+
+        if "watchyoucheat" in response.url:
+            return "Watch You Cheat"
+
     def get_parent(self, response):
         return "AdultTime"
 
@@ -91,4 +118,11 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
             tags = ['Family Roleplay']
         if "stuck" in response.url:
             tags = ['Stuck Sex']
+        if "youngerlover" in response.url:
+            tags = ['Older / Younger']
+        if "dareweshare" in response.url:
+            tags = ['Threesome']
+        if "watchyoucheat" in response.url:
+            tags = ['Voyeur', 'Adultery', 'Married / Boyfriend / Hotwife']
+
         return tags

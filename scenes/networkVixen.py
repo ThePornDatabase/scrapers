@@ -1,5 +1,4 @@
 import json
-from datetime import date, timedelta
 from urllib.parse import urlparse
 import scrapy
 
@@ -50,19 +49,19 @@ class VixenScraper(BaseSceneScraper):
             )
 
     def parse(self, response, **kwargs):
-        json = response.json()['data']['findVideos']
-        scenes = json['edges']
+        jsondata = response.json()['data']['findVideos']
+        scenes = jsondata['edges']
         for item in scenes:
-            id = item['node']['slug']
+            sceneid = item['node']['slug']
             yield scrapy.Request(
                 url=response.url,
                 callback=self.parse_scene,
                 method='POST',
                 headers={'Content-Type': 'application/json'},
-                body=self.get_graphql_body(id, response.url),
+                body=self.get_graphql_body(sceneid, response.url),
             )
 
-        if 'page' in response.meta and response.meta['page'] < self.limit_pages and json['pageInfo']['hasNextPage']:
+        if 'page' in response.meta and response.meta['page'] < self.limit_pages and jsondata['pageInfo']['hasNextPage']:
             meta = response.meta
             meta['page'] = meta['page'] + 1
 
@@ -78,66 +77,54 @@ class VixenScraper(BaseSceneScraper):
 
     def parse_scene(self, response):
         data = response.json()['data']['findOneVideo']
-
         scene = SceneItem()
 
-        scene['id'] = data['id']
-        scene['title'] = self.cleanup_title(data['title'])
-        scene['description'] = self.cleanup_description(data['description']) if 'description' in data else ''
+        try:
+            scene['id'] = data['id']
 
-        site = data['site']
-        if site.upper() in self.sites:
-            site = self.sites[site.upper()]
-        scene['site'] = site
+            scene['title'] = self.cleanup_title(data['title'])
+            scene['description'] = self.cleanup_description(data['description']) if 'description' in data else ''
 
-        scene['network'] = 'Vixen'
-        scene['parent'] = site
+            site = data['site']
+            if site.upper() in self.sites:
+                site = self.sites[site.upper()]
+            scene['site'] = site
 
-        scene['date'] = self.parse_date(data['releaseDate']).isoformat()
-        scene['url'] = self.format_link(response, '/videos/' + data['slug'])
+            scene['network'] = 'Vixen'
+            scene['parent'] = site
 
-        scene['performers'] = []
-        for model in data['models']:
-            scene['performers'].append(model['name'])
+            scene['date'] = self.parse_date(data['releaseDate']).isoformat()
+            scene['url'] = self.format_link(response, '/videos/' + data['slug'])
 
-        scene['tags'] = []
-        if data['tags']:
-            for tag in data['tags']:
-                scene['tags'].append(tag)
+            scene['performers'] = []
+            for model in data['models']:
+                scene['performers'].append(model['name'])
 
-        largest = 0
-        for image in data['images']['poster']:
-            if image['width'] > largest:
-                scene['image'] = image['src']
-            largest = image['width']
+            scene['tags'] = []
+            if data['tags']:
+                for tag in data['tags']:
+                    scene['tags'].append(tag)
 
-        largest = 0
-        scene['image_blob'] = self.get_image_blob_from_link(scene['image'])
+            largest = 0
+            for image in data['images']['poster']:
+                if image['width'] > largest:
+                    scene['image'] = image['src']
+                largest = image['width']
 
-        for trailer in data['previews']['poster']:
-            if trailer['width'] > largest:
-                scene['trailer'] = trailer['src']
-            largest = trailer['width']
+            largest = 0
+            scene['image_blob'] = self.get_image_blob_from_link(scene['image'])
 
-        scene['trailer'] = '' if 'trailer' not in scene or not scene['trailer'] else scene['trailer']
+            for trailer in data['previews']['poster']:
+                if trailer['width'] > largest:
+                    scene['trailer'] = trailer['src']
+                largest = trailer['width']
 
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
+            scene['trailer'] = '' if 'trailer' not in scene or not scene['trailer'] else scene['trailer']
 
-        if self.debug:
-            if not scene['date'] > filterdate:
-                scene['filtered'] = "Scene filtered due to date restraint"
-            print(scene)
-        else:
-            if filterdate:
-                if scene['date'] > filterdate:
-                    yield scene
-            else:
-                yield scene
+            yield self.check_item(scene, self.days)
+
+        except Exception:
+            print(f"Failed Request on: {response.url}")
 
     def get_graphql_search_body(self, per_page, page, link):
         site_name = urlparse(link).hostname.replace('www.', '').replace('.com', '').upper()
@@ -191,13 +178,13 @@ query getFilteredVideos(
 }
 '''
 
-    def get_graphql_body(self, id, link):
+    def get_graphql_body(self, sceneid, link):
         site_name = urlparse(link).hostname.replace('www.', '').replace('.com', '').upper()
 
         return json.dumps({
             'operationName': 'getVideo',
             'variables': {
-                'videoSlug': id,
+                'videoSlug': sceneid,
                 'site': site_name
             },
             'query': self.get_grapgql_query(),

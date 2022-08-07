@@ -62,3 +62,8 @@ class SiteWifeysWorldSpider(BaseSceneScraper):
     def get_description(self, response):
         description = super().get_description(response)
         return description.replace("\n", "").replace("\r", "").replace("\t", "")
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        image = image.replace("com/content", "com/tour/content")
+        return image

@@ -68,28 +68,20 @@ class VnaNetworkSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        if "romemajor" in response.url:
-            scenes = response.xpath('//div[contains(@class, "videoarea clear")]')
-            for scene in scenes:
-                image = scene.xpath('.//img[contains(@src, "thumb_2")]/@src')
-                if image:
-                    image = image.get()
-                else:
-                    image = scene.xpath('.//img[contains(@src, "thumb")/@src').get()
-                if not image:
-                    image = None
-                else:
-                    imageorig = self.format_link(response, image)
-                    image = imageorig.replace("sd3.php?show=file&path=/", "")
+        meta = response.meta
+        # ~ if "romemajor" in response.url:
+        scenes = response.xpath('//div[contains(@class, "videoarea clear")]|//div[contains(@class, "updatedVideo")]')
+        for scene in scenes:
+            image = scene.xpath('.//img[contains(@src, "thumb_2")]/@src|.//img[contains(@src, "thumb")]/@src')
+            if image:
+                meta['image_blob'] = self.get_image_blob_from_link(self.format_link(response, image.get()))
+                meta['image'] = self.format_link(response, image.get()).replace("sd3.php?show=file&path=/", "")
 
-                scene = scene.xpath('.//h3/a/@href').get()
+            scene = scene.xpath('.//h3/a/@href|.//div[@class="videoPic"][1]/a/@href').get()
+            if scene:
+                scene = self.format_link(response, scene)
                 if re.search(self.selector_map['external_id'], scene):
-                    yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image, 'imageorig': imageorig})
-        else:
-            scenes = response.css('a::attr(href)').getall()
-            for scene in scenes:
-                if re.search(self.selector_map['external_id'], scene):
-                    yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                    yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
         taglink = self.process_xpath(
@@ -122,17 +114,9 @@ class VnaNetworkSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_image(self, response):
-        image = super().get_image(response)
-        image = image.replace("sd3.php?show=file&path=/", "")
-        if "jpg" not in image:
-            return None
-        return image
-
-    def get_image_blob(self, response):
         meta = response.meta
         image = super().get_image(response)
-        if "imageorig" in meta:
-            image_blob = self.get_image_blob_from_link(meta['imageorig'])
-        else:
-            image_blob = self.get_image_blob_from_link(image)
-        return image_blob
+        image = image.replace("sd3.php?show=file&path=/", "")
+        if not re.search(r'\.com/(.*)', image) or (".jpg" not in image.lower()):
+            return None
+        return image

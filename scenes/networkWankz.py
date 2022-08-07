@@ -8,6 +8,8 @@ class NetworkWankzSpider(BaseSceneScraper):
     name = 'Wankz'
     network = "Wankz"
 
+    url = 'https://www.wankz.com'
+
     start_urls = [
         'https://www.wankz.com',
         # ~ --------- Added for search compatibility
@@ -73,6 +75,11 @@ class NetworkWankzSpider(BaseSceneScraper):
         # ~ 'https://www.youngslutshardcore.com',
     ]
 
+    paginations = [
+        '/sites/teen-girls?p=%s',
+        '/videos?p=%s#',
+    ]
+
     selector_map = {
         'title': '//title/text()',
         'description': '//div[@class="description"]/p/text()',
@@ -86,6 +93,36 @@ class NetworkWankzSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/videos?p=%s#'
     }
+
+    def start_requests(self):
+        for pagination in self.paginations:
+            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination),
+                                 callback=self.parse,
+                                 meta={'page': self.page, 'pagination': pagination},
+                                 headers=self.headers,
+                                 cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        if response.status == 200:
+            scenes = self.get_scenes(response)
+            count = 0
+            for scene in scenes:
+                count += 1
+                yield scene
+
+            if count:
+                if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                    meta = response.meta
+                    meta['page'] = meta['page'] + 1
+                    print('NEXT PAGE: ' + str(meta['page']))
+                    yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']),
+                                         callback=self.parse,
+                                         meta=meta,
+                                         headers=self.headers,
+                                         cookies=self.cookies)
+
+    def get_next_page_url(self, url, page, pagination):
+        return self.format_url(url, pagination % page)
 
     def get_scenes(self, response):
         scenes = response.xpath(
