@@ -17,7 +17,7 @@ def match_site(argument):
         'badmommypov': 'Bad Mommy POV',
         'badsisterpov': 'Bad Sister POV',
         'daughterjoi': 'Daughter JOI',
-        'downtofuckdating': 'DTF Dating',
+        'downtofuckdating': 'Down to Fuck Dating',
         'dtfsluts': 'DTF Sluts',
         'girlfaction': 'Girl Faction',
         'hergape': 'Her Gape',
@@ -110,7 +110,7 @@ class FullPornNetworkSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="relative group"]/a/@href').getall()
+        scenes = response.xpath('//div[contains(@class,"video_preview")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

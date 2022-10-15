@@ -9,7 +9,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 class siteVIPissyPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h2[@class="title"]/span/text()',
-        'image': '//div[@class="row"]/div/img/@src',
+        'image': '//div[@class="row"]/div/picture//img/@src',
         'cupsize': '//dl[@class="row"]/dt[contains(text(),"Breast")]/following-sibling::dd[1]/text()',
         'height': '//dl[@class="row"]/dt[contains(text(),"Height")]/following-sibling::dd[1]/text()',
         'weight': '//dl[@class="row"]/dt[contains(text(),"Weight")]/following-sibling::dd[1]/text()',
@@ -49,9 +49,9 @@ class siteVIPissyPerformerSpider(BasePerformerScraper):
                     height = re.search('(\d*)\s?cm',height.lower()).group(1)
                     if height:
                         height = height + "cm"
-                
+
                 return height
-                
+
         return ''
 
     def get_weight(self, response):
@@ -62,9 +62,9 @@ class siteVIPissyPerformerSpider(BasePerformerScraper):
                     weight = re.search('(\d*)\s?kg',weight.lower()).group(1)
                     if weight:
                         weight = weight + "kg"
-                
+
                 return weight
-                
+
         return ''
 
     def get_gender(self, response):

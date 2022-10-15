@@ -31,13 +31,12 @@ class SiteSlimk4kPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[@id="list_models_models_list_items"]/a')
         for performer in performers:
             image = performer.xpath('./div/img/@src').get().replace(" ", "%20")
+            image_blob = self.get_image_blob_from_link(image)
             if not image:
                 image = ''
+                image_blob = ''
             performer = performer.xpath('./@href').get()
-            yield scrapy.Request(
-                url=self.format_link(response, performer),
-                callback=self.parse_performer, meta={'image': image}
-            )
+            yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, meta={'image': image, 'image_blob': image_blob})
 
     def get_cupsize(self, response):
         if 'cupsize' in self.selector_map:

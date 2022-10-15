@@ -17,6 +17,7 @@ class HobyBuchanonSpider(BaseSceneScraper):
     pagination = [
         '/updates/page/%s/',
         '/behind-the-scenes/page/%s/',
+        '/suck-this-dick/page/%s/',
     ]
 
     selector_map = {
@@ -80,7 +81,10 @@ class HobyBuchanonSpider(BaseSceneScraper):
             item['description'] = ''
             item['network'] = "Hoby Buchanon"
             item['parent'] = "Hoby Buchanon"
-            item['site'] = "Hoby Buchanon"
+            if "suck-this-dick" in response.url:
+                item['site'] = "Suck This Dick"
+            else:
+                item['site'] = "Hoby Buchanon"
 
             url = scene.xpath('.//div[@class="image_wrapper"]/a/@href').get()
             if url:
@@ -131,9 +135,11 @@ class HobyBuchanonSpider(BaseSceneScraper):
                 else:
                     if filterdate:
                         if item['date'] > filterdate:
-                            scenelist.append(item.copy())
+                            if "suck-this-dick" not in response.url or ("suck-this-dick" in response.url and item['date'] > "2021-01-01"):
+                                scenelist.append(item.copy())
                     else:
-                        scenelist.append(item.copy())
+                        if "suck-this-dick" not in response.url or ("suck-this-dick" in response.url and item['date'] > "2021-01-01"):
+                            scenelist.append(item.copy())
                 item.clear()
 
         return scenelist

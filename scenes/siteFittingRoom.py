@@ -13,7 +13,7 @@ class FittingRoomSpider(BaseSceneScraper):
 
     paginations = [
         '/extras/%s/',
-        # ~ '/videos/%s/',
+        '/videos/%s/',
     ]
 
     selector_map = {

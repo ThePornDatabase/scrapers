@@ -24,6 +24,8 @@ class PornFidelitySpider(BaseSceneScraper):
         'image': '',
         'performers': '//a[@class="is-underlined"]/text()',
         'tags': "",
+        'duration': '//li//text()[contains(., "mins")]',
+        're_duration': r'(\d{1,2}\:\d{2}) mins',
         'external_id': 'episodes\\/(\\d+)',
         'trailer': '',
         'pagination': "/episodes/search?page=%s"

@@ -8,7 +8,7 @@ from tpdb.items import SceneItem
 def match_site(argument):
     match = {
         'backroomcastingcouch': "Backroom Casting Couch",
-        'blackambush': "Black Ambush",
+        'bbcsurprise': "BBC Surprise",
         'exploitedcollegegirls': "Exploited College Girls",
         'ikissgirls': "I Kiss Girls",
         'interracialpass': "Interracial Pass",
@@ -23,20 +23,23 @@ class InterracialPassSpider(BaseSceneScraper):
     start_urls = [
         'https://www.interracialpass.com',
         'https://www.backroomcastingcouch.com',
-        'https://blackambush.com',
+        'https://bbcsurprise.com',
         'https://exploitedcollegegirls.com',
         'https://www.ikissgirls.com'
     ]
 
     selector_map = {
-        'title': '//h2[@class="section-title"]/text()',
+        'title': '//div[@class="video-player"]/div[@class="title-block"]/h3[@class="section-title"]/text()|//div[@class="video-player"]/div[@class="title-block"]/h2[@class="section-title"]/text()',
         'description': '//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()',
         'date': '//div[@class="update-info-row"]/text()',
         'image': '//div[@class="player-thumb"]//img/@src0_1x | //img[contains(@class,"main-preview")]/@src',
         'performers': '//div[contains(@class, "models-list-thumbs")]//li//span/text()',
+        'duration': '//i[@class="fa fa-clock-o"]/following-sibling::strong/following-sibling::text()',
+        're_duration': r'(\d{1,2}\:?\d{1,2}\:\d{1,2})',
         'tags': '//ul[@class="tags"]//li//a/text()',
         'external_id': 'trailers/(.+)\\.html',
         'trailer': '',
+        'type': 'Scene'
     }
 
     def get_scenes(self, response):
@@ -55,13 +58,13 @@ class InterracialPassSpider(BaseSceneScraper):
         selector = '/t1/categories/movies_%s_d.html'
 
         if 'exploitedcollegegirls' in base:
-            selector = '/site/categories/movies_%s_d.html'
+            selector = '/categories/movies_%s_d.html'
         elif 'ikissgirls' in base:
             selector = '/categories/movies_%s_d.html'
-        elif 'blackambush' in base:
+        elif 'bbcsurprise' in base:
             selector = '/categories/movies_%s_d.html'
         elif 'backroomcastingcouch' in base:
-            selector = '/site/categories/movies_%s_d.html'
+            selector = '/categories/movies_%s_d.html'
 
         return self.format_url(base, selector % page)
 
@@ -89,79 +92,7 @@ class InterracialPassSpider(BaseSceneScraper):
         site = match_site(site)
         return site
 
-    def parse_scene(self, response):
-        item = SceneItem()
-
-        if 'title' in response.meta and response.meta['title']:
-            item['title'] = response.meta['title']
-        else:
-            item['title'] = self.get_title(response)
-
-        if 'description' in response.meta:
-            item['description'] = response.meta['description']
-        else:
-            item['description'] = self.get_description(response)
-
-        if 'site' in response.meta:
-            item['site'] = response.meta['site']
-        else:
-            item['site'] = self.get_site(response)
-
-        if 'date' in response.meta:
-            item['date'] = response.meta['date']
-        else:
-            item['date'] = self.get_date(response)
-
-        item['image'] = self.get_image(response)
-
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-        if 'performers' in response.meta:
-            item['performers'] = response.meta['performers']
-        else:
-            item['performers'] = self.get_performers(response)
-
-        if 'tags' in response.meta:
-            item['tags'] = response.meta['tags']
-        else:
-            item['tags'] = self.get_tags(response)
-
-        if 'id' in response.meta:
-            item['id'] = response.meta['id']
-        else:
-            item['id'] = self.get_id(response)
-
-        if 'trailer' in response.meta:
-            item['trailer'] = response.meta['trailer']
-        else:
-            item['trailer'] = self.get_trailer(response)
-
-        item['url'] = self.get_url(response)
-
-        if hasattr(self, 'network'):
-            item['network'] = self.network
-        else:
-            item['network'] = self.get_network(response)
-
-        if hasattr(self, 'parent'):
-            item['parent'] = self.parent
-        else:
-            item['parent'] = self.get_parent(response)
-
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if item['date'] > filterdate:
-                    yield item
-            else:
-                yield item
+    def get_parent(self, response):
+        parent = tldextract.extract(response.url).domain
+        parent = match_site(parent)
+        return parent

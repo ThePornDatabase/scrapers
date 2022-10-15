@@ -52,8 +52,8 @@ class SiteIWantClipsSpider(BaseSceneScraper):
                     yield self.call_algolia(next_page, response.meta['token'], response.meta['url'])
 
     def get_scenes(self, response):
+        # ~ print(response.json())
         for scene in response.json()['results'][0]['hits']:
-
             item = SceneItem()
 
             item['image'] = scene['thumbnail_url']
@@ -70,7 +70,9 @@ class SiteIWantClipsSpider(BaseSceneScraper):
 
             if scene['publish_date']:
                 item['date'] = datetime.datetime.utcfromtimestamp(scene['publish_date']).isoformat()
+                # ~ print(f"Datetime: {scene['publish_date']}     Parsed_date: {item['date']}")
             else:
+                print("Date not provided, using today")
                 item['date'] = self.parse_date('today').isoformat()
 
             item['performers'] = [scene['model_username']]

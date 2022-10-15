@@ -8,7 +8,7 @@ class SiteSteppedUpJSONSpider(BaseSceneScraper):
     network = 'Stepped Up'
 
     start_urls = [
-        # ~ # 'https://tour.swallowed.com', # In non-JSON scraper
+        'https://tour.swallowed.com',
         'https://tour.nympho.com',
         'https://tour.trueanal.com',
         'https://tour.allanal.com',
@@ -40,6 +40,7 @@ class SiteSteppedUpJSONSpider(BaseSceneScraper):
                     item['id'] = scene['id']
                 item['image'] = scene['thumb']
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['duration'] = self.duration_to_seconds(scene['videos_duration'])
                 item['tags'] = scene['tags']
                 item['trailer'] = scene['trailer_url'].replace(" ", "%20")
                 item['url'] = f"https://tour.{scene['site_domain']}/scenes/{scene['slug']}"

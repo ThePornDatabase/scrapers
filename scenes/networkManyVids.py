@@ -77,6 +77,16 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['150576', 'Manyvids: xxxCaligulaxxx'],
         ['1004057036', 'Manyvids: Amber Hallibell'],
         ['1000691111', 'Manyvids: Purple Bitch'],
+        ['1003667583', 'Manyvids: Im Heather Harmon'],
+        ['590705', 'Manyvids: Bettie Bondage'],
+        ['1002042328', 'Manyvids: Jade Vow'],
+        ['518153', 'Manyvids: Naughty Midwest Girls'],
+        ['1002715079', 'Manyvids: Alice Bong'],
+        ['1002319155', 'Manyvids: Sola Zola'],
+        ['1002133241', 'Manyvids: Reislin'],
+        ['1000107977', 'Manyvids: Chad Alva'],
+        ['1000228944', 'Manyvids: Heather Vahn'],
+        ['1002812736', 'Manyvids: Tommy Wood'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -88,6 +98,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         'image': '//meta[@name="twitter:image"]/@content',
         'performers': '',
         'tags': '//script[contains(text(),"tagListApp")]/text()',
+        'duration': '//div[@class="video-details"]//i[contains(@class, "mv-icon-video-length")]/following-sibling::text()[contains(., "min")]',
+        're_duration': r'(\d{1,2}\:.*?) min',
         'external_id': '',
         'trailer': '',
         'pagination': ''
@@ -161,6 +173,9 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\", "")
             if jsonentry['preview']['videoPreview']:
                 meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
+            if jsonentry['videoThumb']:
+                meta['image'] = jsonentry['videoThumb'].replace("\\", "").replace(" ", "%20")
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
             meta['id'] = jsonentry['id']
             meta['title'] = string.capwords(html.unescape(jsonentry['title']))
             if scene and meta['id']:
@@ -352,6 +367,12 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Courtney Scott']
         if "Kiittenymph" in meta['site']:
             return ['Lex Kiittenymph']
+        if "Jade Vow" in meta['site']:
+            return ['Jade Vow']
+        if "Bettie Bondage" in meta['site']:
+            return ['Bettie Bondage']
+        if "Heather Harmon" in meta['site']:
+            return ['Heather Harmon']
         if "xxxCaligulaxxx" in meta['site']:
             return ['xxxCaligulaxxx']
         if "ForbiddenFruitsFilms" in meta['site']:
@@ -360,12 +381,22 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             return ['Jodi West']
         if "Purple Bitch" in meta['site']:
             return ['Purple Bitch']
+        if "Alice Bong" in meta['site']:
+            return ['Alice Bong']
         if "Amber Hallibell" in meta['site']:
             return ['Amber Hallibell']
         if "Diane Andrews" in meta['site']:
             return ['Diane Andrews']
         if "Midori Rose" in meta['site']:
             return ['Midori Rose']
+        if "Sola Zola" in meta['site']:
+            return ['Sola Zola']
+        if "Reislin" in meta['site']:
+            return ['Reislin']
+        if "Chad Alva" in meta['site']:
+            return ['Chad Alva']
+        if "Heather Vahn" in meta['site']:
+            return ['Heather Vahn']
         return []
 
     def get_site(self, response):

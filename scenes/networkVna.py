@@ -70,7 +70,7 @@ class VnaNetworkSpider(BaseSceneScraper):
     def get_scenes(self, response):
         meta = response.meta
         # ~ if "romemajor" in response.url:
-        scenes = response.xpath('//div[contains(@class, "videoarea clear")]|//div[contains(@class, "updatedVideo")]')
+        scenes = response.xpath('//div[contains(@class, "videoarea clear")]|//div[contains(@class, "updatedVideo")]|//div[contains(@class,"videoPics clear")]')
         for scene in scenes:
             image = scene.xpath('.//img[contains(@src, "thumb_2")]/@src|.//img[contains(@src, "thumb")]/@src')
             if image:

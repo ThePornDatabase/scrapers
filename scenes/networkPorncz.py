@@ -66,6 +66,7 @@ class PornCZSpider(BaseSceneScraper):
         'date_formats': ['%d.%m.%Y'],
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//div[contains(text(), "Genres")]/a/text()',
+        'duration': '//meta[@property="video:duration"]/@content',
         'external_id': r'\/(\d+)$',
         'trailer': '//meta[@property="og:video"]/@content',
         'pagination': '/en/new-videos?do=next&_=%s'

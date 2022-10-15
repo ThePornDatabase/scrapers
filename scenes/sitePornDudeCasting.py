@@ -9,6 +9,7 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
     network = 'Porn Dude Casting'
     parent = 'Porn Dude Casting'
     site = 'Porn Dude Casting'
+    days = 90
 
     start_urls = [
         'https://porndudecasting.com',
@@ -27,6 +28,8 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
+        if self.days < 90:
+            self.days = 90
         url = "https://porndudecasting.com/latest-updates/"
         yield scrapy.Request(url,
                              callback=self.parse,

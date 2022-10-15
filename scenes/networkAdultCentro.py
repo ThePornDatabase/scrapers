@@ -80,6 +80,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://www.viscontivip.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Visconti VIP', ''],
         ['https://www.mylifeinmiami.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'My Life In Miami', ''],
         ['https://www.throatwars.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Throat Wars', ''],
+        ['https://www.niksindian.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Niks Indian', ''],
+        ['https://www.getyourkneesdirty.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Get Your Knees Dirty', ''],
     ]
 
     selector_map = {
@@ -181,6 +183,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         item['date'] = self.parse_date(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
         item['performers'] = []
         item['tags'] = []
+        if data['length']:
+            item['duration'] = data['length']
 
         if "jerkoff" in response.url or "dillionation" in response.url:
             performers = data['tags']['collection']
@@ -198,6 +202,9 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
         if "backalleytoonz" in response.url:
             item['tags'].append("Animation")
+
+        if "getyourkneesdirty" in response.url:
+            item['tags'].append("Blowjob")
 
         if "throatwars" in response.url:
             item['tags'].append("Interracial")
@@ -260,7 +267,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         if meta['performer'] and meta['performer'] not in item['performers']:
             item['performers'].append(meta['performer'])
 
-        yield item
+        yield self.check_item(item, self.days)
 
     def clean_tags(self, tags):
         cleanlist = [

@@ -10,7 +10,7 @@ class SiteAdulttimeLadyGonzoSpider(BaseSceneScraper):
     site = 'Lady Gonzo'
 
     start_urls = [
-        'https://www.ladygonzo.com',
+        # ~ 'https://www.ladygonzo.com', Moved to Adulttime
     ]
 
     selector_map = {

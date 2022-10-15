@@ -28,7 +28,7 @@ class SiteTenshigaoSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="thumb"]/a[@class="block"]/@href').getall()
+        scenes = response.xpath('//div[@class="thumb"]/a[contains(@class,"block")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

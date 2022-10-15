@@ -23,6 +23,7 @@ class SiteSuperbeModelsSpider(BaseSceneScraper):
         'image': '//meta[@itemprop="thumbnailUrl"]/@content|//picture[@class="-vcc-picture"]//img/@src',
         'performers': '//h2/span/a//text()',
         'tags': '//div[contains(@class, "h5")]//a[contains(@href, "categories")]/text()',
+        'duration': '//meta[@itemprop="duration"]/@content',
         'external_id': r'watch/(\d+)/',
         'trailer': '//meta[@itemprop="contentURL"]/@content',
         'pagination': '/films.en.html?page=%s'

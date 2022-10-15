@@ -1,5 +1,4 @@
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -20,9 +19,10 @@ class SugarDaddyPornSpider(BaseSceneScraper):
         'date_formats': ['%Y-%m-%d'],
         'image': '//meta[@property="og:image"]/@content',
         'tags': '//div[contains(@class,"video__tags")]/a/text()',
+        'duration': '//span[contains(@class, "duration")]/time/text()',
         'external_id': r'.*/(.*)$',
         'trailer': '',
-        'pagination': '/videos/recent?page=%s'
+        'pagination': '/videos/recent/%s'
     }
 
     def get_scenes(self, response):

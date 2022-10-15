@@ -21,6 +21,7 @@ class SiteSlim4kSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="item" and contains(text(), "Models:")]/a/text()',
         'tags': '//div[@class="item" and contains(text(), "Tags:")]/a/text()',
+        'duration': '//span[contains(text(), "Duration")]/em/text()',
         'external_id': r'videos/(\d+)/',
         'trailer': '',
         'pagination': '/latest-updates/%s/'
@@ -49,6 +50,8 @@ class SiteSlim4kSpider(BaseSceneScraper):
             intervalcount = int(intervalcount)
         if "minute" in datestring:
             date = today - relativedelta(minutes=intervalcount)
+        if "hour" in datestring:
+            date = today - relativedelta(hours=intervalcount)
         if "day" in datestring:
             date = today - relativedelta(days=intervalcount)
         if "today" in datestring:

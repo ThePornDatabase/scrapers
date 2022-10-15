@@ -42,7 +42,10 @@ class SiteDeflorationSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="textblock1"]/p/strong/../..')
         for scene in scenes:
             item = SceneItem()
-
+            mylist = scene.xpath('.//*').getall()
+            mylist = "".join(mylist)
+            if "goland" in mylist.lower():
+                print(mylist)
             title = scene.xpath('./p/strong/text()')
             if title:
                 item['title'] = title.get().strip()
@@ -61,9 +64,16 @@ class SiteDeflorationSpider(BaseSceneScraper):
                 # ~ item['image_blob'] = None
                 item['id'] = re.search(r'.*/(.*?)\.jpg', item['image']).group(1)
             else:
-                item['image'] = None
-                item['image_blob'] = None
-                item['id'] = None
+                image = scene.xpath('./following-sibling::div//img/@src')
+                if image:
+                    item['image'] = "https://www.defloration.com/" + image.get().strip()
+                    item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                    # ~ item['image_blob'] = None
+                    item['id'] = re.search(r'.*/(.*?)\.jpg', item['image']).group(1)
+                else:
+                    item['image'] = None
+                    item['image_blob'] = None
+                    item['id'] = None
 
             description = scene.xpath('./p[2]//text()')
             if description:
@@ -78,6 +88,8 @@ class SiteDeflorationSpider(BaseSceneScraper):
             item['parent'] = 'Defloration'
             item['site'] = 'Defloration'
 
+            if "goland" in item['title'].lower():
+                print(item)
             yield item
 
     def parse_performer(self, title):

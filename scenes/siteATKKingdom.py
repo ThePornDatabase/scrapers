@@ -244,7 +244,7 @@ class ATKKingdomSpider(BaseSceneScraper):
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
         item['image'] = self.get_image(response)
-        item['image_blob'] = self.get_image_blob(response)
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['tags'] = self.get_tags(response)
         if "" in item['tags']:
             item['tags'].remove("")
@@ -292,7 +292,7 @@ class ATKKingdomSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = super().get_image(response)
-        if not image:
+        if not image or "192.168.1.151" in image:
             imagealt = response.xpath('//div[contains(@style,"background")]/@style')
             if imagealt:
                 imagealt = re.search(r'url\(\"(http.*)\"\)', imagealt.get())
@@ -302,17 +302,3 @@ class ATKKingdomSpider(BaseSceneScraper):
                     return imagealt.replace(" ", "%20")
             image = None
         return image
-
-    def get_image_blob(self, response):
-        image = super().get_image(response)
-        if not image:
-            imagealt = response.xpath('//div[contains(@style,"background")]/@style')
-            if imagealt:
-                imagealt = re.search(r'url\(\"(http.*)\"\)', imagealt.get())
-                if imagealt:
-                    imagealt = imagealt.group(1)
-                    imagealt = self.format_link(response, imagealt)
-                    image = imagealt.replace(" ", "%20")
-        if image:
-            return base64.b64encode(requests.get(image).content).decode('utf-8')
-        return None

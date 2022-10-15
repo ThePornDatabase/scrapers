@@ -147,23 +147,8 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
         item['parent'] = "Jacquie et Michel TV"
         item['site'] = "Jacquie et Michel TV"
 
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if item['date'] > filterdate:
-                    yield item
-            else:
-                yield item
+        if ":8191" not in item['image']:
+            yield self.check_item(item, self.days)
 
     def get_image_blob(self, response):
         script = '''

@@ -35,6 +35,8 @@ class TugPassSpider(BaseSceneScraper):
         'date': "//div[@class='views']/span/text()",
         'image': '//div[@class="player"]/img/@src',
         'performers': 'Performers not borken out on sit',
+        'duration': '//div[@class="tags"]//span[contains(text(), "Video")]/text()',
+        're_duration': r'(\d{1,2}:\d{1,2}:?\d{1,2}?)',
         'tags': "",
         'external_id': '\\/videos\\/(.*).htm',
         'trailer': '',

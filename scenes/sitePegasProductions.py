@@ -23,6 +23,8 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         'limiteouvert': '0'
     }
 
+    custom_settings = {'USE_PROXY': 'True'}
+
     selector_map = {
         'title': '//div[@class="span10"]/h4/text()',
         'description': '//div[@class="span10"]//h5/following-sibling::p[1]/text()',

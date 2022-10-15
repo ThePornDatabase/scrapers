@@ -1,17 +1,18 @@
-from datetime import date, timedelta
-import json
+import re
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
 class SiteFemjoySpider(BaseSceneScraper):
-    name = 'FemJoy'
-    network = 'FemJoy'
-    parent = 'FemJoy'
+    name = 'Femjoy'
+    network = 'Femjoy'
+    parent = 'Femjoy'
+    site = 'Femjoy'
 
-    start_urls = {
-        'https://femjoy.com/',
-    }
+    start_urls = [
+        'https://www.femjoy.com',
+    ]
 
     selector_map = {
         'title': '',
@@ -19,63 +20,44 @@ class SiteFemjoySpider(BaseSceneScraper):
         'date': '',
         'image': '',
         'performers': '',
-        'tags': "",
-        'external_id': r'updates/(.*)\.html$',
-        'trailer': '//video/source/@src',
-        'pagination': '/api/v2/videos?include=actors%2Cdirectors&sorting=date&thumb_size=850x463&limit=24&page={}'
+        'tags': '',
+        'duration': '',
+        'trailer': '',
+        'external_id': r'',
+        'pagination': '/videos?page=%s',
+        'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        itemlist = []
-        jsondata = json.loads(response.text)
-        data = jsondata['results']
-        for jsonentry in data:
+        meta = response.meta
+        scenes = response.xpath('//div[contains(@class, "results_item")]')
+        for scene in scenes:
             item = SceneItem()
 
-            item['performers'] = []
-            for model in jsonentry['actors']:
-                item['performers'].append(model['name'].title())
-
-            item['title'] = self.cleanup_title(jsonentry['title'])
-            item['description'] = self.cleanup_description(jsonentry['long_description'])
-            if not item['description']:
-                item['description'] = ''
-
-            item['image'] = jsonentry['thumb']['image']
-            if not item['image']:
-                item['image'] = None
+            item['title'] = self.cleanup_title(scene.xpath('./div/h1/a[1]/text()').get())
+            item['date'] = self.parse_date(scene.xpath('./div//span[@class="posted_on"]/text()').get(), date_formats=['%b %d, %Y']).isoformat()
+            item['duration'] = self.duration_to_seconds(scene.xpath('./div//span[@class="posted_on"]/following-sibling::span/text()').get())
+            item['director'] = scene.xpath('.//h2/a[contains(@href, "/director/")]/text()').get()
+            item['performers'] = scene.xpath('.//h2/a[contains(@href, "/models/")]/text()').getall()
+            item['site'] = 'Femjoy'
+            item['parent'] = 'Femjoy'
+            item['network'] = 'Femjoy'
+            item['type'] = 'Scene'
+            item['image'] = scene.xpath('./div/div/a/img[contains(@class, "item_cover")]/@src').get()
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['id'] = jsonentry['id']
-            item['trailer'] = ''
-            item['url'] = "https://femjoy.com" + jsonentry['url']
-            item['date'] = self.parse_date(jsonentry['release_date'].strip()).isoformat()
-            item['site'] = "FemJoy"
-            item['parent'] = "FemJoy"
-            item['network'] = "FemJoy"
-
+            item['id'] = re.search(r'\.com/(\d*?)/', item['image']).group(1)
             item['tags'] = []
+            item['trailer'] = ''
+            item['url'] = self.format_link(response, scene.xpath('./div/div/a/@href').get())
+            meta['item'] = item
+            yield scrapy.Request(item['url'], callback=self.get_description, headers=self.headers, cookies=self.cookies, meta=meta)
 
-            days = int(self.days)
-            if days > 27375:
-                filterdate = "0000-00-00"
-            else:
-                filterdate = date.today() - timedelta(days)
-                filterdate = filterdate.strftime('%Y-%m-%d')
+    def get_description(self, response):
+        item = response.meta['item']
+        description = response.xpath('//h2[@class="post_description"]/p')
+        if description:
+            item['description'] = description.get().strip()
+        else:
+            item['description'] = ''
 
-            if self.debug:
-                if not item['date'] > filterdate:
-                    item['filtered'] = "Scene filtered due to date restraint"
-                print(item)
-            else:
-                if filterdate:
-                    if item['date'] > filterdate:
-                        itemlist.append(item.copy())
-                else:
-                    itemlist.append(item.copy())
-
-            item.clear()
-        return itemlist
-
-    def get_next_page_url(self, base, page):
-        url = self.format_url(base, self.get_selector_map('pagination').format(page))
-        return url
+        yield self.check_item(item, self.days)

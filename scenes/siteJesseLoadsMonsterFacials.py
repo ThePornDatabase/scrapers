@@ -68,43 +68,40 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
 
             item['tags'] = ['Blowjob', 'Handjob', 'Facial']
 
-            image = scene.xpath('.//td[@rowspan="5"]//img/@src').get()
+            image = scene.xpath('.//td[@rowspan="5"]//img/@src')
             if image:
-                item['image'] = "https://jesseloadsmonsterfacials.com/visitors/" + image.strip()
+                item['image'] = "https://jesseloadsmonsterfacials.com/visitors/" + image.get().strip()
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                sceneid = re.search(r'.*/(.*?)\.jpg', item['image'])
+                if sceneid:
+                    sceneid = re.sub(r'tour_', '', sceneid.group(1)).strip()
+                    if sceneid:
+                        if sceneid != item['id']:
+                            item['id'] = sceneid
+                            item['title'] = self.cleanup_title(sceneid)
+                            item['title'] = re.sub(r'(?!\w)iii$', ' III', item['id'])
+                            item['title'] = re.sub(r'(?![^i ])ii$', ' II', item['id'])
             else:
                 item['image'] = ''
-            item['image_blob'] = ''
+                item['image_blob'] = ''
 
             trailer = scene.xpath('.//a[contains(@href,"trailer")]/@href').get()
             if trailer:
                 item['url'] = "https://jesseloadsmonsterfacials.com/visitors/" + trailer.strip()
                 item['trailer'] = "https://jesseloadsmonsterfacials.com/visitors/" + trailer.strip().replace(".htm", ".mp4")
             else:
+                item['url'] = response.url
                 item['trailer'] = ''
 
             item['site'] = "Jesse Loads Monster Facials"
             item['parent'] = "Jesse Loads Monster Facials"
             item['network'] = "Jesse Loads Monster Facials"
 
-            if item['url'] and item['id']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
-
+            try:
+                if item['url'] and item['id']:
+                    yield self.check_item(item, self.days)
+            except:
+                print(item)
     def get_next_page_url(self, base, page):
         page = str(page)
         page = page.zfill(2)

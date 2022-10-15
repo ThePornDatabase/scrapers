@@ -19,14 +19,16 @@ class SiteTugCastingSpider(BaseSceneScraper):
         're_date': 'on: (.*)',
         'date_formats': ['%b %d, %Y'],
         'image': '//video/@poster',
-        'performers': '//div[@class="model-tags"]/a/text()',
-        'tags': '',
+        'performers': '//div[@class="model-tags"]/a[contains(@href, "/model/")]/text()',
+        'tags': '//div[@class="model-tags"]/a[contains(@href, "/search/")]/text()',
+        'duration': '//p[contains(text(), "Length:")]/text()',
+        're_duration': r'(\d{1,2}\:\d{2})',
         'external_id': r'.*/(.*?)/$',
         'trailer': '',
         'pagination': '/page%s'
     }
 
-    cookies = {'SPSI': 'd2b59601b4a1158e72076badf4a321a1'}
+    cookies = {'SPSI': '57b0cf4fea68da030839a143b1cf3dc1'}
 
     def get_scenes(self, response):
         scenes = response.xpath('//h3/a/@href|//div[@class="video-thumb"]/a/@href').getall()

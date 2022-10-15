@@ -1,6 +1,7 @@
 import scrapy
-from tpdb.BaseSceneScraper import BaseSceneScraper
 from scrapy.utils.project import get_project_settings
+from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
 class LegalPornoSpider(BaseSceneScraper):
@@ -19,8 +20,9 @@ class LegalPornoSpider(BaseSceneScraper):
         'title': "//h1[@class='watchpage-title']//text()",
         'description': '//div[@class="scene-description__row" and contains(., "Description")]//following-sibling::dd/text()',
         'date': "//span[@class='scene-description__detail']//a[1]/text()",
-        'performers': "//div[@class='scene-description__row']//dd//a[contains(@href, '/model/') and not(contains(@href, 'forum'))]/text()",
+        'performers': "//h1[@class='watchpage-title']/a[contains(@href, '/model/')]/text()|//div[@class='scene-description__row']//dd//a[contains(@href, '/model/') and not(contains(@href, 'forum'))]/text()",
         'tags': "//div[@class='scene-description__row']//dd//a[contains(@href, '/niche/')]/text()",
+        'duration': "//i[@class='fa fa-clock-o']/following-sibling::text()",
         'external_id': '\\/watch\\/(\\d+)',
         'trailer': '',
         'pagination': '/new-videos/%s'
@@ -54,3 +56,24 @@ class LegalPornoSpider(BaseSceneScraper):
             return title
 
         return ''
+
+    def parse_scene(self, response):
+        item = SceneItem()
+        item['title'] = self.get_title(response).replace("\r", "").replace("\n", "").replace("\t", "").strip()
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = self.get_date(response)
+        item['image'] = self.get_image(response)
+        item['image_blob'] = self.get_image_blob(response)
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['markers'] = self.get_markers(response)
+        item['id'] = self.get_id(response)
+        item['duration'] = self.get_duration(response)
+        item['trailer'] = self.get_trailer(response)
+        item['url'] = self.get_url(response)
+        item['network'] = self.get_network(response)
+        item['parent'] = 'Legal Porno'
+
+        if "bang bros" not in item['site'].lower():
+            yield self.check_item(item, self.days)

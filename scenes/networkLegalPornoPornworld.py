@@ -23,9 +23,10 @@ class LegalPornoSpider(BaseSceneScraper):
         'date': '//i[contains(@class,"calendar")]/text()',
         'date_formats': ['%Y-%m-%d'],
         'image': '//video/@data-poster',
-        'performers': '//h1[contains(@class,"watch__title")]//a/text()',
+        'performers': '//div[@class="container-fluid"]/h1/a[contains(@href, "/model/")]/text()|//h1[contains(@class,"watch__title")]//a/text()',
         'tags': '//div[contains(@class,"genres-list")]/a/text()',
         'external_id': r'\/watch\/(\d+)',
+        'duration': '//i[@class="bi bi-clock me-5"]/text()',
         'trailer': '//video//source/@src',
         'pagination': '/new-videos/%s'
     }
@@ -34,7 +35,7 @@ class LegalPornoSpider(BaseSceneScraper):
         return "Porn World"
 
     def get_parent(self, response):
-        return "Porn World"
+        return "Legal Porno"
 
     def get_scenes(self, response):
         meta = response.meta

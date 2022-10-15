@@ -39,7 +39,7 @@ def match_site(argument):
         'sheseducedme': "She Seduced Me",
         'shinybound': "Shiny Bound",
         'shinysboundsluts': "Shinys Bound Sluts",
-        'sofiemariexxx': "Sofie Marie",
+        'sofiemariexxx': "SofieMarieXXX",
         'tabooadventures': "Taboo Adventures",
         'thejerkoffmembers': "The Jerk Off Games",
         'vanillapov': "Vanilla POV",
@@ -60,16 +60,17 @@ class AndomarkSpider(BaseSceneScraper):
     name = 'Andomark'
     network = 'Andomark'
 
-    # ~ custom_settings = {'CONCURRENT_REQUESTS': '2',
-    # ~ 'AUTOTHROTTLE_ENABLED': 'True',
-    # ~ 'AUTOTHROTTLE_DEBUG': 'False',
-    # ~ 'ITEM_PIPELINES': {
-    # ~ 'tpdb.pipelines.TpdbApiScenePipeline': 400,
-    # ~ },
-    # ~ 'DOWNLOADER_MIDDLEWARES': {
-    # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-    # ~ }
-    # ~ }
+    custom_settings = {
+            'CONCURRENT_REQUESTS': '2',
+            'AUTOTHROTTLE_ENABLED': 'True',
+            'AUTOTHROTTLE_DEBUG': 'False',
+            'ITEM_PIPELINES': {
+            'tpdb.pipelines.TpdbApiScenePipeline': 400,
+        },
+            'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+        }
+    }
 
     start_urls = [
         'http://sexykarenxxx.com',

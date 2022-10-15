@@ -48,11 +48,11 @@ class Spider(BaseSceneScraper):
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']),
                                      callback=self.parse, meta={'page': meta['page']})
 
     def get_scenes(self, response):
+        print(F"Using Wayback URL: {response.meta['wayback_machine_url']}")
         scenes = response.xpath('//div[contains(@class,"entry") and contains(@id, "post")]')
         for scene in scenes:
             item = SceneItem()
@@ -72,22 +72,35 @@ class Spider(BaseSceneScraper):
             imagepath = re.search(r'(.*id_/)', response.meta['wayback_machine_url']).group(1)
             imagepath = imagepath.replace("id_", "im_")
             imagelink = scene.xpath('./a/img/@src')
+            if not imagelink:
+                imagelink = scene.xpath('.//div[@class="entry_content"]/p/img/@src')
+
             if imagelink:
                 image = imagepath + imagelink.get()
                 item['image_blob'] = self.get_image_blob_from_link(image)
-                item['image'] = re.search(r'src=(.*?\.jpg)', item['image']).group(1)
+                if re.search(r'src=(.*?\.jpg)', image):
+                    item['image'] = re.search(r'src=(.*?\.jpg)', image).group(1)
+                else:
+                    item['image'] = image
             else:
                 item['image'] = ''
                 item['image_blob'] = ''
             item['performers'] = []
             item['tags'] = ['Amateur']
             item['trailer'] = ''
-            item['url'] = scene.xpath('./a/@href').get()
-            item['id'] = re.search(r'.*/(.*?)/', item['url']).group(1)
+            item['url'] = scene.xpath('./a/@href|.//div[@class="title_holder"]/h1/a/@href').get()
+            try:
+                item['id'] = re.search(r'.*/(.*?)/', item['url']).group(1)
+            except Exception:
+                print(f"Item URL: {item['url']}")
+                print(f"Scene Xpath: {scene.xpath('.//*').getall()}")
+                print(f"Item Loaded: {item}")
+                item['id'] = None
             item['network'] = "MomPov"
             item['parent'] = "MomPov"
             item['site'] = "MomPov"
-            yield item
+            if item['id']:
+                yield item
 
     def format_url(self, base, path):
         return 'https://www.mompov.com' + path
@@ -96,5 +109,4 @@ class Spider(BaseSceneScraper):
         if page == 1:
             return base + "/tour"
         pageurl = self.format_url(base, self.get_selector_map('pagination') % page)
-        print(f"Page URL: {pageurl}")
         return pageurl

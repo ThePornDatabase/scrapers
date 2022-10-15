@@ -47,9 +47,11 @@ class PefectGonzoSpider(BaseSceneScraper):
         'title': '//div[@class="row"]/div/h2/text()',
         'description': '//p[@class="mg-md"]/text()',
         'date': '//span[contains(text(),"Added")]/text()',
-        'image': '//video/@poster',
+        'image': '//video/@poster|//div[@class="col-sm-12"]/a/img/@src',
         'performers': '//div[@id="video-info"]//a[contains(@href,"/models/")]/text()',
         'tags': '//a[contains(@href,"tag[]")]/text()',
+        'duration': '//span[contains(text(), "Movie:")]/text()',
+        're_duration': r'([0-9:]{4,8})',
         'external_id': '\\/movies\\/(.*)',
         'trailer': '//video/source/@src',
         'pagination': '/movies/page-%s/?tag=&q=&model=&sort=recent'
@@ -59,8 +61,7 @@ class PefectGonzoSpider(BaseSceneScraper):
         scenes = response.xpath('//div[@class="itemm"]')
         for scene in scenes:
             try:
-                site = scene.xpath(
-                    './/img[@class="domain-label"]/@src').get().strip()
+                site = scene.xpath('.//img[@class="domain-label"]/@src').get().strip()
                 site = re.search(r'/img/(.*)\.com', site).group(1)
             except BaseException:
                 if "sapphix" in response.url:
@@ -77,18 +78,6 @@ class PefectGonzoSpider(BaseSceneScraper):
             scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': site})
-
-    def get_image(self, response):
-        image = self.process_xpath(
-            response, self.get_selector_map('image')).get()
-        if not image:
-            try:
-                image = response.xpath(
-                    '//div[@class="col-sm-12"]/a/img/@src').get()
-            except BaseException:
-                return ''
-
-        return self.format_link(response, image)
 
     def get_id(self, response):
         search = re.search(self.get_selector_map(

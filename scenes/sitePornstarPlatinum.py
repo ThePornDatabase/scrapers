@@ -40,6 +40,7 @@ class SitePornstarPlatinumSpider(BaseSceneScraper):
             if image:
                 image = image.get()
                 meta['image'] = image.strip()
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
 
             scene = scene.xpath('./div[@class="item-content"]/h3/a/@href').get()
             if ".html" in scene:

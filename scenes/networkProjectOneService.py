@@ -14,8 +14,15 @@ class ProjectOneServiceSpider(BaseSceneScraper):
     name = 'ProjectOneService'
     network = 'mindgeek'
 
+    custom_settings = {'CONCURRENT_REQUESTS': '4',
+                       'AUTOTHROTTLE_ENABLED': 'True',
+                       'AUTOTHROTTLE_DEBUG': 'False',
+                       'DOWNLOAD_DELAY': '2',
+                       'CONCURRENT_REQUESTS_PER_DOMAIN': '2',
+                       }
+
     start_urls = [
-        # ~ # Only need one starting URL per "site", pulls everything through common feed
+        # Only need one starting URL per "site", pulls everything through common feed
 
         'https://www.babes.com',
         # 'https://www.babesunleashed.com',
@@ -23,7 +30,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.officeobsession.com',
         # 'https://www.stepmomlessons.com',
 
-        'https://www.bellesafilms.com',
+        # 'https://www.bellesafilms.com', # Removed from Mind Geek connections
         # 'https://www.bellesa.com',
         # 'https://www.bellesahouse.com',
 
@@ -67,6 +74,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.sexworking.com',
 
         'https://www.digitalplayground.com',
+        'https://www.dilfed.com',
         'https://www.erito.com',
         'https://www.fakehub.com',
         # 'https://www.fakeagent.com',
@@ -235,8 +243,9 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         }
 
         response.meta['headers'] = headers
-        response.meta['limit'] = 100
-        response.meta['page'] = -1
+        response.meta['limit'] = 25
+        # ~ response.meta['page'] = -1
+        response.meta['page'] = self.page - 1
         response.meta['url'] = response.url
 
         return self.get_next_page(response)
@@ -246,7 +255,6 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
         for scene in response.json()['result']:
             item = SceneItem()
-
             if scene['collections'] and len(scene['collections']):
                 item['site'] = scene['collections'][0]['name']
             else:
@@ -289,8 +297,33 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             for tag in scene['tags']:
                 item['tags'].append(tag['name'])
 
-            path = '/scene/' + str(item['id']) + '/' + slugify(item['title'])
-            item['url'] = self.format_url(response.meta['url'], path)
+            if "isVR" in scene:
+                if scene['isVR']:
+                    item['tags'].append("VR")
+
+            try:
+                item['duration'] = scene['videos']['mediabook']['length']
+            except Exception:
+                item['duration'] = ''
+
+            item['markers'] = []
+            if "timeTags" in scene:
+                for timetag in scene['timeTags']:
+                    timestamp = {}
+                    timestamp['name'] = self.cleanup_title(timetag['name'])
+                    timestamp['start'] = str(timetag['startTime'])
+                    timestamp['end'] = str(timetag['endTime'])
+                    item['markers'].append(timestamp)
+                    scene['tags'].append(timestamp['name'])
+                item['markers'] = self.clean_markers(item['markers'])
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
+
+            if "brazzers" in response.url or "deviante" in response.url:
+                item['url'] = self.format_link(response, '/video/' + str(item['id']) + '/' + slugify(item['title']))
+            if "www.men.com" in response.url or "thegayoffice" in response.url:
+                item['url'] = self.format_link(response, '/sceneid/' + str(item['id']) + '/' + slugify(item['title']))
+            else:
+                item['url'] = self.format_link(response, '/scene/' + str(item['id']) + '/' + slugify(item['title']))
 
             # Deviante abbreviations
             if item['site'] == "fmf":
@@ -308,27 +341,15 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             if item['site'] == "es":
                 item['site'] = "Erotic Spice"
                 item['parent'] = "Deviante"
+            if item['site'] == "dlf":
+                item['site'] = "DILFed"
+                item['parent'] = "DILFed"
 
             item['parent'] = string.capwords(item['parent'])
 
-            scene_count = scene_count + 1
-            days = int(self.days)
-            if days > 27375:
-                filterdate = "0000-00-00"
-            else:
-                filterdate = date.today() - timedelta(days)
-                filterdate = filterdate.strftime('%Y-%m-%d')
-
-            if self.debug:
-                if not item['date'] > filterdate:
-                    item['filtered'] = "Scene filtered due to date restraint"
-                print(item)
-            else:
-                if filterdate:
-                    if item['date'] > filterdate:
-                        yield item
-                else:
-                    yield item
+            if self.check_item(item, self.days):
+                scene_count = scene_count + 1
+                yield item
 
         if scene_count > 0:
             if 'page' in response.meta and (
@@ -336,12 +357,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
                 yield self.get_next_page(response)
 
     def get_next_page(self, response):
-        meta = {
-            'url': response.meta['url'],
-            'headers': response.meta['headers'],
-            'page': (response.meta['page'] + 1),
-            'limit': response.meta['limit']
-        }
+        meta = response.meta
 
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         query = {
@@ -351,6 +367,12 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             'orderBy': '-dateReleased',
             'offset': (meta['page'] * meta['limit']),
             'referrer': meta['url'],
+        }
+        meta = {
+            'url': response.meta['url'],
+            'headers': response.meta['headers'],
+            'page': (response.meta['page'] + 1),
+            'limit': response.meta['limit']
         }
 
         print('NEXT PAGE: ' + str(meta['page']))
@@ -386,3 +408,39 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             for size in ['720p', '576p', '480p', '360p', '320p', '1080p', '4k']:
                 if size in trailer['files']:
                     return trailer['files'][size]['urls']['view']
+
+    def clean_markers(self, markers):
+        markers = sorted(markers, key=lambda k: (k['name'].lower(), int(k['start']), int(k['end'])))
+        marker_final = []
+        marker_work = markers.copy()
+        marker2_work = markers.copy()
+        for test_marker in marker_work:
+            if test_marker in markers:
+                for marker in marker2_work:
+                    if test_marker['name'].lower().strip() == marker['name'].lower().strip():
+                        test_start = int(test_marker['start'])
+                        mark_start = int(marker['start'])
+                        test_end = int(test_marker['end'])
+                        mark_end = int(marker['end'])
+                        if test_start < mark_start or test_start == mark_start:
+                            test1 = mark_start - test_end
+                            test2 = mark_start - test_start
+                            if 0 < test1 < 60 or 0 < test2 < 60 or test1 == 0 or test2 == 0:
+                                if mark_end > test_end:
+                                    test_marker['end'] = marker['end']
+                                    if marker in markers:
+                                        markers.remove(marker)
+                            if test_end > mark_start and mark_end > test_end:
+                                test_marker['end'] = marker['end']
+                                if marker in markers:
+                                    markers.remove(marker)
+                            if test_start < mark_start and (mark_end < test_end or test_end == mark_end):
+                                if marker in markers:
+                                    markers.remove(marker)
+                marker2_work = markers.copy()
+
+                if test_marker in markers:
+                    marker_final.append(test_marker)
+                    markers.remove(test_marker)
+        marker_final = sorted(marker_final, key=lambda k: (int(k['start']), int(k['end'])))
+        return marker_final

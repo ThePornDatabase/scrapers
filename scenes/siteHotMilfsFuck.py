@@ -7,18 +7,21 @@ class HotMilfsFuckSpider(BaseSceneScraper):
     name = 'HotMilfsFuck'
     network = "Hot Milfs Fuck"
     parent = "Hot Milfs Fuck"
+    site = "Hot Milfs Fuck"
 
     start_urls = [
         'https://www.hotmilfsfuck.com',
     ]
 
     selector_map = {
-        'title': '//div[@class="video-player"]/div[@class="title-block"]/h2/text()',
+        'title': '//div[@class="video-player"]/div[@class="title-block"]/h1/text()',
         'description': '//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()',
         'date': '//div[@class="update-info-block"]/div[@class="row"]/div/div/i[@class="fa fa-calendar"]/following-sibling::strong/following-sibling::text()',
         'image': '//script[contains(text(),"video_content")]',
         'performers': '//section[@class="p-tb-50 bio-section-head"]/div/div/h2/text()',
         'tags': '//ul[@class="tags"]/li/a/text()',
+        'duration': '//strong[contains(text(), "Runtime")]/following-sibling::text()',
+        're_duration': r'(\d{2}.*) \|',
         'trailer': '//script[contains(text(),"video_content")]',
         'external_id': '.*\\/(.*?)\\.html',
         'pagination': '/categories/movies_%s_d.html'

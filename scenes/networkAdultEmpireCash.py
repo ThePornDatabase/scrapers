@@ -7,9 +7,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     name = 'AdultEmpireCash'
     network = 'AdultEmpireCash'
 
-    custom_settings = {
-        'CONCURRENT_REQUESTS': 1
-    }
+    custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False', 'CONCURRENT_REQUESTS': '1'}
 
     start_urls = [
         # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
@@ -28,12 +26,13 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://spankmonster.com',
         'https://www.stephousexxx.com',
         'https://www.wcpclub.com'
+        'https://www.bruthasinc.com'
     ]
 
     selector_map = {
         'title': '//h1[@class="description"]/text()',
         'description': '//div[@class="synopsis"]/p/text()',
-        'date': '//div[@class="release-date"]/text()',
+        'date': '//div[@class="release-date"][1]/text()',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="video-performer"]//img/@title',
         'tags': '//div[@class="tags"]//a/text()',
@@ -60,6 +59,12 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Kings of Fetish"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "bruthasinc" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Brutha's Inc"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "jayspov" in response.url:
             scenes = response.xpath('//a[contains(@class, "scene-update-details")]/@href').getall()
@@ -137,6 +142,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/watch-newest-jonathan-jordan-xxx-clips-and-scenes.html?page=%s&hybridview=member"
         if "kingsoffetish" in base:
             pagination = "/kings-of-fetish-newest-perverted-clips.html?page=%s&hybridview=member"
+        if "bruthasinc" in base:
+            pagination = "/watch-newest-bruthas-inc-clips-and-scenes.html?page=%s&hybridview=member"
         return self.format_url(base, pagination % page)
 
     def get_title(self, response):
@@ -149,3 +156,13 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 release = release.get()
                 title = title + " From " + release.strip()
         return title
+
+    def get_duration(self, response):
+        duration = response.xpath('//span[contains(text(), "Length")]/following-sibling::text()')
+        if duration:
+            duration = duration.get()
+            if "min" in duration:
+                duration = re.search(r'(\d+)', duration).group(1)
+                duration = str(int(duration) * 60)
+                return duration
+        return None

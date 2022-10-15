@@ -1,4 +1,5 @@
 import re
+import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -56,3 +57,19 @@ class DickDrainersSpider(BaseSceneScraper):
 
     def get_site(self, response):
         return 'Dick Drainers'
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image or "content" not in image:
+            image = response.xpath('//script[contains(text(), "src0_1x")]/text()')
+            if image:
+                image = image.get()
+                image = re.search(r'src0_1x.*?(/.*?\.jpg)', image)
+                if image:
+                    image = self.format_link(response, image.group(1))
+        return image
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        title = title.encode('ascii', 'ignore').decode()
+        return title

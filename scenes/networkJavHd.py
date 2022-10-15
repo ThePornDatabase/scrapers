@@ -46,6 +46,7 @@ class NetworkJavHDSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         jsondata = response.json()
+        print(jsondata)
         data = jsondata['template']
         data = data.replace("\n", "").replace("\t", "").replace("\r", "").replace("  ", " ").strip()
         data = data.replace("  ", " ").strip()

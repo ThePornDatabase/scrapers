@@ -42,10 +42,18 @@ class NetworkPervCitySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="videoPic"]/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="videoBlock"]')
         for scene in scenes:
+            duration = scene.xpath('.//div[@class="runtime"]/text()')
+            if duration:
+                duration = duration.get()
+                duration = re.search(r'([0-9:]{4,8})', duration)
+                if duration:
+                    meta['duration'] = self.duration_to_seconds(duration.group(1))
+            scene = scene.xpath('./div[@class="videoPic"]/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
         tags = []

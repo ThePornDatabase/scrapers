@@ -8,10 +8,10 @@ class SiteJerkaokeSpider(BaseSceneScraper):
     network = 'Model Media'
 
     start_urls = [
-        # ~ 'https://www.delphinefilms.com',
-        # ~ 'https://www.jerkaoke.com',
+        'https://www.delphinefilms.com',
+        'https://www.jerkaoke.com',
         'https://www.modelmediaasia.com',
-        # ~ 'https://www.povadventure.com/',
+        'https://www.povadventure.com/',
     ]
 
     selector_map = {
@@ -23,7 +23,7 @@ class SiteJerkaokeSpider(BaseSceneScraper):
         'performers': '//div[contains(text(), "Cast")]/following-sibling::div/a/text()',
         'tags': '//main[@id="MusContainer"]//a[contains(@href, "tags")]/span/text()',
         'trailer': '',
-        'external_id': r'trailers/(.*?)\?',
+        'external_id': r'trailers/(.*)',
         'pagination': '/videos?sort=published_at&page=%s'
     }
 
@@ -31,8 +31,10 @@ class SiteJerkaokeSpider(BaseSceneScraper):
         meta = response.meta
         scenes = response.xpath('//div[contains(@class, "mb-3")]/a/@href').getall()
         for scene in scenes:
+            if "?" in scene:
+                link = re.search(r'(.*)\?', scene).group(1)
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+                yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         if "delphine" in response.url:

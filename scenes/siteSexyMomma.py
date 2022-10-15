@@ -41,9 +41,16 @@ class SiteSexyMommaSpider(BaseSceneScraper):
                 date = self.parse_date(date, date_formats=['%b %d, %Y']).isoformat()
             else:
                 date = self.parse_date('today').isoformat()
+            duration = scene.xpath('.//strong[contains(text(), "Length")]/following-sibling::text()')
+            if duration:
+                duration = duration.get()
+                duration = re.search(r'(\d{1,3}) min', duration).group(1)
+                duration = str(int(duration) * 60)
+            else:
+                duration = ''
             scene = "https://www.sexymomma.com/moms/" + scene.xpath('.//div[@class="img-div"]/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(scene, callback=self.parse_scene, headers={'Referer': 'https://www.sexymomma.com/moms/'}, cookies=self.cookies, meta={'date': date, 'dont_redirect': True})
+                yield scrapy.Request(scene, callback=self.parse_scene, headers={'Referer': 'https://www.sexymomma.com/moms/'}, cookies=self.cookies, meta={'date': date, 'dont_redirect': True, 'duration': duration})
 
     def get_image(self, response):
         image = self.process_xpath(response, self.get_selector_map('image')).get()

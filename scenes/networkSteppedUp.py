@@ -10,7 +10,7 @@ class SteppedUpSpider(BaseSceneScraper):
     network = 'Stepped Up'
 
     start_urls = [
-        'https://tour.swallowed.com',
+        # ~ 'https://tour.swallowed.com', #Moved to JSON Scraper
         # ~ 'https://tour.nympho.com', # Moved to JSON scraper
         # ~ 'https://tour.trueanal.com', # Moved to JSON scraper
         # ~ 'https://tour.allanal.com', # Moved to JSON scraper

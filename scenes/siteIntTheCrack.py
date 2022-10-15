@@ -15,15 +15,10 @@ import dateparser
 import requests
 import scrapy
 from scrapy.http import HtmlResponse
+from scrapy.utils.project import get_project_settings
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class InTheCrackSpider(BaseSceneScraper):
@@ -36,6 +31,9 @@ class InTheCrackSpider(BaseSceneScraper):
     start_urls = [
         'https://inthecrack.com/',
     ]
+    settings = get_project_settings()
+    flare_address = settings.get('FLARE_ADDRESS')
+    splash_address = settings.get('SPLASH_ADDRESS')
 
     custom_settings = {
         'CONCURRENT_REQUESTS': 1
@@ -61,11 +59,19 @@ class InTheCrackSpider(BaseSceneScraper):
             headers['Content-Type'] = 'application/json'
             # ~ setup = json.dumps({'cmd': 'sessions.create', 'session': 'inthecrack'})
             # ~ requests.post("http://192.168.1.151:8191/v1", data=setup, headers=headers)
-            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page), 'domain': 'inthecrack.com'}]}
-            yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers)
+            # ~ my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'cookies': [{'name': 'mypage', 'value': str(self.page), 'domain': 'inthecrack.com'}]}
+            # ~ yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers)
+
+            headers = self.headers
+            headers['Content-Type'] = 'application/json'
+            setup = json.dumps({'cmd': 'sessions.create', 'session': 'inthecrack'})
+            requests.post(self.flare_address, data=setup, headers=headers)
+            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'url': url, 'session': 'inthecrack', 'cookies': [{'name': 'mypage', 'value': str(self.page), 'domain': 'inthecrack.com'}]}
+            yield scrapy.Request(self.flare_address, method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         jsondata = json.loads(response.body)
+        print(jsondata)
         htmlcode = jsondata['solution']['response']
         response = HtmlResponse(url=response.url, body=htmlcode, encoding='utf-8')
         cookies = jsondata['solution']['cookies']

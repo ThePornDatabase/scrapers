@@ -1,4 +1,5 @@
 import json
+import string
 from urllib.parse import urlparse
 import scrapy
 
@@ -105,6 +106,18 @@ class VixenScraper(BaseSceneScraper):
                 for tag in data['tags']:
                     scene['tags'].append(tag)
 
+            scene['markers'] = []
+            if 'chapters' in data:
+                if data['chapters']:
+                    for timetag in data['chapters']['video']:
+                        timestamp = {}
+                        timestamp['name'] = self.cleanup_title(timetag['title'])
+                        timestamp['start'] = str(timetag['seconds'])
+                        scene['markers'].append(timestamp)
+                        scene['tags'].append(timestamp['name'])
+
+            scene['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(scene['tags']))))
+
             largest = 0
             for image in data['images']['poster']:
                 if image['width'] > largest:
@@ -202,6 +215,12 @@ query getVideo($videoSlug: String, $site: Site) {
     description
     releaseDate
     tags
+    chapters {
+      video {
+        title
+        seconds
+      }
+    }
     models {
       name
       slug

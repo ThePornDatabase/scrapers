@@ -11,7 +11,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
     start_urls = [
         "https://www.alsscan.com",
-        "https://www.eroticbeauty.com",
+        # ~ # "https://www.eroticbeauty.com",
         "https://www.errotica-archives.com",
         "https://www.eternaldesire.com",
         "https://www.lovehairy.com",
@@ -33,16 +33,23 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
     max_pages = 100
 
+    def get_next_page_url(self, base, page):
+        if "eroticbeauty" in base:
+            pagination = '/api/updates?tab=stream&page=%s&direction=DESC&showPinnedGallery=true'
+        else:
+            pagination = self.get_selector_map('pagination')
+        return self.format_url(base, pagination % page)
+
     def get_scenes(self, response):
         movies = response.json()['galleries']
         for movie in movies:
+            skip = False
+            if "eroticbeauty" in response.url:
+                if movie['type'] != "MOVIE":
+                    skip = True
             res = re.search('movie/(\\d+)/(.+)', movie['path'])
-            yield scrapy.Request(
-                url=self.format_link(
-                    response, '/api/movie?name=' + res.group(2) + '&date=' + res.group(1)),
-                callback=self.parse_scene,
-                headers=self.headers,
-                cookies=self.cookies)
+            if not skip:
+                yield scrapy.Request(url=self.format_link(response, '/api/movie?name=' + res.group(2) + '&date=' + res.group(1)), callback=self.parse_scene, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
         movie = response.json()
@@ -71,7 +78,10 @@ class MetArtNetworkSpider(BaseSceneScraper):
             item['image'] = self.format_link(response, item['image'])
 
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
+        item['duration'] = ''
+        if "runtime" in movie:
+            if movie['runtime'] > 60:
+                item['duration'] = movie['runtime']
 
         item['date'] = self.parse_date(movie['publishedAt']).isoformat()
         item['tags'] = movie['tags']
