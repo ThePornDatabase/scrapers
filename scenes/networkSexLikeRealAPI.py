@@ -86,7 +86,7 @@ class SexLikeRealSpider(BaseSceneScraper):
 
         item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
 
-        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr']
+        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr']
         if not any(x in item['id'] for x in matches):
             matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr']
             if not any(x in item['site'].lower() for x in matches):

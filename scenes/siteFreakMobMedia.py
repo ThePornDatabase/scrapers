@@ -15,8 +15,10 @@ class SiteFreakMobMediaSpider(BaseSceneScraper):
     selector_map = {
         'title': '//div[@class="title"]/div[@class="heading"]/h3[not(contains(text(),"Suggestions"))]/text()',
         'description': '//div[@class="description"]/text()',
-        'date': '//meta[@property="article:published_time"]/@content',
-        'image': '//meta[@property="og:image"]/@content',
+        'date': '//div[@class="views-single"]/span/text()',
+        'date_formats': ['%B %d, %Y'],
+        'image': '//script[contains(text(),"var jw")]/text()',
+        're_image': r'image: ?\"(http.*?)\"',
         'performers': '//span[@class="meta-info" and contains(text(),"Model")]/following-sibling::a/text()',
         'tags': '//div[@class="post-info"]//a/text()',
         'external_id': r'.*\/(.*?)\/',

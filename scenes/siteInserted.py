@@ -24,36 +24,35 @@ class SiteInsertedSpider(BaseSceneScraper):
         'tags': '',
         'external_id': r'',
         'trailer': '',
-        'pagination': '/tour/videos?page=%s'
+        'pagination': '/videos?page=%s&order_by=publish_date&sort_by=desc'
     }
 
     def get_scenes(self, response):
-        jsoncode = response.xpath('//script[contains(text(), "window.__DATA__")]/text()')
+        jsoncode = response.xpath('//script[contains(@id, "NEXT_DATA")]/text()')
         if jsoncode:
-            jsoncode = re.search(r'({.*})\s+window', jsoncode.get()).group(1)
-            jsondata = json.loads(jsoncode)
-            jsondata = jsondata['videos']['items']
+            jsondata = json.loads(jsoncode.get())
+            jsondata = jsondata['props']['pageProps']['contents']['data']
             for scene in jsondata:
                 item = SceneItem()
                 item['title'] = scene['title']
                 item['id'] = scene['id']
                 item['description'] = re.sub('<[^<]+?>', '', scene['description'])
-                item['image'] = scene['trailer']['poster']
+                item['image'] = scene['trailer_screencap']
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
-                item['trailer'] = scene['trailer']['src']
-                scene_date = self.parse_date(scene['release_date']).isoformat()
+                item['trailer'] = scene['trailer_url']
+                scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).isoformat()
                 if scene_date:
                     item['date'] = scene_date
                 else:
                     item['date'] = self.parse_date('today').isoformat()
-                short_url = item['title'].lower().replace(" ", "-")
-                item['url'] = f"https://inserted.com/tour/videos/{item['id']}/{short_url}"
-                item['tags'] = []
+                item['url'] = f"https://inserted.com/videos/{scene['slug']}"
+                item['tags'] = scene['tags']
+                item['duration'] = self.duration_to_seconds(scene['videos_duration'])
                 item['site'] = 'Inserted'
                 item['parent'] = 'Inserted'
                 item['network'] = 'Inserted'
                 item['performers'] = []
-                for model in scene['models']:
+                for model in scene['models_slugs']:
                     item['performers'].append(model['name'])
 
                 if item['id'] and item['title']:

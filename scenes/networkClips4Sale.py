@@ -6,7 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 # Yes, this site is a mess.
 
 
-class SiteBabesInTroubleSpider(BaseSceneScraper):
+class NetworkClips4saleSpider(BaseSceneScraper):
     name = 'Clips4Sale'
 
     sites = [
@@ -65,6 +65,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Sinn Sage Dreams', 'Sinn Sage Dreams', '/studio/96823/sinn-sage-dreams/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Aaliyah Taylors Fetish', 'Aaliyah Taylors Fetish', '/studio/70866/aaliyah-taylor-s-fetish/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and (contains(text(),"MP4") or contains(text(),"WMV"))]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Ashley Fires Fetish Clips', 'Ashley Fires Fetish Clips', '/studio/5177/ashley-fires-fetish-clips/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
+        ['All Her Luv', 'Missa X', 'Missa X', '/studio/51941/missa/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -73,7 +74,9 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         'title': '//h3[@class="[ text-white mt-3-0 mb-1-0 text-2-4 ]"]/text()',
         'description': '//div[@class="individualClipDescription"]/p/text()',
         'date': '//span[contains(text(),"Added")]/span/text()',
-        'image': '//meta[@property="og:image"]/@content',
+        'image': '//video/@data-poster',
+        'duration': '//span[contains(text(), "Length")]/span/text()',
+        're_duration': r'(\d+)\s+?[mM]in',
         'performers': '',
         'tags': '//span[@class="relatedCatLinks"]/span/a/text()',
         'external_id': r'studio\/.*\/(\d+)\/',
@@ -87,7 +90,7 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         for site in self.sites:
             meta['network'] = site[0]
             meta['parent'] = site[1]
-            meta['site'] = site[2]
+            meta['storedsite'] = site[2]
             meta['pagination'] = site[3]
             meta['get_performers'] = site[4]
             meta['search_string'] = site[5]
@@ -117,6 +120,12 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
                                      headers=self.headers,
                                      cookies=self.cookies)
 
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image:
+            image = response.xpath('//meta[@property="og:image"]/@content').get()
+        return self.format_link(response, image)
+
     def get_next_page_url(self, base, page, pagination):
         url = self.format_url(base, pagination % page)
         return url
@@ -137,9 +146,15 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         return extern_id.strip()
 
     def get_title(self, response):
-        title = self.process_xpath(
-            response, self.get_selector_map('title')).get()
+        meta = response.meta
+        title = self.process_xpath(response, self.get_selector_map('title')).get()
         if title:
+            if "Missa X" in meta['storedsite']:
+                title = title.lower()
+                title = title.replace("allherluv", "")
+                title = title.replace("apovstory", "")
+                title = title.replace("missax", "")
+                title = title.replace(" - ", "")
             if re.search(r'^\w+ \w+ - (.*)', title):
                 title = re.search(r'^\w+ \w+ - (.*)', title).group(1)
             title = title.lower()
@@ -159,6 +174,9 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("(mp4)", "")
             title = title.replace("(.mp4)", "")
             title = title.replace("(hd)", "")
+            title = title.replace("1080p Version", "")
+            title = title.replace("1080p", "")
+            title = title.replace("720p", "")
             title = title.replace("(1080)", "")
             title = title.replace("(1080hd)", "")
             title = title.replace("(1080 )", "")
@@ -169,9 +187,6 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
             title = title.replace("hd-", "")
             title = title.replace("(hd-4k)", "")
             title = title.replace(" optimum", "")
-            title = title.replace("1080p Version", "")
-            title = title.replace("1080p", "")
-            title = title.replace("720p", "")
             title = title.replace("()", "")
             title = title.replace("( )", "")
             title = title.replace("mf~", "")
@@ -184,6 +199,8 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
                 title = re.sub(r'(.*)\(remastered .*?\)(.*)', r'\1 \2', title)
             if re.match(r'.*\(remastered .*?\)', title):
                 title = re.sub(r'(.*)\(remastered .*?\)(.*)', r'\1 \2', title)
+            if re.search(r'(\d{3,4}x\d{3,4})', title):
+                title = re.sub(r'\d{3,4}x\d{3,4}', '', title)
             title = title.replace("(remastered)", "")
             title = title.strip()
             if title[-2:] == " -":
@@ -282,16 +299,16 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
 
                 return performers
 
-        if meta['site'] == "Mandy Flores":
+        if meta['storedsite'] == "Mandy Flores":
             return ['Mandy Flores']
 
-        if meta['site'] == "Sinn Sage Dreams":
+        if meta['storedsite'] == "Sinn Sage Dreams":
             return ['Sinn Sage']
 
-        if meta['site'] == "Aaliyah Taylors Fetish":
+        if meta['storedsite'] == "Aaliyah Taylors Fetish":
             return ['Aaliyah Taylor']
 
-        if meta['site'] == "Ashley Fires Fetish Clips":
+        if meta['storedsite'] == "Ashley Fires Fetish Clips":
             return ['Ashley Fires']
 
         return []
@@ -310,8 +327,17 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
 
     def get_site(self, response):
         meta = response.meta
-        if meta['site']:
-            return meta['site']
+        if "Missa X" in meta['storedsite']:
+            title = self.process_xpath(response, self.get_selector_map('title')).get()
+            if "allherluv" in title.lower():
+                return "All Her Luv"
+            if "missax" in title.lower():
+                return "Missa X"
+            if "apovstory" in title.lower():
+                return "A POV Story"
+
+        if meta['storedsite']:
+            return meta['storedsite']
         return tldextract.extract(response.url).domain
 
     def get_parent(self, response):
@@ -325,3 +351,9 @@ class SiteBabesInTroubleSpider(BaseSceneScraper):
         if meta['network']:
             return meta['network']
         return tldextract.extract(response.url).domain
+
+    def get_duration(self, response):
+        duration = super().get_duration(response)
+        if duration:
+            duration = str(int(duration) * 60)
+        return duration

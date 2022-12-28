@@ -1,6 +1,7 @@
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
 class JavBusSpider(BaseSceneScraper):
@@ -41,3 +42,26 @@ class JavBusSpider(BaseSceneScraper):
             title = title.replace(externid + ' ', '')
 
         return title
+
+    def parse_scene(self, response):
+        item = SceneItem()
+
+        item['title'] = self.get_title(response)
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = self.get_date(response)
+        item['image'] = self.get_image(response)
+        item['image_blob'] = self.get_image_blob(response)
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['markers'] = self.get_markers(response)
+        item['id'] = self.get_id(response)
+        item['trailer'] = self.get_trailer(response)
+        item['duration'] = self.get_duration(response)
+        item['url'] = self.get_url(response)
+        item['network'] = self.get_network(response)
+        item['parent'] = self.get_parent(response)
+        item['type'] = 'Scene'
+
+        if "pondo" not in item['site'].lower():
+            yield self.check_item(item, self.days)

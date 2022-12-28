@@ -1,5 +1,6 @@
 import re
 from datetime import date, timedelta
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -9,9 +10,7 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
     network = "Aletta Ocean Live"
     parent = "Aletta Ocean Live"
 
-    start_urls = [
-        'https://alettaoceanlive.com/',
-    ]
+    url = 'https://alettaoceanlive.com/'
 
     selector_map = {
         'title': '',
@@ -22,11 +21,22 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
         'tags': '',
         'external_id': r'.*/(.*?)\.html',
         'trailer': '',
-        'pagination': '/tour/categories/movies_%s_d.html'
     }
 
+    paginations = [
+        '/tour/categories/homevideos_%s_d.html',
+        '/tour/categories/movies_%s_d.html'
+    ]
+
+    def start_requests(self):
+        for pagination in self.paginations:
+            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse,  meta={'page': self.page, 'pagination': pagination}, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, url, page, pagination):
+        return self.format_url(url, pagination % page)
+
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="movie-set-list-item"]')
+        scenes = response.xpath('//div[@class="movie-set-list-item"]|//div[contains(@class, "movie-set-list-item--homemade")]')
         scenelist = []
         for scene in scenes:
             item = SceneItem()
@@ -52,23 +62,27 @@ class AlettaOceanLiveSpider(BaseSceneScraper):
                 image = re.search(r'url\((.*.jpg)', image).group(1)
                 if image:
                     item['image'] = image.strip()
+                    item['image_blob'] = self.get_image_blob_from_link(item['image'])
             else:
                 item['image'] = ''
-
-            item['image_blob'] = ''
+                item['image_blob'] = ''
 
             item['trailer'] = ''
 
-            url = scene.xpath('./a/@href').get()
-            if url:
-                item['url'] = url.strip()
-                external_id = re.search(r'.*/(.*).html', url).group(1)
-                if external_id:
-                    item['id'] = external_id.strip().lower()
-                else:
-                    item['id'] = ''
+            if "homevideos" in response.url:
+                item['url'] = response.url
+                item['id'] = re.search(r'content/(.*?)/', item['image']).group(1)
             else:
-                item['url'] = ''
+                url = scene.xpath('./a/@href').get()
+                if url:
+                    item['url'] = url.strip()
+                    external_id = re.search(r'.*/(.*).html', url).group(1)
+                    if external_id:
+                        item['id'] = external_id.strip().lower()
+                    else:
+                        item['id'] = ''
+                else:
+                    item['url'] = ''
 
             item['description'] = ''
             item['tags'] = []

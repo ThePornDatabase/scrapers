@@ -43,15 +43,20 @@ class SpizooSpider(BaseSceneScraper):
         'performers': '//div[@class="col-12"]//a[contains(@href, "/models")]/@title|//div[@class="col-3"]//a[contains(@href, "/models")]/@title|//span[@class="update_models"]/a/text()',
         'tags': '//a[contains(@class,"category-tag")]/@title|//a[contains(@href,"/categories/")]/text()',
         'external_id': r'/updates/(.*)\.html$',
+        'duration': '//h4[contains(text(), "Length")]/following-sibling::p/text()|//h2[contains(text(), "Length")]/following-sibling::p/text()',
         'trailer': '',  # Hashed and tokened link.  Will be no good later
         'pagination': '/categories/movies_%s_d.html'
     }
 
     def get_scenes(self, response):
-        if "mrluckyvip" in response.url or "creamher" in response.url:
+        if "mrluckyvip" in response.url or "creamher" in response.url or "spizoo" in response.url:
             scenes = response.xpath('//div[@class="thumb-pic"]/a/@href').getall()
         elif "mrluckyraw" in response.url:
             scenes = response.xpath("//div[@class='thumb-title']/a/@href").getall()
+        elif "realsensual" in response.url:
+            scenes = response.xpath("//div[@class='item']/a/@href").getall()
+        elif "rawattack" in response.url or "mrluckypov" in response.url or "firstclasspov" in response.url:
+            scenes = response.xpath("//div[contains(@class, 'thumb-pic')]/a[1]/@href").getall()
         else:
             scenes = response.xpath("//a[@data-event='106']/@href").getall()
         for scene in scenes:

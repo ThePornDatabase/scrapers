@@ -5,7 +5,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class SiteSelfieSuckSpider(BaseSceneScraper):
     name = 'SelfieSuck'
-    network = 'Selfie Suck'
+    network = 'Dreamnet'
     parent = 'Selfie Suck'
     site = 'Selfie Suck'
 
@@ -29,10 +29,24 @@ class SiteSelfieSuckSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="item-thumb"]/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[contains(@class,"item-video")]')
         for scene in scenes:
+            duration = scene.xpath('.//div[@class="time"]/text()')
+            if duration:
+                meta['duration'] = self.duration_to_seconds(duration.get())
+            image = scene.xpath('./div/a/img/@src0_1x')
+            if image:
+                meta['image'] = self.format_link(response, image.get())
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
+            scenedate = scene.xpath('.//div[@class="time"]/following-sibling::comment()')
+            if scenedate:
+                scenedate = re.search(r'(\d{4}-\d{2}-\d{2})', scenedate.get())
+                if scenedate:
+                    meta['date'] = self.parse_date(scenedate.group(1)).isoformat()
+            scene = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_image(self, response):
         image = super().get_image(response)

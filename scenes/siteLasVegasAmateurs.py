@@ -7,7 +7,7 @@ from tpdb.items import SceneItem
 class SiteLasVegasAmateursSpider(BaseSceneScraper):
     name = 'LasVegasAmateurs'
     network = 'Las Vegas Amateurs'
-    max_pages = 20
+    max_pages = 100
 
     start_urls = [
         'http://lasvegasamateurs.com'
@@ -53,7 +53,7 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
                 image = scene.xpath('./div/a/img/@src0_3x')
                 if image:
                     image = image.get()
-                    item['image'] = "http://lasvegasamateurs.com/tour/" + image.strip()
+                    item['image'] = "http://lasvegasamateurs.com/tour/" + image.strip().replace(" ", "%20")
                 else:
                     item['image'] = None
 
@@ -66,8 +66,7 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
                     trailer = trailer.get()
                     trailer = re.search(r'\'(/.*.mp4)', trailer)
                     if trailer:
-                        item['trailer'] = 'https://lasvegasamateurs.com' + trailer.group(1).strip()
-
+                        item['trailer'] = 'https://lasvegasamateurs.com' + trailer.group(1).strip().replace(" ", "%20")
                 item['site'] = "Las Vegas Amateurs"
                 item['parent'] = "Las Vegas Amateurs"
                 item['network'] = "Las Vegas Amateurs"

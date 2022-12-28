@@ -27,6 +27,7 @@ class VnaNetworkSpider(BaseSceneScraper):
         'https://kink305.com',
         'https://maggiegreenlive.com',
         'https://maxinex.com',
+        'https://nataliastarr.com',
         'https://ninakayy.com',
         'https://pennypaxlive.com',
         'https://povmania.com',
@@ -77,7 +78,11 @@ class VnaNetworkSpider(BaseSceneScraper):
                 meta['image_blob'] = self.get_image_blob_from_link(self.format_link(response, image.get()))
                 meta['image'] = self.format_link(response, image.get()).replace("sd3.php?show=file&path=/", "")
 
-            scene = scene.xpath('.//h3/a/@href|.//div[@class="videoPic"][1]/a/@href').get()
+            scenelink = scene.xpath('.//h3/a/@href|.//div[@class="videoPic"][1]/a/@href').get()
+            if "join" in scenelink:
+                scenelink = scene.xpath('./div[1]/div[1]/a[1]/@href').get()
+            if scenelink:
+                scene = scenelink
             if scene:
                 scene = self.format_link(response, scene)
                 if re.search(self.selector_map['external_id'], scene):

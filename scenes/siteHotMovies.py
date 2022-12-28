@@ -1,4 +1,5 @@
 import re
+import string
 import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -250,7 +251,11 @@ class MoviesHotMoviesSpider(BaseSceneScraper):
                 scenestart = int(self.duration_to_seconds(scene.xpath('.//button[@class="buy_this_scene_responsive"]/@data-start').get()))
                 sceneend = int(self.duration_to_seconds(scene.xpath('.//button[@class="buy_this_scene_responsive"]/@data-stop').get()))
                 item['duration'] = str(sceneend - scenestart)
-                item['performers'] = scene.xpath('.//strong[contains(text(), "Stars")]/following-sibling::a/text()').getall()
+                performers = scene.xpath('.//strong[contains(text(), "Stars")]/following-sibling::a/text()')
+                if performers:
+                    item['performers'] = list(map(lambda x: string.capwords(x.strip()).replace(" (Trans)", ""), performers.getall()))
+                else:
+                    item['performers'] = []
                 item['tags'] = self.cleantags(scene.xpath('.//span[@class="list_attributes"]/a/text()').getall())
                 item['type'] = "Scene"
                 scenecount = scenecount + 1

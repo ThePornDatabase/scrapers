@@ -11,6 +11,7 @@ def match_site(argument):
         '50plusmilfs': "50Plus MILFs",
         '60plusmilfs': "60Plus MILFs",
         'ashleysageellison': "Ashley Sage Ellison",
+        'analqts': "Anal QTs",
         'autumn-jade': "Autumn-Jade",
         'bigboobbundle': "Big Boob Bundle",
         'bigboobspov': "Big Boobs POV",
@@ -81,6 +82,7 @@ def match_site(argument):
 
 def match_page_scenepath(argument):
     match = {
+        'analqts': "/anal-sex-videos/?page=%s",
         'bigboobspov': "/big-boob-videos/?page=%s",
         'bigtithooker': "/big-boob-videos/?page=%s",
         'bonedathome': "/amateur-videos/?page=%s",
@@ -101,6 +103,7 @@ class ScorePassSpider(BaseSceneScraper):
     network = 'ScorePass'
 
     start_urls = [
+        'https://www.analqts.com',
         'https://www.bigboobspov.com',
         'https://www.bigtithooker.com',
         'https://www.bonedathome.com',
@@ -192,8 +195,9 @@ class ScorePassSpider(BaseSceneScraper):
         'description': "//meta[@itemprop='description']/@content | //*[@class='p-desc']/text()",
         'date': "//div[contains(@class, 'stat')]//span[contains(text(),'Date')]/following-sibling::span/text()",
         'image': '//meta[@property="og:image"]/@content',
-        'performers': "//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::span//text()|//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::a//text()",
-        'tags': "//a[contains(@href,'videos-tag')]/text()",
+        'performers': "//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::a//text()|//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::span/a/text()|//div[contains(@class, 'stat')]//span[contains(text(),'Featuring')]/following-sibling::span//text()",
+        'tags': "//a[contains(@href,'videos-tag')]/text()|//a[contains(@href,'scenes-tag')]/text()",
+        'duration': '//span[@class="label" and contains(text(), "Duration")]/following-sibling::span/text()',
         'external_id': r'/(\d+)',
         'trailer': '//div[@class="pos-rel"]//video/source/@src',
         'pagination': 'xxx-teen-videos/?page=%s'

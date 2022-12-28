@@ -399,6 +399,17 @@ class GammaEnterprisesSpider(BaseSceneScraper):
             if not item['site']:
                 item['site'] = self.get_site(response)
 
+            duration = ''
+            if "duration" in jsonlde:
+                duration = re.sub(r'[^\d:]', '', jsonlde['duration'])
+                duration = self.duration_to_seconds(duration)
+            elif "duration" in json_data:
+                duration = re.sub(r'[^\d:]', '', jsonlde['duration'])
+                duration = self.duration_to_seconds(duration)
+            elif response.xpath('//meta[@property="video:duration"]/@content'):
+                duration = response.xpath('//meta[@property="video:duration"]/@content').get()
+            item['duration'] = duration
+
             if 'date' in response.meta:
                 item['date'] = response.meta['date']
             elif 'dateCreated' in jsonlde and 'nudefightclub' not in response.url and '0000-00-00' not in jsonlde['dateCreated']:

@@ -1,4 +1,5 @@
 import json
+import urllib
 from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -47,7 +48,7 @@ class SiteMrBigfatdickSpider(BaseSceneScraper):
             item['site'] = "MrBigfatdick"
             item['parent'] = "MrBigfatdick"
             item['network'] = "MrBigfatdick"
-            item['url'] = "https://www.mrbigfatdick.com/videos/" + movie['permaLink']
+            item['url'] = "https://www.mrbigfatdick.com/videos/" + urllib.parse.quote_plus(movie['permaLink'])
             item['id'] = movie['id']
 
             days = int(self.days)

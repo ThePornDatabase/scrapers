@@ -9,7 +9,8 @@ class BJRawSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.bjraw.com',
-        'https://www.gotfilled.com'
+        'https://www.gotfilled.com',
+        'https://sexymodernbull.com'
     ]
 
     selector_map = {
@@ -23,6 +24,13 @@ class BJRawSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/tour/videos?page=%s'
     }
+
+    def get_next_page_url(self, base, page):
+        if "sexymodernbull" in base:
+            pagination = '/videos?page=%s&order_by=publish_date&sort_by=desc'
+        else:
+            pagination = '/tour/videos?page=%s'
+        return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
         jsondata = response.xpath('//script[@id="__NEXT_DATA__"]/text()')
@@ -52,6 +60,14 @@ class BJRawSpider(BaseSceneScraper):
                     item['site'] = "Got Filled"
                     item['parent'] = "Got Filled"
                     item['network'] = "Got Filled"
+                if 'sexymodernbull' in response.url:
+                    if "Interracial" not in item['tags']:
+                        item['tags'].append('Interracial')
+                    if "BBC" not in item['tags']:
+                        item['tags'].append('BBC')
+                    item['site'] = "Sexy Modern Bull"
+                    item['parent'] = "Sexy Modern Bull"
+                    item['network'] = "Sexy Modern Bull"
                 if scene['trailer_screencap']:
                     item['image'] = scene['trailer_screencap'].replace(" ", "%20")
                 else:

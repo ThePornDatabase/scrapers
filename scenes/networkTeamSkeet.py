@@ -19,6 +19,7 @@ link_to_info = {
     "BCG-organic-dhed18vuav": {"site": "Black Valley Girls", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "DC-organic-w8xs8e0dv3": {"site": "Dad Crush", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "DSW-organic-dfangeym88": {"site": "Daughter Swap", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
+    "organic-dct-gheet2ch": {"site": "Doctor Tapes", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "FS-organic-1rstmyhj44": {"site": "Family Strokes", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "FOS-organic-n5oaginage": {"site": "Foster Tapes", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-fem-Qvk5s1BL": {"site": "Freaky Fembots", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
@@ -35,6 +36,7 @@ link_to_info = {
     "PVM-organic-rg7wwuc7uh": {"site": "PervMom", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "Organic-ppv-zl6ifm7": {"site": "Perv Principal", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-pvt-fePaiz9a": {"site": "Perv Therapy", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
+    "sau-elastic-00gy5fg5ra": {"site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
     "SHL-organic-driobt7t0f": {"site": "ShopLyfter", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "MSL-organic-ws9h564all": {"site": "ShopLyfter MYLF", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "SLM-organic-b75inmn9fu": {"site": "Sis Loves Me", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
@@ -45,7 +47,7 @@ link_to_info = {
     "TLBC-organic-w8bw4yp9io": {"site": "Teens Love Black Cocks", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "TMZ-organic-958spxinbs": {"site": "Thickumz", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-1-saeXae9v": {"site": "Tiny Sis", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    # "Organic-bad-aiGhaiL5": {"site": "BadMILFs", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False}, ### Pulled from other scrapers
+    # ~ # "Organic-bad-aiGhaiL5": {"site": "BadMILFs", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False}, ### Pulled from other scrapers
 }
 
 
@@ -55,7 +57,9 @@ def format_nav_url(link, start, limit, v2=False):
     else:
         nav_format = "https://store.psmcdn.net/{link}/{navText}/items.json?orderBy=\"$key\"&startAt=\"{start}\"&limitToFirst={limit}"
 
-    return nav_format.format(link=link, start=start, limit=limit, navText=link_to_info[link]["navText"])
+    nav_url = nav_format.format(link=link, start=start, limit=limit, navText=link_to_info[link]["navText"])
+
+    return nav_url
 
 
 def format_scene_url(link, sceneId, v2=False):
@@ -87,10 +91,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
-        'DOWNLOADER_MIDDLEWARES': {
-            'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-        }
+        # ~ 'DOWNLOADER_MIDDLEWARES': {
+            # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+        # ~ }
     }
 
     selector_map = {
@@ -106,10 +110,10 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 is_v2 = False
             if is_v2:
                 start = "0"
-                limit = 25
+                limit = 50
             else:
                 start = "aaaaaaaa"
-                limit = 12 # Was originally 450.  Next Page is keyed at 450
+                limit = 150 # Was originally 450.  Next Page is keyed at 450
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
                                  meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2},
@@ -197,6 +201,8 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         else:
             item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
         item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
+        item['url'] = item['url'].replace("-–", "-")
+        # ~ print(item['url'])
 
         item['performers'] = []
         if 'models' in data:

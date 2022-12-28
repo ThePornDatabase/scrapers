@@ -43,12 +43,14 @@ class SiteFemjoySpider(BaseSceneScraper):
             item['parent'] = 'Femjoy'
             item['network'] = 'Femjoy'
             item['type'] = 'Scene'
+            item['url'] = self.format_link(response, scene.xpath('./div/div/a/@href').get())
             item['image'] = scene.xpath('./div/div/a/img[contains(@class, "item_cover")]/@src').get()
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['id'] = re.search(r'\.com/(\d*?)/', item['image']).group(1)
+            sceneid = re.search(r'\.com/post/(\d+)', item['url'])
+            if sceneid:
+                item['id'] = sceneid.group(1)
             item['tags'] = []
             item['trailer'] = ''
-            item['url'] = self.format_link(response, scene.xpath('./div/div/a/@href').get())
             meta['item'] = item
             yield scrapy.Request(item['url'], callback=self.get_description, headers=self.headers, cookies=self.cookies, meta=meta)
 
@@ -61,3 +63,4 @@ class SiteFemjoySpider(BaseSceneScraper):
             item['description'] = ''
 
         yield self.check_item(item, self.days)
+

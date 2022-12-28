@@ -8,15 +8,14 @@ import re
 import html
 import json
 import string
-from datetime import datetime
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
-class NetworkManyVidsSpider(BaseSceneScraper):
-    name = 'ManyVids'
+class NetworkManyVidsV2Spider(BaseSceneScraper):
+    name = 'ManyVidsV2'
 
     start_urls = [
         ['1001216419', 'YouthLust'],
@@ -87,6 +86,8 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         ['1000107977', 'Manyvids: Chad Alva'],
         ['1000228944', 'Manyvids: Heather Vahn'],
         ['1002812736', 'Manyvids: Tommy Wood'],
+        ['1000657719', 'Manyvids: Dawns Place'],
+        ['1004225528', 'Manyvids: MyLittleSwallow']
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -111,36 +112,18 @@ class NetworkManyVidsSpider(BaseSceneScraper):
 
     def start_requests(self):
         url = "https://www.manyvids.com/Profile/1001216419/YouthLust/Store/Videos/"
-        yield scrapy.Request(url,
-                             callback=self.get_taglist,
-                             headers=self.headers,
-                             cookies=self.cookies)
-
-    def get_taglist(self, response):
-        meta = response.meta
-        meta['mvtoken'] = response.xpath('//html/@data-mvtoken').get()
-        meta['headers'] = self.headers
-        url = "https://d3e1078hs60k37.cloudfront.net/site_files/json/vid_categories.json"
-        yield scrapy.Request(url,
-                             callback=self.start_requests2,
-                             headers=self.headers,
-                             cookies=self.cookies, meta=meta)
+        yield scrapy.Request(url, callback=self.start_requests2, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
         meta = response.meta
+        meta['mvtoken'] = response.xpath('//html/@data-mvtoken').get()
         self.headers['referer'] = 'https://www.manyvids.com/Profile/1003004427/Sweetie-Fox/Store/Videos/'
-        taglist = json.loads(response.text)
-        meta['taglist'] = taglist
 
         for link in self.start_urls:
             meta['page'] = self.page
             meta['siteid'] = link[0]
             meta['site'] = link[1]
-            yield scrapy.Request(url=self.get_next_page_url(self.page, meta),
-                                 callback=self.parse,
-                                 meta=meta,
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(self.page, meta), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response):
         # ~ print(response.text)
@@ -154,11 +137,7 @@ class NetworkManyVidsSpider(BaseSceneScraper):
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta),
-                                     callback=self.parse,
-                                     meta=meta,
-                                     headers=self.headers,
-                                     cookies=self.cookies)
+                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_next_page_url(self, page, meta):
         offset = str((int(page) - 1) * 30)
@@ -170,134 +149,11 @@ class NetworkManyVidsSpider(BaseSceneScraper):
         jsondata = json.loads(response.text)
         data = jsondata['result']['content']['items']
         for jsonentry in data:
-            scene = "https://www.manyvids.com" + jsonentry['preview']['path'].replace("\\", "")
-            if jsonentry['preview']['videoPreview']:
-                meta['trailer'] = jsonentry['preview']['videoPreview'].replace("\\", "").replace(" ", "%20")
-            if jsonentry['videoThumb']:
-                meta['image'] = jsonentry['videoThumb'].replace("\\", "").replace(" ", "%20")
-                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
             meta['id'] = jsonentry['id']
             meta['title'] = string.capwords(html.unescape(jsonentry['title']))
-            if scene and meta['id']:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
-
-    def get_date(self, response):
-        meta = response.meta
-        videostring = response.xpath('//meta[@property="og:video"]/@content')
-        if videostring:
-            videostring = videostring.get()
-            datestring = re.search(r'_(\d{10,13})\.', videostring)
-            if datestring:
-                datestring = datestring.group(1)
-                if len(datestring) > 10:
-                    datestring = int(datestring) / 1000
-                date = datetime.utcfromtimestamp(int(datestring)).isoformat()
-                return date
-        else:
-            imagestring = response.xpath('//meta[@name="twitter:image"]/@content').get()
-            if imagestring:
-                imagestring = re.search(r'.*_([0-9a-zA-Z]{10,20}).jpg', imagestring)
-                if imagestring:
-                    imagestring = imagestring.group(1)
-                    imagestringhex = imagestring[:8]
-                    if imagestringhex and "386D43BC" <= imagestringhex <= "83AA7EBC":
-                        imagedate = int(imagestringhex, 16)
-                        date = datetime.utcfromtimestamp(imagedate).isoformat()
-                        return date
-                    if imagestring and 946684860 <= int(imagestring) <= 2208988860:
-                        date = datetime.utcfromtimestamp(int(imagestring)).isoformat()
-                        return date
-
-        # If no valid image string available to pull date from
-        # print(f'Guessing date for: {response.url}')
-        page = int(meta['page'])
-        date = response.xpath('//div[@class="mb-1"]/span[@class="d-none"]/span[2]/text()')
-        if date:
-            date = date.get()
-            date = re.search(r'(\w{3} \d{1,2})', date)
-            if date:
-                date = date.group(1)
-        if not date:
-            date = response.xpath('//div[@class="mb-1"]/span[2]/text()')
-            if date:
-                date = date.get()
-                date = re.search(r'(\w{3} \d{1,2})', date)
-                if date:
-                    date = date.group(1)
-        if date:
-            date = date.strip()
-            if re.search(r'([a-zA-Z]{3} \d{1,2})', date):
-                date = re.search(r'([a-zA-Z]{3} \d{1,2})', date).group(1)
-                date = date.split(" ")
-                monthstring = datetime.strptime(date[0], '%b')
-                month = str(monthstring.month)
-                if len(month) == 1:
-                    month = "0" + month
-                if len(date[1]) == 1:
-                    day = "0" + date[1]
-                else:
-                    day = date[1]
-
-                today = datetime.now().strftime('%m%d')
-                year = datetime.now().strftime('%Y')
-                scenedate = str(month) + str(day)
-
-                sceneid = re.search(r'Video\/(\d+)\/', response.url).group(1)
-                if sceneid:
-                    sceneid = int(sceneid)
-                    if sceneid > 2462280:
-                        scenedate = scenedate + "2021"
-                    if 1657000 <= sceneid <= 2462279:
-                        scenedate = scenedate + "2020"
-                    if 1014000 <= sceneid <= 1656999:
-                        scenedate = scenedate + "2019"
-                    if 600000 <= sceneid <= 1013999:
-                        scenedate = scenedate + "2018"
-                    if sceneid < 599999:
-                        scenedate = scenedate + "2017"
-                else:
-                    if page in range(1, 5):
-                        if scenedate <= today:
-                            scenedate = scenedate + year
-                        else:
-                            scenedate = scenedate + str(int(year) - 1)
-
-                    if page in range(6, 7):
-                        if scenedate <= today:
-                            scenedate = scenedate + str(int(year) - 1)
-                        else:
-                            scenedate = scenedate + str(int(year) - 2)
-
-                    if page == 8:
-                        if scenedate <= today:
-                            scenedate = scenedate + str(int(year) - 2)
-                        else:
-                            scenedate = scenedate + str(int(year) - 3)
-
-                    if page == 9:
-                        if scenedate <= today:
-                            scenedate = scenedate + str(int(year) - 3)
-                        else:
-                            scenedate = scenedate + str(int(year) - 4)
-
-                    if page == 10:
-                        if scenedate <= today:
-                            scenedate = scenedate + str(int(year) - 4)
-                        else:
-                            scenedate = scenedate + str(int(year) - 5)
-
-                    if page > 10:
-                        if scenedate <= today:
-                            scenedate = scenedate + str(int(year) - 5)
-                        else:
-                            scenedate = scenedate + str(int(year) - 6)
-
-            if len(scenedate) > 2:
-                try:
-                    return dateparser.parse(scenedate, date_formats=['%m%d%Y']).isoformat()
-                except Exception:
-                    return dateparser.parse('today').isoformat()
-        return dateparser.parse('today').isoformat()
+            scenelink = f"https://video-player-bff.estore.kiwi.manyvids.com/videos/{meta['id']}"
+            if meta['id']:
+                yield scrapy.Request(scenelink, callback=self.parse_scene, meta=meta)
 
     def get_performers(self, response):
         meta = response.meta
@@ -416,28 +272,33 @@ class NetworkManyVidsSpider(BaseSceneScraper):
     def get_network(self, response):
         return "Manyvids"
 
-    def get_tags(self, response):
+    def parse_scene(self, response):
+        item = SceneItem()
         meta = response.meta
-        taglist = meta['taglist']
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(response, self.get_selector_map('tags')).get()
-            scenetags = []
-            if tags:
-                tags = re.search('\"(.*)\"', tags).group(1)
-                if tags:
-                    tags = tags.split(",")
-                    for tag in tags:
-                        for alltags in taglist:
-                            if alltags['id'] == tag:
-                                scenetags.append(alltags['label'])
-                                break
-            if meta['site'] and "Manyvids" in meta['site']:
-                scenetags.append("Manyvids")
-            if scenetags:
-                return list(map(lambda x: x.strip().title(), scenetags))
-        return []
-
-    def get_description(self, response):
-        description = super().get_description(response)
-        description = description.replace("[custom video] ", "")
-        return description
+        jsondata = json.loads(response.text)
+        item['title'] = meta['title']
+        item['id'] = meta['id']
+        if 'description' in jsondata:
+            item['description'] = jsondata['description']
+        else:
+            item['description'] = ""
+        if "tags" in jsondata:
+            item['tags'] = jsondata['tags']
+        else:
+            item['tags'] = []
+        item['image'] = jsondata['screenshot'].replace(" ", "%20")
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        item['date'] = jsondata['launchDate']
+        item['trailer'] = None
+        item['type'] = 'Scene'
+        item['network'] = "Manyvids"
+        item['performers'] = self.get_performers(response)
+        item['site'] = self.get_site(response)
+        item['parent'] = self.get_parent(response)
+        item['url'] = "https://www.manyvids.com" + jsondata['url']
+        if "videoDuration" in jsondata:
+            duration = re.search(r'(\d{1,2}:\d{1,2}:?\d{1,2}?)', jsondata['videoDuration'])
+            item['duration'] = self.duration_to_seconds(duration.group(1))
+        else:
+            item['duration'] = ""
+        yield self.check_item(item, self.days)

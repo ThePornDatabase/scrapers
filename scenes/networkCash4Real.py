@@ -1,5 +1,7 @@
 import re
+import base64
 import scrapy
+from tpdb.helpers.http import Http
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -16,8 +18,7 @@ class NetworkCash4RealSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//meta[@name="twitter:title"]/@content',
-        'image': '//div[@class="player-thumb"]//img/@src0_1x',
-        'image_blob': True,
+        'image': '//div[@class="player-thumb"]//img/@src0_1x|//div[@class="player-thumb"]//img[contains(@id, "set-target")]/@src',
         'tags': '//i[@class="fa fa-tags"]/following-sibling::span/a/text()',
         'trailer': '//script[contains(text(), "video_content")]/text()',
         're_trailer': r'playsinline src=\"(.*?\.mp4)',
@@ -64,3 +65,25 @@ class NetworkCash4RealSpider(BaseSceneScraper):
                 date = date.replace(".", "")
                 return self.parse_date(date, date_formats=['%b %d, %Y']).isoformat()
         return self.parse_date('today').isoformat()
+
+    def get_image(self, response):
+        if 'image' in self.get_selector_map():
+            image = self.get_element(response, 'image', 're_image')
+            if isinstance(image, list):
+                image = image[0]
+            if "http" in image:
+                imagelink = image.replace(' ', '%20')
+            else:
+                if "gloryholeswallow" in response.url:
+                    imagelink = "https://www.gloryholeswallow.com" + image.replace(' ', '%20')
+                if "cumclinic" in response.url:
+                    imagelink = "https://www.cumclinic.com" + image.replace(' ', '%20')
+            return imagelink
+        return ''
+
+    def get_image_blob_from_link(self, image):
+        if image:
+            req = Http.get(image, headers=self.headers, cookies=self.cookies, verify=False)
+            if req and req.ok:
+                return base64.b64encode(req.content).decode('utf-8')
+        return None

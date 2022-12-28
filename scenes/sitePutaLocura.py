@@ -15,8 +15,8 @@ class PutaLocuraSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//title/text()',
-        'description': '//div[@class="description clearfix"]/p[2]/text()',
+        'title': '//h1/span[@class="model-name"]/text()',
+        'description': '//div[contains(@class,"description")]/p//text()',
         'date': '//div[@class="released-views"]/span[1]/text()',
         'date_formats': ['%d/%m/%Y'],
         'image': '//script[contains(text(), "fluidPlayer")]/text()',
@@ -29,7 +29,7 @@ class PutaLocuraSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="girls-site-box"]/var/a/@href').getall()
+        scenes = response.xpath('//div[@class="widget-release-card"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

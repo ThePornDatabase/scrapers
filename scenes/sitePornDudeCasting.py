@@ -24,25 +24,25 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         'tags': '//div[@class="btn btn--green btn--small header__login-btn"]/text()',
         'external_id': r'casting/(\d+)/',
         'trailer': '',
-        'pagination': '/latest-updates/'
+        'pagination': '/latest-updates/%s/?sort_by=post_date&sort_by=post_date&sort_by=post_date'
     }
 
-    def start_requests(self):
-        if self.days < 90:
-            self.days = 90
-        url = "https://porndudecasting.com/latest-updates/"
-        yield scrapy.Request(url,
-                             callback=self.parse,
-                             meta={'page': self.page},
-                             headers=self.headers,
-                             cookies=self.cookies)
+    # ~ def start_requests(self):
+        # ~ if self.days < 90:
+            # ~ self.days = 90
+        # ~ url = "https://porndudecasting.com/latest-updates/"
+        # ~ yield scrapy.Request(url,
+                             # ~ callback=self.parse,
+                             # ~ meta={'page': self.page},
+                             # ~ headers=self.headers,
+                             # ~ cookies=self.cookies)
 
-    def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
-        count = 0
-        for scene in scenes:
-            count += 1
-            yield scene
+    # ~ def parse(self, response, **kwargs):
+        # ~ scenes = self.get_scenes(response)
+        # ~ count = 0
+        # ~ for scene in scenes:
+            # ~ count += 1
+            # ~ yield scene
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="thumb__gallery"]/div/a[@class="thumb__gallery-col"][1]/@data-href').getall()

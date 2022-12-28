@@ -47,7 +47,7 @@ class NetworkVegasDreamworksSpider(BaseSceneScraper):
         ['https://paradisegfs.com', '/movies/page/%s/', 'Paradise GFs'],
         ['https://screwmetoo.com', '/all-updates/page/%s/', 'Screw Me Too'],
         ['https://trikepatrol.com/', '/all-updates/page/%s/', 'Trike Patrol'],
-        # ~ ['https://tuktukpatrol.com/', '/all-updates/page/%s/', 'TukTuk Patrol'],
+        ['https://tuktukpatrol.com/', '/all-updates/page/%s/', 'TukTuk Patrol'],
     ]
 
     selector_map = {

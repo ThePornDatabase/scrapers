@@ -25,6 +25,7 @@ class LetsDoeItSpider(BaseSceneScraper):
         'image': '//meta[@itemprop="thumbnailUrl"]/@content|//img[@class="-vcc-img"]/@src',
         'performers': '//div[@class="actors"]/h2/span/a[contains(@href, "models")]/strong/text()',
         'tags': "//a[contains(@href,'/tags/') or contains(@href,'/categories/')]/text()",
+        'duration': '//meta[@itemprop="duration"]/@content',
         'external_id': r'/watch/(.*)/',
         'trailer': '//meta[@itemprop="contentURL"]/@content',
         'pagination': '/videos.en.html?order=-recent&page=%s'
@@ -57,3 +58,25 @@ class LetsDoeItSpider(BaseSceneScraper):
             return "Dirty Cosplay"
 
         return tldextract.extract(response.url).domain
+
+    def get_description(self, response):
+        xpathtext = response.xpath('//meta[@itemprop="description"]/@content')
+        if not xpathtext:
+            xpathtext = response.xpath(self.get_selector_map('description'))
+
+        description = xpathtext.getall()
+        description = " ".join(description)
+        return description
+
+    def get_duration(self, response):
+        duration = response.xpath(self.get_selector_map('duration'))
+        if duration:
+            duration = duration.get()
+            if "M" in duration:
+                minutes = (int(re.search(r'(\d+)M', duration).group(1)) * 60)
+                seconds = int(re.search(r'(\d+)M', duration).group(1))
+                if "H" in duration:
+                    hours = (int(re.search(r'(\d+)M', duration).group(1)) * 3600)
+                    return str(hours + minutes + seconds)
+                return str(minutes + seconds)
+        return None

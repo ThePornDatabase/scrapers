@@ -21,7 +21,7 @@ class SiteSuckThisDickSpider(BaseSceneScraper):
         'performers': '',
         'tags': '',
         'external_id': r'.*/(.*?)/',
-        'trailer': '//div[@class="mcb-wrap-inner"]//video/source[1]/@src',
+        'trailer': '//div[contains(@class, "post-wrapper-content")]/div[1]/div/div/div[@class="mcb-wrap-inner"]//video/source[1]/@src',
         'pagination': '/latest-videos/page/%s/'
     }
 

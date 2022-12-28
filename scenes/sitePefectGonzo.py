@@ -7,7 +7,7 @@ def match_site(argument):
     match = {
         'allinternal': "All Internal",
         'asstraffic': "Ass Traffic",
-        'cumforcover': "All Internal",
+        'cumforcover': "Cum For Cover",
         'fistflush': "Fist Flush",
         'givemepink': "Give Me Pink",
         'milfthing': "MILF Thing",
@@ -52,7 +52,7 @@ class PefectGonzoSpider(BaseSceneScraper):
         'tags': '//a[contains(@href,"tag[]")]/text()',
         'duration': '//span[contains(text(), "Movie:")]/text()',
         're_duration': r'([0-9:]{4,8})',
-        'external_id': '\\/movies\\/(.*)',
+        'external_id': r'/movies/(.*)/',
         'trailer': '//video/source/@src',
         'pagination': '/movies/page-%s/?tag=&q=&model=&sort=recent'
     }

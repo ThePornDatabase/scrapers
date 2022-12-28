@@ -13,7 +13,7 @@ class GirlsOutWestSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//meta[@name="twitter:title"]/@content',
+        'title': '//meta[@name="twitter:title"]/@content|//meta[@property="og:title"]/@content|//div[contains(@class, "centerwrap")]/h3/text()',
         'description': '',
         'date': "//div[@class='centerwrap clear']/p",
         're_date': r'(\d{2}/\d{2}/\d{4})',

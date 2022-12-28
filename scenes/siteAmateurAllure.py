@@ -27,9 +27,16 @@ class AmateurAllureSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="update_thumbnail"]/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="update_thumbnail"]')
         for scene in scenes:
-            yield scrapy.Request(url=scene, callback=self.parse_scene)
+            image = scene.xpath('./a/img/@src')
+            if image:
+                image = self.format_link(response, image.get())
+                meta['image'] = image
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
+            scene = scene.xpath('./a/@href').get()
+            yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 
     def get_image(self, response):
         return ''

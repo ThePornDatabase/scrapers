@@ -371,7 +371,7 @@ class AdultTimeAPIUpcomingSpider(BaseSceneScraper):
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'girlsway' in referrerurl:
                 item['parent'] = "Girlsway"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'joymii' in referrerurl:
                 item['parent'] = "JoyMii"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))

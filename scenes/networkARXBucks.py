@@ -13,23 +13,30 @@ class NetworkARXBucksSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        true = True
-        null = None
-        data = {
-            "operationName": "Scenes",
-            "variables": {
-                "first": 50,
-                "after": "",
-                "siteId": null,
-                "isAvailable": true,
-                "orderBy": {"field": "AVAILABLE_AT", "direction": "DESC"}
-            },
-            "query": "query Scenes($first: Int, $after: String, $siteId: [Int], $actorId: [Int], $genreId: [Int], $isAvailable: Boolean, $orderBy: ScenesOrderBy) {\n  scenes(\n    first: $first\n    after:$after\n    siteId: $siteId\n    actorId: $actorId\n    genreId: $genreId\n    isAvailable: $isAvailable\n    orderBy: $orderBy\n  ) {\n    totalCount\n    edges {\n      node {\n        ...sceneFields\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment sceneFields on Scene {\n  id\n  title\n  durationText\n  quality\n  thumbnailUrl\n  primaryPhotoUrl\n  url\n  createdAt\n  summary\n  photoCount\n  photoThumbUrlPath\n  photoFullUrlPath\n  isAvailable\n  availableAt\n  metadataTitle\n  metadataDescription\n  downloadPhotosUrl\n  actors {\n    id\n    stageName\n    url\n    __typename\n  }\n  genres {\n    id\n    name\n    slug\n    __typename\n  }\n  videoUrls {\n    trailer\n    full4k\n    fullHd\n    fullLow\n    __typename\n  }\n  sites {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n"
-        }
+        data = {"operationName": "Sites", "variables": {}, "query": "query Sites($first: Int) {  sites(first: $first) {edges{node {id name}}}}"}
         url = "https://arwest-api-production.herokuapp.com/graphql"
         data2 = json.dumps(data)
-        # ~ print(data2)
-        yield Request(url, headers=self.headers, body=data2, method="POST", callback=self.get_scenes)
+        yield Request(url, headers=self.headers, body=data2, method="POST", callback=self.start_requests2)
+
+    def start_requests2(self, response):
+        jsondata = response.json()['data']['sites']['edges']
+        for jsonrow in jsondata:
+            true = True
+            null = None
+            data = {
+                "operationName": "Scenes",
+                "variables": {
+                    "first": 500,
+                    "after": null,
+                    "siteId": jsonrow['node']['id'],
+                    "isAvailable": true,
+                    "orderBy": {"field": "AVAILABLE_AT", "direction": "DESC"}
+                },
+                "query": "query Scenes($first:Int,$after:String,$siteId:[Int],$actorId:[Int],$genreId:[Int],$isAvailable:Boolean,$orderBy:ScenesOrderBy) {\n  scenes(\n    first: $first\n    after:$after\n    siteId: $siteId\n    actorId: $actorId\n    genreId: $genreId\n    isAvailable: $isAvailable\n    orderBy: $orderBy\n  ) {\n    totalCount\n    edges {\n      node {\n        ...sceneFields\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment sceneFields on Scene {\n  id\n  title\n  durationText\n  quality\n  thumbnailUrl\n  primaryPhotoUrl\n  url\n  createdAt\n  summary\n  photoCount\n  photoThumbUrlPath\n  photoFullUrlPath\n  isAvailable\n  availableAt\n  metadataTitle\n  metadataDescription\n  downloadPhotosUrl\n  actors {\n    id\n    stageName\n    url\n    __typename\n  }\n  genres {\n    id\n    name\n    slug\n    __typename\n  }\n  videoUrls {\n    trailer\n    full4k\n    fullHd\n    fullLow\n    __typename\n  }\n  sites {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n"
+            }
+            url = "https://arwest-api-production.herokuapp.com/graphql"
+            data2 = json.dumps(data)
+            yield Request(url, headers=self.headers, body=data2, method="POST", callback=self.get_scenes)
 
     selector_map = {
         'title': '',
@@ -56,7 +63,10 @@ class NetworkARXBucksSpider(BaseSceneScraper):
             item['url'] = prefix + jsonrow['node']['url']
             item['image'] = jsonrow['node']['primaryPhotoUrl']
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['date'] = jsonrow['node']['createdAt']
+            if jsonrow['node']['availableAt']:
+                item['date'] = jsonrow['node']['availableAt']
+            else:
+                item['date'] = jsonrow['node']['createdAt']
             item['trailer'] = jsonrow['node']['videoUrls']['trailer']
             item['description'] = jsonrow['node']['summary']
             item['tags'] = []

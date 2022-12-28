@@ -31,7 +31,8 @@ class NetworkPOVRSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="teaser-video"]/a/@href | //a[@class="thumbnail__link"]/@href').getall()
         for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            if "czech-vr" not in scene:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
         site = self.process_xpath(response, self.get_selector_map('site')).get()

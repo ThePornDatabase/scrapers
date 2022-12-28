@@ -23,12 +23,12 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
 
 
         # To be done in another scraper, not standard format
-        # 'https://www.adulttime.com/series/kiss-me-fuck-me', *
-        # 'https://www.adulttime.com/series/naked-yoga-life', *
-        # https://www.ladygonzo.com/en/videos *
-        # https://www.adulttime.com/series/she-wants-him
-        # https://www.adulttime.com/series/shower-solos *
-        # https://www.adulttime.com/series/teen-sneaks *
+        # 'https://www.adulttime.com/series/kiss-me-fuck-me', * Done
+        # 'https://www.adulttime.com/series/naked-yoga-life', * Done
+        # https://www.ladygonzo.com/en/videos * Done
+        # https://www.adulttime.com/series/she-wants-him * Done
+        # https://www.adulttime.com/series/shower-solos * Done
+        # https://www.adulttime.com/series/teen-sneaks * Done
         # https://www.adulttime.com/series/the-mike-and-joanna-show *
 
     ]

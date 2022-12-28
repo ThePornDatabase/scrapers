@@ -98,6 +98,10 @@ class CosmidFullImportSpider(BaseSceneScraper):
             else:
                 item['trailer'] = ''
 
+            duration = scene.xpath('.//div[@class="time"]/text()')
+            if duration:
+                item['duration'] = self.duration_to_seconds(duration.get())
+
             externalid = title.replace("_", "-").strip().lower()
             externalid = externalid.replace("  ", " ")
             externalid = externalid.replace(" ", "-")

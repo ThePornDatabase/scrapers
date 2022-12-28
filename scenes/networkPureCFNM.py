@@ -32,6 +32,7 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/videos?order=publish_date&sort=desc&page=%s'
     }
+    custom_scraper_settings = {'DOWNLOADER_CLIENT_TLS_CIPHERS': 'DEFAULT:!DH'}
 
     def start_requests(self):
         for link in self.start_urls:
@@ -101,7 +102,8 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            # ~ item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['image_blob'] = None
 
             trailer = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a[contains(@onclick,"/trailer/")]/@onclick').get()
             if trailer:

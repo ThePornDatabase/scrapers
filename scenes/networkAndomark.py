@@ -5,6 +5,8 @@ import tldextract
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+false = False
+true = True
 
 
 def match_site(argument):
@@ -71,7 +73,7 @@ class AndomarkSpider(BaseSceneScraper):
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
         }
     }
-
+    
     start_urls = [
         'http://sexykarenxxx.com',
         'https://ariellynn.com',
@@ -123,7 +125,6 @@ class AndomarkSpider(BaseSceneScraper):
         'date': '//span[@class="availdate"]/text()',
         'description': '//span[contains(@class,"description")]/text()',
         'image': '//meta[@property="og:image"]/@content',
-        'image_blob': True,
         'performers': '//span[@class="tour_update_models"]/a/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
         'external_id': r'updates/(.+)\.html',
@@ -138,8 +139,6 @@ class AndomarkSpider(BaseSceneScraper):
     def get_next_page_url(self, base, page):
         if 'yummygirl' in base:
             selector = '/updates/page_%s.html'
-        elif 'sheseducedme' in base:
-            selector = '/updates/page_%s.html'
         elif 'ariellynn' in base:
             selector = '/tour/categories/updates_%s_d.html'
         elif 'britstudio' in base or 'houseoffyre' in base:
@@ -150,6 +149,8 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/tour/categories/movies_%s_d.html'
         elif 'sexykaren' in base:
             selector = '/tour2/categories/movies_%s_d.html'
+        elif 'laurenphillips' in base:
+            selector = '/categories/lauren-phillips-movies_%s_d.html'
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
         elif 'shiny' in base or '4k' in base or 'charlieforde' in base:
@@ -215,7 +216,7 @@ class AndomarkSpider(BaseSceneScraper):
         elif 'houseofyre' in response.url:
             titlesearch = '//div[@class="update_block_info"]/span[@class="update_title"]/text()'
         elif 'meanawolf' in response.url:
-            titlesearch = '//h3/text()'
+            titlesearch = '//div[@class="trailerArea"]/h1/text()'
         else:
             titlesearch = '//span[@class="update_title"]/text()|//div[@class="updatesBlock"][1]/div[@class="title clear"]/h2/text()'
 
@@ -235,7 +236,7 @@ class AndomarkSpider(BaseSceneScraper):
             imagesearch = '//div[@class="videoplayer"]/img/@src0_1x'
             image = response.xpath(imagesearch).get()
             if image:
-                image = "https://minkaxxx.com" + image
+                image = self.format_link(response, image)
         elif 'sexykaren' in response.url:
             imagesearch = '//script[contains(text(),"video_content")]'
             image = response.xpath(imagesearch).get()
@@ -245,7 +246,7 @@ class AndomarkSpider(BaseSceneScraper):
             if not image:
                 image = response.xpath('//div[@class="videoplayer"]/img/@src0_1x').get()
             if image:
-                image = "http://sexykarenxxx.com" + image
+                image = self.format_link(response, image)
         elif 'meanawolf' in response.url:
             imagesearch = '//script[contains(text(),"useimage")]/text()'
             image = response.xpath(imagesearch).get()
@@ -338,8 +339,7 @@ class AndomarkSpider(BaseSceneScraper):
         if 'meanawolf' in response.url:
             description = response.xpath('//div[@class="trailerContent"]/p/text()').getall()
             if description:
-                if len(description) > 1:
-                    description = " ".join(description)
+                description = " ".join(description)
                 return description
         if 'description' not in self.get_selector_map():
             return ''
@@ -350,3 +350,6 @@ class AndomarkSpider(BaseSceneScraper):
         if description is not None:
             return description.replace('Description:', '').strip()
         return ""
+
+    def get_image_blob(self, response):
+        return None

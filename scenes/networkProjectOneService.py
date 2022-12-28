@@ -2,7 +2,6 @@ import re
 import string
 from urllib.parse import urlencode
 import datetime
-from datetime import date, timedelta
 import scrapy
 from slugify import slugify
 from tldextract import tldextract
@@ -15,9 +14,9 @@ class ProjectOneServiceSpider(BaseSceneScraper):
     network = 'mindgeek'
 
     custom_settings = {'CONCURRENT_REQUESTS': '4',
-                       'AUTOTHROTTLE_ENABLED': 'True',
-                       'AUTOTHROTTLE_DEBUG': 'False',
-                       'DOWNLOAD_DELAY': '2',
+                       # ~ 'AUTOTHROTTLE_ENABLED': 'True',
+                       # ~ 'AUTOTHROTTLE_DEBUG': 'False',
+                       # ~ 'DOWNLOAD_DELAY': '2',
                        'CONCURRENT_REQUESTS_PER_DOMAIN': '2',
                        }
 
@@ -318,13 +317,6 @@ class ProjectOneServiceSpider(BaseSceneScraper):
                 item['markers'] = self.clean_markers(item['markers'])
                 item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
 
-            if "brazzers" in response.url or "deviante" in response.url:
-                item['url'] = self.format_link(response, '/video/' + str(item['id']) + '/' + slugify(item['title']))
-            if "www.men.com" in response.url or "thegayoffice" in response.url:
-                item['url'] = self.format_link(response, '/sceneid/' + str(item['id']) + '/' + slugify(item['title']))
-            else:
-                item['url'] = self.format_link(response, '/scene/' + str(item['id']) + '/' + slugify(item['title']))
-
             # Deviante abbreviations
             if item['site'] == "fmf":
                 item['site'] = "Forgive Me Father"
@@ -344,6 +336,19 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             if item['site'] == "dlf":
                 item['site'] = "DILFed"
                 item['parent'] = "DILFed"
+
+            siteurl = re.compile(r'\W')
+            siteurl = re.sub(siteurl, '', item['site']).lower()
+            brand = scene['brand'].lower().strip()
+
+            if brand == "brazzers" or brand == "deviante" or brand == "bromo":
+                item['url'] = f"https://www.{brand}.com/video/{scene['id']}/{slugify(item['title'])}"
+            elif brand == "men":
+                item['url'] = f"https://www.{brand}.com/sceneid/{scene['id']}/{slugify(item['title'])}"
+            elif brand == "mofos" or brand == "realitykings" or brand == "sexyhub" or brand == "twistys" or brand == "babes":
+                item['url'] = f"https://www.{brand}.com/scene/{scene['id']}/{slugify(item['title'])}"
+            else:
+                item['url'] = f"https://www.{siteurl}.com/scene/{scene['id']}/{slugify(item['title'])}"
 
             item['parent'] = string.capwords(item['parent'])
 

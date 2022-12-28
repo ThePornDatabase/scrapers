@@ -11,7 +11,7 @@ class AllHerLuvSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.allherluv.com',
-        'https://www.missax.com'
+        # ~ 'https://www.missax.com'
     ]
 
     selector_map = {

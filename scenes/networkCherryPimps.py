@@ -1,14 +1,8 @@
-import warnings
+import re
 import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class CherryPimpsSpider(BaseSceneScraper):
@@ -33,6 +27,8 @@ class CherryPimpsSpider(BaseSceneScraper):
         'tags': '//ul[@class="tags"]/li/a/text() | '
                 '//p[@class="text" and contains(text()'
                 ',"Categories")]/a/text()',
+        'duration': '//div[@class="update-info-row"]/i[contains(@class, "play-circle")]/following-sibling::text()[1]',
+        're_duration': r'(\d{1,2}:\d{2}(?::\d{2})?)',
         'external_id': 'trailers/(.+)\\.html',
         'trailer': '',
         'pagination': '/categories/movies_%s.html'
@@ -86,3 +82,16 @@ class CherryPimpsSpider(BaseSceneScraper):
         if meta['site']:
             return meta['site']
         return super().get_parent(response)
+
+    def get_duration(self, response):
+        duration = self.get_element(response, 'duration', 're_duration')
+        if duration:
+            return self.duration_to_seconds(duration)
+        if not duration:
+            duration = response.xpath('//p[@class="text" and contains(text(), "min")]/text()')
+            if duration:
+                duration = duration.get()
+                duration = re.search(r'(\d+).?min', duration)
+                if duration:
+                    return str(int(duration.group(1)) * 60)
+        return None

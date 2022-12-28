@@ -11,8 +11,8 @@ class NomadMediaSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.aziani.com',
-        'https://www.gangbangcreampie.com',
-        'https://www.gloryholesecrets.com',
+        # ~ 'https://www.gangbangcreampie.com',
+        # ~ 'https://www.gloryholesecrets.com',
     ]
 
     selector_map = {

@@ -25,20 +25,24 @@ class BangBrosSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        meta = response.meta
         scenes = response.xpath("//div[@class='videosPopGrls']//div[@class='echThumb']")
         for scene in scenes:
             date = scene.xpath(".//span[contains(@class, 'thmb_mr_cmn')][2]//span[@class='faTxt']/text()")
             if date:
-                date = self.parse_date(date.get(), date_formats=['%b %d, %Y']).isoformat()
+                meta['date'] = self.parse_date(date.get(), date_formats=['%b %d, %Y']).isoformat()
             else:
-                date = self.parse_date('today').isoformat()
+                meta['date'] = self.parse_date('today').isoformat()
+                
+            duration = scene.xpath('.//b[@class="tTm"]/text()')
+            if duration:
+                meta['duration'] = self.duration_to_seconds(duration.get())
 
             link = self.format_link(response, scene.css('a::attr(href)').get())
-            yield scrapy.Request(url=link, callback=self.parse_scene, meta={'date': date})
+            yield scrapy.Request(url=link, callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        site = response.xpath(
-            "//div[@class='vdoAllDesc']//div[@class='vdoCast']//a[1]/text()").get()
+        site = response.xpath("//div[@class='vdoAllDesc']//div[@class='vdoCast']//a[1]/text()").get()
         if 'casting' in site:
             return 'Bang Bros Casting'
         if 'party of 3' in site.lower():

@@ -1,3 +1,4 @@
+import re
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -24,7 +25,16 @@ class LittleCapriceSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.css(
-            '.et_pb_portfolio_items .et_pb_portfolio_item a::attr(href)').getall()
+        scenes = response.css('.et_pb_portfolio_items .et_pb_portfolio_item a::attr(href)').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image:
+            image = response.xpath('//style[contains(text(), ".vid_bg")]/text()').get
+            image = image.replace("\n", "").replace("\r", "").replace("\t", "").replace("  ", " ")
+            image = re.search(r'vid_bg.*?background:\s+?url\(\'(.*?)\'', image)
+            if image:
+                image = image.group(1)
+        return image
