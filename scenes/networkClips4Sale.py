@@ -6,7 +6,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 # Yes, this site is a mess.
 
 
-class SiteBabesInTroubleSpider(BaseSceneScraper):
+class NetworkClips4saleSpider(BaseSceneScraper):
     name = 'Clips4Sale'
 
     sites = [
