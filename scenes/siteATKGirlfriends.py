@@ -50,6 +50,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
             yield scrapy.Request("http://192.168.1.151:8191/v1", method='POST', callback=self.parse, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
+        page = 1
         jsondata = response.json()
         htmlcode = jsondata['solution']['response']
         response = HtmlResponse(url=response.url, body=htmlcode, encoding='utf-8')
@@ -77,7 +78,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//div[contains(@class,"movie-wrap")]')
         for scene in scenes:
-            link = scene.xpath('./div[@class="movie-image"]/a/@href').get()
+            link = scene.xpath('.//div[@class="movie-image"]/a/@href').get()
             link = "https://www.atkgirlfriends.com" + link
             scenedate = scene.xpath('./div[@class="vid-count left"]/text()').get()
             if scenedate:
@@ -173,6 +174,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
         htmlcode = jsondata['solution']['response']
         response = HtmlResponse(url=response.url, body=htmlcode, encoding='utf-8')
         cookies = jsondata['solution']['cookies']
+        print(cookies)
         for cookie in cookies:
             if cookie['name'] == 'mydate':
                 scenedate = cookie['value']

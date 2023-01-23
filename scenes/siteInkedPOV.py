@@ -18,11 +18,13 @@ class SiteInkedPOVSpider(BaseSceneScraper):
         'pagination': '/scenes?page=%s&order_by=publish_date&sort_by=desc'
     }
 
+    cookies = {"close-warning": "1"}
+
     def get_scenes(self, response):
-        scenes = response.xpath('//h4[@class="content-title-wrap"]/a/@href').getall()
+        scenes = response.xpath('//h4[@class="content-title-wrap"]/a/@href|//h2[@class="content-title-wrap"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, cookies=self.cookies, headers=self.headers)
 
     def parse_scene(self, response):
         jsondata = response.xpath('//script[@id="__NEXT_DATA__"]/text()')

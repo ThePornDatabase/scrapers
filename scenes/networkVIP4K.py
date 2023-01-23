@@ -21,7 +21,7 @@ class NetworkVIP4KSpider(BaseSceneScraper):
         'tags': '//div[@class="player-description__tags"]/div/a/text()',
         'trailer': '',
         'external_id': r'videos/(\d+)',
-        'pagination': '/en/videos/publish/all/all/all/%s'
+        'pagination': '/en/publish/tag/all/all/all/%s'
     }
 
     def get_scenes(self, response):

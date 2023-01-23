@@ -43,9 +43,15 @@ class NetworkTwoWebMediaSpider(BaseSceneScraper):
                 date = self.parse_date(date).isoformat()
             else:
                 date = self.parse_date('today').isoformat()
+
+            duration = scene.xpath('.//span[@class="meta_time"]/text()')
+            if duration:
+                duration = self.duration_to_seconds(duration.get())
+            else:
+                duration = None
             scene = scene.xpath('.//h2/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date})
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date, 'duration': duration})
 
     def get_title(self, response):
         title = self.process_xpath(response, self.get_selector_map('title'))

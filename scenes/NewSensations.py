@@ -1,5 +1,4 @@
-import base64
-import requests
+import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -45,20 +44,31 @@ class NewSensationsSpider(BaseSceneScraper):
         if self.get_selector_map('tags'):
             taglist = self.process_xpath(response, self.get_selector_map('tags')).get()
             taglist = taglist.replace(" ", "")
-            if "hotwifexxx" in taglist.lower():
-                return "HotWifeXXX"
-            if "thelesbianexperience" in taglist.lower():
-                return "The Lesbian Experience"
             if "familyxxx" in taglist.lower():
                 return "Family XXX"
-            if "tabutales" in taglist.lower():
-                return "Tabu Tales"
-            if "stretchedoutsnatch" in taglist.lower():
-                return "Stretched Out Snatch"
-            if "talesfromtheedge" in taglist.lower():
-                return "Tales From the Edge"
+            if "freshouttahighschool" in taglist.lower():
+                return "Fresh Outta High School"
+            if "heavyhandfuls" in taglist.lower():
+                return "Heavy Handfuls"
+            if "hotwifexxx" in taglist.lower():
+                return "HotWifeXXX"
             if "parody" in taglist.lower():
                 return "Parody Pass"
+            if "povfantasy" in taglist.lower():
+                return "POV Fantasy"
+            if "stretchedoutsnatch" in taglist.lower():
+                return "Stretched Out Snatch"
+            if "tabutales" in taglist.lower():
+                return "Tabu Tales"
+            if "talesfromtheedge" in taglist.lower():
+                return "Tales From the Edge"
+            if "theromanceseries" in taglist.lower():
+                return "The Romance Series"
+            if "thelesbianexperience" in taglist.lower():
+                return "The Lesbian Experience"
+            if "unlimitedmilfs" in taglist.lower():
+                return "Unlimited Milfs"
+            print(f"{response.url} -> {taglist}")
             return "New Sensations"
 
     def get_image(self, response):
@@ -66,13 +76,6 @@ class NewSensationsSpider(BaseSceneScraper):
         if image[-3:] == "%20":
             image = image[:-3]
         return image
-
-    def get_image_blob(self, response):
-        image = self.get_image(response)
-        if image:
-            image = self.format_link(response, image)
-            return base64.b64encode(requests.get(image).content).decode('utf-8')
-        return None
 
     def get_tags(self, response):
         performers = super().get_performers(response)
@@ -99,3 +102,9 @@ class NewSensationsSpider(BaseSceneScraper):
                     tags.remove(tag)
 
         return tags
+
+    def get_id(self, response):
+        sceneid = response.xpath('//comment()[contains(.,"data-id")]')
+        if sceneid:
+            return re.search(r'data-id=\"(\d+)\"', sceneid.get()).group(1)
+        return None

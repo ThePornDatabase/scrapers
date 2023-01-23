@@ -32,7 +32,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://bhalasada.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bhala Sada', ''],
         ['https://bigjohnnyxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Big Johnny XXX', ''],
         ['https://brookelynnebriar.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Brookelynne Briar', 'Brookelynne Briar'],
-        # ['https://bruceandmorgan.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Bruce and Morgan', ''],  Closed site, historical only
+        # ~ # ['https://bruceandmorgan.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Bruce and Morgan', ''],  Closed site, historical only
         ['https://bunnyscout.tv', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Bunny Scout', ''],
         ['https://cleagaultier-official.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Clea Gaultier', 'Clea Gaultier'],
         ['https://cospimps.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Cospimps', ''],
@@ -82,6 +82,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://www.throatwars.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Throat Wars', ''],
         ['https://www.niksindian.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Niks Indian', ''],
         ['https://www.getyourkneesdirty.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Get Your Knees Dirty', ''],
+        ['https://arabellesplayground.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Arabelles Playground', ''],
+        ['https://antonioclemens.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Antonio Clemens', ''],
     ]
 
     selector_map = {
@@ -144,7 +146,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             uri = urlparse(base)
             base = uri.scheme + "://" + uri.netloc
         page = str((int(page) - 1) * 10)
-        if 'mylifeinmiami' in base:
+        if 'mylifeinmiami' in base or "brookelynn" in base:
             page_url = base + '/sapi/' + token + '/event.last?_method=event.last&tz=-4&limit=10&offset={}&transitParameters[showOnHome]=true' + transit
         else:
             page_url = base + '/sapi/' + token + '/content.load?_method=content.load&tz=-4&limit=10&offset={}&transitParameters[preset]=videos' + transit
@@ -157,7 +159,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         jsondata = jsondata['response']['collection']
 
         for scene in jsondata:
-            if "miami" in response.url:
+            if "miami" in response.url or "brookelynn" in response.url:
                 scene_id = scene['_typedParams']['id']
             else:
                 scene_id = scene['id']
@@ -199,6 +201,9 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 if tagname and "Model - " not in tagname:
                     item['tags'].append(tagname)
             item['tags'] = self.clean_tags(item['tags'])
+
+        if "arabelle" in response.url:
+            meta['performer'] = "Arabelle Raphael"
 
         if "backalleytoonz" in response.url:
             item['tags'].append("Animation")
@@ -256,6 +261,11 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 item['tags'].remove("Don And Nina")
             if "Nina And Don" in item['tags']:
                 item['tags'].remove("Nina And Don")
+
+        if "antonioclemens" in response.url:
+            for tag in item['tags']:
+                if "model" in tag:
+                    item['tags'].remove(tag)
 
         if item['performers']:
             for performer in item['performers']:

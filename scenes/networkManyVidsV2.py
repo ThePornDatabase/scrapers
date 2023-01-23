@@ -87,7 +87,10 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['1000228944', 'Manyvids: Heather Vahn'],
         ['1002812736', 'Manyvids: Tommy Wood'],
         ['1000657719', 'Manyvids: Dawns Place'],
-        ['1004225528', 'Manyvids: MyLittleSwallow']
+        ['1004225528', 'Manyvids: MyLittleSwallow'],
+        ['1000933793', 'Manyvids: Sukisukigirl'],
+        ['1005546662', 'Manyvids: Andregotbars'],
+        ['1003828607', 'Manyvids: Brandibabes']
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -165,6 +168,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             return ['Cattie Candescent']
         if "Hidori" in meta['site']:
             return ['Hidori']
+        if "Brandibabes" in meta['site']:
+            return ['Brandi Babes']
         if "Jaybbgirl" in meta['site']:
             return ['Jaybbgirl']
         if "FreyaJade" in meta['site']:
@@ -253,6 +258,10 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             return ['Chad Alva']
         if "Heather Vahn" in meta['site']:
             return ['Heather Vahn']
+        if "Sukisuki" in meta['site']:
+            return ['Sukisukigirl']
+        if "Andregotbars" in meta['site']:
+            return ['Andregotbars']
         return []
 
     def get_site(self, response):

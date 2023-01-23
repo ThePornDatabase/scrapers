@@ -75,5 +75,5 @@ class LegalPornoSpider(BaseSceneScraper):
         item['network'] = self.get_network(response)
         item['parent'] = 'Legal Porno'
 
-        if "bang bros" not in item['site'].lower() and "jeffsmodels" not in item['site'].lower():
+        if "bang bros" not in item['site'].lower() and "jeffsmodels" not in item['site'].lower() and "antoniosuleiman" not in item['site'].lower():
             yield self.check_item(item, self.days)

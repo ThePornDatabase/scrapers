@@ -22,6 +22,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://detentiongirls.com",
         "https://driverxxx.com",
         "https://familyswap.xxx",
+        "https://hotcrazymess.com",
         "https://momlover.com",
         "https://momsteachsex.com",
         "https://myfamilypies.com",
@@ -74,6 +75,9 @@ class NubilesSpider(BaseSceneScraper):
                 elif "deeplush" in response.url:
                     meta['site'] = "Deep Lush"
                     meta['parent'] = "Deep Lush"
+                elif "hotcrazymess" in response.url:
+                    meta['site'] = "Hot Crazy Mess"
+                    meta['parent'] = "Hot Crazy Mess"
                 elif "nfbusty" in response.url:
                     meta['site'] = "NF Busty"
                     meta['parent'] = "NF Busty"
@@ -88,7 +92,10 @@ class NubilesSpider(BaseSceneScraper):
                     callback=self.parse_scene, meta=meta)
 
     def get_next_page_url(self, base, page):
-        page = (page - 1) * 10
+        if "hotcrazymess" in base:
+            page = ((page - 1) * 12)
+        else:
+            page = (page - 1) * 10
         return self.format_url(
             base, self.get_selector_map('pagination') % page)
 

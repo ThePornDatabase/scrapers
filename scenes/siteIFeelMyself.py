@@ -1,3 +1,4 @@
+import re
 import string
 import scrapy
 
@@ -25,14 +26,24 @@ class IFeelMyselfSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % ((page - 1) * 12))
 
     def get_scenes(self, response):
-        for scene in response.xpath('//table[@class="ThumbTab ppss-scene"]/tr/td/a/@href').getall():
+        for scene in response.xpath('//table[@class="ThumbTab ppss-scene"]'):
+            imagealt = scene.xpath('.//img/@src').get()
+            datealt = scene.xpath('.//td[@class="thumbTXT"]/text()[3]')
+            passdate = ''
+            if datealt:
+                datealt = datealt.get()
+                datealt = re.search(r'(\d{1,2} \w+ \d{4})', datealt)
+                if datealt:
+                    datealt = datealt.group(1)
+                    passdate = self.parse_date(datealt, ['%d %b %Y']).isoformat()
+            scene = scene.xpath('./tr/td/a/@href').get()
             split = scene.split("'")
             scene_id = split[1]
             artist_id = split[3]
 
             yield scrapy.Request(
                 url="https://ifeelmyself.com/public/main.php?page=flash_player&out=bkg&media_id=" + scene_id + "&artist_id=" + artist_id,
-                callback=self.parse_scene, meta={'site': 'I Feel Myself'})
+                callback=self.parse_scene, meta={'site': 'I Feel Myself', 'imagealt': imagealt, 'datealt': passdate})
 
     def get_title(self, response):
         title = response.xpath('//span[@class="entryHeadingFlash"]//a[1]/text()').get().replace("_", " ")
@@ -44,14 +55,22 @@ class IFeelMyselfSpider(BaseSceneScraper):
 
     def get_tags(self, response):
         tags = response.xpath('//table[@class="news_bottom_line"]/tr//text()').getall()
-        tags = [t.strip() for t in tags]
-        tags = [t.replace(";", "") for t in tags if t != '']
         enhanced_tags = response.xpath('//table[@class="news_tag_line"]//td/div/span/span[1]/text()').getall()
         fulltags = tags + enhanced_tags
         if "HD" in fulltags:
             fulltags.remove('HD')
         fulltags = list(map(lambda x: x.strip().title(), fulltags))
-        return fulltags
+        fulltags2 = []
+        for t in fulltags:
+            t = t.replace(";", "")
+            t = t.replace("\\r", "")
+            t = t.replace("\\n", "")
+            t = t.replace("\\t", "")
+            t = t.replace("Explicit Content Solo", "")
+            t = t.strip()
+            if t:
+                fulltags2.append(t)
+        return fulltags2
 
     def get_all_performers(self, response):
         '''Override performers with correct value
@@ -71,8 +90,14 @@ class IFeelMyselfSpider(BaseSceneScraper):
         yield scene
 
     def parse_scene(self, response):
+        meta = response.meta
         for item in super().parse_scene(response):
             keywords = item["title"].replace(" ", "+")
+            if "tags.png" in item['image']:
+                item['image'] = meta['imagealt']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if not item['date'] and meta['datealt']:
+                item['date'] = meta['datealt']
             yield scrapy.FormRequest(
                 url="https://ifeelmyself.com/public/main.php?page=search_results",
                 meta={"scene": item},

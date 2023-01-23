@@ -34,30 +34,33 @@ class SiteNetGirlSpider(BaseSceneScraper):
     def get_scenes(self, response):
         jsondata = response.xpath('//script[contains(text(), "pageProps")]/text()').get()
         jsondata = json.loads(jsondata)
-        jsondata = jsondata['props']['pageProps']['recent_updates']
-        for scene in jsondata:
-            # ~ json_formatted_str = json.dumps(scene, indent=2)
-            # ~ print(json_formatted_str)
+        jsondata = jsondata['props']['pageProps']
+        for key in jsondata:
+            jsongroup = jsondata[key]
+            if "year" not in key:
+                for scene in jsongroup:
+                    # ~ json_formatted_str = json.dumps(scene, indent=2)
+                    # ~ print(json_formatted_str)
 
-            item = SceneItem()
+                    item = SceneItem()
 
-            item['network'] = 'NetVideoGirls'
-            item['parent'] = 'NetGirl'
-            item['site'] = 'NetGirl'
+                    item['network'] = 'NetVideoGirls'
+                    item['parent'] = 'NetGirl'
+                    item['site'] = 'NetGirl'
 
-            item['date'] = self.parse_date('today').isoformat()
-            item['title'] = scene['short_title']
-            item['id'] = scene['id']
-            item['url'] = 'https://www.netgirl.com/'
+                    item['date'] = self.parse_date('today').isoformat()
+                    item['title'] = scene['short_title']
+                    item['id'] = scene['id']
+                    item['url'] = 'https://www.netgirl.com/'
 
-            if "loading" in scene['thumb']:
-                item['image'] = f"https://cdn2.netgirl.com/images/web/{item['id']}-1-med.jpg"
-            else:
-                item['image'] = f"https://cdn2.netgirl.com/images/web/{scene['thumb']}"
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                    if "loading" in scene['thumb']:
+                        item['image'] = f"https://cdn2.netgirl.com/images/web/{item['id']}-1-med.jpg"
+                    else:
+                        item['image'] = f"https://cdn2.netgirl.com/images/web/{scene['thumb']}"
+                    item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-            item['description'] = ''
-            item['performers'] = scene['pretty_models']
-            item['tags'] = ['Amateur', 'Audition']
-            item['trailer'] = ''
-            yield item
+                    item['description'] = ''
+                    item['performers'] = scene['pretty_models']
+                    item['tags'] = ['Amateur', 'Audition']
+                    item['trailer'] = ''
+                    yield item

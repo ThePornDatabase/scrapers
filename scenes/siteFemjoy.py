@@ -2,6 +2,8 @@ import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+false = False
+true = True
 
 
 class SiteFemjoySpider(BaseSceneScraper):
@@ -13,6 +15,8 @@ class SiteFemjoySpider(BaseSceneScraper):
     start_urls = [
         'https://www.femjoy.com',
     ]
+
+    headers = {'referer': 'https://www.femjoy.com/videos'}
 
     selector_map = {
         'title': '',
@@ -27,6 +31,17 @@ class SiteFemjoySpider(BaseSceneScraper):
         'pagination': '/videos?page=%s',
         'type': 'Scene',
     }
+
+    def start_requests(self):
+        meta = {}
+        meta={'dont_redirect': True,"handle_httpstatus_list": [302]}
+        url = "https://www.femjoy.com"
+        yield scrapy.Request(url, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = response.meta
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta
@@ -64,3 +79,9 @@ class SiteFemjoySpider(BaseSceneScraper):
 
         yield self.check_item(item, self.days)
 
+    def get_next_page_url(self, base, page):
+        if page > 1:
+            pagination =  self.get_selector_map('pagination') % page
+        else:
+            pagination = '/videos'
+        return self.format_url(base, pagination)

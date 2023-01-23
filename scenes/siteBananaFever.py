@@ -57,7 +57,10 @@ class SiteBananaFeverSpider(BaseSceneScraper):
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = SceneItem()
-            image_url = scene['_links']['wp:featuredmedia'][0]['href']
+            if 'wp:featuredmedia' in scene['_links']:
+                image_url = scene['_links']['wp:featuredmedia'][0]['href']
+            else:
+                image_url = ""
             item['id'] = str(scene['id'])
             item['date'] = scene['date']
             item['title'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).strip())
@@ -79,14 +82,18 @@ class SiteBananaFeverSpider(BaseSceneScraper):
 
             meta['item'] = item
 
-            req = requests.get(image_url)
-            if req and len(req.text) > 5:
-                imagerow = json.loads(req.text)
-            else:
-                imagerow = None
+            if image_url:
+                req = requests.get(image_url)
+                if req and len(req.text) > 5:
+                    imagerow = json.loads(req.text)
+                else:
+                    imagerow = None
 
-            item['image'] = imagerow['guid']['rendered']
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['image'] = imagerow['guid']['rendered']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            else:
+                item['image'] = None
+                item['image_blob'] = None
 
             if " - Demo" not in item['title']:
                 yield item

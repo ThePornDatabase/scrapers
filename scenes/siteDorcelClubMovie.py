@@ -139,13 +139,13 @@ class DorcelClubSpider(BaseSceneScraper):
             item['site'] = 'Dorcel Club'
             item['url'] = response.url
             item['id'] = re.search(r'movie/.*?/.*?/(\d+)', item['image']).group(1)
-            item['sceneurls'] = response.xpath('//div[@class="scenes"]/div/div/a/@href').getall()
+            sceneurls = response.xpath('//div[@class="scenes"]/div/div/a/@href').getall()
             item['scenes'] = []
-            for sceneurl in item['sceneurls']:
+            for sceneurl in sceneurls:
                 item['scenes'].append({'site': item['site'], 'external_id': re.search(r'scene/(\d+)/', sceneurl).group(1)})
             meta['movie'] = item
             yield item
-            for sceneurl in item['sceneurls']:
+            for sceneurl in sceneurls:
                 yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):

@@ -12,6 +12,25 @@ class LittleCapriceSpider(BaseSceneScraper):
         'https://www.littlecaprice-dreams.com'
     ]
 
+    custom_scraper_settings = {
+        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
+        'CONCURRENT_REQUESTS': 1,
+        'DOWNLOAD_DELAY': 2,
+        'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+        },
+        'DOWNLOAD_HANDLERS': {
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        }
+    }
+
     selector_map = {
         'title': '//h1[@class="entry-title"]/text()',
         'description': "//article/div[@class='entry-content']//div[contains(@class,'et_section_regular')]//div[contains(@class,'et_pb_row_1-4_3-4')]//div[contains(@class,'et_pb_column_3_4')]//div[contains(@class,'et_pb_text')]/text()",
@@ -23,6 +42,10 @@ class LittleCapriceSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/videos/?page=%s'
     }
+
+    def start_requests2(self, response):
+        for pagination in self.paginations:
+            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta={'page': self.page, 'pagination': pagination, "playwright": True}, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         scenes = response.css('.et_pb_portfolio_items .et_pb_portfolio_item a::attr(href)').getall()

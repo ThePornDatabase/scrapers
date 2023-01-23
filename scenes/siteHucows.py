@@ -13,6 +13,18 @@ class HucowsSpider(BaseSceneScraper):
         'https://www.hucows.com'
     ]
 
+    custom_scraper_settings = {
+        'USER_AGENT':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 120,
+        'CONCURRENT_REQUESTS': 1,
+        'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'CONCURRENT_REQUESTS_PER_IP': 1,
+        "MEDIA_ALLOW_REDIRECTS": True,
+    }
+
     selector_map = {
         'title': '//h1/text()',
         'description': '//div[@class="entry-content"]//p/text()',
