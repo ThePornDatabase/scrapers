@@ -1,18 +1,8 @@
-import warnings
-from datetime import datetime
-import dateparser
 import scrapy
 
 from extruct.jsonld import JsonLdExtractor
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
-
 
 class VRLifeSpider(BaseSceneScraper):
     name = 'VRLife'
@@ -32,6 +22,7 @@ class VRLifeSpider(BaseSceneScraper):
         'url': './/a[contains(@class, "w-portfolio-item-anchor")]/@href',
         'title': './/img/@alt',
         'tags': '//div[@class="metaSingleData"]//a/span/text()',
+        'external_id': '-(\\d+)\\/?$',
         'pagination': '/?videoPage=%s'        
     }
 
