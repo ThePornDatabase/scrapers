@@ -280,7 +280,7 @@ class ScorePassSpider(BaseSceneScraper):
             date = response.xpath('//div[contains(@class, "stat")]//span[contains(text(),"Date")]/following-sibling::text()').get()
         if date:
             return self.parse_date(date.strip()).isoformat()
-        return self.parse_date('today').isoformat()
+        return ""
 
     def get_trailer(self, response):
         if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):

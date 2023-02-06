@@ -10,6 +10,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False', 'CONCURRENT_REQUESTS': '1'}
 
     start_urls = [
+        'https://www.18lust.com',
         # ~ # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
@@ -55,21 +56,21 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta = {}
                 meta['site'] = "West Coast Productions"
                 meta['parent'] = "West Coast Productions"
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "conorcoxxx" in response.url:
             scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Conor Coxxx Clips"
                 meta['parent'] = "Conor Coxxx Clips"
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "hornyhousehold" in response.url:
             scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Horny Household Clips"
                 meta['parent'] = "Horny Household Clips"
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "stephousexxx" in response.url:
             scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
             for scene in scenes:
@@ -94,6 +95,12 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Brutha's Inc"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "18lust" in response.url:
+            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "18lustclips"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "jayspov" in response.url:
             scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
@@ -168,6 +175,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_next_page_url(self, base, page):
         pagination = self.get_selector_map('pagination')
 
+        if "18lust" in base:
+            pagination = "/watch-newest-18-lust-clips-and-scenes.html?page=%s&hybridview=member"
         if "wcpclub" in base or "thirdworld" in base:
             pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "conorcoxxx" in base:

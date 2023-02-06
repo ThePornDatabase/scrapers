@@ -73,7 +73,7 @@ class AndomarkSpider(BaseSceneScraper):
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
         }
     }
-    
+
     start_urls = [
         'http://sexykarenxxx.com',
         'https://ariellynn.com',
@@ -255,6 +255,9 @@ class AndomarkSpider(BaseSceneScraper):
         elif 'shinybound.com' in response.url:
             imagesearch = '//img[@class="stdimage promo_thumb left thumbs"]/@src0_1x'
             image = response.xpath(imagesearch).get()
+        elif 'sheseducedme' in response.url:
+            imagesearch = '//div[@class="update_image"]/a[1]/img/@src0_1x'
+            image = response.xpath(imagesearch).get()
         elif 'ariellynn.com' in response.url:
             imagesearch = '//div[@class="model_update_block_image"]/a//img/@src0_2x'
             image = "tour/" + response.xpath(imagesearch).get()
@@ -327,7 +330,7 @@ class AndomarkSpider(BaseSceneScraper):
             return ["Karen Fisher"]
         if 'ariellynn' in response.url:
             return ["Ariel Lynn"]
-        if 'houseofyre' in response.url:
+        if 'houseofyre' in response.url or 'sheseducedme' in response.url:
             performersearch = '//div[@class="update_block_info"]/span[@class="tour_update_models"]/a/text()'
         if 'meanawolf' in response.url:
             performersearch = '//span[contains(text(),"FEATURING:")]/following-sibling::a[contains(@href,"/models/")]/text()'

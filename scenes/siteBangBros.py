@@ -12,6 +12,20 @@ class BangBrosSpider(BaseSceneScraper):
         'https://bangbros.com/'
     ]
 
+    custom_settings = {
+        'USER_AGENT':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
+        'AUTOTHROTTLE_ENABLED': True,
+        # ~ 'AUTOTHROTTLE_START_DELAY': 1,
+        # ~ 'AUTOTHROTTLE_MAX_DELAY': 120,
+        'CONCURRENT_REQUESTS': 1,
+        # ~ 'DOWNLOAD_DELAY': 60,
+        'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'CONCURRENT_REQUESTS_PER_IP': 1,
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429, 403, 302],
+
+        }
+
     selector_map = {
         'title': "//div[@class='ps-vdoHdd']//h1/text()",
         'description': "//div[@class='vdoDesc']/text()",
@@ -25,7 +39,9 @@ class BangBrosSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        print(response.text)
         meta = response.meta
+        meta={'dont_redirect': True}
         scenes = response.xpath("//div[@class='videosPopGrls']//div[@class='echThumb']")
         for scene in scenes:
             date = scene.xpath(".//span[contains(@class, 'thmb_mr_cmn')][2]//span[@class='faTxt']/text()")
@@ -33,12 +49,14 @@ class BangBrosSpider(BaseSceneScraper):
                 meta['date'] = self.parse_date(date.get(), date_formats=['%b %d, %Y']).isoformat()
             else:
                 meta['date'] = self.parse_date('today').isoformat()
-                
+
             duration = scene.xpath('.//b[@class="tTm"]/text()')
             if duration:
                 meta['duration'] = self.duration_to_seconds(duration.get())
 
             link = self.format_link(response, scene.css('a::attr(href)').get())
+            if "mobile." in link:
+                link = link.replace("mobile.", "")
             yield scrapy.Request(url=link, callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):

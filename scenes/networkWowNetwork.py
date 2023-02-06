@@ -18,6 +18,18 @@ class NetworkWowNetworkSpider(BaseSceneScraper):
     name = 'WowNetwork'
     network = 'Wow Girls'
 
+    custom_scraper_settings = {
+        'USER_AGENT':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 5,
+        'CONCURRENT_REQUESTS': 1,
+        'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'CONCURRENT_REQUESTS_PER_IP': 1,
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429, 403, 302],
+    }
+
     start_urls = [
         'https://www.wowpornblog.com/',
         'https://www.wowgirlsblog.com/',
@@ -29,8 +41,7 @@ class NetworkWowNetworkSpider(BaseSceneScraper):
         'title': '//h1[@class="entry-title"]/text()',
         'description': '',
         'date': '//meta[@itemprop="uploadDate"]/@content',
-        'image': '//meta[@property="og:image"]/@content',
-        'image_blob': True,
+        'image': '//meta[@property="og:image"]/@content|//meta[@itemprop="thumbnailUrl"]/@content',
         'performers': '//div[@id="video-about"]/div[@id="video-actors"]/a/text()',
         'tags': '//div[@class="tags-list"]/a[@class="label"]/text()',
         'external_id': '/([a-z0-9-]+?)/?$',

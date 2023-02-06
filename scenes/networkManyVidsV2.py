@@ -90,7 +90,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['1004225528', 'Manyvids: MyLittleSwallow'],
         ['1000933793', 'Manyvids: Sukisukigirl'],
         ['1005546662', 'Manyvids: Andregotbars'],
-        ['1003828607', 'Manyvids: Brandibabes']
+        ['1003828607', 'Manyvids: Brandibabes'],
+        ['602138', 'Manyvids: WCA Productions'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}

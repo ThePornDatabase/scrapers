@@ -11,45 +11,14 @@ videos_nav_text = "latestVideos"
 movies_content_text = "moviesContent"
 videos_content_text = "videosContent"
 v2_videos_content_text = "videoscontent"
+false = False
+true = True
 
 link_to_info = {
-    "organic-alm-Od3Iqu9I": {"site": "Anal Mom", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-1-goide6Xo": {"site": "BBC Paradise", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "BFFS-organic-7o68xoev0j": {"site": "BFFs", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "BCG-organic-dhed18vuav": {"site": "Black Valley Girls", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "DC-organic-w8xs8e0dv3": {"site": "Dad Crush", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "DSW-organic-dfangeym88": {"site": "Daughter Swap", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-dct-gheet2ch": {"site": "Doctor Tapes", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "FS-organic-1rstmyhj44": {"site": "Family Strokes", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "FOS-organic-n5oaginage": {"site": "Foster Tapes", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-fem-Qvk5s1BL": {"site": "Freaky Fembots", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-fuf-eiBei5In": {"site": "Freeuse Fantasy", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-Freeusemilf-uug2tohT": {"site": "Free Use MILF", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-hhk-am7zoi2G": {"site": "Hijab Hookups", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "LAS-organic-whlghevsfs": {"site": "Little Asians", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-momswap-6fkccwxhi0": {"site": "Mom Swap", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    # "mylf-elastic-hka5k7vyuw": {"site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True}, Moved to Playwright
-    "organic-mylfdom-ieH7cuos%20": {"site": "MYLFDom", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-Baepha2v-1": {"site": "Not My Grandpa", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-doc-utei5Mai": {"site": "Perv Doctor", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "Organic-pna-OongoaF1": {"site": "Perv Nana", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "PVM-organic-rg7wwuc7uh": {"site": "PervMom", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "Organic-ppv-zl6ifm7": {"site": "Perv Principal", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-pvt-fePaiz9a": {"site": "Perv Therapy", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    # "sau-elastic-00gy5fg5ra": {"site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True}, Moved to Playwright
-    "SHL-organic-driobt7t0f": {"site": "ShopLyfter", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "MSL-organic-ws9h564all": {"site": "ShopLyfter MYLF", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "SLM-organic-b75inmn9fu": {"site": "Sis Loves Me", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-swp-Jo4daep7": {"site": "Sis Swap", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-shm-iev4iCh6": {"site": "Stay Home MILF", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-sss-no7OhCoo": {"site": "Step Siblings", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    # "ts-elastic-d5cat0jl5o": {"site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True}, Moved to Playwright
-    "TLBC-organic-w8bw4yp9io": {"site": "Teens Love Black Cocks", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "TMZ-organic-958spxinbs": {"site": "Thickumz", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-1-saeXae9v": {"site": "Tiny Sis", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    # "Organic-bad-aiGhaiL5": {"site": "BadMILFs", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False}, ### Pulled from other scrapers
+    "mylf-elastic-hka5k7vyuw": {"site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
+    "ts-elastic-d5cat0jl5o": {"site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
+    "sau-elastic-00gy5fg5ra": {"site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
 }
-
 
 def format_nav_url(link, start, limit, v2=False):
     if v2:
@@ -82,19 +51,31 @@ def get_site_link_text(url, v2=False):
     return site_link
 
 
-class TeamSkeetNetworkSpider(BaseSceneScraper):
-    name = 'TeamSkeetNetwork'
+class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
+    name = 'TeamSkeetNetworkPlaywright'
     network = 'teamskeet'
 
     custom_scraper_settings = {
+        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
         'AUTOTHROTTLE_ENABLED': True,
+        'USE_PROXY': True,
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
-        # ~ 'DOWNLOADER_MIDDLEWARES': {
+        'DOWNLOAD_DELAY': 2,
+        'DOWNLOADER_MIDDLEWARES': {
             # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-        # ~ }
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+        },
+        'DOWNLOAD_HANDLERS': {
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        }
     }
 
     selector_map = {
@@ -116,7 +97,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 limit = 150 # Was originally 450.  Next Page is keyed at 450
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2},
+                                 meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2, "playwright": True},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -186,7 +167,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         if 'publishedDate' in data:
             item['date'] = self.parse_date(data['publishedDate']).isoformat()
         else:
-            item['date'] = None
+            item['date'] = none
 
         if 'site' in data:
             if 'name' in data['site']:

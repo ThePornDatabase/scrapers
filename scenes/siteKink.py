@@ -1,5 +1,5 @@
 import re
-
+import asyncio
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -13,15 +13,15 @@ class KinkFeaturedSpider(BaseSceneScraper):
 
     paginations = [
         '/shoots/latest?page=%s',
-        '/shoots/featured?page=%s',
-        '/shoots/partner?page=%s',
+        # ~ '/shoots/featured?page=%s',
+        # ~ '/shoots/partner?page=%s',
     ]
 
     cookies = {
-        'ct': 1,
-        'ktvc': 0,
-        '_privy_83DCC55BDFCD05EB0CBCF79C': '%7B%22uuid%22%3A%22e02b79b2-739c-4a54-bfa4-b6ce5ebc8997%22%7D',
-        'amp_54ec17': 'rms7dX-UcWd9HEcDIt1hs4...1fsi1o49m.1fsi1o49p.4.4.8',
+        'ct': "1",
+        'ktvc': "0",
+        '_privy_83DCC55BDFCD05EB0CBCF79C': '%7B%22uuid%22%3A%2265d4e0f8-3c9f-4fe6-a5b2-4dfaaf1ecb88%22%7D',
+        'amp_54ec17': 'GF6wTIBRyay-cByhPpt5zG...1gecuq1dk.1gecure9l.1.2.3',
     }
 
     selector_map = {
@@ -37,17 +37,22 @@ class KinkFeaturedSpider(BaseSceneScraper):
     }
 
     custom_scraper_settings = {
+        'USER_AGENT': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:86.0) Gecko/20100101 Firefox/86.0',
+        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
         'AUTOTHROTTLE_ENABLED': True,
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
         'DOWNLOADER_MIDDLEWARES': {
-            'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            'http': 'scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler',
+            'https': 'scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler',
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
         }
     }
 
     def start_requests(self):
+        install_reactor('twisted.internet.asyncioreactor.AsyncioSelectorReactor')
         for pagination in self.paginations:
             yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination),
                                  callback=self.parse,
@@ -56,6 +61,7 @@ class KinkFeaturedSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def parse(self, response, **kwargs):
+        print(response.text)
         if response.status == 200:
             scenes = self.get_scenes(response)
             count = 0
