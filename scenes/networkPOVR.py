@@ -28,6 +28,25 @@ class NetworkPOVRSpider(BaseSceneScraper):
         'pagination': '/?p=%s'
     }
 
+    def start_requests(self):
+        link = "https://povr.com"
+        yield scrapy.Request(url=link, callback=self.change_preferences, cookies=self.cookies, headers=self.headers)
+
+    def change_preferences(self, response):
+        headers = self.headers
+        headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8]"
+        body = "ui_update_flags=t,fp&merge=1"
+
+        yield scrapy.Request(url="https://povr.com/account/ui-settings.json", callback=self.start_requests2, method="POST", body=body, cookies=self.cookies, headers=headers)
+
+    def start_requests2(self, response):
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page),
+                                 callback=self.parse,
+                                 meta={'page': self.page},
+                                 headers=self.headers,
+                                 cookies=self.cookies)
+
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="teaser-video"]/a/@href | //a[@class="thumbnail__link"]/@href').getall()
         for scene in scenes:
