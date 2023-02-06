@@ -4,6 +4,7 @@ from extruct.jsonld import JsonLdExtractor
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
+
 class VRLifeSpider(BaseSceneScraper):
     name = 'VRLife'
     network = 'VRLife'
@@ -22,20 +23,18 @@ class VRLifeSpider(BaseSceneScraper):
         'url': './/a[contains(@class, "w-portfolio-item-anchor")]/@href',
         'title': './/img/@alt',
         'tags': '//div[@class="metaSingleData"]//a/span/text()',
-        'external_id': '-(\\d+)\\/?$',
+        'external_id': r'-(\d+)/?$',
         'pagination': '/?videoPage=%s'        
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            "//div[@data-id and contains(@class, 'videoItem')]")
+        scenes = response.xpath("//div[@data-id and contains(@class, 'videoItem')]")
         
         for scene in scenes:
-            id = self.process_xpath(scene, self.get_selector_map('id')).get()
+            scene_id = self.process_xpath(scene, self.get_selector_map('id')).get()
             title = self.process_xpath(scene, self.get_selector_map('title')).get()
             url = self.process_xpath(scene, self.get_selector_map('url')).get()
-            yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene, meta={'id': id, 'title': title})
-
+            yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene, meta={'id': scene_id, 'title': title})
 
     def parse_scene(self, response):
         jslde = JsonLdExtractor()
@@ -73,6 +72,7 @@ class VRLifeSpider(BaseSceneScraper):
             tags.append("VR")
         return tags
     
-    def clean_title(self, title):
+    @staticmethod
+    def clean_title(title):
         # virtualrealjapan.com uses funky brackets, cleaning up for astethics
-        return title.replace("【","[").replace("】","] ")
+        return title.replace("【", "[").replace("】", "] ")

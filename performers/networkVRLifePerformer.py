@@ -21,7 +21,7 @@ class networkVRLifePerformerSpider(BasePerformerScraper):
 
     selector_map = {
         'url': '//div[@class="performerItem"]//a[contains(@href, "/vr-pornstars/") or contains(@href, "/vr-models/")]/@href',
-        'external_id': r'\/vr-models\/(.*)\/$',
+        'external_id': r'/vr-models/(.*)/$',
         'date_formats': ['%d/%m/%Y'],
     }
 
@@ -63,14 +63,14 @@ class networkVRLifePerformerSpider(BasePerformerScraper):
                                      headers=headers,
                                      cookies=self.cookies)
 
-    def create_post_data(self, page):
+    @staticmethod
+    def create_post_data(page):
         return f"action=virtualreal_get_performers&sort=rating&sortDirection=DESC&index={(page-1)}&itemsPerPage=15"
 
     def get_performers(self, response):
-
-        jsondata = response.json()['performers']
-        for jsonrow in jsondata:
-            response = HtmlResponse(url=response.url, body=jsonrow, encoding='utf-8')
+        json_data = response.json()['performers']
+        for json_row in json_data:
+            response = HtmlResponse(url=response.url, body=json_row, encoding='utf-8')
             url = self.process_xpath(response, self.get_selector_map('url')).get()
             yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_performer)
 
@@ -162,7 +162,8 @@ class networkVRLifePerformerSpider(BasePerformerScraper):
 
         yield item
 
-    def parse_bio_data(self, response):
+    @staticmethod
+    def parse_bio_data(response):
         # Bio data available in simple table, zipping to create dictionary of all available data
         items = response.css('#table_about tbody th').xpath("normalize-space()").getall()
         values = response.css('#table_about tbody td').xpath("normalize-space()").getall()
