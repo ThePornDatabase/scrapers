@@ -63,7 +63,7 @@ class VRLifeSpider(BaseSceneScraper):
         for model in data['actors']:
             item['performers'].append(model['name'])
 
-        item['tags'] = self.get_tags(response)        
+        item['tags'] = self.get_tags(response)
         yield item
 
     def get_tags(self, response):
