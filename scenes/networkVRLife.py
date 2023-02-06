@@ -24,12 +24,12 @@ class VRLifeSpider(BaseSceneScraper):
         'title': './/img/@alt',
         'tags': '//div[@class="metaSingleData"]//a/span/text()',
         'external_id': r'-(\d+)/?$',
-        'pagination': '/?videoPage=%s'        
+        'pagination': '/?videoPage=%s'
     }
 
     def get_scenes(self, response):
         scenes = response.xpath("//div[@data-id and contains(@class, 'videoItem')]")
-        
+
         for scene in scenes:
             scene_id = self.process_xpath(scene, self.get_selector_map('id')).get()
             title = self.process_xpath(scene, self.get_selector_map('title')).get()
@@ -49,7 +49,7 @@ class VRLifeSpider(BaseSceneScraper):
         item['title'] = self.clean_title(response.meta['title'])
         item['description'] = self.cleanup_description(data['description'])
         item['image'] = data['image']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])        
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['id'] = response.meta['id']
         item['trailer'] = self.format_link(response, data['trailer']['contentUrl'])
         item['duration'] = self.duration_to_seconds(data['duration'])
@@ -71,7 +71,7 @@ class VRLifeSpider(BaseSceneScraper):
         if "VR" not in tags:
             tags.append("VR")
         return tags
-    
+
     @staticmethod
     def clean_title(title):
         # virtualrealjapan.com uses funky brackets, cleaning up for astethics
