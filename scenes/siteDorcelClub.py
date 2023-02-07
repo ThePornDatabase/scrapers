@@ -14,6 +14,7 @@ class DorcelClubSpider(BaseSceneScraper):
 
     headers = {
         'Accept-Language': 'en-US,en',
+        'x-requested-with': 'XMLHttpRequest',
     }
 
     selector_map = {
@@ -29,8 +30,6 @@ class DorcelClubSpider(BaseSceneScraper):
     }
 
     cookies = {
-        # ~ 'dorcelclub': 'jjp5ajprrugqqp7j04ibtugdlp',
-        # ~ 'u': '61836d0b0c409b94e77',
         'disclaimer2': 'xx'
     }
 
