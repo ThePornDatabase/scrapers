@@ -1,6 +1,5 @@
 import re
 import json
-from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -22,6 +21,8 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
         'tags': '',
         'external_id': r'.*/(.*?)',
         'trailer': '',
+        'duration': '//div[contains(@class,"video-detail")]//div[contains(@class,"info")]/text()',
+        're_duration': r'((?P<hour>[0-9]+) (?:hour[s]?\s*)?)?(?P<min>[0-9]+) min',
         'pagination': '/videos?page=%s'
     }
 
@@ -55,8 +56,8 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
         item['id'] = re.search(r'videos/(.*)', item['url']).group(1)
         item['date'] = self.parse_date(jsondata['video']['datePublished'].strip()).isoformat()
         item['site'] = "Virtual Taboo"
-        item['parent'] = "POVR"
-        item['network'] = "POVR"
+        item['parent'] = "Virtual Taboo"
+        item['network'] = "Virtual Taboo"
 
         item['tags'] = jsondata['video']['keywords']
         tags2 = item['tags'].copy()
@@ -65,20 +66,21 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
                 item['tags'].remove(tag)
         item['tags'] = list(map(lambda x: x.strip().title(), set(item['tags'])))
 
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
+        # Duration in jsondata is unreliable, grabbing from video info section
+        item['duration'] = self.get_duration(response)
 
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if item['date'] > filterdate:
-                    yield item
-            else:
-                yield item
+        yield self.check_item(item, self.days)
+
+    def get_duration(self, response):
+        selector = self.get_selector_map('duration')
+        regexp, group, mod = self.get_regex(self.regex['re_duration'])
+        info = self.process_xpath(response, selector)
+
+        for text in info:
+            match = regexp.search(text.get())
+            if match:
+                duration = int(match.group("min"))*60
+                if match.group("hour"):
+                    duration += int(match.group("hour"))*3600
+
+                return duration
