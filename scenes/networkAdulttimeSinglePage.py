@@ -95,7 +95,7 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
         return "AdultTime"
 
     def get_date(self, response):
-        date = self.process_xpath(response, self.get_selector_map('date')).get()
+        date = self.process_xpath(response, self.get_selector_map('date')).get().strip()
         if date:
             if "Days" in date:
                 numdays = re.search(r'(\d+)\s+Days', date).group(1)
@@ -103,13 +103,20 @@ class AdultTimeSinglePageSpider(BaseSceneScraper):
                     date = (datetime.today() - timedelta(days=int(numdays))).isoformat()
             else:
                 date = dateparser.parse(date).isoformat()
-
             return date
+        else:
+            date = response.xpath('//div[@id="title-single"]/span/img[@id="time-single"]/following-sibling::span[1]/text()')
+            if date:
+                date = date.get()
+                if "Yesterday" in date:
+                    numdays = 1
+                    date = (datetime.today() - timedelta(days=int(numdays))).isoformat()
+                    return date
 
         return None
 
     def get_tags(self, response):
-        tags =[]
+        tags = []
         if "accident" in response.url:
             tags = ['Gangbang']
         if "joi" in response.url:

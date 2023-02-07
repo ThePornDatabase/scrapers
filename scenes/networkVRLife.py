@@ -18,6 +18,21 @@ class VRLifeSpider(BaseSceneScraper):
         'https://virtualrealamateurporn.com',
     ]
 
+    cookies = {
+        'av-accepted': '1'
+    }
+
+    custom_scraper_settings = {
+        'USER_AGENT':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_MAX_DELAY': 5,
+        'CONCURRENT_REQUESTS': 2,
+        'DOWNLOAD_DELAY': 5,
+        'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
+        'CONCURRENT_REQUESTS_PER_IP': 2,
+    }
+
     selector_map = {
         'id': './@data-id',
         'url': './/a[contains(@class, "w-portfolio-item-anchor")]/@href',

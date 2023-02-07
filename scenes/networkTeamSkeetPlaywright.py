@@ -178,7 +178,11 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
             item['site'] = response.meta['site']
 
         if is_v2:
-            item['url'] = "https://www.teamskeet.com/movies/" + data['id']
+            if "Say Uncle" in response.meta['site']:
+                item['url'] = "https://www.sayuncle.com/movies/" + data['id']
+            else:
+                item['url'] = "https://www.teamskeet.com/movies/" + data['id']
+
         else:
             item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
         item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
