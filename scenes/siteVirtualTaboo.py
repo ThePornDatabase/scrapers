@@ -79,8 +79,8 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
         for text in info:
             match = regexp.search(text.get())
             if match:
-                duration = int(match.group("min"))*60
+                duration = int(match.group("min")) * 60
                 if match.group("hour"):
-                    duration += int(match.group("hour"))*3600
+                    duration += int(match.group("hour")) * 3600
 
                 return duration
