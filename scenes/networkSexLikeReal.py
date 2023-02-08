@@ -77,7 +77,7 @@ class SexLikeRealSpider(BaseSceneScraper):
                 if item['date'] > filterdate:
                     yield item
             else:
-                matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr']
+                matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'virtualrealporn']
                 if not any(x in item['id'] for x in matches):
                     matches = ['swallowbay', 'wankitnowvr', 'baberoticavr']
                     if not any(x in item['site'].lower() for x in matches):
