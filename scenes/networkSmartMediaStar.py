@@ -138,7 +138,7 @@ class SmartMediaStarSpider(BaseSceneScraper):
 
     @staticmethod
     def create_post_data(page, per_page):
-        return json.dumps({"searchQuery": "", "categoryId": None, "perspective": None, "actorId": None, "offset": (page-1) * per_page, "isInitialLoad": False, "sortBy": "NEWEST", "videoView": "MEDIUM", "device": "DESKTOP"})
+        return json.dumps({"searchQuery": "", "categoryId": None, "perspective": None, "actorId": None, "offset": (page - 1) * per_page, "isInitialLoad": False, "sortBy": "NEWEST", "videoView": "MEDIUM", "device": "DESKTOP"})
 
     @staticmethod
     def get_main_image_from_srcset(srcset):
