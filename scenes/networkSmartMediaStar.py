@@ -8,7 +8,6 @@ class SmartMediaStarSpider(BaseSceneScraper):
     network = 'Smart Media Star'
     parent = 'Smart Media Star'
 
-    limit_pages = int(129/15)+1
     per_page = 15
 
     # Creates individual versions if multiple perspectives are found
@@ -19,7 +18,7 @@ class SmartMediaStarSpider(BaseSceneScraper):
     always_label_perspective = False
 
     start_urls = [
-        # 'https://realitylovers.com',
+        'https://realitylovers.com',
         'https://tsvirtuallovers.com'
     ]
 
