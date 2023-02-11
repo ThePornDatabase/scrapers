@@ -53,7 +53,7 @@ class SmartMediaStarSpider(BaseSceneScraper):
         count = 0
         for scene in scenes:
             count += 1
-            yield self.check_item(scene)
+            yield scene
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
@@ -99,9 +99,9 @@ class SmartMediaStarSpider(BaseSceneScraper):
                 if not scene['main'] or self.always_label_perspective:
                     localitem['title'] += f" ({scene['perspective']})"
 
-                yield localitem
+                yield self.check_item(localitem, self.days)
         else:
-            yield item
+            yield self.check_item(item, self.days)
 
     def get_site(self, response):
         site = super().get_site(response)

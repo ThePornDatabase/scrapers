@@ -46,3 +46,7 @@ class Site18YogaSpider(BaseSceneScraper):
             return int(match.group("minutes")) * 60 + int(match.group("seconds"))
 
         return ''
+
+    def get_description(self, response):
+        description = super().get_description(response)
+        return re.sub('<[^<]+?>', '', description).strip()
