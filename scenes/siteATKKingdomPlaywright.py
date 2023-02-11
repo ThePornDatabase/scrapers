@@ -157,7 +157,8 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
                 if item['image']:
                     item['id'] = re.search(r'.*/(\d{4,8})/.*', item['image']).group(1)
 
-                yield self.check_item(item, self.days)
+                if item['title']:
+                    yield self.check_item(item, self.days)
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -213,7 +214,8 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
             item['parent'] = "ATK Galleria"
             item['site'] = "ATK Galleria"
 
-        yield self.check_item(item, self.days)
+        if item['title']:
+            yield self.check_item(item, self.days)
 
     def get_image(self, response):
         image = super().get_image(response)
@@ -225,5 +227,9 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
                     imagealt = imagealt.group(1)
                     imagealt = self.format_link(response, imagealt)
                     return imagealt.replace(" ", "%20")
-            image = None
-        return image
+        if not image or ".com/" not in image:
+            imagealt = response.xpath('//video/@poster')
+            if imagealt:
+                imagealt = imagealt.get()
+                return imagealt.replace(" ", "%20")
+        return None
