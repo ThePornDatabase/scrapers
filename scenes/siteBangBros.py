@@ -39,7 +39,6 @@ class BangBrosSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        print(response.text)
         meta = response.meta
         meta={'dont_redirect': True}
         scenes = response.xpath("//div[@class='videosPopGrls']//div[@class='echThumb']")
@@ -74,3 +73,11 @@ class BangBrosSpider(BaseSceneScraper):
             if external_id:
                 return external_id.group(1)
         return super().get_id(response)
+
+    def get_image(self, response):
+        image = response.xpath(self.get_selector_map('image'))
+        if image:
+            image = image.get()
+            image = image.strip('//')
+            return "https://" + image.replace("//", "/")
+        return ''

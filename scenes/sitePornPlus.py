@@ -22,6 +22,7 @@ class NetworkPornPlusSpider(BaseSceneScraper):
         '/series/shower-4k',
         '/series/kinky-sluts-4k',
         '/series/asians-exploited',
+        '/series/school-of-cock',
     ]
 
     selector_map = {
