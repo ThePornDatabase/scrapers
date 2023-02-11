@@ -27,7 +27,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://www.smutfactor.com/',
         'https://spankmonster.com',
         'https://www.stephousexxx.com',
-        'https://www.wcpclub.com'
+        'https://www.wcpclub.com',
         'https://www.bruthasinc.com'
     ]
 
@@ -91,7 +91,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta['parent'] = "Lethal Hardcore"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "bruthasinc" in response.url:
-            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Brutha's Inc"
@@ -103,7 +103,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta['site'] = "18lustclips"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "jayspov" in response.url:
-            scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
+            scenes = response.xpath('//a[contains(@class,"scene-update-details")]/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Jays POV"
@@ -209,6 +209,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/kings-of-fetish-newest-perverted-clips.html?page=%s&hybridview=member"
         if "bruthasinc" in base:
             pagination = "/watch-newest-bruthas-inc-clips-and-scenes.html?page=%s&hybridview=member"
+
         return self.format_url(base, pagination % page)
 
     def get_title(self, response):
