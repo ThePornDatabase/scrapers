@@ -92,6 +92,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['1005546662', 'Manyvids: Andregotbars'],
         ['1003828607', 'Manyvids: Brandibabes'],
         ['602138', 'Manyvids: WCA Productions'],
+        ['1002621197', 'Manyvids: Riley Jacobs'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -197,7 +198,9 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             return ['Charlette Webb']
         if "Alli Leigh" in meta['site']:
             return ['Alli Leigh']
-        if "Little Miss Elle" in meta['site']:
+        if "Alli Leigh" in meta['site']:
+            return ['Riley Jacobs']
+        if "Riley Jacobs" in meta['site']:
             return ['Little Miss Elle']
         if "Lena Spanks" in meta['site']:
             return ['Lena Spanks']
