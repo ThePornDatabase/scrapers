@@ -12,8 +12,6 @@ class GasmSpider(BaseSceneScraper):
         'https://www.gasm.com/studio/profile/harmonyvision'
     ]
 
-    limit_pages = 2
-
     selector_map = {
         'title': '//span[contains(@class,"gqTitle")]/text()',
         'description': '//meta[@property="og:description"]/@content',
