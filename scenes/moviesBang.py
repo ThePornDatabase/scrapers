@@ -114,8 +114,11 @@ class MoviesBangSpider(BaseSceneScraper):
             duration = duration + int(movie['duration'])
         item['duration'] = str(duration)
         item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
-        if item['title'] and 'dvd' in item['format'].lower():
+        if item['title'] and 'dvd' in item['format'].lower() and "bluebirdfilms" not in item['site'].lower().replace(" ", ""):
             yield self.check_item(item, self.days)
+        else:
+            print("Found one here!!!!")
+            print(item)
 
     def get_elastic_payload(self, per_page, offset: int = 0):
         return {"size": per_page, "from": offset, "sort": [{"releaseDate": {"order": "desc"}}, {"tracking.views.weekly": {"order": "desc", "nested_path": "tracking.views"}}], "query": {"bool": {"must": [{"match": {"status": "ok"}}, {"range": {"releaseDate": {"lte": "now"}}}], "must_not": [{"match": {"type": "trailer"}}]}}, "aggs": {"aggs": {"nested": {"path": "genres"}, "aggs": {"genres": {"terms": {"field": "genres.name.untouched", "size": 400}}}}}}

@@ -9,10 +9,8 @@ class GasmSpider(BaseSceneScraper):
     parent = 'Gasm'
 
     start_urls = [
-        'https://www.gasm.com/studio/profile/harmonyvision'
+        'https://www.gasm.com'
     ]
-
-    limit_pages = 2
 
     selector_map = {
         'title': '//span[contains(@class,"gqTitle")]/text()',
@@ -25,7 +23,7 @@ class GasmSpider(BaseSceneScraper):
         'trailer': '',
         'site': '//span[contains(@class,"gqOwner")]/a/text()',
         'external_id': r'details\/([0-9]+)',
-        'pagination': '?page=%s',
+        'pagination': '/studio/profile/harmonyvision?page=%s',
         'type': 'Scene',
     }
 
@@ -47,6 +45,3 @@ class GasmSpider(BaseSceneScraper):
     def get_site(self, response):
         site = self.get_element(response, 'site')
         return self.sites[site.lower()]
-
-    def get_next_page_url(self, base, page):
-        return base + self.get_selector_map('pagination') % page

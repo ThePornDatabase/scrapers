@@ -92,10 +92,7 @@ class NubilesSpider(BaseSceneScraper):
                     callback=self.parse_scene, meta=meta)
 
     def get_next_page_url(self, base, page):
-        if "hotcrazymess" in base:
-            page = ((page - 1) * 12)
-        else:
-            page = (page - 1) * 10
+        page = ((page - 1) * 12)
         return self.format_url(
             base, self.get_selector_map('pagination') % page)
 

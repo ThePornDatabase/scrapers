@@ -1,6 +1,8 @@
 import re
 from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.BaseOCR import BaseOCR
+
 from tpdb.items import SceneItem
 
 
@@ -84,6 +86,16 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
             else:
                 item['image'] = ''
                 item['image_blob'] = ''
+
+            if item['image']:
+                performer_image = "https://jesseloadsmonsterfacials.com/visitors/" + scene.xpath('.//img[contains(@src,"fft")]/@src').get()
+
+                ocr = BaseOCR()
+                image_data = self.get_image_from_link(performer_image)
+                text = ocr.get_data_from_image(image_data)
+                if text and len(text) > 5:
+                    item['title'] = self.cleanup_title(text)
+                    item['performers'] = [self.cleanup_title(text)]
 
             trailer = scene.xpath('.//a[contains(@href,"trailer")]/@href').get()
             if trailer:

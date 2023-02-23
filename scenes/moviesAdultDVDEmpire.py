@@ -126,6 +126,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         item = SceneItem()
 
         item['title'] = self.clean_text(self.get_title(response))
+        item['title'] = re.sub(r'\(.*?dvd.*?\)|\(.*?blu-ray.*?\)|\(.*?combo.*?\)', '', item['title'], flags=re.IGNORECASE)
         item['description'] = self.clean_text(self.get_description(response))
         item['store'] = "Adult DVD Empire"
         item['date'] = self.get_date(response)
@@ -156,7 +157,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             filter_date = filter_date.strftime('%Y-%m-%d')
 
         foundpointer = 0
-        if item['title'] and item['site']:
+        if item['title'] and item['site'] and "bluebirdfilms" not in item['site'].lower().replace(" ", ""):
             year = re.search(r'(\d{4})-\d{2}-\d{2}', item['date']).group(1)
             teststring = item['title'] + year + item['site']
             teststring = re.sub(r'[^A-Za-z0-9#]+', '', teststring).lower()
@@ -168,20 +169,20 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
                         foundpointer = 1
                         break
 
-        if not foundpointer and "dvd" not in item['format'].lower():
-            with open('adedupelist.txt', 'a', encoding="utf-8") as file1:
-                file1.write(teststring + "\n")
+            if not foundpointer and "dvd" not in item['format'].lower():
+                with open('adedupelist.txt', 'a', encoding="utf-8") as file1:
+                    file1.write(teststring + "\n")
 
-        if self.debug:
-            if not item['date'] > filter_date:
-                item['filtered'] = 'movie filtered due to date restraint'
-            print(item)
-        else:
-            if filter_date:
-                if item['date'] > filter_date:
-                    yield item
+            if self.debug:
+                if not item['date'] > filter_date:
+                    item['filtered'] = 'movie filtered due to date restraint'
+                print(item)
             else:
-                yield item
+                if filter_date:
+                    if item['date'] > filter_date:
+                        yield item
+                else:
+                    yield item
 
     def clean_text(self, textstring):
         if textstring is not None:
