@@ -13,6 +13,7 @@ class SiteSteppedUpJSONSpider(BaseSceneScraper):
         'https://tour.trueanal.com',
         'https://tour.allanal.com',
         'https://tour.analonly.com',
+        'https://sidechick.com',
     ]
 
     selector_map = {
@@ -38,7 +39,10 @@ class SiteSteppedUpJSONSpider(BaseSceneScraper):
                     item['id'] = scene['slug']
                 else:
                     item['id'] = scene['id']
-                item['image'] = scene['thumb']
+                if "sidechick" in response.url:
+                    item['image'] = scene['trailer_screencap'].replace(" ", "%20")
+                else:
+                    item['image'] = scene['thumb']
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 item['duration'] = self.duration_to_seconds(scene['videos_duration'])
                 item['tags'] = scene['tags']

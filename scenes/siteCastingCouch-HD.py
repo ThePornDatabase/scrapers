@@ -49,6 +49,7 @@ class SiteCastingCouchHDSpider(BaseSceneScraper):
 
             item['date'] = scene['release_date']
             item['title'] = scene['short_title']
+            item['duration'] = scene['video_duration']
             item['id'] = scene['id']
             item['url'] = 'https://www.castingcouch-hd.com/'
 

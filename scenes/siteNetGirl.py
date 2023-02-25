@@ -28,7 +28,7 @@ class SiteNetGirlSpider(BaseSceneScraper):
 
     def start_requests(self):
 
-        url = "https://www.netgirl.com/"
+        url = "https://www.netgirl.com"
         yield scrapy.Request(url, callback=self.get_scenes)
 
     def get_scenes(self, response):
@@ -39,28 +39,37 @@ class SiteNetGirlSpider(BaseSceneScraper):
             jsongroup = jsondata[key]
             if "year" not in key:
                 for scene in jsongroup:
-                    # ~ json_formatted_str = json.dumps(scene, indent=2)
-                    # ~ print(json_formatted_str)
-
                     item = SceneItem()
 
-                    item['network'] = 'NetVideoGirls'
-                    item['parent'] = 'NetGirl'
-                    item['site'] = 'NetGirl'
+                    if "id" in scene:
+                        item['network'] = 'NetVideoGirls'
+                        item['parent'] = 'NetGirl'
+                        item['site'] = 'NetGirl'
 
-                    item['date'] = self.parse_date('today').isoformat()
-                    item['title'] = scene['short_title']
-                    item['id'] = scene['id']
-                    item['url'] = 'https://www.netgirl.com/'
+                        item['date'] = None
+                        if "release_date" in scene:
+                            if scene['release_date']:
+                                item['date'] = self.parse_date(scene['release_date']).isoformat()
+                        item['title'] = scene['short_title']
+                        item['id'] = scene['id']
+                        item['url'] = 'https://www.netgirl.com/'
+                        item['duration'] = scene['video_duration']
+                        item['image'] = None
+                        item['image_blob'] = None
+                        if "pinned_thumb" in scene:
+                            if not scene['pinned_thumb']:
+                                item['image'] = f"https://cdn2.netgirl.com/images/web/{item['id']}-1-med.jpg"
+                            elif "thumb" in scene['pinned_thumb']:
+                                if "loading" in scene['pinned_thumb']['thumb'] or not scene['pinned_thumb']:
+                                    item['image'] = f"https://cdn2.netgirl.com/images/web/{item['id']}-1-med.jpg"
+                                else:
+                                    item['image'] = f"https://cdn2.netgirl.com/images/web/{scene['pinned_thumb']['thumb']['thumb_name']}"
+                                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-                    if "loading" in scene['thumb']:
-                        item['image'] = f"https://cdn2.netgirl.com/images/web/{item['id']}-1-med.jpg"
-                    else:
-                        item['image'] = f"https://cdn2.netgirl.com/images/web/{scene['thumb']}"
-                    item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-                    item['description'] = ''
-                    item['performers'] = scene['pretty_models']
-                    item['tags'] = ['Amateur', 'Audition']
-                    item['trailer'] = ''
-                    yield item
+                        item['description'] = ''
+                        item['performers'] = []
+                        for model in scene['models']:
+                            item['performers'].append(model['model_name'])
+                        item['tags'] = ['Amateur', 'Audition']
+                        item['trailer'] = ''
+                        yield item

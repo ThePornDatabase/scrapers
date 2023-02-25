@@ -10,10 +10,15 @@ class NetworkGhostProSpider(BaseSceneScraper):
 
     paginations = [
         ['https://www.thaigirlswild.com', '/categories/scenes_%s_d', ['Asian', 'Amateur'], 'Thai Girls Wild'],
+        ['https://www.thaigirlswild.com', '/index.php', ['Asian', 'Amateur'], 'Thai Girls Wild'],
         ['https://www.creampieinasia.com', '/categories/creampie-in-asia-scenes_%s_d', ['Asian', 'Amateur'], 'Creampie in Asia'],
+        ['https://www.creampieinasia.com', '/index.php', ['Asian', 'Amateur'], 'Creampie in Asia'],
         ['https://www.creampiethais.com/', '/categories/creampiethais_%s_d', ['Asian', 'Amateur'], 'Creampie Thais'],
+        ['https://www.creampiethais.com/', '/index.php', ['Asian', 'Amateur'], 'Creampie Thais'],
         ['https://asiansuckdolls.com', '/categories/asiansuckdolls_%s_d', ['Asian', 'Amateur'], 'Asian Suck Dolls'],
+        ['https://asiansuckdolls.com', '/index.php', ['Asian', 'Amateur'], 'Asian Suck Dolls'],
         ['https://creampiecuties.com', '/categories/creampiecuties_%s_d', ['Creampie', 'Amateur'], 'Creampie Cuties'],
+        ['https://creampiecuties.com', '/index.php', ['Creampie', 'Amateur'], 'Creampie Cuties'],
     ]
 
     selector_map = {
@@ -51,8 +56,14 @@ class NetworkGhostProSpider(BaseSceneScraper):
                                          headers=self.headers,
                                          cookies=self.cookies)
 
+
     def get_next_page_url(self, url, page, pagination):
-        return self.format_url(url, pagination % str(page))
+        if "%s" in pagination:
+            url = self.format_url(url, pagination % str(page))
+        else:
+            url = url + pagination
+        return url
+
 
     def get_scenes(self, response):
         meta = response.meta
