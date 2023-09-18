@@ -34,10 +34,10 @@ class NetworkCXWowPerformerSpider(BasePerformerScraper):
     network = 'CX Wow'
 
     start_urls = [
-        # ~ 'https://www.becomingfemme.com/',
-        # ~ 'https://www.pure-bbw.com/',
-        # ~ 'https://www.pure-ts.com/',
-        # ~ 'https://www.pure-xxx.com/',
+        'https://www.becomingfemme.com/',
+        'https://www.pure-bbw.com/',
+        'https://www.pure-ts.com/',
+        'https://www.pure-xxx.com/',
         'https://www.tspov.com/',
     ]
 
