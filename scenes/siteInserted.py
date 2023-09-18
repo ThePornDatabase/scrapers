@@ -55,21 +55,4 @@ class SiteInsertedSpider(BaseSceneScraper):
                 for model in scene['models_slugs']:
                     item['performers'].append(model['name'])
 
-                if item['id'] and item['title']:
-                    days = int(self.days)
-                    if days > 27375:
-                        filterdate = "0000-00-00"
-                    else:
-                        filterdate = date.today() - timedelta(days)
-                        filterdate = filterdate.strftime('%Y-%m-%d')
-
-                    if self.debug:
-                        if not item['date'] > filterdate:
-                            item['filtered'] = "Scene filtered due to date restraint"
-                        print(item)
-                    else:
-                        if filterdate:
-                            if item['date'] > filterdate:
-                                yield item
-                        else:
-                            yield item
+                yield self.check_item(item, self.days)

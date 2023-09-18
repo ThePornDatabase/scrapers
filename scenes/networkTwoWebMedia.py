@@ -1,100 +1,95 @@
 import re
 import scrapy
-
+import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
-class NetworkTwoWebMediaSpider(BaseSceneScraper):
-    name = 'TwoWebMedia'
-    network = 'Two Web Media'
+class SiteNetworkTwoWebMediaSpider(BaseSceneScraper):
+    name = 'NetworkTwoWebMedia'
+    start_url = 'https://wankitnow.com/'
 
-    start_urls = [
-        'https://www.boppingbabes.com',
-        'https://www.downblousejerk.com',
-        'https://www.upskirtjerk.com',
-        'https://www.wankitnow.com',
+    paginations = [
+        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=wankitnow.com',
+        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=upskirtjerk.com',
+        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=downblousejerk.com',
+        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=realbikinigirls.com',
+        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=lingerietales.com',
+        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=boppingbabes.com'
     ]
 
     selector_map = {
-        'title': '//h1[@class="page_title"]/text()',
-        'description': '//div[@class="post_excerpt"]/p/text()',
-        'date': '',
-        'image': '//meta[@property="og:image"]/@content',
-        'performers': '//span[contains(@class,"meta_modelcategory")]/a/text()',
-        'tags': '//span[contains(@class,"meta_videotag")]/a/text()',
-        'external_id': r'.*\/(.*?)\/',
-        'trailer': '//script[contains(text(),"jwplayer.key")]/text()',
-        're_trailer': r'.*(http.*?\.mp4).*',
-        'pagination': '/videoentry/page/%s/'
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=wankitnow.com',
     }
 
-    def get_next_page_url(self, base, page):
-        if "boppingbabes" in base:
-            pagination = '/v2/videoentry/page/%s/'
-        else:
-            pagination = '/videoentry/page/%s/'
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://wankitnow.com/', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = response.meta
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            for pagination in self.paginations:
+                meta['pagination'] = pagination
+                link = self.get_next_page_url(self.start_url, self.page, meta['buildID'], pagination)
+                yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID, pagination):
+        pagination = pagination.replace("<buildID>", buildID)
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"loop_content")]')
-        for scene in scenes:
-            date = scene.xpath('.//span[@class="meta_date"]/text()').get()
-            if date:
-                date = self.parse_date(date).isoformat()
-            else:
-                date = self.parse_date('today').isoformat()
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
+        for scene in jsondata:
+            item = SceneItem()
+            # ~ print(scene)
+            scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).strftime('%Y-%m-%d')
+            item['date'] = ""
+            if scene_date:
+                item['date'] = scene_date
+            if item['date'] > "2023-09-06":
+                item['title'] = string.capwords(self.cleanup_title(scene['title'].replace("\"", "")))
+                item['id'] = scene['id']
+                item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
+                if scene['thumb']:
+                    item['image'] = self.format_link(response, scene['thumb']).replace(" ", "%20")
+                else:
+                    item['image'] = self.format_link(response, scene['trailer_screencap']).replace(" ", "%20")
 
-            duration = scene.xpath('.//span[@class="meta_time"]/text()')
-            if duration:
-                duration = self.duration_to_seconds(duration.get())
-            else:
-                duration = None
-            scene = scene.xpath('.//h2/a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'date': date, 'duration': duration})
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                if scene['trailer_url']:
+                    item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
+                else:
+                    item['trailer'] = ""
+                item['url'] = f"https://wankitnow.com/videos/{scene['slug']}"
+                item['tags'] = []
+                if "tags" in scene:
+                    item['tags'] = scene['tags']
+                item['duration'] = scene['seconds_duration']
+                item['site'] = scene['site']
+                item['parent'] = scene['site']
+                item['network'] = 'Two Web Media'
+                item['performers'] = []
+                for model in scene['models_slugs']:
+                    item['performers'].append(model['name'])
 
-    def get_title(self, response):
-        title = self.process_xpath(response, self.get_selector_map('title'))
-        if title:
-            title = self.get_from_regex(title.get(), 're_title')
-        title = title.replace("'", "")
-        title = title.replace(u"\u2019", "")
-        title = title.replace(" & ", " and ")
-        title = re.sub(r'&#\d+;', '', title)
-        title = re.sub(r'[^a-zA-Z0-9-:;.,_() ]', ' ', title)
-        return self.cleanup_title(title).replace("  ", " ")
-
-    def get_image(self, response):
-        imageurl = super().get_image(response)
-        if not imageurl or ".jpg" not in imageurl:
-            image = response.xpath('//div[contains(@class,"wpfp_custom_background")]/@style')
-            if image:
-                image = image.get()
-                image = re.search(r'.*(http.*?\.jpg).*', image)
-                if image:
-                    imageurl = image.group(1)
-        return imageurl.strip()
-
-    def get_site(self, response):
-        site = super().get_site(response)
-        if "wankitnow" in site:
-            return "Wank It Now"
-        if "boppingbabes" in site:
-            return "Bopping Babes"
-        if "downblousejerk" in site:
-            return "Downblouse Jerk"
-        if "upskirtjerk" in site:
-            return "Upskirt Jerk"
-        return site
-
-    def get_parent(self, response):
-        site = super().get_parent(response)
-        if "wankitnow" in site:
-            return "Wank It Now"
-        if "boppingbabes" in site:
-            return "Bopping Babes"
-        if "downblousejerk" in site:
-            return "Downblouse Jerk"
-        if "upskirtjerk" in site:
-            return "Upskirt Jerk"
-        return site
+                yield self.check_item(item, self.days)

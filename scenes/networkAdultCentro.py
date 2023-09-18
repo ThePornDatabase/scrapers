@@ -84,6 +84,12 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://www.getyourkneesdirty.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Get Your Knees Dirty', ''],
         ['https://arabellesplayground.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Arabelles Playground', ''],
         ['https://antonioclemens.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Antonio Clemens', ''],
+        ['https://ponygirl-riding.com', '&transitParameters[v1]=OBoiu4zYsP&transitParameters[v2]=OhUOlmasXD', 'Ponygirl Riding', ''],
+        ['https://hansthehornygrandpa.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Hans The Horny Grandpa', ''],
+        ['https://vinaskyxxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Vina Sky', ''],
+        ['https://lonelymeow.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'LonelyMeow', ''],
+        ['https://rydenarmani.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Ryden Armani', ''],
+        ['https://lilcandy.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Lil Candy', 'Lil Candy'],
     ]
 
     selector_map = {
@@ -177,58 +183,75 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         except Exception as ex:
             print(f'Exception: {ex} --> JSON Data: {jsondata}')
 
-        data = data['response']['collection'][0]
+        if data and "response" in data and len(data['response']['collection']):
+            data = data['response']['collection'][0]
 
-        item['id'] = data['id']
-        item['title'] = unidecode.unidecode(html.unescape(string.capwords(data['title']).strip()))
-        item['description'] = html.unescape(data['description'].strip())
-        item['date'] = self.parse_date(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
-        item['performers'] = []
-        item['tags'] = []
-        if data['length']:
-            item['duration'] = data['length']
+            item['id'] = data['id']
+            item['title'] = unidecode.unidecode(html.unescape(string.capwords(data['title']).strip()))
+            item['description'] = html.unescape(data['description'].strip())
+            item['date'] = self.parse_date(data['sites']['collection'][str(item['id'])]['publishDate'].strip()).isoformat()
+            item['performers'] = []
+            item['tags'] = []
+            if data['length']:
+                item['duration'] = data['length']
 
-        if "jerkoff" in response.url or "dillionation" in response.url:
-            performers = data['tags']['collection']
-            for performer in performers:
-                performername = performers[performer]['alias'].strip().title()
-                if performername:
-                    item['performers'].append(performername)
-        elif "daddyscowgirl" not in response.url and "fallinlovia" not in response.url:
-            tags = data['tags']['collection']
-            for tag in tags:
-                tagname = tags[tag]['alias'].strip().title()
-                if tagname and "Model - " not in tagname:
-                    item['tags'].append(tagname)
-            item['tags'] = self.clean_tags(item['tags'])
+            if "jerkoff" in response.url or "dillionation" in response.url:
+                performers = data['tags']['collection']
+                for performer in performers:
+                    performername = performers[performer]['alias'].strip().title()
+                    if performername:
+                        item['performers'].append(performername)
+            elif "daddyscowgirl" not in response.url and "fallinlovia" not in response.url:
+                tags = data['tags']['collection']
+                for tag in tags:
+                    tagname = tags[tag]['alias'].strip().title()
+                    if tagname and "Model - " not in tagname:
+                        item['tags'].append(tagname)
+                item['tags'] = self.clean_tags(item['tags'])
 
-        if "arabelle" in response.url:
-            meta['performer'] = "Arabelle Raphael"
+            if "arabelle" in response.url:
+                meta['performer'] = "Arabelle Raphael"
 
-        if "backalleytoonz" in response.url:
-            item['tags'].append("Animation")
+            if "vinasky" in response.url:
+                meta['performer'] = "Vina Sky"
 
-        if "getyourkneesdirty" in response.url:
-            item['tags'].append("Blowjob")
+            if "rydenarmani" in response.url:
+                meta['performer'] = "Ryden Armani"
 
-        if "throatwars" in response.url:
-            item['tags'].append("Interracial")
-            item['tags'].append("Blowjob")
-            item['tags'].append("Face Fuck")
-            item['tags'].append("Deepthroat")
+            if "backalleytoonz" in response.url:
+                item['tags'].append("Animation")
 
-        item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
-        item['image'] = data['_resources']['primary'][0]['url'].strip()
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['trailer'] = ''
+            if "hansthehornygrandpa" in response.url:
+                item['tags'].append("Older / Younger")
 
-        if 'site' in meta and meta['site']:
-            item['site'] = meta['site']
-            item['parent'] = meta['site']
-            item['network'] = meta['site']
-            modelurl = meta['link'] + "/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
-            meta['item'] = item
-            yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
+            if "ponygirl" in response.url:
+                item['tags'].append("Ponygirl")
+                item['tags'].append("Fetish")
+
+            if "getyourkneesdirty" in response.url:
+                item['tags'].append("Blowjob")
+
+            if "lonelymeow" in response.url:
+                item['tags'].append("Asian")
+
+            if "throatwars" in response.url:
+                item['tags'].append("Interracial")
+                item['tags'].append("Blowjob")
+                item['tags'].append("Face Fuck")
+                item['tags'].append("Deepthroat")
+
+            item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
+            item['image'] = data['_resources']['primary'][0]['url'].strip()
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['trailer'] = ''
+
+            if 'site' in meta and meta['site']:
+                item['site'] = meta['site']
+                item['parent'] = meta['site']
+                item['network'] = meta['site']
+                modelurl = meta['link'] + "/sapi/{}/model.getModelContent?_method=model.getModelContent&tz=-4&transitParameters[contentId]={}".format(meta['token'], item['id'])
+                meta['item'] = item
+                yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
     def get_performers_json(self, response):
         meta = response.meta
@@ -243,24 +266,27 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
         if "sukmydick" in response.url:
             item['performers'] = []
-            if "Don Whoe" in item['tags']:
-                item['tags'].remove("Don Whoe")
-                item['performers'].append("Don Whoe")
-            if "Lisa Rivera" in item['tags']:
-                item['tags'].remove("Lisa Rivera")
-                item['performers'].append("Lisa Rivera")
-            if "Nina Rivera" in item['tags']:
-                item['tags'].remove("Nina Rivera")
-                item['performers'].append("Nina Rivera")
-            if "Nadia White" in item['tags']:
-                item['tags'].remove("Nadia White")
-                item['performers'].append("Nadia White")
-            if "Don And Lisa" in item['tags']:
-                item['tags'].remove("Don And Lisa")
-            if "Don And Nina" in item['tags']:
-                item['tags'].remove("Don And Nina")
-            if "Nina And Don" in item['tags']:
-                item['tags'].remove("Nina And Don")
+        if "lonelymeow" in response.url:
+            item['performers'] = ['LonelyMeow']
+
+        if "Don Whoe" in item['tags']:
+            item['tags'].remove("Don Whoe")
+            item['performers'].append("Don Whoe")
+        if "Lisa Rivera" in item['tags']:
+            item['tags'].remove("Lisa Rivera")
+            item['performers'].append("Lisa Rivera")
+        if "Nina Rivera" in item['tags']:
+            item['tags'].remove("Nina Rivera")
+            item['performers'].append("Nina Rivera")
+        if "Nadia White" in item['tags']:
+            item['tags'].remove("Nadia White")
+            item['performers'].append("Nadia White")
+        if "Don And Lisa" in item['tags']:
+            item['tags'].remove("Don And Lisa")
+        if "Don And Nina" in item['tags']:
+            item['tags'].remove("Don And Nina")
+        if "Nina And Don" in item['tags']:
+            item['tags'].remove("Nina And Don")
 
         if "antonioclemens" in response.url:
             for tag in item['tags']:
@@ -322,6 +348,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             'Ladyluciana',
             'Lara',
             'Latex Lucy',
+            'Lil Candy',
+            'Lilcandy',
             'Lucy',
             'Miss Courtney',
             'Misscourtney',
@@ -330,15 +358,17 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             'Mistress Ezada',
             'Mistresscourtney',
             'Mistressluciana',
+            'Request',
             'Rubber_Jeff',
             'Whitney Morgan'
         ]
         newlist = []
         for word in tags:
             if word not in cleanlist:
-                matches = ['dani ', 'deni ', 'daniel', 'deniels', 'kaite']
-                if any(x in word.lower() for x in matches):
-                    word = ''
-                else:
-                    newlist.append(word)
+                if not re.search('(\d{4})', word):
+                    matches = ['dani ', 'deni ', 'daniel', 'deniels', 'kaite']
+                    if any(x in word.lower() for x in matches):
+                        word = ''
+                    else:
+                        newlist.append(word)
         return newlist

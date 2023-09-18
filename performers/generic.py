@@ -48,21 +48,21 @@ class PerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.match(r'\d+.*?-.*?\d+.*?-.*?\d+', measurements):
-                measurements = measurements.replace("B", "").replace("W", "").replace("H", "")
+            if measurements and re.search(r'(\d+\w+-\d+-\d+)', measurements):
+                measurements = re.search(r'(\d+\w+-\d+-\d+)', measurements).group(1)
                 return measurements.strip()
         return ''
 
     def get_cupsize(self, response):
-        if 'cupsize' in self.selector_map:
+        if 'cupsize' in self.selector_map and self.get_selector_map('cupsize'):
             cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get()
-            if cupsize:
-                if 'measurements' in self.selector_map:
-                    measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-                    if measurements and re.match(r'\d+.*?-.*?\d+.*?-.*?\d+', measurements):
-                        breasts = re.search(r'(\d+).*?-.*?\d+.*?-.*?\d+', measurements).group(1)
-                        cupsize = breasts.strip() + cupsize.strip()
-                        if cupsize:
-                            return cupsize.strip()
-                return cupsize.strip()
+            return cupsize.strip()
+        else:
+            if 'measurements' in self.selector_map:
+                measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
+                if measurements and re.search(r'(\d+\w+-\d+-\d+)', measurements):
+                    cupsize = re.search(r'(\d+\w+)-\d+-\d+', measurements)
+                    if cupsize:
+                        cupsize = cupsize.group(1)
+                        return cupsize.strip()
         return ''

@@ -9,7 +9,7 @@ class BangBrosSpider(BaseSceneScraper):
     parent = 'Bang Bros'
 
     start_urls = [
-        'https://bangbros.com/'
+        # ~ 'https://bangbros.com/' # Moved to ProjectOneService
     ]
 
     custom_settings = {
@@ -35,7 +35,7 @@ class BangBrosSpider(BaseSceneScraper):
         'tags': "//div[@class='vdoTags']//a/text()",
         'external_id': r'/([A-Za-z0-9-_+=%]+)$',
         'trailer': '//video//source[contains(@src, "mp4") and not(contains(@src, "mpd")) and not(contains(@src, "m3u8"))]/@src',
-        'pagination': '/videos/%s'
+        'pagination': '/videos/page/%s'
     }
 
     def get_scenes(self, response):

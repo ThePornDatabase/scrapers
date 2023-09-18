@@ -59,8 +59,8 @@ class SiteFootFetishDailyByModelSpider(BaseSceneScraper):
                 item['id'] = None
 
             item['url'] = response.url
-            item['description'] = None
-            item['trailer'] = None
+            item['description'] = ''
+            item['trailer'] = ''
             item['performers'] = [name]
             item['tags'] = ['Foot Fetish', 'Feet']
             item['site'] = "Foot Fetish Daily"

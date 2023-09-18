@@ -28,7 +28,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         'date': '//li/small[contains(text(),"Released")]/following-sibling::text()',
         'image': '//a[@id="front-cover"]/img/@src',
         'back': '//a[@id="back-cover"]/@href',
-        'performers': '//strong[contains(text(),"Starring")]/following-sibling::a/div/u/text()',
+        'performers': '//strong[contains(text(),"Starring")]/following-sibling::a/div//text()|//strong[contains(text(),"Starring")]/following-sibling::a//text()',
         'tags': '//strong[contains(text(),"Categories")]/following-sibling::a/text()',
         'external_id': r'/(\d+)/',
         'studio': '//li/small[contains(text(), "Studio:")]/following-sibling::a/text()',
@@ -37,6 +37,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         'duration': '//li/small[contains(text(), "Length:")]/following-sibling::text()',
         'sku': '//li/small[contains(text(), "SKU:")]/following-sibling::text()',
         'pagination': '/new-release-porn-movies.html?page=%s',
+        # ~ 'pagination': '/29773/studio/lethal-hardcore-porn-movies.html?page=%s&media=2',
     }
 
     def get_scenes(self, response):
@@ -157,7 +158,12 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             filter_date = filter_date.strftime('%Y-%m-%d')
 
         foundpointer = 0
-        if item['title'] and item['site'] and "bluebirdfilms" not in item['site'].lower().replace(" ", ""):
+        matches = ['bangbros', 'jeffsmodels', 'private', 'dorcel', 'bluebirdfilms', 'antoniosuleiman', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
+                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
+                   'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
+                   'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
+                   'pornmuschimovie', 'chickpass', 'grooby', 'dreamtranny']
+        if item['title'] and item['site'] and not any(x in re.sub(r'[^a-zA-Z0-9]', '', item['site']).lower().replace(" ", "") for x in matches):
             year = re.search(r'(\d{4})-\d{2}-\d{2}', item['date']).group(1)
             teststring = item['title'] + year + item['site']
             teststring = re.sub(r'[^A-Za-z0-9#]+', '', teststring).lower()

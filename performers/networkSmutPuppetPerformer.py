@@ -1,3 +1,4 @@
+import re
 import dateparser
 import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
@@ -10,16 +11,16 @@ class NetworkSmutPuppetPerformerSpider(BasePerformerScraper):
     start_urls = ['https://smutpuppet.com']
 
     selector_map = {
-        'name': '//div[@class="modelInfo"]/h2/text()',
-        'image': '//figure[@class="modelPreview"]/img/@src',
-        'nationality': '//div[@class="modelNationality"]/strong/text()',
-        'birthday': '//div[@class="modelDOB"]/strong/text()',
+        'name': '//div[@class="model-content"]/h1/text()',
+        'image': '//div[@class="model-img"]/a/img/@src',
+        'nationality': '//div[@class="model-content"]/p/span[@class="que" and contains(text(), "NATIONALITY")]/following-sibling::span[@class="ans"][1]/text()',
+        'birthday': '//div[@class="model-content"]/p/span[@class="que" and contains(text(), "BIRTH")]/following-sibling::span[@class="ans"][1]/text()',
         'pagination': '/models/?page_num=%s',
         'external_id': r'girls/(.+)/?$'
     }
 
     def get_performers(self, response):
-        performers = response.xpath('//div[@class="blockItem"]/a/@href').getall()
+        performers = response.xpath('//div[@class="item-wrapper"]/a[contains(@href, "/models/")]/@href').getall()
         for performer in performers:
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer)
 
@@ -32,3 +33,9 @@ class NetworkSmutPuppetPerformerSpider(BasePerformerScraper):
             birthday = dateparser.parse(birthday).isoformat()
             return birthday
         return ''
+
+    def get_url(self, response):
+        sceneurl = super().get_url(response)
+        if "?&nats" in sceneurl:
+            sceneurl = re.search(r'(.*)\?&nats', sceneurl).group(1)
+        return sceneurl

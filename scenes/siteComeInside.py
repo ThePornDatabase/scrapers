@@ -19,7 +19,7 @@ class SiteComeInsideSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//h4[@class="content-title-wrap"]/a/@href').getall()
+        scenes = response.xpath('//div[contains(@class, "video-on-hover")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

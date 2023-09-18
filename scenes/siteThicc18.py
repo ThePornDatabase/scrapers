@@ -57,7 +57,7 @@ class SiteThicc18Spider(BaseSceneScraper):
             item['network'] = "Thicc 18"
             item['parent'] = "Thicc 18"
             item['url'] = "https://thicc18.com/videos/" + sceneid.replace(':', '%3A')
-            item['date'] = self.parse_date('today').isoformat()
+            item['date'] = ""
             item['trailer'] = ''
             item['tags'] = ['Big Ass']
             meta['item'] = item.copy()

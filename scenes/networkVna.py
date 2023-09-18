@@ -71,14 +71,20 @@ class VnaNetworkSpider(BaseSceneScraper):
     def get_scenes(self, response):
         meta = response.meta
         # ~ if "romemajor" in response.url:
-        scenes = response.xpath('//div[contains(@class, "videoarea clear")]|//div[contains(@class, "updatedVideo")]|//div[contains(@class,"videoPics clear")]')
+        scenes = response.xpath('//div[contains(@class, "videoarea clear")]|//div[contains(@class, "updatedVideo")]|//div[contains(@class,"videoPics clear")]|//div[contains(@class, "vid-block")]')
         for scene in scenes:
             image = scene.xpath('.//img[contains(@src, "thumb_2")]/@src|.//img[contains(@src, "thumb")]/@src')
             if image:
                 meta['image_blob'] = self.get_image_blob_from_link(self.format_link(response, image.get()))
                 meta['image'] = self.format_link(response, image.get()).replace("sd3.php?show=file&path=/", "")
 
-            scenelink = scene.xpath('.//h3/a/@href|.//div[@class="videoPic"][1]/a/@href').get()
+            scenelink = scene.xpath('.//h3/a/@href|.//div[@class="videoPic"][1]/a/@href')
+            if scenelink:
+                scenelink = scenelink.get()
+            if not scenelink:
+                scenelink = scene.xpath('.//div[contains(@class,"wrap-video-thumb")]/a/@href')
+                if scenelink:
+                    scenelink = scenelink.get()
             if "join" in scenelink:
                 scenelink = scene.xpath('./div[1]/div[1]/a[1]/@href').get()
             if scenelink:

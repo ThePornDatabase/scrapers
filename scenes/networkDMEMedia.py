@@ -32,26 +32,27 @@ class NetworkDMEMediaSpider(BaseSceneScraper):
     name = 'DMEMedia'
     network = 'DME Media'
 
+    # Deprecated, use DMEMediaV2 instead
     start_urls = [
-        'https://tour5m.adultdoorway.com',
-        'https://tour5m.amateurthroats.com',
-        'https://tour5m.analrecruiters.com',
-        'https://tour5m.bustyamateurboobs.com',
-        'https://tour5m.clubamberrayne.com',
-        'https://tour5m.facialabuse.com',
-        'https://tour5m.hardcoredoorway.com',
-        'https://tour5m.herfirstporn.com',
-        'https://tour5m.hugerubberdicks.com',
-        'https://tour5m.joethepervert.com',
-        'https://tour5m.latinaabuse.com',
-        'https://tour5m.lesbianslovesex.com',
-        'https://tour5m.monstercockmadness.com',
-        'https://tour5m.nastylittlefacials.com',
-        'https://tour5m.pinkkittygirls.com',
-        'https://tour5m.sexysuckjobs.com',
-        'https://tour5m.spermsuckers.com',
-        'https://tour5m.thehandjobsite.com',
-        'https://tour5m.thepantyhosesite.com',
+        # ~ 'https://tour5m.amateurthroats.com',
+        # ~ 'https://tour5m.analrecruiters.com',
+        # ~ 'https://tour5m.herfirstporn.com',
+        # ~ 'https://tour5m.hugerubberdicks.com',
+        # 'https://tour5m.latinaabuse.com',
+        # 'https://tour5m.lesbianslovesex.com',
+        # ~ 'https://tour5m.monstercockmadness.com',
+        # ~ 'https://tour5m.sexysuckjobs.com',
+        # ~ 'https://tour5m.spermsuckers.com',
+        # ~ # 'https://tour5m.adultdoorway.com', Just listing FacialAbuse scenes
+        # 'https://tour5m.bustyamateurboobs.com',  # Moved to V2
+        # 'https://tour5m.clubamberrayne.com', # Moved to V2
+        # 'https://tour5m.facialabuse.com', # Moved to V2
+        # ~ # 'https://tour5m.hardcoredoorway.com', Just listing from others
+        # 'https://tour5m.joethepervert.com', # Moved to V2
+        # 'https://tour5m.nastylittlefacials.com', # Moved to V2
+        # 'https://tour5m.pinkkittygirls.com', # Moved to V2
+        # 'https://tour5m.thehandjobsite.com', # Moved to V2
+        # 'https://tour5m.thepantyhosesite.com', # Moved to V2
     ]
 
     selector_map = {

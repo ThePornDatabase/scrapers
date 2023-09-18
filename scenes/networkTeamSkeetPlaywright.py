@@ -20,6 +20,7 @@ link_to_info = {
     "sau-elastic-00gy5fg5ra": {"site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
 }
 
+
 def format_nav_url(link, start, limit, v2=False):
     if v2:
         nav_format = "https://store2.psmcdn.net/{link}-{navText}/_search?from={start}&size={limit}"
@@ -94,7 +95,7 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
                 limit = 50
             else:
                 start = "aaaaaaaa"
-                limit = 150 # Was originally 450.  Next Page is keyed at 450
+                limit = 150  # Was originally 450.  Next Page is keyed at 450
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
                                  meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2, "playwright": True},
@@ -138,79 +139,80 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
         else:
             data = ''
         item = SceneItem()
-        is_v2 = "store2" in response.url
+        if ('isUpcoming' in data and not data['isUpcoming']) or 'isUpcoming' not in data:
+            is_v2 = "store2" in response.url
 
-        if "store2" in response.url:
-            data = data['_source']
-        item['title'] = data['title']
-        item['description'] = data['description']
-        item['image'] = data['img']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if "store2" in response.url:
+                data = data['_source']
+            item['title'] = data['title']
+            item['description'] = data['description']
+            item['image'] = data['img']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-        if 'tags' in data:
-            item['tags'] = data['tags']
-        else:
-            item['tags'] = []
-        item['id'] = data['id']
+            if 'tags' in data:
+                item['tags'] = data['tags']
+            else:
+                item['tags'] = []
+            item['id'] = data['id']
 
-        if 'videoTrailer' in data:
-            item['trailer'] = data['videoTrailer']
-        elif 'video' in data:
-            item['trailer'] = 'https://videodelivery.net/' + \
-                              data['video'] + '/manifest/video.m3u8'
-        else:
-            item['trailer'] = ''
+            if 'videoTrailer' in data:
+                item['trailer'] = data['videoTrailer']
+            elif 'video' in data:
+                item['trailer'] = 'https://videodelivery.net/' + \
+                                  data['video'] + '/manifest/video.m3u8'
+            else:
+                item['trailer'] = ''
 
-        item['network'] = self.network
-        item['parent'] = response.meta['site']
+            item['network'] = self.network
+            item['parent'] = response.meta['site']
 
-        if 'publishedDate' in data:
-            item['date'] = self.parse_date(data['publishedDate']).isoformat()
-        else:
-            item['date'] = none
+            if 'publishedDate' in data:
+                item['date'] = self.parse_date(data['publishedDate']).isoformat()
+            else:
+                item['date'] = None
 
-        if 'site' in data:
-            if 'name' in data['site']:
-                item['site'] = data['site']['name']
+            if 'site' in data:
+                if 'name' in data['site']:
+                    item['site'] = data['site']['name']
+                else:
+                    item['site'] = response.meta['site']
             else:
                 item['site'] = response.meta['site']
-        else:
-            item['site'] = response.meta['site']
 
-        if is_v2:
-            if "Say Uncle" in response.meta['site']:
-                item['url'] = "https://www.sayuncle.com/movies/" + data['id']
+            if is_v2:
+                if "Say Uncle" in response.meta['site']:
+                    item['url'] = "https://www.sayuncle.com/movies/" + data['id']
+                else:
+                    item['url'] = "https://www.teamskeet.com/movies/" + data['id']
+
             else:
-                item['url'] = "https://www.teamskeet.com/movies/" + data['id']
+                item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
+            item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
+            item['url'] = item['url'].replace("-–", "-")
+            # ~ print(item['url'])
 
-        else:
-            item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
-        item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
-        item['url'] = item['url'].replace("-–", "-")
-        # ~ print(item['url'])
+            item['performers'] = []
+            if 'models' in data:
+                for model in data['models']:
+                    item['performers'].append(model['modelName'])
 
-        item['performers'] = []
-        if 'models' in data:
-            for model in data['models']:
-                item['performers'].append(model['modelName'])
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
 
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if (item['date'] and item['date'] > filterdate) or not item['date']:
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if (item['date'] and item['date'] > filterdate) or not item['date']:
+                        yield item
+                else:
                     yield item
-            else:
-                yield item
 
     def get_scenes(self, response):
         body = re.search(r'({.*})', response.text)

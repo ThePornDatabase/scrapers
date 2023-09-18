@@ -102,8 +102,7 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
             else:
                 item['image'] = None
 
-            # ~ item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['image_blob'] = None
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             trailer = scene.xpath('./comment()[contains(.,"Title")]/following-sibling::a[contains(@onclick,"/trailer/")]/@onclick').get()
             if trailer:

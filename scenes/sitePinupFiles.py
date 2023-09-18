@@ -17,42 +17,30 @@ class SitePinupFilesSpider(BaseSceneScraper):
         'title': '//h1/text()',
         'description': '//div[@class="update-info-block"]/h3/following-sibling::text()',
         'date': '//strong[contains(text(),"Added")]/following-sibling::text()',
-        'image': '//script[contains(text(),"video_content")]/text()',
-        're_image': r'(http.*\.jpg)',
-        'performers': '//div[contains(@class,"models-list-thumbs")]/ul/li/a/span/text()',
-        'tags': '//h3[contains(text(),"Tags")]/following-sibling::ul/li/a/text()',
-        'external_id': r'.*/(.*?).html',
-        'trailer': '//script[contains(text(),"video_content")]/text()',
-        're_trailer': r'(/trailers.*?\.mp4)',
+        'image': '//meta[@property="og:image"]/@content',
+        'duration': '//div[@class="player-time"]/text()',
+        'performers': '//div[contains(@class, "models-list-thumbs")]//a[contains(@href, "/models/")]/span/text()',
+        'tags': '//ul[@class="tags"]/li/a/text()',
+        'external_id': r'',
+        'trailer': '//script[contains(text(), "video_content")]/text()',
+        're_trailer': r'video playsinline src=\"(.*?)\"',
         'pagination': '/categories/movies/%s/latest/'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="item-title"]/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[contains(@class, "_videothumb_")]|//div[@class="item-thumb"]/a/@href/../..')
         for scene in scenes:
+            sceneid = scene.xpath('./@class').get()
+            if re.search(r'(\w\d+)_', sceneid):
+                meta['id'] = re.search(r'(\w\d+)_', sceneid).group(1)
+            else:
+                sceneid = scene.xpath('./a/img/@id')
+                if sceneid:
+                    sceneid = sceneid.get()
+                    sceneid = re.search(r'-(\d+)$', sceneid)
+                    if sceneid:
+                        meta['id'] = "b" + sceneid.group(1)
+            scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_description(self, response):
-        description = self.process_xpath(response, self.get_selector_map('description')).getall()
-        if description:
-            description = " ".join(description)
-            description = description.replace("\r", "").replace("\n", "").replace("&nbsp;", "").strip()
-            description = re.sub(r'\s{3,100}', ' ', description)
-            return self.cleanup_description(description)
-
-        return ''
-
-    def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image'))
-        if image:
-            image = self.get_from_regex(image.get(), 're_image')
-            if image:
-                image = self.format_link(response, image)
-                return image.replace(" ", "%20")
-        else:
-            image = response.xpath('//meta[@property="og:image"]/@content').get()
-            if image:
-                return image.strip().replace(" ", "%20").replace("https://www.pinupfiles.com/https://", "https://")
-
-        return None
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

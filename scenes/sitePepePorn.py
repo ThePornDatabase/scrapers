@@ -2,7 +2,7 @@ import urllib.parse
 import string
 import dateparser
 import scrapy
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -80,33 +80,27 @@ class FakingsSpider(BaseSceneScraper):
         return performers
 
     def get_title(self, response):
-        translator = Translator()
         title = super().get_title(response).lower()
         if title:
-            title = translator.translate((title.lower()), src='es', dest='en')
-            title = string.capwords(title.text)
+            title = GoogleTranslator(source='es', target='en').translate(title)
+            title = string.capwords(title)
         return title
 
     def get_description(self, response):
-        translator = Translator()
         description = super().get_description(response)
         if description:
-            description = translator.translate((description.strip()), src='es', dest='en')
-            description = description.text.strip()
+            description = GoogleTranslator(source='es', target='en').translate(description)
+            description = description.strip()
             return description
         return ''
 
     def get_tags(self, response):
-        translator = Translator()
         tagsoriginal = super().get_tags(response)
         tags = []
         for tag in tagsoriginal:
-            tag = translator.translate((tag.strip()), src='es', dest='en')
-            tag = tag.text.strip()
+            tag = GoogleTranslator(source='es', target='en').translate(tag.strip())
+            tag = tag.strip()
             tags.append(tag)
         tags.append("Latina")
         tags.append("Latin American")
         return tags
-
-
-

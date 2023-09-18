@@ -21,7 +21,7 @@ class SiteXConfessionsSpider(BaseSceneScraper):
         're_date': r'dateCreated.*?(\d{4}-\d{2}-\d{2})',
         'image': '//div[contains(@class,"w-1/3")][1]/div/div/picture/source/@data-srcset',
         're_image': r'(.*)\?',
-        'performers': '//div[contains(@class,"w-1/3")]//a[@data-cy="performer-link"]/text()',
+        'performers': '//div[contains(@class,"w-1/3")]//a[@data-cy="performer-link"]/text()|//a[@data-cy="performer-link"]/text()',
         'tags': '//div[contains(@class,"w-1/3")]//a[contains(@href,"/categories/")]/text()',
         'duration': '//div[contains(@class,"tablet:hidden laptop:block")]/p[contains(text(), "mins")]/text()',
         're_duration': r'(\d+)\s+?mins',

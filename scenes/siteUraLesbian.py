@@ -1,5 +1,4 @@
 import re
-from datetime import date, timedelta
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -71,7 +70,7 @@ class SiteLegsJapanSpider(BaseSceneScraper):
                     if scenedate:
                         item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
                     else:
-                        item['date'] = self.parse_date('today').isoformat()
+                        item['date'] = ""
 
                     image = scene.xpath('./div[contains(@class,"content-img")]/@style').get()
                     if image:
@@ -95,20 +94,4 @@ class SiteLegsJapanSpider(BaseSceneScraper):
 
                     item['url'] = "https://www.uralesbian.com/en/updates/" + item['id']
 
-                    days = int(self.days)
-                    if days > 27375:
-                        filterdate = "0000-00-00"
-                    else:
-                        filterdate = date.today() - timedelta(days)
-                        filterdate = filterdate.strftime('%Y-%m-%d')
-
-                    if self.debug:
-                        if not item['date'] > filterdate:
-                            item['filtered'] = "Scene filtered due to date restraint"
-                        print(item)
-                    else:
-                        if filterdate:
-                            if item['date'] > filterdate:
-                                yield item
-                        else:
-                            yield item
+                    yield self.check_item(item, self.days)

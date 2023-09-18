@@ -5,6 +5,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 def match_site(argument):
     match = {
+        'classics': "TIM Classics",
         'ghr': "Grindhouse Raw",
         'timfuck': "Timfuck",
         'timsuck': "Timsuck",
@@ -22,6 +23,7 @@ class NetworkTreasureIslandMediaSpider(BaseSceneScraper):
     parent = 'Treasure Island Media'
 
     start_urls = [
+        'https://classics.treasureislandmedia.com',
         'https://ghr.treasureislandmedia.com',
         'https://timfuck.treasureislandmedia.com',
         'https://timsuck.treasureislandmedia.com',
@@ -52,3 +54,7 @@ class NetworkTreasureIslandMediaSpider(BaseSceneScraper):
     def get_site(self, response):
         sitematch = re.search(r'https://(.*?)\.', response.url).group(1)
         return match_site(sitematch)
+
+    def get_next_page_url(self, base, page):
+        page = str(int(page) - 1)
+        return self.format_url(base, self.get_selector_map('pagination') % page)

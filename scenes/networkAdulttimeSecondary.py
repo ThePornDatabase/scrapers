@@ -36,6 +36,7 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
     ]
 
     site_list = [
+        "18auditions",
         "3dgspot",
         "accidentalgangbang",
         "adulttimepilots",
@@ -61,6 +62,7 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "daddysboy",
         "dareweshare",
         "disruptivefilms",
+        "Fine-Erotica",
         "fistingcentral",
         "fistinginferno",
         "forbiddenseductions",
@@ -82,7 +84,9 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "korinakova",
         "latinoboysporn",
         "lesbiandatingstories",
+        "milfoverload",
         "mommysboy",
+        "mugurporn",
         "muses",
         "myyoungerlover",
         "officemsconduct",
@@ -138,7 +142,8 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         referrerurl = response.meta["url"]
-        for scene in response.json()['results'][0]['hits']:
+        jsondata = response.json()['results'][0]['hits']
+        for scene in jsondata:
             item = SceneItem()
             item['site'] = scene['sitename']
             if item['site'].lower().strip().replace(" ", "") in self.site_list:

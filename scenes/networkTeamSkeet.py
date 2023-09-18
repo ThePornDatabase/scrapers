@@ -25,7 +25,7 @@ link_to_info = {
     "organic-fem-Qvk5s1BL": {"site": "Freaky Fembots", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-fuf-eiBei5In": {"site": "Freeuse Fantasy", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-Freeusemilf-uug2tohT": {"site": "Free Use MILF", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
-    "organic-hhk-am7zoi2G": {"site": "Hijab Hookups", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
+    "organic-hhk-am7zoi2G": {"site": "Hijab Hookup", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "LAS-organic-whlghevsfs": {"site": "Little Asians", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-momswap-6fkccwxhi0": {"site": "Mom Swap", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     # "mylf-elastic-hka5k7vyuw": {"site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True}, Moved to Playwright
@@ -47,6 +47,8 @@ link_to_info = {
     "TLBC-organic-w8bw4yp9io": {"site": "Teens Love Black Cocks", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "TMZ-organic-958spxinbs": {"site": "Thickumz", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     "organic-1-saeXae9v": {"site": "Tiny Sis", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
+    "organic-use-ydqmiup0dm": {"site": "Use POV", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
+    "organic-HJM-l0mjkz6g9r": {"site": "Hijab Mylfs", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False},
     # "Organic-bad-aiGhaiL5": {"site": "BadMILFs", "navText": movies_nav_text, "contentText": movies_content_text, "v2": False}, ### Pulled from other scrapers
 }
 
@@ -58,6 +60,7 @@ def format_nav_url(link, start, limit, v2=False):
         nav_format = "https://store.psmcdn.net/{link}/{navText}/items.json?orderBy=\"$key\"&startAt=\"{start}\"&limitToFirst={limit}"
 
     nav_url = nav_format.format(link=link, start=start, limit=limit, navText=link_to_info[link]["navText"])
+    print(nav_url)
 
     return nav_url
 
@@ -91,10 +94,6 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
-        # ~ 'DOWNLOADER_MIDDLEWARES': {
-            # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-        # ~ }
     }
 
     selector_map = {
@@ -113,7 +112,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 limit = 50
             else:
                 start = "aaaaaaaa"
-                limit = 150 # Was originally 450.  Next Page is keyed at 450
+                limit = 150  # Was originally 450.  Next Page is keyed at 450
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
                                  meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2},
@@ -157,75 +156,76 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         else:
             data = ''
         item = SceneItem()
-        is_v2 = "store2" in response.url
+        if ('isUpcoming' in data and not data['isUpcoming']) or 'isUpcoming' not in data:
+            is_v2 = "store2" in response.url
 
-        if "store2" in response.url:
-            data = data['_source']
-        item['title'] = data['title']
-        item['description'] = data['description']
-        item['image'] = data['img']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if "store2" in response.url:
+                data = data['_source']
+            item['title'] = data['title']
+            item['description'] = data['description']
+            item['image'] = data['img']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-        if 'tags' in data:
-            item['tags'] = data['tags']
-        else:
-            item['tags'] = []
-        item['id'] = data['id']
+            if 'tags' in data:
+                item['tags'] = data['tags']
+            else:
+                item['tags'] = []
+            item['id'] = data['id']
 
-        if 'videoTrailer' in data:
-            item['trailer'] = data['videoTrailer']
-        elif 'video' in data:
-            item['trailer'] = 'https://videodelivery.net/' + \
-                              data['video'] + '/manifest/video.m3u8'
-        else:
-            item['trailer'] = ''
+            if 'videoTrailer' in data:
+                item['trailer'] = data['videoTrailer']
+            elif 'video' in data:
+                item['trailer'] = 'https://videodelivery.net/' + \
+                                  data['video'] + '/manifest/video.m3u8'
+            else:
+                item['trailer'] = ''
 
-        item['network'] = self.network
-        item['parent'] = response.meta['site']
+            item['network'] = self.network
+            item['parent'] = response.meta['site']
 
-        if 'publishedDate' in data:
-            item['date'] = self.parse_date(data['publishedDate']).isoformat()
-        else:
-            item['date'] = None
+            if 'publishedDate' in data:
+                item['date'] = self.parse_date(data['publishedDate']).isoformat()
+            else:
+                item['date'] = None
 
-        if 'site' in data:
-            if 'name' in data['site']:
-                item['site'] = data['site']['name']
+            if 'site' in data:
+                if 'name' in data['site']:
+                    item['site'] = data['site']['name']
+                else:
+                    item['site'] = response.meta['site']
             else:
                 item['site'] = response.meta['site']
-        else:
-            item['site'] = response.meta['site']
 
-        if is_v2:
-            item['url'] = "https://www.teamskeet.com/movies/" + data['id']
-        else:
-            item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
-        item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
-        item['url'] = item['url'].replace("-–", "-")
-        # ~ print(item['url'])
-
-        item['performers'] = []
-        if 'models' in data:
-            for model in data['models']:
-                item['performers'].append(model['modelName'])
-
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if (item['date'] and item['date'] > filterdate) or not item['date']:
-                    yield item
+            if is_v2:
+                item['url'] = "https://www.teamskeet.com/movies/" + data['id']
             else:
-                yield item
+                item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
+            item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
+            item['url'] = item['url'].replace("-–", "-")
+            # ~ print(item['url'])
+
+            item['performers'] = []
+            if 'models' in data:
+                for model in data['models']:
+                    item['performers'].append(model['modelName'])
+
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if (item['date'] and item['date'] > filterdate) or not item['date']:
+                        yield item
+                else:
+                    yield item
 
     def get_scenes(self, response):
         body = re.search(r'({.*})', response.text)

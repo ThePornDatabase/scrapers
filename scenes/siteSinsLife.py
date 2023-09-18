@@ -52,7 +52,7 @@ class SiteSinsLifeSpider(BaseSceneScraper):
                 description = description.replace("  ", " ")
                 item['description'] = self.cleanup_description(description)
 
-            item['date'] = self.parse_date('today').isoformat()
+            item['date'] = ""
 
             image = scene.xpath('.//img/@src0_3x').get()
             if not image:

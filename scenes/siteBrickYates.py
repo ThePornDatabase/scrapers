@@ -14,7 +14,7 @@ class SiteBrickYatesSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[contains(@class,"videoDetails")]/h3/text()',
+        'title': '//div[contains(@class,"videoDetails")]/h3/text()|//h1/strong/text()',
         'description': '//div[contains(@class,"videoDetails")]/p/text()',
         'date': '//span[contains(text(),"Added")]/following-sibling::text()',
         'image': '//meta[@property="og:image"]/@content',

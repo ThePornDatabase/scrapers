@@ -29,7 +29,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         'date': '//li/small[contains(text(),"Released")]/following-sibling::text()',
         'image': '//a[@id="front-cover"]/img/@src',
         'back': '//a[@id="back-cover"]/@href',
-        'performers': '//strong[contains(text(),"Starring")]/following-sibling::a/div/u/text()',
+        'performers': '//strong[contains(text(),"Starring")]/following-sibling::a/div//text()|//strong[contains(text(),"Starring")]/following-sibling::a//text()',
         'tags': '//strong[contains(text(),"Categories")]/following-sibling::a/text()',
         'external_id': r'/(\d+)/',
         'studio': '//li/small[contains(text(), "Studio:")]/following-sibling::a/text()',
@@ -201,72 +201,82 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
 
     def parse_movie(self, response):
         item = SceneItem()
+        num_scenes = response.xpath('//h3/a[contains(@label, "Scene Title")]')
+        if len(num_scenes) > 1 or not len(num_scenes):
+            item['title'] = self.clean_text(self.get_title(response))
+            item['description'] = self.clean_text(self.get_description(response))
+            item['store'] = "Adult DVD Empire"
+            item['date'] = self.get_date(response)
+            item['image'] = self.get_image(response)
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['back'] = self.get_back_image(response)
+            item['back_blob'] = self.get_image_blob_from_link(item['back'])
+            item['performers'] = self.get_performers(response)
+            item['tags'] = self.get_tags(response)
+            item['id'] = self.get_id(response)
+            item['trailer'] = self.get_trailer(response)
+            item['network'] = "Adult DVD Empire"
+            item['site'] = self.get_studio(response)
+            item['parent'] = self.get_studio(response)
+            item['director'] = self.get_director(response)
+            item['format'] = self.get_format(response)
+            item['duration'] = self.get_duration(response)
+            item['sku'] = self.get_sku(response)
+            item['type'] = 'Movie'
 
-        item['title'] = self.clean_text(self.get_title(response))
-        item['description'] = self.clean_text(self.get_description(response))
-        item['store'] = "Adult DVD Empire"
-        item['date'] = self.get_date(response)
-        item['image'] = self.get_image(response)
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['back'] = self.get_back_image(response)
-        item['back_blob'] = self.get_image_blob_from_link(item['back'])
-        item['performers'] = self.get_performers(response)
-        item['tags'] = self.get_tags(response)
-        item['id'] = self.get_id(response)
-        item['trailer'] = self.get_trailer(response)
-        item['network'] = "Adult DVD Empire"
-        item['site'] = self.get_studio(response)
-        item['parent'] = self.get_studio(response)
-        item['director'] = self.get_director(response)
-        item['format'] = self.get_format(response)
-        item['duration'] = self.get_duration(response)
-        item['sku'] = self.get_sku(response)
-        item['type'] = 'Movie'
+            item['url'] = self.get_url(response)
 
-        item['url'] = self.get_url(response)
-
-        if self.days > 27375:
-            filter_date = '0000-00-00'
-        else:
-            days = self.days
-            filter_date = date.today() - timedelta(days)
-            filter_date = filter_date.strftime('%Y-%m-%d')
-
-        foundpointer = 0
-        if item['title'] and item['site']:
-            year = re.search(r'(\d{4})-\d{2}-\d{2}', item['date']).group(1)
-            teststring = item['title'] + year + item['site']
-            teststring = re.sub(r'[^A-Za-z0-9#]+', '', teststring).lower()
-            if not os.path.exists('adedupelist.txt'):
-                Path('adedupelist.txt').touch()
-            with open('adedupelist.txt', 'r', encoding="utf-8") as file1:
-                for i in file1.readlines():
-                    if teststring in i:
-                        foundpointer = 1
-                        break
-
-        if not foundpointer and "dvd" not in item['format'].lower():
-            with open('adedupelist.txt', 'a', encoding="utf-8") as file1:
-                file1.write(teststring + "\n")
-
-            if self.debug:
-                if not item['date'] > filter_date:
-                    item['filtered'] = 'movie filtered due to date restraint'
-                print(item)
+            if self.days > 27375:
+                filter_date = '0000-00-00'
             else:
-                if filter_date:
-                    if item['date'] > filter_date:
-                        yield item
+                days = self.days
+                filter_date = date.today() - timedelta(days)
+                filter_date = filter_date.strftime('%Y-%m-%d')
+
+            foundpointer = 0
+            matches = ['bangbros', 'jeffsmodels', 'private', 'dorcel', 'bluebirdfilms', 'antoniosuleiman', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
+                       'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
+                       'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
+                       'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
+                       'pornmuschimovie', 'chickpass', 'grooby', 'dreamtranny']
+            if item['title'] and item['site'] and not any(x in re.sub(r'[^a-zA-Z0-9]', '', item['site']).lower().replace(" ", "") for x in matches):
+                year = re.search(r'(\d{4})-\d{2}-\d{2}', item['date']).group(1)
+                teststring = item['title'] + year + item['site']
+                teststring = re.sub(r'[^A-Za-z0-9#]+', '', teststring).lower()
+                if not os.path.exists('adedupelist.txt'):
+                    Path('adedupelist.txt').touch()
+                with open('adedupelist.txt', 'r', encoding="utf-8") as file1:
+                    for i in file1.readlines():
+                        if teststring in i:
+                            foundpointer = 1
+                            break
+
+                if not foundpointer and "dvd" not in item['format'].lower():
+                    with open('adedupelist.txt', 'a', encoding="utf-8") as file1:
+                        file1.write(teststring + "\n")
+
+                    if self.debug:
+                        if not item['date'] > filter_date:
+                            item['filtered'] = 'movie filtered due to date restraint'
+                        print(item)
+                    else:
+                        if filter_date:
+                            if item['date'] > filter_date:
+                                yield item
+                        else:
+                            yield item
                 else:
-                    yield item
-        else:
-            if "dvd" in item['format'].lower():
-                print(f"Skipping {item['title']} due to dvd format")
-            elif foundpointer:
-                print(f"Skipping {item['title']} due to duplicate")
+                    if "dvd" in item['format'].lower():
+                        print(f"Skipping {item['title']} due to dvd format")
+                    elif foundpointer:
+                        print(f"Skipping {item['title']} due to duplicate")
+                    else:
+                        print(f"Skipping {item['title']} but not sure why")
             else:
-                print(f"Skipping {item['title']} but not sure why")
-
+                print(f"Skipping {item['title']} Due to blocked Studio: {item['site']}")
+        else:
+            urltitle = re.search(r'.*/(.*?)$', response.url).group(1)
+            print(f"Skipping Due to Low Scene Count: {len(num_scenes)} {urltitle} :: ({response.url})")
 
     def check_json(self, jsondata, arg1, arg2=None):
         jsondata = json.loads(jsondata)

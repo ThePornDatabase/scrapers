@@ -10,7 +10,7 @@ class FamilyLustSpider(BaseSceneScraper):
     name = 'FamilyLust'
     network = "TugPass"
     parent = "TugPass"
-    site = "TugPass"
+    site = "Family Lust"
 
     max_pages = 30
 

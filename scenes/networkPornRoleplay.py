@@ -24,7 +24,7 @@ class networkPornRoleplaySpider(BaseSceneScraper):
         ['Shantibody Media', 'Shantibody Media', 'Shantibody Media', '/tags/Shantibody%20Media/page/{}/'],
         ['Serious Coin', 'Special Examination', 'Special Examination', '/tags/Special%20Examination/page/{}/'],
     ]
-    
+
     url = 'https://pornroleplay.org'
 
     selector_map = {
@@ -35,11 +35,10 @@ class networkPornRoleplaySpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//b[contains(text(),"Model:")]/following-sibling::text()[1]',
         'tags': '//div[@class="text"]/div[@class="marbox20"][1]/div[@class="tag_list"]/span/a/text()',
-        'external_id': '\/(\d+).*?.html',
+        'external_id': r'/(\d+).*?.html',
         'trailer': '',
         'pagination': ''
     }
-    
 
     def start_requests(self):
         link = self.url
@@ -50,13 +49,12 @@ class networkPornRoleplaySpider(BaseSceneScraper):
             meta['site'] = site[2]
             meta['pagination'] = site[3]
             meta['page'] = self.page
-            
+
             yield scrapy.Request(url=self.get_next_page_url(link, self.page, meta['pagination']),
                                  callback=self.parse,
                                  meta=meta,
                                  headers=self.headers,
                                  cookies=self.cookies)
-                                 
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -74,13 +72,11 @@ class networkPornRoleplaySpider(BaseSceneScraper):
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
-                                     cookies=self.cookies)             
-                                     
+                                     cookies=self.cookies)
 
     def get_next_page_url(self, base, page, pagination):
         url = self.format_url(base, pagination.format(page))
-        print(f'URL: {url}')
-        return url    
+        return url
 
     def get_scenes(self, response):
         meta = response.meta
@@ -88,7 +84,6 @@ class networkPornRoleplaySpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
-
 
     def get_title(self, response):
         title = self.process_xpath(response, self.get_selector_map('title'))
@@ -98,11 +93,11 @@ class networkPornRoleplaySpider(BaseSceneScraper):
             if re.search(f'(.*) - {site}', title):
                 title = re.search(f'(.*) - {site}', title).group(1)
             title = title.lower()
-            title = title.replace("sd","").replace("hd","").replace("wmv","").replace("mp4","").replace("mkv","").replace("4k","").replace("full hd","").replace("/","")
+            title = title.replace("sd", "").replace("hd", "").replace("wmv", "").replace("mp4", "").replace("mkv", "").replace("4k", "").replace("full hd", "").replace("/", "")
             title = title.strip()
             if title[-2:] == " -":
                 title = title[:-2]
-            
+
             return string.capwords(html.unescape(title.strip()))
 
         return None
@@ -111,16 +106,16 @@ class networkPornRoleplaySpider(BaseSceneScraper):
         meta = response.meta
         performers = self.process_xpath(response, self.get_selector_map('performers'))
         if performers:
-            performers = list(map(lambda x: x.strip().lower(), performers.getall()))        
-        
+            performers = list(map(lambda x: x.strip().lower(), performers.getall()))
+
         if self.get_selector_map('tags'):
             tags = self.process_xpath(response, self.get_selector_map('tags'))
             if tags:
                 tags = list(map(lambda x: x.strip().lower(), tags.getall()))
-                
+
             if meta['site'].lower() in tags:
                 tags.remove(meta['site'].lower())
-                
+
             for performer in performers:
                 if performer in tags:
                     tags.remove(performer)
@@ -129,37 +124,9 @@ class networkPornRoleplaySpider(BaseSceneScraper):
             for tag in tags2:
                 matches = ['sd', 'mp4', 'hd', 'mkv']
                 if any(x in tag.lower() for x in matches):
-                    tags.remove(tag)                    
-            
+                    tags.remove(tag)
+
             tags = list(map(lambda x: x.strip().title(), tags))
             return tags
-            
 
         return []
-        
-        
-
-
-    def get_site(self, response):
-        meta = response.meta
-        if meta['site']:
-            return meta['site']
-            
-        return tldextract.extract(response.url).domain
-
-
-    def get_parent(self, response):
-        meta = response.meta
-        if meta['parent']:
-            return meta['parent']
-            
-        return tldextract.extract(response.url).domain
-
-
-    def get_network(self, response):
-        meta = response.meta
-        if meta['network']:
-            return meta['network']
-            
-        return tldextract.extract(response.url).domain
-        

@@ -1,4 +1,5 @@
 import re
+import string
 import tldextract
 import scrapy
 
@@ -52,7 +53,6 @@ class NetworkClips4saleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Girls Controlled', 'Girls Controlled To Be Bad', '/studio/10982/robo-pimp-girls-trained-to-be-bad/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Mark Rockwell', 'Marks Head Bobbers and Hand Jobbers', '/studio/47321/marks-head-bobbers-and-hand-jobbers/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Aaliyah Taylor', 'Aliyah Taylors Fetish', '/studio/70866/aaliyah-taylor-s-fetish/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
-        ['Clips4Sale', 'Cock Ninja Studios', 'Cock Ninja Studios', '/studio/79893/cock-ninja-studios/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Family Therapy (Clips4Sale)', 'Family Therapy (Clips4Sale)', '/studio/81593/family-therapy/Cat0-AllCategories/Page%s/DisplayOrder-asc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Brat Attack', 'Brat Attack', '/studio/83427/brat-attack/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'BlackCow Video', 'BlackCow Video', '/studio/15814/blackcow-video/Cat0-AllCategories/Page%s/DisplayOrder-asc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
@@ -66,6 +66,25 @@ class NetworkClips4saleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Aaliyah Taylors Fetish', 'Aaliyah Taylors Fetish', '/studio/70866/aaliyah-taylor-s-fetish/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and (contains(text(),"MP4") or contains(text(),"WMV"))]/../../following-sibling::div/div/a[1]/@href'],
         ['Clips4Sale', 'Ashley Fires Fetish Clips', 'Ashley Fires Fetish Clips', '/studio/5177/ashley-fires-fetish-clips/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
         ['All Her Luv', 'Missa X', 'Missa X', '/studio/51941/missa/Cat0-AllCategories/Page%s/DisplayOrder-desc/Limit96/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cock Ninja Studios', 'Cock Ninja Studios', '/studio/79893/cock-ninja-studios/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Pampered Penny', 'Pampered Penny', '/studio/11315/pampered-penny/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Miss Penny Barber', 'Miss Penny Barber', '/studio/18369/miss-penny-barber/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'VMVideo', 'VMVideo', '/studio/174737/vince-may-video/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Angel the Dreamgirl', 'Angel the Dreamgirl', '/studio/68591/angel-the-dreamgirl/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'K Klixen Productions', 'K Klixen Productions', '/studio/7373/k-handjob-by-klixen-/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"WMV")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Dick Sucking Lips And Facials', 'Dick Sucking Lips And Facials', '/studio/78419/dick-sucking-lips-and-spit/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Feet of Philly', 'Feet of Philly', '/studio/40511/feet-of-philly/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Cruel Unusual Femdom', 'Cruel Unusual Femdom', '/studio/5751/cruel---unusual-femdom/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', True, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Ruthless Vixens Femdom', 'Ruthless Vixens Femdom', '/studio/9085/ruthless-vixens-femdom/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'XXXTREMECOMIXXX', 'XXXTREMECOMIXXX', '/studio/56081/xxxtremecomixxx/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Robomeats', 'Robomeats', '/studio/50885/robomeats/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'The Tabooddhist', 'The Tabooddhist', '/studio/62135/dan-s-porn-and-taboo/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Bondage Junkies', 'Bondage Junkies', '/studio/47664/bondagejunkies-clips/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[not(contains(@href, "-4k"))][1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[not(contains(@href, "-4k"))][1]/@href'],
+        ['Clips4Sale', 'KICK ASS BONDAGE BY ROPEMARKED', 'KICK ASS BONDAGE BY ROPEMARKED', '/studio/39599/kick-ass-bondage-by-girls-in-a-bind/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Fetish Cartel', 'Fetish Cartel', '/studio/3044/fetish-cartel//Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Philly Butt Sluts', 'Philly Butt Sluts', '/studio/40522/philly-butt-sluts/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Pedi Police', 'Pedi Police', '/studio/124175/pedi-police/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"WMV")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
+        ['Clips4Sale', 'Barely Legal Foot Jobs', 'Barely Legal Foot Jobs', '/studio/40521/barely-legal-foot-jobs/Cat0-AllCategories/Page%s/ClipDate-desc/Limit24/', False, '//span[@class="thumb_format" and contains(text(),"MP4")]/../../following-sibling::div/div/a[1]/@href|//span[@class="thumb_format" and contains(text(),"MPG")]/../../following-sibling::div/div/a[1]/@href'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -122,6 +141,10 @@ class NetworkClips4saleSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = super().get_image(response)
+        if image in response.url:
+            image = response.xpath('//div[@class="react-thumb"]/@data-src')
+            if image:
+                image = self.format_link(response, image.get())
         if not image:
             image = response.xpath('//meta[@property="og:image"]/@content').get()
         return self.format_link(response, image)
@@ -250,6 +273,13 @@ class NetworkClips4saleSpider(BaseSceneScraper):
                     performers = re.search(r'^(\w+ \w+ and \w+ \w+) in .*', title).group(1)
                     performers = performers.split("and")
 
+            if "studio/7373/" in response.url:
+                performers = response.xpath('//div[@class="individualClipDescription"]//strong/text()')
+                if performers:
+                    performers = performers.get()
+                    performers = performers.split(",")
+                    performers = list(map(lambda x: string.capwords(x.strip()), performers))
+
             if performers:
                 performers = list(map(lambda x: x.strip().title(), performers))
                 if "Wonder Woman" in performers:
@@ -298,6 +328,12 @@ class NetworkClips4saleSpider(BaseSceneScraper):
                     performers.remove("")
 
                 return performers
+
+        if meta['storedsite'] == "Miss Penny Barber":
+            return ['Penny Barber']
+
+        if meta['storedsite'] == "Pampered Penny":
+            return ['Penny Barber']
 
         if meta['storedsite'] == "Mandy Flores":
             return ['Mandy Flores']

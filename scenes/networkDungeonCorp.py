@@ -28,19 +28,19 @@ class networkDungeonCorpSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/trial/index.php?page=%s'
     }
-    
+
 
     def start_requests(self):
-        
+
         url = "http://dungeoncorp.com/NEWS/updates_guest_all.js"
         yield scrapy.Request(url, callback=self.get_scenes,
                              meta={'page': self.page},
                              headers=self.headers,
-                             cookies=self.cookies)    
+                             cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta
-        
+
         javascript = response.text
         counter = 0
         pagelimit = 10
@@ -73,14 +73,14 @@ class networkDungeonCorpSpider(BaseSceneScraper):
                         else:
                             performers = [performers]
                         meta['performers'] = list(map(lambda x: x.replace("  "," ").strip(), performers))
-                        
-                        yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)                    
-        
-                
-                
+
+                        yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+
+
     def get_date(self, response):
         return dateparser.parse('today').isoformat()
-        
+
     def get_title(self, response):
         title = response.xpath('//span[@class="shoottitle"]//text()')
         if not title:
@@ -93,7 +93,7 @@ class networkDungeonCorpSpider(BaseSceneScraper):
             title = response.xpath('//*[contains(text(),"Preivew for")]/text()')
         if not title:
             title = response.xpath('//*[contains(text(),"Preview") and contains(text(),"for")]/text()')
-            
+
         if title:
             title = title.getall()
             title = "".join(title)
@@ -118,7 +118,7 @@ class networkDungeonCorpSpider(BaseSceneScraper):
                 image = response.url.replace("index.html","vidt1.jpg").replace("index.php","vidt1.jpg")
             if "vidt.jpg" in image:
                 image = response.url.replace("index.html","vidt.jpg").replace("index.php","vidt.jpg")
-                
+
             image = self.format_link(response, image)
             return image.replace(" ", "%20")
         else:
@@ -126,13 +126,13 @@ class networkDungeonCorpSpider(BaseSceneScraper):
 
     def get_performers(self, response):
         return []
-        
+
     def get_tags(self, response):
         return ['Bondage', 'Submission']
-        
+
     def get_parent(self, response):
         return response.meta['site']
-        
+
 
     def get_description(self, response):
         if 'description' not in self.get_selector_map():

@@ -9,8 +9,8 @@ class LegalPornoSpider(BaseSceneScraper):
     name = 'LegalPornoPornworld'
     network = 'Legal Porno'
 
-    settings = get_project_settings()
-    proxy_address = settings.get('PROXY_ADDRESS')
+    # ~ settings = get_project_settings()
+    # ~ proxy_address = settings.get('PROXY_ADDRESS')
 
     start_urls = [
         # ~ 'https://www.analvids.com',  # Located in networkLegalPorno.py

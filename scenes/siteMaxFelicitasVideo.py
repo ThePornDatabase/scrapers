@@ -1,7 +1,7 @@
 import re
 import datetime
 from dateutil.relativedelta import relativedelta
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -26,7 +26,6 @@ class SiteMaxFelicitasSpider(BaseSceneScraper):
         meta = response.meta
         scenes = response.xpath('//div[contains(@class, "video-item")]')
         for scene in scenes:
-            translator = Translator()
 
             image = scene.xpath('./div/a/img/@src')
             if image:
@@ -40,13 +39,13 @@ class SiteMaxFelicitasSpider(BaseSceneScraper):
 
             title = scene.xpath('.//h4/text()')
             if title:
-                title = translator.translate((title.get().lower()), src='it', dest='en')
-                meta['title'] = self.cleanup_title(title.text)
+                title = GoogleTranslator(source='it', target='en').translate(title.get().lower())
+                meta['title'] = self.cleanup_title(title)
 
             datetext = scene.xpath('.//div[contains(@class, "video-info")]/text()')
             if datetext:
-                datetext = translator.translate((datetext.get().lower()), src='it', dest='en')
-                meta['date'] = self.parse_date(datetext.text)
+                datetext = GoogleTranslator(source='it', target='en').translate(datetext.get().lower())
+                meta['date'] = self.parse_date(datetext)
 
             scene = scene.xpath('./div/a/@href').get()
 

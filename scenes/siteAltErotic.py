@@ -1,6 +1,8 @@
 import re
+import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
 class SiteAltEroticSpider(BaseSceneScraper):
@@ -13,35 +15,36 @@ class SiteAltEroticSpider(BaseSceneScraper):
         'https://alterotic.com',
     ]
 
-    cookies = {'splash-page': '1'}
+    cookies = {'close-warning': '1'}
 
     selector_map = {
-        'title': '//div[@class="breadcrumbs-tour"]/following-sibling::div[1]/div[@class="title-category"]/h3/text()',
-        'description': '//div[@class="titleBlock" and .//h3[contains(text(), "VIDEO DESCRIPTION")]]/following-sibling::div[@class="trailer-details"]/span/text()',
-        'date': '//div[@class="trailer-details"]/span[contains(text(), "Released")]/text()',
-        're_date': r'(\d{2}/\d{2}/\d{4})',
-        'date_formats': ['%m/%d/%Y'],
-        'image': '//div[@class="Vcontainer"]//img/@src0_1x',
-        'performers': '//div[@class="trailer-details"]/span[contains(text(), "Featuring")]/a/text()',
-        'tags': '//div[@class="trailer-details"]//span[contains(text(), "Categories")]/a/text()',
-        'trailer': '//div[@class="Vcontainer"]/a/@onclick',
-        're_trailer': r'(http.*?\.mp4)',
         'external_id': r'updates/(.*?)\.html',
-        'pagination': '/tour/videos/page_%s_d.html'
+        'pagination': '/_next/data/56lUITLyKsV3iowSLtu3y/videos.json?page=%s&order_by=publish_date&sort_by=desc'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="updateThumbnail"]/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, cookies=self.cookies, headers=self.headers)
+        jsondata = json.loads(response.text)
+        if jsondata:
+            jsondata = jsondata['pageProps']['contents']
+            for scene in jsondata['data']:
+                item = SceneItem()
+                item['site'] = "Alt Erotic"
+                item['parent'] = "Alt Erotic"
+                item['network'] = "Alt Erotic"
+                item['title'] = self.cleanup_title(scene['title'])
+                item['description'] = self.cleanup_text(scene['description'])
+                item['performers'] = []
+                if "models_slugs" in scene:
+                    for performer in scene['models_slugs']:
+                        item['performers'].append(performer['name'])
+                item['date'] = self.parse_date(scene['publish_date']).isoformat()
+                item['id'] = scene['id']
+                if scene['videos_duration']:
+                    item['duration'] = self.duration_to_seconds(scene['videos_duration'])
+                item['image'] = scene['thumb'].replace(" ", "%20")
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['tags'] = scene['tags']
+                item['trailer'] = scene['trailer_url'].replace(" ", "%20")
+                item['url'] = f"https://alterotic.com/videos/{scene['slug']}"
 
-    def get_id(self, response):
-        sceneid = self.get_element(response, 'image')
-        if sceneid:
-            idsearch = re.search(r'.*?\/\/.*?\/.*?\/.*?\/.*?\/.*?\/(.*?)_', sceneid)
-            if idsearch:
-                idsearch = idsearch.group(1)
-                if re.search(r'(\d{3,6})', idsearch):
-                    return idsearch.strip()
-        return super().get_id(response)
+                yield self.check_item(item, self.days)

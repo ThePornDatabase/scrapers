@@ -54,4 +54,4 @@ class SiteTwoTgirlsSiteSpider(BaseSceneScraper):
         date = re.search(self.get_selector_map('re_date'), date)
         if date:
             return self.parse_date(date.group(1)).isoformat()
-        return self.parse_date('today').isoformat()
+        return ""

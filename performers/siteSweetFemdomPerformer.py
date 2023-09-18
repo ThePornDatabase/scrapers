@@ -2,7 +2,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
 
-class SiteSweetFemondomPerformerSpider(BasePerformerScraper):
+class SiteSweetFemdomPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '',
         'image': '',

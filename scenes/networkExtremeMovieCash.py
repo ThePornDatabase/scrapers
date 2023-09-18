@@ -135,7 +135,7 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
                     date = date.replace("Updated", "").strip()
                 item['date'] = self.parse_date(date).isoformat()
             else:
-                item['date'] = self.parse_date('today').isoformat()
+                item['date'] = ''
             external_id = scene.xpath('.//img[contains(@id, "set-target")]/@id')
             if external_id:
                 external_id = external_id.get().replace("set-target-", "").strip()
@@ -151,10 +151,10 @@ class NetworkExtremeMovieCashSpider(BaseSceneScraper):
                 item['performers'] = []
             item['image'] = self.format_link(response, scene.xpath('.//img[contains(@id, "set-target")]/@src0_3x|.//img[contains(@id, "set-target")]/@src0_2x|.//img[contains(@id, "set-target")]/@src0_1x|./div[@class="product-image"]/a/img/@src').get())
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['trailer'] = None
-            item['description'] = None
+            item['trailer'] = ''
+            item['description'] = ''
             item['tags'] = []
             item['network'] = "Extreme Movie Cash"
             item['site'] = match_site(tldextract.extract(response.url).domain)
             item['parent'] = match_site(tldextract.extract(response.url).domain)
-            yield item
+            yield self.check_item(item, self.days)

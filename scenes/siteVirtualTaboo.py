@@ -38,32 +38,26 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
         jsondata = json.loads(jsondata)
         item = SceneItem()
 
-        item['performers'] = []
-        for model in jsondata['video']['actor']:
-            item['performers'].append(model['name'].title())
+        item['performers'] = response.xpath('//div[contains(@class, "info")]/a[contains(@href, "/pornstars/")]/text()').getall()
 
-        item['title'] = self.cleanup_title(jsondata['video']['name'])
-        item['description'] = self.cleanup_description(jsondata['video']['description'])
+        item['title'] = self.cleanup_title(jsondata['name'])
+        item['description'] = self.cleanup_description(jsondata['description'])
         if not item['description']:
             item['description'] = ''
 
-        item['image'] = jsondata['video']['thumbnail']
+        item['image'] = jsondata['thumbnailUrl']
         if not item['image']:
             item['image'] = None
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['trailer'] = ''
-        item['url'] = jsondata['video']['url']
+        item['url'] = response.url
         item['id'] = re.search(r'videos/(.*)', item['url']).group(1)
-        item['date'] = self.parse_date(jsondata['video']['datePublished'].strip()).isoformat()
+        item['date'] = self.parse_date(jsondata['uploadDate'].strip()).isoformat()
         item['site'] = "Virtual Taboo"
         item['parent'] = "Virtual Taboo"
         item['network'] = "Virtual Taboo"
 
-        item['tags'] = jsondata['video']['keywords']
-        tags2 = item['tags'].copy()
-        for tag in tags2:
-            if re.match(r'\d+K', tag):
-                item['tags'].remove(tag)
+        item['tags'] = response.xpath('//div[contains(@class, "tag-list")]/a[contains(@href, "/tag/")]/text()').getall()
         item['tags'] = list(map(lambda x: x.strip().title(), set(item['tags'])))
 
         # Duration in jsondata is unreliable, grabbing from video info section

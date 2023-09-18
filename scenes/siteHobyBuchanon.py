@@ -15,9 +15,9 @@ class HobyBuchanonSpider(BaseSceneScraper):
     ]
 
     pagination = [
-        '/updates/page/%s/',
-        '/behind-the-scenes/page/%s/',
-        '/suck-this-dick/page/%s/',
+        '/updates?page=%s&order_by=publish_date&sort_by=desc',
+        '/behind-the-scenes?page=%s&order_by=publish_date&sort_by=desc',
+        '/suck-this-dick?page=%s&order_by=publish_date&sort_by=desc',
     ]
 
     selector_map = {

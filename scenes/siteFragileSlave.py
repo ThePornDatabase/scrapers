@@ -26,7 +26,7 @@ class SiteFragileSlaveSpider(BaseSceneScraper):
         'external_id': r'.*/(.*?).html',
         'trailer': '//script[contains(text(), "video_content")]/text()',
         're_trailer': r'video src=\"(.*?)\".*',
-        'pagination': '/updates/categories/movies/%s/latest/'
+        'pagination': '/updates?page=%s'
     }
 
     def get_scenes(self, response):

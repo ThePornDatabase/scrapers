@@ -30,11 +30,22 @@ class AmateurAllureSpider(BaseSceneScraper):
         meta = response.meta
         scenes = response.xpath('//div[@class="update_thumbnail"]')
         for scene in scenes:
-            image = scene.xpath('./a/img/@src')
-            if image:
-                image = self.format_link(response, image.get())
-                meta['image'] = image
-                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
+            images = scene.xpath('./a/img/@srcset')
+            if images:
+                images = images.get()
+                images = images.split(",")
+                imagelink = None
+                for image in images:
+                    if "1920w" in image:
+                        imagelink = re.search(r'(.*?\.\w{3,4}) ', image).group(1)
+                    if not imagelink and "720w" in image:
+                        imagelink = re.search(r'(.*?\.\w{3,4}) ', image).group(1)
+                    if not imagelink and "540w" in image:
+                        imagelink = re.search(r'(.*?\.\w{3,4}) ', image).group(1)
+                if imagelink:
+                    image = self.format_link(response, imagelink.strip())
+                    meta['image'] = image
+                    meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
             scene = scene.xpath('./a/@href').get()
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 

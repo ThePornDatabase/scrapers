@@ -52,14 +52,15 @@ class CumPerfectionSpider(BaseSceneScraper):
                 image = image.group(1)
         else:
             image = response.xpath('//img[contains(@class,"update_thumb")]/@src0_1x').get()
-            
+
         if image:
             image = image.replace(" ", "%20")
-            image = "https://hookuphotshot.com" + image
+            if "https://" not in image:
+                image = "https://hookuphotshot.com" + image
             return image
         else:
             return ''
-        
+
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -67,7 +68,7 @@ class CumPerfectionSpider(BaseSceneScraper):
                 response, self.get_selector_map('tags')).getall()
             if tags:
                 return list(map(lambda x: x.strip().title(), tags))
-        return []        
+        return []
 
     def get_description(self,response):
         return ''

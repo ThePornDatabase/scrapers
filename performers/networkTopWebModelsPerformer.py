@@ -19,10 +19,9 @@ class TopWebModelsSpider(BasePerformerScraper):
     }
 
     def get_performers(self, response):
-        responseresult = response.xpath('//script[contains(text(),"window.__DATA__")]/text()').get()
-        responsedata = re.search(r'__DATA__\ =\ (.*)', responseresult).group(1)
-        jsondata = json.loads(responsedata)
-        data = jsondata['data']['models']['items']
+        responseresult = response.xpath('//script[contains(@id,"NEXT_DATA")]/text()').get()
+        jsondata = json.loads(responseresult)
+        data = jsondata['props']['pageProps']['models']['data']
         for jsonentry in data:
             item = PerformerItem()
             item['gender'] = "Female"
@@ -35,46 +34,46 @@ class TopWebModelsSpider(BasePerformerScraper):
             item['url'] = urltext
             item['network'] = 'TopWebModels'
 
-            if 'birthdate' in jsonentry['attributes']:
-                item['birthday'] = jsonentry['attributes']['birthdate']['value']
+            if 'Birthdate' in jsonentry:
+                item['birthday'] = jsonentry['Birthdate']
             else:
                 item['birthday'] = ''
 
-            if 'born' in jsonentry['attributes']:
-                item['birthplace'] = jsonentry['attributes']['born']['value']
+            if 'Born' in jsonentry:
+                item['birthplace'] = jsonentry['Born']
             else:
                 item['birthplace'] = ''
 
-            if 'ethnicity' in jsonentry['attributes']:
-                item['ethnicity'] = jsonentry['attributes']['ethnicity']['value']
+            if 'Ethnicity' in jsonentry:
+                item['ethnicity'] = jsonentry['Ethnicity']
             else:
                 item['ethnicity'] = ''
 
-            if 'hair' in jsonentry['attributes']:
-                item['haircolor'] = jsonentry['attributes']['hair']['value']
+            if 'Hair' in jsonentry:
+                item['haircolor'] = jsonentry['Hair']
             else:
                 item['haircolor'] = ''
 
-            if 'eyes' in jsonentry['attributes']:
-                item['eyecolor'] = jsonentry['attributes']['eyes']['value']
+            if 'Eyes' in jsonentry:
+                item['eyecolor'] = jsonentry['Eyes']
             else:
                 item['eyecolor'] = ''
 
-            if 'weight' in jsonentry['attributes']:
-                item['weight'] = jsonentry['attributes']['weight']['value']
+            if 'Weight' in jsonentry:
+                item['weight'] = jsonentry['Weight']
             else:
                 item['weight'] = ''
 
             if item['weight']:
                 item['weight'] = str(item['weight']) + "lbs"
 
-            if 'height' in jsonentry['attributes']:
-                item['height'] = jsonentry['attributes']['height']['value']
+            if 'Height' in jsonentry:
+                item['height'] = jsonentry['Height']
             else:
                 item['height'] = ''
 
-            if 'measurements' in jsonentry['attributes']:
-                item['measurements'] = jsonentry['attributes']['measurements']['value']
+            if 'Measurements' in jsonentry:
+                item['measurements'] = jsonentry['Measurements']
             else:
                 item['measurements'] = ''
 

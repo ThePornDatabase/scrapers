@@ -66,14 +66,18 @@ class NetworkAVRevenueSpider(BaseSceneScraper):
         scenes = selector.xpath('//item', namespaces=self.NSMAP)
         for scene in scenes:
             item = SceneItem()
-
             item['title'] = self.cleanup_title(self.get_field(scene, './title/text()'))
-            item['description'] = self.get_field(scene, './description/text()')
+            description = self.get_field(scene, './description/text()')
+            if description:
+                item['description'] = description
+            else:
+                item['description'] = ""
+            item['date'] = ""
             scenedate = self.get_field(scene, './pubdate/text()|./pubDate/text()')
             if scenedate:
-                item['date'] = self.parse_date(scenedate).isoformat()
-            else:
-                item['date'] = self.parse_date('today').isoformat()
+                scenedate = self.parse_date(scenedate)
+                if scenedate:
+                    item['date'] = scenedate.isoformat()
             item['performers'] = self.get_fields(scene, './category[contains(@domain,"model")]//text()')
             tags = self.get_fields(scene, './category[not(contains(@domain,"model"))]//text()')
             tags2 = tags.copy()
@@ -87,7 +91,8 @@ class NetworkAVRevenueSpider(BaseSceneScraper):
             if not image:
                 image = self.get_field(scene, './/media:content[1]/@url')
             item['image'] = image
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            # ~ item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['image_blob'] = ""
             item['trailer'] = self.get_field(scene, './/media:content[contains(@url, "mp4")]/@url')
             item['url'] = self.get_field(scene, './link/text()').replace("https:https:", "https:").replace("http:http:", "http:")
             item['id'] = self.get_field(scene, './/guid//text()')

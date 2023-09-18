@@ -43,11 +43,11 @@ class SitePacopacomamaSpider(BaseSceneScraper):
             item['description'] = ''
             if scene['DescEn'] and len(scene['DescEn']) > 5:
                 item['description'] = scene['DescEn'].replace("\r", "").replace("\n", "").replace("\t", "").strip()
-            item['date'] = self.parse_date(scene['Release'], date_formats=['%Y-%m-%d']).isoformat()
+            item['date'] = self.parse_date(scene['Release'], date_formats=['%Y-%m-%d']).strftime('%Y-%m-%d')
             item['id'] = scene['MovieID']
             item['url'] = f"https://en.pacopacomama.com/movies/{item['id']}/"
             item['image'] = scene['ThumbHigh']
-            item['image_blob'] = ''
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['trailer'] = ''
             if "SampleFiles" in scene and scene['SampleFiles']:
                 for trailer in scene['SampleFiles']:

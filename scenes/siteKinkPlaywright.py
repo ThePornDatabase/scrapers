@@ -1,8 +1,11 @@
 import re
 import scrapy
-
+from PIL import Image
+import base64
+from io import BytesIO
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+from tpdb.helpers.http import Http
 
 
 class NetworkKinkSpider(BaseSceneScraper):
@@ -15,14 +18,8 @@ class NetworkKinkSpider(BaseSceneScraper):
         '/shoots/latest?page=%s',
         '/shoots/featured?page=%s',
         '/shoots/partner?page=%s',
+        # ~ '/search?type=shoots&channelIds=wasteland&sort=published&page=%s',
     ]
-
-    cookies = {
-        'ct': "2",
-        'ktvc': "0",
-        '_privy_83DCC55BDFCD05EB0CBCF79C': '%7B%22uuid%22%3A%22b8e05870-77c3-440f-84fc-703a4d2ba530%22%7D',
-        'amp_54ec17': 'dDzSKWGiIXkroTA-rjWoBK...1get0otup.1get0p2lc.1.2.3',
-    }
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0",
@@ -59,7 +56,7 @@ class NetworkKinkSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 1,
         'DOWNLOAD_DELAY': 2,
         'DOWNLOADER_MIDDLEWARES': {
-            # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
@@ -74,7 +71,7 @@ class NetworkKinkSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        yield scrapy.Request("https://www.kink.com", callback=self.start_requests2, headers=self.headers, meta={"playwright": True})
+        yield scrapy.Request("https://www.kink.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
 
     def start_requests2(self, response):
         for pagination in self.paginations:
@@ -261,3 +258,18 @@ class NetworkKinkSpider(BaseSceneScraper):
         matches = ['str8hell', 'cfnmeu', 'malefeet4u', 'williamhiggins', 'ambushmassage', 'swnude', 'sweetfemdom']
         if not any(x in item['site'] for x in matches):
             yield self.check_item(item, self.days)
+
+    def get_image_blob_from_link(self, image):
+        if image:
+            data = self.get_image_from_link(image)
+            if data:
+                img = BytesIO(data)
+                img = Image.open(img)
+                width, height = img.size
+                if height > 1080 or width > 1920:
+                    img.thumbnail((1920, 1080))
+                    buffer = BytesIO()
+                    img.save(buffer, format="JPEG")
+                    data = buffer.getvalue()
+                return base64.b64encode(data).decode('utf-8')
+        return None

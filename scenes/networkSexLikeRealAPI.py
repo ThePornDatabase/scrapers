@@ -24,7 +24,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         'external_id': '(?:scenes|shemale|gay)\\/(.+)',
         'image': '//meta[@name="twitter:image1"]/@content or //meta[@name="twitter:image2"]/@content or //meta[@name="twitter:image3"]/@content or //meta[@name="twitter:image"]/@content',
         'trailer': '',
-        'pagination': '/scenes?type=new&page=%s'
+        'pagination': '/scenes?type=premium&sort=most_recent&page=%s'
     }
 
     def get_scenes(self, response):
@@ -85,9 +85,10 @@ class SexLikeRealSpider(BaseSceneScraper):
                     item['tags'].append(timestamp['name'])
 
         item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
-
-        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr']
+        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr','badoink','realvr','kinkvr','babevr','vrcosplayx','18vr','wankzvr','vrhush','naughtyamerica']
         if not any(x in item['id'] for x in matches):
-            matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr']
-            if not any(x in item['site'].lower() for x in matches):
-                yield self.check_item(item, self.days)
+            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush']
+            if not any(x in item['id'] for x in matches):
+                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink']
+                if not any(x in item['site'].lower() for x in matches):
+                    yield self.check_item(item, self.days)

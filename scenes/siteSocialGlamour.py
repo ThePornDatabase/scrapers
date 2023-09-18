@@ -84,7 +84,7 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                     item['performers'] = []
 
                 date_xpath = scene.xpath('..//i[contains(@class, "fa-calendar")]/following-sibling::text()')
-                item['date'] = self.parse_date('today').isoformat()
+                item['date'] = ""
                 if date_xpath:
                     date_xpath = date_xpath.get().strip()
                     item['date'] = self.parse_date(date_xpath, date_formats=['%Y-%m-%d']).isoformat()

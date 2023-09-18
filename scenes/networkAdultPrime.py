@@ -21,6 +21,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 # ~ "Elegant Raw",
 # ~ "Evil Playgrounds",
 # ~ "Family Screw",
+# ~ "Fan Fuckers",
 # ~ "Fetish Prime",
 # ~ "Fixxxion",
 # ~ "Grandmams",
@@ -70,9 +71,9 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
         'description': '//p[contains(@class,"ap-limited-description-text")]/text()',
         'date': '//p[contains(@class,"update-info-line")]/i[@class="fa fa-calendar"][1]/following-sibling::b[1]/text()',
         'date_formats': ['%d.%m.%Y'],
-        'image': '//div[contains(@class,"update-video-wrapper")]/a/div/@style',
+        'image': '//div[contains(@class,"update-video-wrapper")]/a/div/@style|//video/@poster',
         're_image': r'(http.*\.jpg)',
-        'performers': '//b[contains(text(), "Performer")]/following-sibling::a/text()',
+        'performers': '//p[contains(@class,"update-info-line")]/b[contains(text(), "Performer")]/following-sibling::a/text()',
         'tags': '//b[contains(text(), "Niches")]/following-sibling::text()',
         'external_id': r'.*/(\d+)',
         'trailer': '',
@@ -113,3 +114,9 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
             if "" in tags:
                 tags.remove("")
         return tags
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if len(image) < 10:
+            image = ""
+        return image

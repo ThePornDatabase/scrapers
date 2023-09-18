@@ -13,21 +13,21 @@ class NetworkSmutPuppetSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="updateInfo"]/h2/text()',
-        'description': '//div[@class="updateDescription"]/p/text()',
+        'title': '//div[@class="section-title"]/h4/text()',
+        'description': '//p[@class="read-more"]/text()',
         'date': '',
-        'image': '//div[contains(@class,"blockUpdates")]/div[contains(@class, "exclusive_update")]/a/img/@src',
-        'performers': '//div[@class="updateModels"]/a/text()',
-        'tags': '',
-        'external_id': r'count/(\d+)/',
+        'image': '//div[@class="model-player"]/a/img/@src|//video/@poster',
+        'performers': '//h4/a[contains(@href, "/models/")]/text()',
+        'tags': '//span[contains(text(), "ategories")]/following-sibling::a/text()',
+        'external_id': r'update/(\d+)/',
         'trailer': '',
-        'pagination': '/tour/?cat=latest&page_num=%s'
+        'pagination': '/updates/?page=%s&latest=1'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="videoThumb"]')
+        scenes = response.xpath('//div[@class="item-content"]')
         for scene in scenes:
-            site = scene.xpath('./div[contains(@class,"videoDetails")]/p/text()')
+            site = scene.xpath('./div[contains(@class,"item-cblock")]/p/a[contains(@href, "site")]/text()')
             sitename = ''
             if site:
                 site = site.get()
@@ -35,8 +35,10 @@ class NetworkSmutPuppetSpider(BaseSceneScraper):
                     site = re.search(r'.* - (.*?)$', site)
                     if site:
                         sitename = site.group(1).strip()
+                else:
+                    sitename = site
 
-            scene = scene.xpath('./a/@href').get()
+            scene = scene.xpath('./div/a/@href').get()
             scene = re.sub(r'(\?.*)', '', scene)
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': sitename})

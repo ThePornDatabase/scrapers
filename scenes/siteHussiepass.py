@@ -26,7 +26,7 @@ class HussiepassSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//div[contains(@class,"videoDetails")]/h3/text()',
-        'description': '//div[contains(@class,"videoDetails")]/p/text()',
+        'description': '//div[contains(@class,"videoDetails")]/p//text()',
         'date': '//div[contains(@class,"videoInfo")]/p/span[contains(text(),"Added")]/following-sibling::text()',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//li[@class="update_models"]/a/text()',

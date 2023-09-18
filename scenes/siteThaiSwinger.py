@@ -22,15 +22,15 @@ class SiteThaiSwingerSpider(BaseSceneScraper):
         'tags': '',
         'trailer': '',
         'external_id': r'',
-        'pagination': '/index.php?start=%s'
+        'pagination': '/index.php?section=1681&start=%s'
     }
 
     def get_next_page_url(self, base, page):
-        page = str(32 * (int(page) - 1))
+        page = str(48 * (int(page) - 1))
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="col-sm-6 mb-4"]')
+        scenes = response.xpath('//div[contains(@class,"col-lg-4 col-md-4")]')
         for scene in scenes:
             item = SceneItem()
 

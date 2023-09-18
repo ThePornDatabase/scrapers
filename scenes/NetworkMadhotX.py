@@ -40,3 +40,9 @@ class NetworkMadhotXSpider(BaseSceneScraper):
             scene = scene.xpath('./a[@class="gallery-item"]/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_image_blob(self, response):
+        image = response.xpath('//video/@data-poster')
+        if image:
+            return self.get_image_blob_from_link(image.get())
+        return ''

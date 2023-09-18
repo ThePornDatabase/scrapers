@@ -38,7 +38,7 @@ class SiteTokyoFaceFuckSpider(BaseSceneScraper):
                 item['title'] = ""
                 item['performers'] = []
 
-            item['date'] = self.parse_date('today').isoformat()
+            item['date'] = ""
             description = scene.xpath('.//div[@class="info"]/div/p/text()')
             if description:
                 item['description'] = " ".join(description.getall()).strip()
@@ -69,4 +69,4 @@ class SiteTokyoFaceFuckSpider(BaseSceneScraper):
             item['parent'] = 'Tokyo Face Fuck'
             item['network'] = 'Tokyo Face Fuck'
 
-            yield item
+            yield self.check_item(item, self.days)

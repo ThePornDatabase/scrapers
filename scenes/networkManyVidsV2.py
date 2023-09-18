@@ -18,81 +18,175 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
     name = 'ManyVidsV2'
 
     start_urls = [
-        ['1001216419', 'YouthLust'],
-        ['214657', 'Manyvids: Lana Rain'],
-        ['423053', 'MySweetApple'],
-        ['1001495638', 'Manyvids: Jack and Jill'],
-        ['325962', 'Manyvids: Dirty Princess'],
-        ['312711', 'Manyvids: Cattie'],
-        ['1000286888', 'A Taboo Fantasy'],
-        ['694469', 'Adult Candy Store'],
-        ['1000159044', 'Fuck Club'],
-        ['1000380769', 'IXXVICOM'],
-        ['806007', 'Jay Bank Presents'],
-        ['1001483477', 'Undercover Sluts'],
-        # ~ # ['574529', 'Submissive Teen POV'],  # Seems to have gone away, leaving for reference
-        ['1002638751', 'Sloppy Toppy'],
-        ['69353', 'Natalia Grey'],
-        ['97815', 'Manyvids: Hidori'],
-        ['1001123043', 'Manyvids: Paige Steele'],
-        ['1001317123', 'Manyvids: Jaybbgirl'],
-        ['1001673578', 'Manyvids: FreyaJade'],
-        ['304591', 'Manyvids: 420SexTime'],
-        ['217682', 'Manyvids: OmankoVivi'],
-        ['1000304351', 'Manyvids: Haylee Love'],
-        ['1002322838', 'Manyvids: Jewelz Blu'],
-        ['1003298627', 'Manyvids: Molly Redwolf'],
-        ['1003004427', 'Manyvids: Sweetie Fox'],
-        ['32539', 'Manyvids: Cherry Crush'],
-        ['35990', 'Manyvids: Charlette Webb'],
-        ['91512', 'Manyvids: Alli Leigh'],
-        ['65933', 'Manyvids: Little Miss Elle'],
-        ['216064', 'Manyvids: Lena Spanks'],
-        ['251896', 'Manyvids: Submissive Lexi'],
-        ['1004407943', 'Manyvids: Sloansmoans'],
-        ['491714', 'Manyvids: ImMeganLive'],
-        ['577443', 'Manyvids: Emmas Secret Life'],
-        ['375403', 'Manyvids: Natashas Bedroom'],
-        ['102036', 'Manyvids: Ashley Alban'],
-        ['147843', 'Manyvids: Penny Barber'],
-        ['38793', 'Manyvids: Princess Leia'],
-        ['1003527333', 'Manyvids: Kathia Nobili'],
-        ['1004207044', 'Manyvids: Mrs Mischief'],
-        ['1000997612', 'Manyvids: MistressT'],
-        ['1005123610', 'Manyvids: Tara Tainton'],
-        ['1001836304', 'Manyvids: Siena Rose'],
-        ['273124', 'Manyvids: Courtney Scott'],
-        ['1000856699', 'Manyvids: Kiittenymph'],
-        ['1004388117', 'Manyvids: ForbiddenFruitsFilms'],
-        ['1004388132', 'Manyvids: Jodi West'],
-        ['320527', 'Manyvids: Diane Andrews'],
-        ['97815', 'Manyvids: Midori Rose'],
-        ['1000324638', 'Manyvids: Blissed XXX'],
-        ['1004131603', 'Manyvids: Chris And Mari'],
-        ['1000829435', 'Manyvids: RhiannonRyder1995'],
-        ['1001194277', 'Manyvids: Legendarylootz'],
-        ['1002393375', 'Manyvids: Natasha Nixx'],
-        ['208703', 'Manyvids: Tatum Christine'],
-        ['150576', 'Manyvids: xxxCaligulaxxx'],
-        ['1004057036', 'Manyvids: Amber Hallibell'],
-        ['1000691111', 'Manyvids: Purple Bitch'],
-        ['1003667583', 'Manyvids: Im Heather Harmon'],
-        ['590705', 'Manyvids: Bettie Bondage'],
-        ['1002042328', 'Manyvids: Jade Vow'],
-        ['518153', 'Manyvids: Naughty Midwest Girls'],
-        ['1002715079', 'Manyvids: Alice Bong'],
-        ['1002319155', 'Manyvids: Sola Zola'],
-        ['1002133241', 'Manyvids: Reislin'],
-        ['1000107977', 'Manyvids: Chad Alva'],
-        ['1000228944', 'Manyvids: Heather Vahn'],
-        ['1002812736', 'Manyvids: Tommy Wood'],
-        ['1000657719', 'Manyvids: Dawns Place'],
-        ['1004225528', 'Manyvids: MyLittleSwallow'],
-        ['1000933793', 'Manyvids: Sukisukigirl'],
-        ['1005546662', 'Manyvids: Andregotbars'],
-        ['1003828607', 'Manyvids: Brandibabes'],
-        ['602138', 'Manyvids: WCA Productions'],
-        ['1002621197', 'Manyvids: Riley Jacobs'],
+        ['1001216419', 'YouthLust', False],
+        ['214657', 'Manyvids: Lana Rain', True],
+        ['423053', 'MySweetApple', False],
+        ['1001495638', 'Manyvids: Jack and Jill', False],
+        ['325962', 'Manyvids: Dirty Princess', False],
+        ['312711', 'Manyvids: Cattie', False],
+        ['1000286888', 'A Taboo Fantasy', False],
+        ['694469', 'Adult Candy Store', False],
+        ['1000159044', 'Fuck Club', False],
+        ['1000380769', 'IXXVICOM', False],
+        ['806007', 'Jay Bank Presents', False],
+        ['1001483477', 'Undercover Sluts', False],
+        # ~ # ['574529', 'Submissive Teen POV, False'],  # Seems to have gone away, leaving for reference
+        ['1002638751', 'Sloppy Toppy', False],
+        ['69353', 'Natalia Grey', False],
+        ['97815', 'Manyvids: Hidori', True],
+        ['1001123043', 'Manyvids: Paige Steele', True],
+        ['1001317123', 'Manyvids: Jaybbgirl', True],
+        ['1001673578', 'Manyvids: FreyaJade', False],
+        ['304591', 'Manyvids: 420SexTime', False],
+        ['217682', 'Manyvids: OmankoVivi', False],
+        ['1000304351', 'Manyvids: Haylee Love', True],
+        ['1002322838', 'Manyvids: Jewelz Blu', True],
+        ['1003298627', 'Manyvids: Molly Redwolf', True],
+        ['1003004427', 'Manyvids: Sweetie Fox', True],
+        ['32539', 'Manyvids: Cherry Crush', True],
+        ['35990', 'Manyvids: Charlette Webb', True],
+        ['91512', 'Manyvids: Alli Leigh', True],
+        ['65933', 'Manyvids: Little Miss Elle', True],
+        ['216064', 'Manyvids: Lena Spanks', True],
+        ['251896', 'Manyvids: Submissive Lexi', True],
+        ['1004407943', 'Manyvids: Sloansmoans', False],
+        ['491714', 'Manyvids: ImMeganLive', True],
+        ['577443', 'Manyvids: Emmas Secret Life', False],
+        ['375403', 'Manyvids: Natashas Bedroom', False],
+        ['102036', 'Manyvids: Ashley Alban', True],
+        ['147843', 'Manyvids: Penny Barber', True],
+        ['38793', 'Manyvids: Princess Leia', True],
+        ['1003527333', 'Manyvids: Kathia Nobili', True],
+        ['1004207044', 'Manyvids: Mrs Mischief', True],
+        ['1000997612', 'Manyvids: MistressT', True],
+        ['1005123610', 'Manyvids: Tara Tainton', True],
+        ['1001836304', 'Manyvids: Siena Rose', True],
+        ['273124', 'Manyvids: Courtney Scott', True],
+        ['1000856699', 'Manyvids: Kiittenymph', False],
+        ['1004388117', 'Manyvids: ForbiddenFruitsFilms', False],
+        ['1004388132', 'Manyvids: Jodi West', True],
+        ['320527', 'Manyvids: Diane Andrews', True],
+        ['1000324638', 'Manyvids: Blissed XXX', False],
+        ['1004131603', 'Manyvids: Chris And Mari', False],
+        ['1000829435', 'Manyvids: RhiannonRyder1995', False],
+        ['1001194277', 'Manyvids: Legendarylootz', True],
+        ['1002393375', 'Manyvids: Natasha Nixx', True],
+        ['208703', 'Manyvids: Tatum Christine', True],
+        ['150576', 'Manyvids: xxxCaligulaxxx', True],
+        ['1004057036', 'Manyvids: Amber Hallibell', True],
+        ['1000691111', 'Manyvids: Purple Bitch', True],
+        ['1003667583', 'Manyvids: Im Heather Harmon', False],
+        ['590705', 'Manyvids: Bettie Bondage', True],
+        ['1002042328', 'Manyvids: Jade Vow', True],
+        ['518153', 'Manyvids: Naughty Midwest Girls', False],
+        ['1002715079', 'Manyvids: Alice Bong', True],
+        ['1002319155', 'Manyvids: Sola Zola', True],
+        ['1002133241', 'Manyvids: Reislin', True],
+        ['1000107977', 'Manyvids: Chad Alva', True],
+        ['1000228944', 'Manyvids: Heather Vahn', True],
+        ['1002812736', 'Manyvids: Tommy Wood', True],
+        ['1000657719', 'Manyvids: Dawns Place', False],
+        ['1004225528', 'Manyvids: MyLittleSwallow', False],
+        ['1000933793', 'Manyvids: Sukisukigirl', True],
+        ['1005546662', 'Manyvids: Andregotbars', True],
+        ['1003828607', 'Manyvids: Brandibabes', False],
+        ['602138', 'Manyvids: WCA Productions', False],
+        ['1002621197', 'Manyvids: Riley Jacobs', True],
+        ['1001106526', 'Manyvids: Lola Rose', True],
+        ['1002865441', 'Manyvids: Luna Roulette', True],
+        ['1003906145', 'Manyvids: Octokuro', True],
+        ['1004893370', 'Manyvids: TheGorillaGrip', True],
+        ['1004855103', 'Manyvids: Angelphub', True],
+        ['1002214325', 'Manyvids: Senorita Satan', False],
+        ['1002980475', 'Manyvids: Peachy Skye', True],
+        ['1003834874', 'Manyvids: Summer Fox', True],
+        ['1002023399', 'Manyvids: Daddys Rozay', True],
+        ['1000452244', 'Manyvids: Ondrea Lee', True],
+        ['1000862654', 'Manyvids: Horny Lily', True],
+        ['1000182655', 'Manyvids: Nicole Belle', True],
+        ['419692', 'Manyvids: Little Puck', True],
+        ['1002190635', 'Manyvids: Violet Myers', True],
+        ['65682', 'Manyvids: Krissy Lynn', True],
+        ['1001368680', 'Manyvids: Smiles of Sally', False],
+        ['1001768929', 'Manyvids: Natalie Wonder', True],
+        ['522512', 'Manyvids: Sally Dangelo', True],
+        ['54610', 'Manyvids: Lanie Love', True],
+        ['1000534648', 'Manyvids: Jenni Knight', True],
+        ['1000833600', 'Manyvids: Miss Ellie', True],
+        ['1003962281', 'Manyvids: Little Bunny B', True],
+        ['1000675514', 'Manyvids: The Queen Lanie', True],
+        ['1003387859', 'Manyvids: Britney Amber', True],
+        ['1002555505', 'Manyvids: Taboo Saga', False],
+        ['1001830287', 'Manyvids: Lani Lust', True],
+        ['549738', 'Manyvids: Lissie Belle', True],
+        ['1004243978', 'Manyvids: Pepperanncan', False],
+        ['1001213004', 'Manyvids: Sydney Harwin', True],
+        ['115565', 'Manyvids: ohaiNaomi', True],
+        ['1005854378', 'Manyvids: Trisha Moon', True],
+        ['1003987502', 'Manyvids: 2 Drops Studio', False],
+        ['49000', 'Manyvids: BuniBun', True],
+        ['620931', 'Manyvids: Mylene', True],
+        ['1002463312', 'Manyvids: Oralsonly', False],
+        ['1002067521', 'Manyvids: Zirael Rem', True],
+        ['1000764908', 'Manyvids: Tweetney', True],
+        ['1004557133', 'Manyvids: Aery Tiefling', True],
+        ['1000945715', 'Manyvids: Alexa Pearl', True],
+        ['1003572193', 'Manyvids: Vina Sky', True],
+        ['525062', 'Manyvids: JaySmoothXXX', False],
+        ['1001301396', 'Manyvids: Sia Siberia', True],
+        ['358347', 'Manyvids: LittleSubGirl', True],
+        ['106308', 'Manyvids: OUSweetheart', False],
+        ['1003025690', 'Manyvids: Laura King', True],
+        ['1004485402', 'Manyvids: TheSophieJames', False],
+        ['456897', 'Manyvids: Fell On Productions', False],
+        ['362540', 'Manyvids: Ivy Starshine', True],
+        ['1000718761', 'Manyvids: Jane Cane', True],
+        ['1001244409', 'Manyvids: Yogabella', True],
+        ['1002612831', 'Manyvids: Mama Fiona', True],
+        ['1004271325', 'Manyvids: Peachypoppy', True],
+        ['1000297683', 'Manyvids: Marica Hase', True],
+        ['1004225528', 'Manyvids: MyLittleSwallow', True],
+        ['167615', 'Manyvids: Reagan Foxx', True],
+        ['541454', 'Manyvids: Lena Paul', True],
+        ['1004357188', 'Manyvids: AimeeWavesXXX', True],
+        ['1004323423', 'Manyvids: Bella Bates', True],
+        ['1007113302', 'Manyvids: Funsizedcumslut', True],
+        ['30313', 'Manyvids: Alix Lynx', True],
+        ['1000567799', 'Manyvids: Made In Canarias', True],
+        ['826394', 'Manyvids: Lexxxi Luxe', True],
+        ['1004385584', 'Manyvids: Slut Me Out Now', False],
+        ['1000024307', 'Manyvids: Brea Rose', True],
+        ['375644', 'Manyvids: Delphoxi', True],
+        ['1000457016', 'Manyvids: EastCoastXXX', False],
+        ['1002460913', 'Manyvids: Leah Meow', True],
+        ['1003179211', 'Manyvids: Phatassedangel69', True],
+        ['1002698505', 'Manyvids: Nicole Doshi', True],
+        ['1002219117', 'Manyvids: Gogofukmexxx', False],
+        ['1003672212', 'Manyvids: Sonya Vibe', True],
+        ['380172', 'Manyvids: Raquel Roper', True],
+        ['1003468856', 'Manyvids: Vitaduplez', True],
+        ['1005161332', 'Manyvids: Lauryn Mae', True],
+        ['353960', 'Manyvids: Arabelle Raphael', True],
+        ['1003125256', 'Manyvids: Halfwin', True],
+        ['1004334654', 'Manyvids: ASMRMaddy', True],
+        ['1000722201', 'Manyvids: Jada Kai', True],
+        ['1001389615', 'Manyvids: Kimberlyjx', True],
+        ['1003079493', 'Manyvids: Luke Cooper', True],
+        ['673872', 'Manyvids: Veruca James', True],
+        ['34', 'Manyvids: Angie Noir', True],
+        ['528941', 'Manyvids: Rae Knight', True],
+        ['1001803967', 'Manyvids: xxxmultimediacom', False],
+        ['152830', 'Manyvids: Anna Bell Peaks', True],
+        ['539280', 'Manyvids: Kimberly Kane', True],
+        ['1001516727', 'Manyvids: Vanessa Veracruz', True],
+        ['599647', 'Manyvids: Forbidden Perversions', False],
+        ['1002202911', 'Manyvids: Hazel Simone', True],
+        ['1002587264', 'Manyvids: Golden Lace', True],
+        ['1005049819', 'Manyvids: Lewdest Bunnie', True],
+        ['83782', 'Manyvids: oopepperoo', True],
+        ['124871', 'Manyvids: Olive Wood', True],
+        ['1000532441', 'Manyvids: Rhea Sweet', True],
+        ['159708', 'Manyvids: Robin Mae', True],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -128,6 +222,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             meta['page'] = self.page
             meta['siteid'] = link[0]
             meta['site'] = link[1]
+            meta['parse_performer'] = link[2]
             yield scrapy.Request(url=self.get_next_page_url(self.page, meta), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response):
@@ -162,110 +257,34 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
 
     def get_performers(self, response):
         meta = response.meta
-        if meta['site'] == "Lana Rain":
-            return ['Lana Rain']
-        if meta['site'] == "Natalia Grey":
-            return ['Natalia Grey']
-        if meta['site'] == "Cattie":
-            return ['Cattie Candescent']
-        if "Hidori" in meta['site']:
-            return ['Hidori']
-        if "Brandibabes" in meta['site']:
-            return ['Brandi Babes']
-        if "Jaybbgirl" in meta['site']:
-            return ['Jaybbgirl']
-        if "FreyaJade" in meta['site']:
-            return ['Freya Jade']
-        if "420SexTime" in meta['site']:
-            return ['Asteria']
-        if "OmankoVivi" in meta['site']:
-            return ['Omanko Vivi']
-        if "Haylee Love" in meta['site']:
-            return ['Haylee Love']
-        if "Paige Steele" in meta['site']:
-            return ['Paige Steele']
-        if "RhiannonRyder1995" in meta['site']:
-            return ['Rhiannon Ryder']
-        if "Jewelz Blu" in meta['site']:
-            return ['Jewelz Blu']
-        if "Molly Redwolf" in meta['site']:
-            return ['Molly Redwolf']
-        if "Sweetie Fox" in meta['site']:
-            return ['Sweetie Fox']
-        if "Cherry Crush" in meta['site']:
-            return ['Cherry Crush']
-        if "Charlette Webb" in meta['site']:
-            return ['Charlette Webb']
-        if "Alli Leigh" in meta['site']:
-            return ['Alli Leigh']
-        if "Alli Leigh" in meta['site']:
-            return ['Riley Jacobs']
-        if "Riley Jacobs" in meta['site']:
-            return ['Little Miss Elle']
-        if "Lena Spanks" in meta['site']:
-            return ['Lena Spanks']
-        if "Submissive Lexi" in meta['site']:
-            return ['Submissive Lexi']
-        if "Tatum Christine" in meta['site']:
-            return ['Tatum Christine']
-        if "Ashley Alban" in meta['site']:
-            return ['Ashley Alban']
-        if "Natasha Nixx" in meta['site']:
-            return ['Natasha Nixx']
-        if "Legendary" in meta['site']:
-            return ['Legendarylootz']
-        if "Penny Barber" in meta['site']:
-            return ['Penny Barber']
-        if "Princess Leia" in meta['site']:
-            return ['Princess Leia']
-        if "Kathia Nobili" in meta['site']:
-            return ['Kathia Nobili']
-        if "Mrs Mischief" in meta['site']:
-            return ['Mrs Mischief']
-        if "MistressT" in meta['site']:
-            return ['MistressT']
-        if "Tara Tainton" in meta['site']:
-            return ['Tara Tainton']
-        if "Siena Rose" in meta['site']:
-            return ['Siena Rose']
-        if "Courtney Scott" in meta['site']:
-            return ['Courtney Scott']
-        if "Kiittenymph" in meta['site']:
-            return ['Lex Kiittenymph']
-        if "Jade Vow" in meta['site']:
-            return ['Jade Vow']
-        if "Bettie Bondage" in meta['site']:
-            return ['Bettie Bondage']
-        if "Heather Harmon" in meta['site']:
-            return ['Heather Harmon']
-        if "xxxCaligulaxxx" in meta['site']:
-            return ['xxxCaligulaxxx']
-        if "ForbiddenFruitsFilms" in meta['site']:
-            return ['Jodi West']
-        if "Jodi West" in meta['site']:
-            return ['Jodi West']
-        if "Purple Bitch" in meta['site']:
-            return ['Purple Bitch']
-        if "Alice Bong" in meta['site']:
-            return ['Alice Bong']
-        if "Amber Hallibell" in meta['site']:
-            return ['Amber Hallibell']
-        if "Diane Andrews" in meta['site']:
-            return ['Diane Andrews']
-        if "Midori Rose" in meta['site']:
-            return ['Midori Rose']
-        if "Sola Zola" in meta['site']:
-            return ['Sola Zola']
-        if "Reislin" in meta['site']:
-            return ['Reislin']
-        if "Chad Alva" in meta['site']:
-            return ['Chad Alva']
-        if "Heather Vahn" in meta['site']:
-            return ['Heather Vahn']
-        if "Sukisuki" in meta['site']:
-            return ['Sukisukigirl']
-        if "Andregotbars" in meta['site']:
-            return ['Andregotbars']
+        if meta['parse_performer']:
+            performer = re.search(r'Manyvids:(.*)$', meta['site']).group(1).strip()
+            return [performer]
+        else:
+            if meta['site'] == "Cattie":
+                return ['Cattie Candescent']
+            if "Brandibabes" in meta['site']:
+                return ['Brandi Babes']
+            if "Gogofukmexxx" in meta['site']:
+                return ['Gogo Fukme']
+            if "FreyaJade" in meta['site']:
+                return ['Freya Jade']
+            if "420SexTime" in meta['site']:
+                return ['Asteria']
+            if "OmankoVivi" in meta['site']:
+                return ['Omanko Vivi']
+            if "RhiannonRyder1995" in meta['site']:
+                return ['Rhiannon Ryder']
+            if "Kiittenymph" in meta['site']:
+                return ['Lex Kiittenymph']
+            if "ForbiddenFruitsFilms" in meta['site']:
+                return ['Jodi West']
+            if "OUSweetheart" in meta['site']:
+                return ['Summer Hart']
+            if "Senorita Satan" in meta['site']:
+                return ['Chloe Temple']
+            if "TheSophieJames" in meta['site']:
+                return ['Sophie James']
         return []
 
     def get_site(self, response):
@@ -301,6 +320,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             item['tags'] = []
         item['image'] = jsondata['screenshot'].replace(" ", "%20")
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        item['image'] = re.sub(r'(.*)(\.\w{3,4})$',r'\1_1\2', item['image'])
         item['date'] = jsondata['launchDate']
         item['trailer'] = None
         item['type'] = 'Scene'
@@ -314,4 +334,10 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             item['duration'] = self.duration_to_seconds(duration.group(1))
         else:
             item['duration'] = ""
-        yield self.check_item(item, self.days)
+        parse_scene = True
+        if "eastcoastxxx" in item['site'].lower():
+            matches = ['-free', '-tube', 'free-preview', 'free preview', '-teaser']
+            if any(x in item['url'].lower() for x in matches):
+                parse_scene = False
+        if parse_scene:
+            yield self.check_item(item, self.days)

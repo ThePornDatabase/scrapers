@@ -93,15 +93,17 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers={"Accept": "application/json"}, cookies=self.cookies)
 
     def get_scenes(self, response):
+        print(response.text)
         jsondata = json.loads(response.text)
         taglist = jsondata['facets']['tags']
-        scenelist = jsondata['contents']['data']
+        scenelist = jsondata['contents']
         for scene in scenelist:
             item = SceneItem()
             item['title'] = self.cleanup_title(scene['title'])
-            item['description'] = scene['description']
-            item['description'] = re.sub('<[^<]+?>', '', item['description']).replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ").strip()
-            item['duration'] = str(int(scene['duration']) * 60)
+            # ~ item['description'] = scene['description']
+            # ~ item['description'] = re.sub('<[^<]+?>', '', item['description']).replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ").strip()
+            # ~ item['duration'] = str(int(scene['duration']) * 60)
+            item['description'] = ""
             item['date'] = scene['publication_date']['iso']
             item['image'] = scene['poster']['thumbnail']['srcSet']
             item['image'] = re.search(r'^(http.*?)\s', item['image']).group(1)

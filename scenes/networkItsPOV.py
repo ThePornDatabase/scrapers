@@ -20,9 +20,11 @@ class NetworkItsPOVSpider(BaseSceneScraper):
         ['BackdoorPOV', '74'],
         ['IntimatePOV', '76'],
         ['FeetishPOV', '75'],
-        ['SchoolPOV', '78'],
+        ['AcademyPOV', '78'],
         ['StepPOV', '102'],
         ['PetitePOV', '107'],
+        ['MorePOV', '108'],
+        ['ILovePOV', '109']
     ]
 
     headers = {

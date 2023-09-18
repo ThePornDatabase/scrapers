@@ -66,6 +66,6 @@ class ProducersFunSpider(BaseSceneScraper):
             performers = re.search('(.*)\\ -\\ ', performers).group(1)
             performers = performers.strip()
 
-        if performers and "Volume" not in performers and "Compilation" not in performers:
+        if performers and "Volume" not in performers and "Compilation" not in performers and "Podcast" not in performers:
             return [performers]
         return ''

@@ -56,7 +56,6 @@ class Watch4BeautyScraper(BaseSceneScraper):
 
         if len(data):
             data = data[0]
-
             item['title'] = data['issue_title']
             item['date'] = data['issue_datetime']
             if "Z" in item['date']:
@@ -70,7 +69,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['network'] = "Watch4Beauty"
             item['parent'] = "Watch4Beauty"
             item['url'] = "https://www.watch4beauty.com/updates/" + data['issue_simple_title']
-            item['id'] = data['issue_simple_title']
+            item['id'] = data['issue_id']
             item['trailer'] = ''
             item['image'] = "https://s5q3w2t8.ssl.hwcdn.net/production/%s-issue-cover-wide-2560.jpg" % (datetime.fromisoformat(item['date']).strftime('%Y%m%d'))
             item['image_blob'] = self.get_image_blob_from_link(item['image'])

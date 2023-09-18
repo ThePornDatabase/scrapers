@@ -23,7 +23,8 @@ class MetArtNetworkSpider(BaseSceneScraper):
         "https://www.stunning18.com",
         "https://www.thelifeerotic.com",
         "https://www.vivthomas.com",
-        'https://www.hustler.com'
+        'https://www.hustler.com',
+        'https://www.barelylegal.com/'
     ]
 
     selector_map = {
@@ -70,7 +71,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
         else:
             item['image'] = None
 
-        if 'hustler' in response.url:
+        if 'hustler' in response.url or "barelylegal" in response.url:
             item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']
         elif 'lovehairy' in response.url or 'straplez' in response.url or 'alsscan' in response.url:
             item['image'] = 'https://cdn.metartnetwork.com/' + movie['siteUUID'] + movie['splashImagePath']
@@ -85,29 +86,14 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
         item['date'] = self.parse_date(movie['publishedAt']).isoformat()
         item['tags'] = movie['tags']
-        item['trailer'] = self.format_url(
-            response.url, '/api/m3u8/' + movie['UUID'] + '.m3u8')
+        # ~ item['trailer'] = self.format_url(response.url, '/api/m3u8/' + movie['UUID'] + '.m3u8')
+        item['trailer'] = ""
+
         item['site'] = self.get_site(response)
-        item['url'] = self.format_link(response, movie['path'])
+        item['url'] = self.format_link(response, movie['path']).replace(" ", "%20")
         item['network'] = self.network
         item['parent'] = self.get_parent(response)
         res = re.search('movie/(\\d+)/(.+)', movie['path'])
         item['id'] = res.group(1) + "_" + res.group(2)
 
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if item['date'] > filterdate:
-                    yield item
-            else:
-                yield item
+        yield self.check_item(item, self.days)

@@ -1,60 +1,150 @@
 import re
+import string
 import scrapy
-
 from tpdb.BasePerformerScraper import BasePerformerScraper
+from tpdb.items import PerformerItem
 
 
-class NetworkTwoWebMediaSpider(BasePerformerScraper):
-    selector_map = {
-        'name': '//h1[@class="page_title"]/text()',
-        'image': '//div[@class="wpb_wrapper"]/a/@data-src|//div[@class="wpb_wrapper"]/a/@href',
-        'cupsize': '//h5/strong[contains(text(),"Measurement")]/following-sibling::text()',
-        'weight': '//h5/strong[contains(text(),"Weight")]/following-sibling::text()',
-        'height': '//h5/strong[contains(text(),"Height")]/following-sibling::text()',
-        'ethnicity': '//h5/strong[contains(text(),"Race")]/following-sibling::text()',
-        'eyecolor': '//h5/strong[contains(text(),"Eyes")]/following-sibling::text()',
-        'haircolor': '//h5/strong[contains(text(),"Hair")]/following-sibling::text()',
-        'bio': '//div[@class="post_excerpt"]/p/text()',
-        'external_id': r'models\/(.*).html',
-        'pagination': '/modelentry/page/%s/'
-    }
+class NetworkTwoWebMediaPerformerSpider(BasePerformerScraper):
+    name = 'NetworkTwoWebMediaPerformer'
+    start_url = 'https://wankitnow.com/'
 
-    start_urls = [
-        'https://www.boppingbabes.com',
-        'https://www.downblousejerk.com',
-        'https://www.upskirtjerk.com',
-        'https://www.wankitnow.com',
+    paginations = [
+        '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=wankitnow.com',
+        '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=upskirtjerk.com',
+        '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=downblousejerk.com',
+        '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=realbikinigirls.com',
+        '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=lingerietales.com',
+        '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=boppingbabes.com'
     ]
 
-    paginations = {
-        '/tour/models/%s/latest/?g=f',
-        '/tour/models/%s/latest/?g=m',
+    selector_map = {
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc&site=wankitnow.com',
     }
 
-    name = 'TwoWebMediaPerformer'
-    network = "Two Web Media"
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://wankitnow.com/', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def get_next_page_url(self, base, page):
-        if "boppingbabes" in base:
-            pagination = '/v2/modelentry/page/%s/'
-        else:
-            pagination = '/modelentry/page/%s/'
+    def start_requests_2(self, response):
+        meta = response.meta
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            for pagination in self.paginations:
+                meta['pagination'] = pagination
+                link = self.get_next_page_url(self.start_url, self.page, meta['buildID'], pagination)
+                yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        performers = self.get_performers(response)
+        count = 0
+        for performer in performers:
+            count += 1
+            yield performer
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID, pagination):
+        pagination = pagination.replace("<buildID>", buildID)
         return self.format_url(base, pagination % page)
 
-    def get_performers(self, response):
-        performers = response.xpath('//div[contains(@class,"loop_content")]//h2/a/@href').getall()
-        for performer in performers:
-            yield scrapy.Request(
-                url=self.format_link(response, performer),
-                callback=self.parse_performer
-            )
-
     def get_gender(self, response):
-        return "Female"
+        return 'Female'
 
-    def get_cupsize(self, response):
-        cupsize = super().get_cupsize(response)
-        cupsize = re.search(r'(\w) .*', cupsize)
-        if cupsize:
-            return cupsize.group(1).strip().upper()
-        return ''
+    def get_performers(self, response):
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['models']['data']
+        for performer in jsondata:
+            item = PerformerItem()
+
+            item['name'] = performer['name']
+            item['image'] = performer['thumb']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['bio'] = ''
+            if "gender" in performer and performer['gender']:
+                item['gender'] = string.capwords(performer['gender'])
+            else:
+                item['gender'] = "female"
+            item['astrology'] = ''
+            if "Birthdate" in performer and performer['Birthdate']:
+                item['birthday'] = performer['Birthdate']
+            else:
+                item['birthday'] = ''
+
+            if "Born" in performer and performer['Born']:
+                item['birthplace'] = performer['Born']
+            else:
+                item['birthplace'] = ''
+
+            if "Measurements" in performer and performer['Measurements']:
+                item['measurements'] = performer['Measurements']
+            else:
+                item['measurements'] = ''
+
+            if re.search(r'(\d+\w+)-', item['measurements']):
+                item['cupsize'] = re.search(r'(\d+\w+)-', item['measurements']).group(1)
+            else:
+                item['cupsize'] = ''
+
+            item['ethnicity'] = ''
+
+            if "Eyes" in performer and performer['Eyes']:
+                item['eyecolor'] = performer['Eyes']
+            else:
+                item['eyecolor'] = ''
+            item['fakeboobs'] = ''
+
+            if "Hair" in performer and performer['Hair']:
+                item['haircolor'] = performer['Hair']
+            else:
+                item['haircolor'] = ''
+
+            if "Height" in performer and performer['Height']:
+                item['height'] = self.get_height(performer['Height'])
+            else:
+                item['height'] = ''
+
+            if "Weight" in performer and performer['Weight']:
+                item['weight'] = self.get_height(performer['Weight'])
+            else:
+                item['weight'] = ''
+
+            item['nationality'] = ''
+            item['piercings'] = ''
+            item['tattoos'] = ''
+            item['network'] = 'Two Web Media'
+            item['url'] = f"https://wankitnow.com/models/{performer['slug']}"
+
+            yield item
+
+    def get_weight(self, weight):
+        if weight:
+            weight = int(weight)
+            weight = int(weight * .45)
+        return str(weight) + "kg"
+
+    def get_height(self, height):
+        if "'" in height:
+            height = re.sub(r'[^0-9\']', '', height)
+            feet = re.search(r'(\d+)\'', height)
+            if feet:
+                feet = feet.group(1)
+                feet = int(feet) * 12
+            else:
+                feet = 0
+            inches = re.search(r'\'(\d+)', height)
+            if inches:
+                inches = inches.group(1)
+                inches = int(inches)
+            else:
+                inches = 0
+            return str(int((feet + inches) * 2.54)) + "cm"
+        return None

@@ -12,26 +12,26 @@ class TeenMegaWorldSpider(BaseSceneScraper):
 
     start_urls = [
         'https://teenmegaworld.net',
-        'http://rawcouples.com/',
-        'http://anal-angels.com',
-        'http://anal-beauty.com',
-        'http://beauty4k.com',
-        'http://beauty-angels.com',
-        'http://creampie-angels.com',
-        'http://dirty-coach.com',
-        'http://dirty-doctor.com',
-        'http://firstbgg.com',
-        'http://fuckstudies.com',
-        'http://gag-n-gape.com',
-        'http://lollyhardcore.com',
-        'http://noboring.com',
-        'http://nubilegirlshd.com',
-        'http://old-n-young.com',
-        'http://soloteengirls.net',
-        'http://teensexmania.com',
-        'http://trickymasseur.com',
-        'http://x-angels.com',
-        'http://teensexmovs.com',
+        # 'http://rawcouples.com/',
+        # 'http://anal-angels.com',
+        # 'http://anal-beauty.com',
+        # 'http://beauty4k.com',
+        # 'http://beauty-angels.com',
+        # 'http://creampie-angels.com',
+        # 'http://dirty-coach.com',
+        # 'http://dirty-doctor.com',
+        # 'http://firstbgg.com',
+        # 'http://fuckstudies.com',
+        # 'http://gag-n-gape.com',
+        # 'http://lollyhardcore.com',
+        # 'http://noboring.com',
+        # 'http://nubilegirlshd.com',
+        # 'http://old-n-young.com',
+        # 'http://soloteengirls.net',
+        # 'http://teensexmania.com',
+        # 'http://trickymasseur.com',
+        # 'http://x-angels.com',
+        # 'http://teensexmovs.com',
     ]
 
     selector_map = {
@@ -47,8 +47,8 @@ class TeenMegaWorldSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            "//a[contains(@class, 'title')]/@href").getall()
+        # ~ scenes = response.xpath("//a[contains(@class, 'title')]/@href").getall()
+        scenes = response.xpath('//li[@class="video_card"]/a[contains(@class, "video_card")]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 

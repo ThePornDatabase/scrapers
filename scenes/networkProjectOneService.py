@@ -33,6 +33,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.bellesa.com',
         # 'https://www.bellesahouse.com',
 
+        'https://www.bangbros.com',
         'https://www.biempire.com',
         'https://www.brazzers.com',
         # 'https://www.babygotboobs.com',
@@ -72,8 +73,10 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.prettydirtyteens.com',
         # 'https://www.sexworking.com',
 
+        'https://www.czechhunter.com/',
         'https://www.digitalplayground.com',
         'https://www.dilfed.com',
+        # 'https://www.gilfed.com', API responses from this site are borked
         'https://www.erito.com',
         'https://www.fakehub.com',
         # 'https://www.fakeagent.com',
@@ -137,7 +140,9 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.strandedteens.com',
         # 'https://www.thesexscout.com',
 
+        'https://www.noirmale.com',
         'https://www.propertysex.com',
+        'https://www.realitydudesnetwork.com',
         'https://www.realitykings.com',
         # 'https://www.40inchplus.com',
         # 'https://www.8thstreetlatinas.com',
@@ -184,6 +189,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.welivetogether.com',
         # 'https://www.wivesinpantyhose.com',
 
+        'https://www.seancody.com',
         'https://www.sexyhub.com',
         # 'https://www.danejones.com',
         # 'https://www.fitnessrooms.com',
@@ -290,7 +296,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
                 item['performers'].append(model['name'])
 
             if 'actors' not in scene or not item['performers']:
-                item['performers'] = ['Unknown']
+                item['performers'] = []
 
             item['tags'] = []
             for tag in scene['tags']:
@@ -341,7 +347,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             siteurl = re.sub(siteurl, '', item['site']).lower()
             brand = scene['brand'].lower().strip()
 
-            if brand == "brazzers" or brand == "deviante" or brand == "bromo":
+            if brand == "brazzers" or brand == "deviante" or brand == "bangbros" or brand == "bromo":
                 item['url'] = f"https://www.{brand}.com/video/{scene['id']}/{slugify(item['title'])}"
             elif brand == "men":
                 item['url'] = f"https://www.{brand}.com/sceneid/{scene['id']}/{slugify(item['title'])}"
@@ -352,7 +358,11 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
             item['parent'] = string.capwords(item['parent'])
 
-            if self.check_item(item, self.days):
+            yield_item = True
+            if brand == "bangbros" and item['date'] < "2023-06-21":
+                yield_item = False
+
+            if self.check_item(item, self.days) and yield_item:
                 scene_count = scene_count + 1
                 yield item
 

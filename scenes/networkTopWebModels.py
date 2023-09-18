@@ -48,15 +48,17 @@ class TopWebModelsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        responseresult = response.xpath('//script[contains(text(),"window.__DATA__")]/text()').get()
-        responsedata = re.search(r'__DATA__\ =\ (.*)', responseresult).group(1)
-        jsondata = json.loads(responsedata)
-        data = jsondata['data']['videos']['items']
+        # ~ responseresult = response.xpath('//script[contains(text(),"window.__DATA__")]/text()').get()
+        responseresult = response.xpath('//script[@id="__NEXT_DATA__"]/text()').get()
+        # ~ responsedata = re.search(r'__DATA__\ =\ (.*)', responseresult).group(1)
+        jsondata = json.loads(responseresult)
+        data = jsondata['props']['pageProps']['contents']['data']
         for jsonentry in data:
             item = SceneItem()
             item['title'] = jsonentry['title']
-            item['description'] = jsonentry['description']
-            item['description'] = re.sub('<[^<]+?>', '', item['description']).strip()
+            # ~ item['description'] = jsonentry['description']
+            item['description'] = ""
+            # ~ item['description'] = re.sub('<[^<]+?>', '', item['description']).strip()
             item['image'] = jsonentry['thumb']
             if not isinstance(item['image'], str):
                 item['image'] = None
@@ -64,36 +66,39 @@ class TopWebModelsSpider(BaseSceneScraper):
                 item['image'] = item['image'].replace(" ", "%20")
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['id'] = jsonentry['id']
+            item['duration'] = jsonentry['seconds_duration']
             item['trailer'] = ''
-            urltext = re.sub(r'[^A-Za-z0-9 ]+', '', jsonentry['title']).lower()
-            urltext = urltext.replace("  ", " ")
-            urltext = urltext.replace(" ", "-")
-            urltext = "https://tour.topwebmodels.com/scenes/" + str(jsonentry['id']) + "/" + urltext
-            item['url'] = urltext
-            item['date'] = jsonentry['release_date']
-            item['site'] = match_site(jsonentry['sites'][0]['name'])
+            item['url'] = "https://tour.topwebmodels.com/scenes/" + jsonentry['slug']
+            item['date'] = re.search(r'(\d{4}/\d{2}/\d{2})', jsonentry['publish_date']).group(1)
+            item['date'] = self.parse_date(item['date'], date_formats=['%Y/%m/%d']).isoformat()
+            item['site'] = match_site(jsonentry['site'])
             item['network'] = 'TopWebModels'
             item['parent'] = 'TopWebModels'
 
             item['performers'] = []
             for model in jsonentry['models']:
-                if " and " in model['name'].lower():
-                    modellist = model['name'].split(" and ")
+                if " and " in model.lower():
+                    modellist = model.split(" and ")
                     if modellist:
                         for model in modellist:
                             item['performers'].append(model.title())
-                if " & " in model['name'].lower():
-                    modellist = model['name'].split(" & ")
+                if " & " in model.lower():
+                    modellist = model.split(" & ")
+                    if modellist:
+                        for model in modellist:
+                            item['performers'].append(model.title())
+                if "\\u0026" in model.lower():
+                    modellist = model.split("\\u0026")
                     if modellist:
                         for model in modellist:
                             item['performers'].append(model.title())
                 else:
-                    item['performers'].append(model['name'])
+                    item['performers'].append(model)
 
             item['tags'] = []
             for tags in jsonentry['tags']:
-                if "scott's picks" not in tags['name'].lower():
-                    item['tags'].append(string.capwords(tags['name']))
+                if "scott's picks" not in tags.lower():
+                    item['tags'].append(string.capwords(tags))
 
             days = int(self.days)
             if days > 27375:

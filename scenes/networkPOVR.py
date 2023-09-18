@@ -18,7 +18,7 @@ class NetworkPOVRSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1[@class="player__title"]/text() | //h4/text() | //h1[contains(@class,"heading-title")]/text()',
         'description': '//p[contains(@class,"description")]/text() | //div[@class="player__description"]/p/text()',
-        'performers': '//a[contains(@class,"actor")]/text() | //ul/li/a[contains(@class,"btn--eptenary")]/text()',
+        'performers': '//a[contains(@class,"actor")]/text() | //ul/li/a[contains(@class,"btn--eptenary")]/text()|//ul[contains(@class,"category-link")]/li/a[contains(@href, "/pornstars/")]/text()',
         'date': '//div[@class="player__meta"]/div[3]/span/text() | //p[contains(@class,"player__date")]/text()',
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': '//meta[@property="og:image"]/@content',
@@ -26,7 +26,8 @@ class NetworkPOVRSpider(BaseSceneScraper):
         'site': '//a[contains(@class,"source")]/text() | //ul/li/a[contains(@class,"btn--secondary")]/text()',
         'external_id': r'.*-(\d+)$',
         'trailer': '',
-        'pagination': '/?p=%s'
+        # ~ 'pagination': '/?p=%s'
+        'pagination': '/studios/povr-originals?p=%s'
     }
 
     def start_requests(self):
@@ -73,7 +74,17 @@ class NetworkPOVRSpider(BaseSceneScraper):
             response, self.get_selector_map('performers')).getall()
         if performers:
             return list(map(lambda x: string.capwords(x.strip()), performers))
-        return ["No Performers Listed"]
+        return []
+
+    def get_duration(self, response):
+        duration = response.xpath('//p[contains(@class,"player__date")]/text()')
+        if duration:
+            duration = duration.get()
+            if " min" in duration:
+                duration = re.search(r'(\d+) [mM]in', duration)
+                if duration:
+                    return str(int(duration.group(1)) * 60)
+        return ''
 
     def parse_scene(self, response):
         item = SceneItem()
@@ -224,6 +235,6 @@ class NetworkPOVRSpider(BaseSceneScraper):
         else:
             item['type'] = 'Scene'
 
-        matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur']
+        matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush']
         if not any(x in re.sub('[^a-zA-Z0-9-]', '', item['site']).lower() for x in matches):
             yield self.check_item(item, self.days)

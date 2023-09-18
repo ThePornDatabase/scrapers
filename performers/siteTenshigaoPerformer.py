@@ -23,7 +23,7 @@ class SiteTenshigaoSpider(BasePerformerScraper):
     }
 
     name = 'TenshigaoPerformer'
-    network = 'Tenshigao'
+    network = 'AV Revenue'
     parent = 'Tenshigao'
     site = 'Tenshigao'
 

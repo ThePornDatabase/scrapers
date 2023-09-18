@@ -78,7 +78,7 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
                 limit = 25
             else:
                 start = "aaaaaaaa"
-                limit = 450 # Was originally 450.  Next Page is keyed at 450
+                limit = 450  # Was originally 450.  Next Page is keyed at 450
             yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
                                  callback=self.parse,
                                  meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2},
@@ -122,73 +122,74 @@ class TeamSkeetNetworkSpider(BaseSceneScraper):
         else:
             data = ''
         item = SceneItem()
-        is_v2 = "store2" in response.url
+        if ('isUpcoming' in data and not data['isUpcoming']) or 'isUpcoming' not in data:
+            is_v2 = "store2" in response.url
 
-        if "store2" in response.url:
-            data = data['_source']
-        item['title'] = data['title']
-        item['description'] = data['description']
-        item['image'] = data['img']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if "store2" in response.url:
+                data = data['_source']
+            item['title'] = data['title']
+            item['description'] = data['description']
+            item['image'] = data['img']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-        if 'tags' in data:
-            item['tags'] = data['tags']
-        else:
-            item['tags'] = []
-        item['id'] = data['id']
+            if 'tags' in data:
+                item['tags'] = data['tags']
+            else:
+                item['tags'] = []
+            item['id'] = data['id']
 
-        if 'videoTrailer' in data:
-            item['trailer'] = data['videoTrailer']
-        elif 'video' in data:
-            item['trailer'] = 'https://videodelivery.net/' + \
-                              data['video'] + '/manifest/video.m3u8'
-        else:
-            item['trailer'] = ''
+            if 'videoTrailer' in data:
+                item['trailer'] = data['videoTrailer']
+            elif 'video' in data:
+                item['trailer'] = 'https://videodelivery.net/' + \
+                                  data['video'] + '/manifest/video.m3u8'
+            else:
+                item['trailer'] = ''
 
-        item['network'] = self.network
-        item['parent'] = response.meta['site']
+            item['network'] = self.network
+            item['parent'] = response.meta['site']
 
-        if 'publishedDate' in data:
-            item['date'] = self.parse_date(data['publishedDate']).isoformat()
-        else:
-            item['date'] = self.parse_date('today').isoformat()
+            if 'publishedDate' in data:
+                item['date'] = self.parse_date(data['publishedDate']).isoformat()
+            else:
+                item['date'] = ""
 
-        if 'site' in data:
-            if 'name' in data['site']:
-                item['site'] = data['site']['name']
+            if 'site' in data:
+                if 'name' in data['site']:
+                    item['site'] = data['site']['name']
+                else:
+                    item['site'] = response.meta['site']
             else:
                 item['site'] = response.meta['site']
-        else:
-            item['site'] = response.meta['site']
 
-        if is_v2:
-            item['url'] = "https://www.teamskeet.com/movies/" + data['id']
-        else:
-            item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
-        item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
-
-        item['performers'] = []
-        if 'models' in data:
-            for model in data['models']:
-                item['performers'].append(model['modelName'])
-
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if item['date'] > filterdate:
-                    yield item
+            if is_v2:
+                item['url'] = "https://www.teamskeet.com/movies/" + data['id']
             else:
-                yield item
+                item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
+            item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
+
+            item['performers'] = []
+            if 'models' in data:
+                for model in data['models']:
+                    item['performers'].append(model['modelName'])
+
+            days = int(self.days)
+            if days > 27375:
+                filterdate = "0000-00-00"
+            else:
+                filterdate = date.today() - timedelta(days)
+                filterdate = filterdate.strftime('%Y-%m-%d')
+
+            if self.debug:
+                if not item['date'] > filterdate:
+                    item['filtered'] = "Scene filtered due to date restraint"
+                print(item)
+            else:
+                if filterdate:
+                    if item['date'] > filterdate:
+                        yield item
+                else:
+                    yield item
 
     def get_scenes(self, response):
         body = re.search(r'({.*})', response.text)

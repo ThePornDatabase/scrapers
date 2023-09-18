@@ -3,7 +3,6 @@ import string
 import unicodedata
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from scrapy.utils.project import get_project_settings
 
 
 class SitePegasProductionsSpider(BaseSceneScraper):
@@ -24,8 +23,6 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         'limiteouvert': '0'
     }
 
-    # ~ custom_settings = {'USE_PROXY': 'True'}
-
     selector_map = {
         'title': '//div[@class="span10"]/h4/text()',
         'description': '//div[@class="span10"]//h5/following-sibling::p[1]/text()',
@@ -38,25 +35,25 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         'external_id': r'\.com/(.*)\?',
         'trailer': '//script[contains(text(), "poster")]/text()',
         're_trailer': r'(http.*?\.mp4)',
-        'pagination': '/videos-porno-tour/page/%s?langue=en'
+        'pagination': '/videos-porno-tour/page/%s?lang=en'
     }
 
     custom_scraper_settings = {
         'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
         'AUTOTHROTTLE_ENABLED': True,
-        # ~ 'USE_PROXY': True,
+        'USE_PROXY': True,
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
         'DOWNLOAD_DELAY': 2,
         'DOWNLOADER_MIDDLEWARES': {
+            # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
             'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
             'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-            'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 100,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -65,40 +62,12 @@ class SitePegasProductionsSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        settings = get_project_settings()
+        yield scrapy.Request("https://www.pegasproductions.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
 
-        if not hasattr(self, 'start_urls'):
-            raise AttributeError('start_urls missing')
-
-        if not self.start_urls:
-            raise AttributeError('start_urls selector missing')
-
-        meta = {}
-        meta['playwright'] = True
-        meta['page'] = self.page
-        if 'USE_PROXY' in self.settings.attributes.keys():
-            use_proxy = self.settings.get('USE_PROXY')
-        elif 'USE_PROXY' in settings.attributes.keys():
-            use_proxy = settings.get('USE_PROXY')
-        else:
-            use_proxy = None
-
-        if use_proxy:
-            print(f"Using Settings Defined Proxy: True ({settings.get('PROXY_ADDRESS')})")
-        else:
-            try:
-                if self.proxy_address:
-                    meta['proxy'] = self.proxy_address
-                    print(f"Using Scraper Defined Proxy: True ({meta['proxy']})")
-            except Exception:
-                print("Using Proxy: False")
-
+    def start_requests2(self, response):
+        meta = response.meta
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page),
-                                 callback=self.parse,
-                                 meta=meta,
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta)
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -112,19 +81,17 @@ class SitePegasProductionsSpider(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
-                                     
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)
+
     def get_scenes(self, response):
         meta = response.meta
         scenes = response.xpath('//span[contains(text(), "Latest") and not(contains(text(), "Girls"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href|//span[contains(text(), "Récentes") and not(contains(text(), "Filles"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href').getall()
         # ~ scenes = response.xpath('//span[contains(text(), "Récentes") and not(contains(text(), "Filles"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href').getall()
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                if "&nats=" in scene:
-                    scene = re.search(r'(.*)&nats=', scene).group(1)
-                scene = scene.replace("?langue=fr", "?langue=en")
-                if "?langue=en" not in scene:
-                    scene = scene + "?langue=en"
+            if "?" in scene:
+                scene = re.search(r'(.*)\?', scene).group(1)
+                scene = scene + "?lang=en&chlg=1&langue=en"
+                meta['id'] = re.search(r'\.com/(.*)\?', scene).group(1)
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):

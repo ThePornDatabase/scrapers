@@ -1,5 +1,4 @@
-from datetime import datetime
-import string
+
 import html
 import scrapy
 import tldextract
@@ -14,11 +13,13 @@ def match_site(argument):
         'horrorporn': "Horror Porn",
         'movieporn': "Movie Porn",
         'perversefamily': "Perverse Family",
+        'perversefamilylive': "Perverse Family Live",
         'spy26': "SPY26",
         'unrealporn': "Unreal Porn",
         'xvirtual': "XVirtual",
     }
     return match.get(argument, argument)
+
 
 class siteUnrealPornSpider(BaseSceneScraper):
     name = 'UnrealPorn'
@@ -31,6 +32,7 @@ class siteUnrealPornSpider(BaseSceneScraper):
         'https://horrorporn.com',
         'https://movieporn.com',
         'https://perversefamily.com',
+        'https://perversefamilylive.com',
         'https://spy26.com',
         'https://unrealporn.com',
         'https://xvirtual.com',
@@ -40,7 +42,7 @@ class siteUnrealPornSpider(BaseSceneScraper):
         'title': '//div[@class="title"]/h2[@class="nice-title"]/text()',
         'description': "//div[@class='desc-text']//p/text()",
         'image': "//meta[@property='og:image']/@content",
-        're_image': '(.*)\?',
+        're_image': r'(.*)\?',
         'tags': '//ul[@class="tags"]/li/a/text()',
         'external_id': '/tour\\/preview\\/(.+)/',
         'trailer': '',
@@ -54,10 +56,10 @@ class siteUnrealPornSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_performers(self, response):
-        return ['Unknown Czech Performer']
+        return []
 
     def get_date(self, response):
-        return datetime.now().isoformat()
+        return ""
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description')).getall()
@@ -65,10 +67,13 @@ class siteUnrealPornSpider(BaseSceneScraper):
             description = " ".join(description)
             return html.unescape(description.strip())
         return ''
- 
+
     def get_parent(self, response):
         return match_site(tldextract.extract(response.url).domain)
-               
+
     def get_site(self, response):
         return match_site(tldextract.extract(response.url).domain)
 
+    def get_image_blob(self, response):
+        image = response.xpath('//meta[@property="og:image"]/@content').get()
+        return self.get_image_blob_from_link(image)

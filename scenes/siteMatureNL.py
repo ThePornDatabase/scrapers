@@ -16,9 +16,10 @@ class SiteMatureNLSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1/text()',
         'description': '//meta[@name="description"]/@content',
-        'date': '//div[@class="box-cnt"]/div[@class="mar-t"][1]/text()[1]',
+        'date': '//span[contains(@title, "Release")]/following-sibling::span[contains(@class, "val-m")][1]/text()',
         're_date': r'(\d{1,2}-\d{1,2}-\d{4})',
         'date_formats': ['%d-%m-%Y'],
+        'duration': '//span[contains(@title, "length")]/following-sibling::span[contains(@class, "val-m")][1]/text()',
         'image': '//span[@id="spnPageUpdateTrailer"]//img/@data-src',
         'image_blob': True,
         'performers': '//div[@class="box-cnt"]//div[@class="grid-tile-model"]/div[@class="name"]/span/text()',
@@ -29,8 +30,21 @@ class SiteMatureNLSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="grid-item"]/div/div/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="grid-item"]')
         for scene in scenes:
+            scenedate = scene.xpath('./div/div//div[contains(@class, "fs-small")]/div[@class="overflow"]/text()')
+            if scenedate:
+                scenedate = scenedate.get()
+                scenedate = re.search(r'(\d{1,2}-\d{1,2}-\d{4})', scenedate)
+                if scenedate:
+                    meta['date'] = self.parse_date(scenedate.group(1), date_formats=['%d-%m-%Y']).strftime('%Y-%m-%d')
+
+            performers = scene.xpath('.//div[@class="card-subtitle"]/a/text()')
+            if performers:
+                meta['performers'] = performers.getall()
+
+            scene = scene.xpath('./div/div/a/@href').get()
             if "/update/" in scene:
                 try:
                     sceneid = re.search(r'\/update\/(\d+)', scene).group(1)
@@ -40,8 +54,7 @@ class SiteMatureNLSpider(BaseSceneScraper):
                 sceneid = re.search(r'upid=(\d+)', scene).group(1)
             scene = "https://www.mature.nl/en/update/" + sceneid.strip() + "/"
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene),
-                                     callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene),callback=self.parse_scene, meta=meta)
 
     def get_performers(self, response):
         performers = super().get_performers(response)

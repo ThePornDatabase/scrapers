@@ -14,10 +14,11 @@ class VrAllureSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//deo-video/@title',
+        'title': '//meta[@property="og:title"]/@content',
+        're_title': r'(.*) - ',
         'description': '//p[@class="desc"]/span/text()',
         'date': '//p[@class="publish-date"]/img/following-sibling::text()',
-        'image': '//deo-video/@cover-image',
+        'image': '//meta[@property="og:image"]/@content',
         'performers': '//p[@class="model-name"]/a/text()',
         'tags': '//p[@class="tag-container"]/a/text()',
         'trailer': '',

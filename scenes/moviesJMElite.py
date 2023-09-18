@@ -44,7 +44,8 @@ class MoviesJMEliteSpider(BaseSceneScraper):
         'studio': '//strong[contains(text(), "Studio:")]/following-sibling::a/text()',
         'director': '//ul[@class="video-detail__infos"]/li[3]/text()',
         'external_id': r'elite/(\d+)/',
-        'pagination': '/en/porn-movies-p-%s.html'
+        # ~ 'pagination': '/en/porn-movies-p-%s.html'
+        'pagination': '/en/porn-movies-jacquie-et-michel-elite-f-1354-p-%s.html'
     }
 
     def get_scenes(self, response):

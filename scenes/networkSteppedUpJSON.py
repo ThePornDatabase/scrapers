@@ -50,3 +50,11 @@ class SiteSteppedUpJSONSpider(BaseSceneScraper):
                 item['url'] = f"https://tour.{scene['site_domain']}/scenes/{scene['slug']}"
 
                 yield self.check_item(item, self.days)
+
+    def get_next_page_url(self, base, page):
+        if "sidechick" in base:
+            pagination = '/videos?page=%s&order_by=publish_date&sort_by=desc'
+        else:
+            pagination = '/scenes?page=%s&order_by=publish_date&sort_by=desc'
+
+        return self.format_url(base, pagination % page)

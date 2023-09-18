@@ -38,6 +38,7 @@ class SiteAdultAuditionsSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
+        meta = response.meta
         scenes = response.xpath('//div[@class="col-sm-3"]/a')
         for scene in scenes:
             image = scene.xpath('./img/@src')
@@ -51,11 +52,13 @@ class SiteAdultAuditionsSpider(BaseSceneScraper):
                         image = None
             else:
                 image = None
+            meta['image'] = image
+            meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
             scene = scene.xpath('./@href').get()
             if scene[0] == ".":
                 scene = scene[1:]
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'image': image})
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
         return ['Amateur', 'Audition']

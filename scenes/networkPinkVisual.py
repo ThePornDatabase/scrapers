@@ -1,5 +1,4 @@
 import re
-from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -68,21 +67,5 @@ class NetworkPinkVisualSpider(BaseSceneScraper):
     def check_item(self, item, days=None):
         if "Elegant Angel" in item['site'] or "Holly Randall" in item['site'] or "ThirdWorldMedia" in item['site']:
             return None
-        if days:
-            if days > 27375:
-                filter_date = '0000-00-00'
-            else:
-                days = self.days
-                filter_date = date.today() - timedelta(days)
-                filter_date = filter_date.strftime('%Y-%m-%d')
-
-            if self.debug:
-                if not item['date'] > filter_date:
-                    item['filtered'] = 'Scene filtered due to date restraint'
-                print(item)
-            if filter_date:
-                if item['date'] > filter_date:
-                    return item
-                return None
         else:
             return item

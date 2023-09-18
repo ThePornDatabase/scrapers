@@ -16,7 +16,7 @@ class IFeelMyselfSpider(BaseSceneScraper):
     selector_map = {
         'external_id': r'media_id=([0-9]+)&',
         'description': '//td[@class="blog_wide_new_text"]/text()',
-        'date': '//span[@class="entryDatestamp"]//text()',
+        'date': '//div[@class="blog-title-right"]/text()',
         'date_formats': ['%d %b %Y'],
         'image': '//img/@src',
         'pagination': '/public/main.php?page=view&mode=all&offset=%s',
@@ -26,24 +26,32 @@ class IFeelMyselfSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % ((page - 1) * 12))
 
     def get_scenes(self, response):
-        for scene in response.xpath('//table[@class="ThumbTab ppss-scene"]'):
-            imagealt = scene.xpath('.//img/@src').get()
-            datealt = scene.xpath('.//td[@class="thumbTXT"]/text()[3]')
-            passdate = ''
-            if datealt:
-                datealt = datealt.get()
-                datealt = re.search(r'(\d{1,2} \w+ \d{4})', datealt)
+        for scene in response.xpath('//table[@class="DispResults"]'):
+            if scene.xpath('.//a[contains(@href, "photoshoot")]'):
+                print("Scene is a Photoshoot, not Video")
+            else:
+                imagealt = scene.xpath('.//img/@src').get()
+                datealt = scene.xpath('.//td[@align="right"]/text()')
+                passdate = ''
                 if datealt:
-                    datealt = datealt.group(1)
-                    passdate = self.parse_date(datealt, ['%d %b %Y']).isoformat()
-            scene = scene.xpath('./tr/td/a/@href').get()
-            split = scene.split("'")
-            scene_id = split[1]
-            artist_id = split[3]
+                    datealt = datealt.get()
+                    datealt = re.search(r'(\d{1,2} \w+ \d{4})', datealt)
+                    if datealt:
+                        datealt = datealt.group(1)
+                        passdate = self.parse_date(datealt, ['%d %b %Y']).isoformat()
+                scenelink = scene.xpath('.//a[contains(@href, "javascript")]').get()
+                try:
+                    split = scenelink.split("'")
+                except:
+                    errortext = scene.xpath('.//b/a[contains(@href, "public")]/../..//text()').getall()
+                    errortext = " ".join(errortext).replace("\n", " ").replace("  ", " ")
+                    print(f"Error on parsing: {errortext}")
+                scene_id = split[1]
+                artist_id = split[3]
 
-            yield scrapy.Request(
-                url="https://ifeelmyself.com/public/main.php?page=flash_player&out=bkg&media_id=" + scene_id + "&artist_id=" + artist_id,
-                callback=self.parse_scene, meta={'site': 'I Feel Myself', 'imagealt': imagealt, 'datealt': passdate})
+                yield scrapy.Request(
+                    url="https://ifeelmyself.com/public/main.php?page=flash_player&out=bkg&media_id=" + scene_id + "&artist_id=" + artist_id,
+                    callback=self.parse_scene, meta={'site': 'I Feel Myself', 'imagealt': imagealt, 'datealt': passdate})
 
     def get_title(self, response):
         title = response.xpath('//span[@class="entryHeadingFlash"]//a[1]/text()').get().replace("_", " ")

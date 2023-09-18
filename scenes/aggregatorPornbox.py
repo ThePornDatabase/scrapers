@@ -5,8 +5,8 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class PornboxSpider(BaseSceneScraper):
-    name = 'Pornbox'
+class PornboxSingleSiteSpider(BaseSceneScraper):
+    name = 'PornboxSingleSite'
     network = 'Pornbox'
     parent = 'Pornbox'
 

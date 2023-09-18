@@ -96,6 +96,9 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
                     item['title'] = self.cleanup_title(title)
                 else:
                     item['title'] = ''
+                image = scene.xpath('.//img/@alt').get()
+                if "compilation" in image.lower():
+                    item['title'] = "Compilation: " + item['title']
 
                 item['date'] = meta['date']
                 item['duration'] = meta['duration']
@@ -107,18 +110,16 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
                     item['image'] = None
 
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['image'] = re.search(r'(.*\.\w{3,4})', item['image']).group(1)
 
                 url = scene.xpath('./div/a[contains(@href,"/model/")]/@href').get()
                 if url:
                     item['url'] = "https://www.atkgirlfriends.com" + url.strip()
                 else:
                     item['url'] = ''
-
-                externalid = item['title'].replace(" ", "-").lower()
-                externalid = re.sub('[^a-zA-Z0-9-]', '', externalid)
-                item['id'] = externalid
-                # ~ item['id'] = re.search(r'/model/(.*?)/', jsondata['solution']['url']).group(1)
-
+                sceneid = re.search(r'.*/(\d+)/', item['image'])
+                if sceneid:
+                    item['id'] = sceneid.group(1)
                 item['performers'] = []
                 item['tags'] = []
                 item['trailer'] = ''
@@ -146,7 +147,6 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
                 return list(map(lambda x: x.strip().title(), tags))
         return []
 
-
     def parse_scene(self, response):
         meta = response.meta
         item = SceneItem()
@@ -159,7 +159,7 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['performers'] = self.get_performers(response)
         item['tags'] = self.get_tags(response)
-        item['id'] = re.search(r'/movie/(.*?)/', response.url).group(1)
+        item['id'] = re.search(r'/movie/(\d+)/', response.url).group(1)
         item['trailer'] = self.get_trailer(response)
         item['url'] = response.url
         item['network'] = "ATK Girlfriends"

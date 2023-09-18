@@ -13,12 +13,12 @@ class SiteSpermCocktailSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@id="boxVidTitle"]/text()',
-        'description': '//p[@id="boxVidDescription"]/text()',
+        'title': '//div[@id="boxVidTitle"]/text()|//div[@class="boxVidTop"]/table//tr[@valign="top"]/td[1]/text()',
+        'description': '//p[@id="boxVidDescription"]/text()|//div[@class="boxVidDescription"]/p/text()',
         'date': '//div[@id="boxVidDetail"]/b[contains(text(), "UPDATED")]/following-sibling::text()',
         'date_formats': ['%b %d, %Y'],
         'image': '',
-        'performers': '//div[@id="boxVidDetail"]/a[contains(@onclick, "Actor")]/text()',
+        'performers': '//div[@id="boxVidDetail"]/a[contains(@onclick, "Actor")]/text()|//div[@class="boxVidTop"]/table//tr[@valign="top"]/td[1]/text()',
         'tags': '',
         'trailer': '',
         'external_id': r'',

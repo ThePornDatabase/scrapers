@@ -13,16 +13,19 @@ class NetworkPornPlusSpider(BaseSceneScraper):
 
     paginations = [
         '/series/strip-club-tryouts',
+        '/series/double-trouble',
         '/series/glory-hole-4k',
         '/series/property-exploits',
         '/series/caged-sex',
         '/series/momcum',
         '/series/bbc-povd',
+        '/series/bikini-splash',
         '/series/creepy-pa',
         '/series/shower-4k',
         '/series/kinky-sluts-4k',
         '/series/asians-exploited',
         '/series/school-of-cock',
+        '/series/throat-creampies',
     ]
 
     selector_map = {

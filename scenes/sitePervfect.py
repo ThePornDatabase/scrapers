@@ -71,4 +71,4 @@ class SitePervfectSpider(BaseSceneScraper):
             item['site'] = "Pervfect"
             item['parent'] = "Pervfect"
             item['network'] = "Pervfect"
-            yield item
+            yield self.check_item(item, self.days)

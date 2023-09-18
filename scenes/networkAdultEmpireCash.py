@@ -1,7 +1,8 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
+true = True
+false = False
 
 class AdultEmpireCashScraper(BaseSceneScraper):
     name = 'AdultEmpireCash'
@@ -19,12 +20,14 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
         # ~ # 'https://cospimps.com',
+        'https://www.hotwivescheating.com',
         'https://www.joannaangel.com',
         'https://www.jonathanjordanxxx.com',
         'https://www.kingsoffetish.com',
         # ~ # 'https://pmggirls.com',
         'https://www.lethalhardcore.com',
         'https://www.smutfactor.com/',
+        'https://realgirlsfuck.com',
         'https://spankmonster.com',
         'https://www.stephousexxx.com',
         'https://www.wcpclub.com',
@@ -43,12 +46,46 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'pagination': '/watch-newest-clips-and-scenes.html?page=%s&hybridview=member'
     }
 
+    cookies = [{"domain":".jayspov.net","expirationDate":1726453662.344982,"hostOnly":false,"httpOnly":true,"name":"cf_clearance","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"xaCoO4P10hFQNhWO.9909OxN.5CI8RvdYnwohf.cZpc-1694917660-0-1-79efa21a.4a4679b3.2eeefdfa-160.0.0"},{"domain":"www.jayspov.net","expirationDate":1696127263.345028,"hostOnly":true,"httpOnly":false,"name":"etoken","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"a1=f3db6f2986568a8105766cb8ba398a2b9b3ff378457e58ea7a1008b06db030fc&a2=2a5137236e1bfa4c76129c3f4d0a266385d4d1a56ea68df00aaab8448ef524f6&a3=99452567261518"},{"domain":"www.jayspov.net","hostOnly":true,"httpOnly":false,"name":"use_lang","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"val=en"},{"domain":"www.jayspov.net","hostOnly":true,"httpOnly":false,"name":"defaults","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"{'hybridView':'member'}"}]
+
+    custom_scraper_settings = {
+        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
+        'CONCURRENT_REQUESTS': 1,
+        'DOWNLOAD_DELAY': 2,
+        'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+        },
+        'DOWNLOAD_HANDLERS': {
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        }
+    }
+
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        meta['playwright'] = True
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
         if "spankmonster" in response.url:
-            scenes = response.xpath('//a[@class="grid-item-details"]/@href').getall()
+            scenes = response.xpath('//a[@class="still-screen"]/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Spank Monster"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "smutfactor" in response.url:
+            scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Smut Factor"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "wcpclub" in response.url:
             scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
@@ -72,7 +109,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta['parent'] = "Horny Household Clips"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "stephousexxx" in response.url:
-            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Stephouse XXX"
@@ -96,8 +133,14 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta = {}
                 meta['site'] = "Brutha's Inc"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "realgirlsfuck" in response.url:
+            scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Real Girls Fuck"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "18lust" in response.url:
-            scenes = response.xpath('//div[@class="animated-screenshot-container"]/a/@href').getall()
+            scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
             for scene in scenes:
                 meta = {}
                 meta['site'] = "18lustclips"
@@ -107,6 +150,12 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Jays POV"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "hotwivescheating" in response.url:
+            scenes = response.xpath('//a[contains(@class,"scene-update-details")]/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Hotwives Cheating"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "thirdworld" in response.url:
             meta = response.meta
@@ -149,10 +198,14 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def get_site(self, response):
         if 'jayspov' in response.url:
             return 'Jays POV'
+        if 'hotwivescheating' in response.url:
+            return 'Hotwives Cheating'
         if 'joannaangel' in response.url:
             return 'Joanna Angel'
         if 'smutfactor' in response.url:
             return 'Smut Factor'
+        if 'realgirlsfuck' in response.url:
+            return 'Real Girls Fuck'
         if 'wcpclub' in response.url:
             return 'West Coast Productions'
 
@@ -163,6 +216,10 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             return 'Jays POV'
         if 'joannaangel' in response.url:
             return 'Joanna Angel'
+        if 'hotwivescheating' in response.url:
+            return 'Hotwives Cheating'
+        if 'realgirlsfuck' in response.url:
+            return 'Real Girls Fuck'
         if 'smutfactor' in response.url:
             return 'Smut Factor'
         if 'thirdworld' in response.url:
@@ -201,6 +258,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/watch-newest-smut-factor-clips-and-scenes.html?page=%s&hybridview=member"
         if "spankmonster" in base:
             pagination = "/spank-monster-updates.html?page=%s&hybridview=member"
+        if "realgirlsfuck" in base:
+            pagination = "/watch-newest-real-girls-fuck-clips-and-scenes.html?page=%s&hybridview=member"
         if "stephousexxx" in base:
             pagination = "/watch-newest-step-house-xxx-clips-and-scenes.html?page=%s&hybridview=member"
         if "jonathanjordanxxx" in base:
@@ -209,6 +268,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/kings-of-fetish-newest-perverted-clips.html?page=%s&hybridview=member"
         if "bruthasinc" in base:
             pagination = "/watch-newest-bruthas-inc-clips-and-scenes.html?page=%s&hybridview=member"
+        if "hotwivescheating" in base:
+            pagination = "/hot-wives-cheating-updates.html?page=%s&hybridview=member"
 
         return self.format_url(base, pagination % page)
 

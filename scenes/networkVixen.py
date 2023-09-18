@@ -18,6 +18,7 @@ class VixenScraper(BaseSceneScraper):
         'https://www.blackedraw.com',
         'https://www.tushyraw.com',
         'https://www.deeper.com',
+        'https://www.milfy.com',
         'https://www.slayed.com',
     ]
 
@@ -29,6 +30,7 @@ class VixenScraper(BaseSceneScraper):
         'TUSHYRAW': 'TushyRaw',
         'DEEPER': 'Deeper',
         'SLAYED': 'Slayed',
+        'MILFY': 'Milfy',
     }
 
     selector_map = {

@@ -1,3 +1,4 @@
+# Part of AdultPrime
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -7,7 +8,7 @@ class SiteHotTSSpider(BaseSceneScraper):
     name = 'HotTS'
 
     start_urls = [
-        'https://hotts.com/',
+        # ~ 'https://hotts.com/',
     ]
 
     selector_map = {

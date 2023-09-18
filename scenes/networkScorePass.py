@@ -63,6 +63,7 @@ def match_site(argument):
         'pornmegaload': "PornMegaLoad",
         'sarennasworld': "Sarennas World",
         'scoreland': "Scoreland",
+        'scoreland2': "Scoreland2",
         'scorevideos': "Score Videos",
         'sharizelvideos': "Sharizel Videos",
         'silversluts': "Silver Sluts",
@@ -92,6 +93,7 @@ def match_page_scenepath(argument):
         'naughtytugs': "/hand-job-videos/?page=%s",
         'pickinguppussy': "/xxx-teen-videos/?page=%s",
         'pornmegaload': "/hd-porn-scenes/?page=%s",
+        'scoreland2': "/big-boob-scenes/?page=%s",
         'titsandtugs': "/big-boob-videos/?page=%s",
         'tnatryouts': "/xxx-teen-videos/?page=%s",
     }
@@ -114,6 +116,7 @@ class ScorePassSpider(BaseSceneScraper):
         'https://www.naughtyfootjobs.com',
         'https://www.naughtytugs.com',
         'https://www.pickinguppussy.com',
+        'https://www.scoreland2.com',
         'https://www.titsandtugs.com',
         'https://www.tnatryouts.com',
 
@@ -189,6 +192,18 @@ class ScorePassSpider(BaseSceneScraper):
         # 'https://www.scorevideos.com',
         # 'https://www.xlgirls.com'
     ]
+
+    custom_scraper_settings = {
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 120,
+        'CONCURRENT_REQUESTS': 1,
+        # ~ 'DOWNLOAD_DELAY': 60,
+        # ~ 'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'CONCURRENT_REQUESTS_PER_IP': 1,
+        'DOWNLOAD_FAIL_ON_DATALOSS': False,
+    }
 
     selector_map = {
         'title': "#videos_page-page h1::text",
@@ -365,3 +380,15 @@ class ScorePassSpider(BaseSceneScraper):
         parent = tldextract.extract(response.url).domain
         parent = match_site(parent)
         return parent
+
+    def get_image(self, response):
+        orig_image = super().get_image(response)
+        image = response.xpath('//script[contains(text(), "load_player")]/text()')
+        if image:
+            image = re.search(r'poster.*?(http.*?)[\'\"]', image.get())
+            if image:
+                return self.format_link(response, image.group(1))
+        image = response.xpath('//video/@poster')
+        if image:
+            return self.format_link(response, image.get())
+        return orig_image

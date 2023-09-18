@@ -53,7 +53,33 @@ class SiteJamieYoungSpider(BaseSceneScraper):
             req = requests.get(link, headers=reqheaders, timeout=10)
             if req and len(req.text) > 5:
                 imagelist = json.loads(req.text)
-                item['image'] = imagelist[0]['guid']['rendered']
+                images = re.findall(r'https.*?\.(?:png|jpg)', imagelist[0]['description']['rendered'])
+                imagelink = None
+                if len(images):
+                    if not imagelink:
+                        for image in images:
+                            if "2048x" in image:
+                                imagelink = image
+
+                    if not imagelink:
+                        for image in images:
+                            if "1536x" in image:
+                                imagelink = image
+
+                    if not imagelink:
+                        for image in images:
+                            if "1200x" in image:
+                                imagelink = image
+
+                    if not imagelink:
+                        for image in images:
+                            if "1024x" in image:
+                                imagelink = image
+
+                if not imagelink:
+                    item['image'] = imagelist[0]['guid']['rendered']
+                else:
+                    item['image'] = imagelink
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['performers'] = []

@@ -11,7 +11,7 @@ class PornprosSpider(BaseSceneScraper):
     name = 'PornProsProper'
     network = 'Porn Pros'
 
-    start_url = "https://pornpros.com/"
+    #start_url = "https://pornpros.com/"  # Disabled, left for historical info
 
     paginations = [
         ['/site/18yearsold?page=%s', '18 Years Old'],

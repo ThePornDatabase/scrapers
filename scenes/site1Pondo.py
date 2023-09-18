@@ -43,7 +43,10 @@ class Site1PondoSpider(BaseSceneScraper):
             item['network'] = "D2Pass"
             item['type'] = "Scene"
 
-            item['title'] = self.cleanup_title(scene['TitleEn'])
+            if scene['TitleEn']:
+                item['title'] = self.cleanup_title(scene['TitleEn'])
+            else:
+                item['title'] = None
             if scene['DescEn']:
                 item['description'] = self.cleanup_description(scene['DescEn'])
             else:
@@ -61,4 +64,5 @@ class Site1PondoSpider(BaseSceneScraper):
                 item['tags'].append("Asian")
             for trailer in scene['SampleFiles']:
                 item['trailer'] = trailer['URL']
-            yield self.check_item(item, self.days)
+            if item['title']:
+                yield self.check_item(item, self.days)

@@ -14,21 +14,26 @@ class SiteRealJamVRSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h1[contains(@class, "header-title")]/text()',
-        'description': '//div[contains(@class, "item-desc")]//text()',
-        'date': '//div[contains(@class, "item-header-date")]/span/following-sibling::text()',
-        're_date': r'(\w+ \d{1,2}, \d{4})',
+        'title': '//h1/text()',
+        'description': '//div[contains(@class,"opacity-75")]/text()',
+        'date': '//i[contains(@class, "bi-calendar")]/../../strong/text()',
         'date_formats': ['%B %d, %Y'],
-        'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[contains(@class, "item-header-featuring")]/a/text()',
-        'tags': '//div[contains(@class, "video-item-tags")]/a/text()',
+        'duration': '//i[contains(@class, "bi-clock-history")]/../../strong/text()',
+        'image': '//dl8-video/@poster',
+        'performers': '//div[contains(text(), "Starring")]/a/text()',
+        'tags': '//div[contains(text(), "Tags")]/a/text()',
         'trailer': '',
-        'external_id': r'/id/(.*)',
-        'pagination': '/virtualreality/list/page/%s'
+        'external_id': r'/scene/(.*)',
+        'pagination': '/scenes/?page=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"list-item")]/a[contains(@class, "list-link")]/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="panel"]')
         for scene in scenes:
+            trailer = scene.xpath('.//video/source/@src')
+            if trailer:
+                meta['trailer'] = trailer.get()
+            scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

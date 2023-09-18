@@ -45,42 +45,74 @@ class NetworkJavHDSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
+        meta = response.meta
         jsondata = response.json()
-        print(jsondata)
+        # ~ print(jsondata)
         data = jsondata['template']
         data = data.replace("\n", "").replace("\t", "").replace("\r", "").replace("  ", " ").strip()
         data = data.replace("  ", " ").strip()
         data = data.replace("  ", " ").strip()
         data = data.replace("  ", " ").strip()
         sel = Selector(text=data)
-        scenes = sel.xpath('//thumb-component/@link-content').getall()
+        scenes = sel.xpath('//thumb-component')
+
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, cookies=self.cookies)
+            meta['image'] = scene.xpath('./@url-thumb').get()
+            meta['trailer'] = scene.xpath('./@video-preview').get()
+            scene = scene.xpath('./@link-content').get()
+            meta['id'] = None
+            sceneid = re.search(r'id/(\d+)/', scene)
+            if sceneid:
+                meta['id'] = sceneid.group(1)
+
+            if not meta['id']:
+                sceneid = re.search(r'video/(\d+)$', scene)
+                if sceneid:
+                    meta['id'] = sceneid.group(1)
+
+            if meta['id']:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, cookies=self.cookies, meta=meta)
 
     def get_image(self, response):
-        externid = re.search(r'id/(\d+)/', response.url).group(1)
-        payload = {'X-Requested-With': 'XMLHttpRequest', 'Cookie': 'locale=en'}
-        headers = {}
-        url = "https://javhd.com/en/player/" + externid.strip() + "?is_trailer=1"
+        externid = re.search(r'id/(\d+)/', response.url)
         if externid:
-            image = requests.post(url, data=json.dumps(payload), headers=headers)
-            jsondata = image.json()
-            image = jsondata['poster'].strip()
-            return image
-        return ''
+            externid = externid.group(1)
+            payload = {'X-Requested-With': 'XMLHttpRequest', 'Cookie': 'locale=en'}
+            headers = {}
+            url = "https://javhd.com/en/player/" + externid.strip() + "?is_trailer=1"
+            if externid:
+                image = requests.post(url, data=json.dumps(payload), headers=headers)
+                jsondata = image.json()
+                image = jsondata['poster'].strip()
+                return image
+            return ''
+        else:
+            image = re.search(r'poster\:.*?[\'\"](http.*?)[\'\"]', response.text)
+            if image:
+                image = image.group(1)
+                return image
+            return ''
 
     def get_trailer(self, response):
-        externid = re.search(r'id/(\d+)/', response.url).group(1)
-        payload = {'X-Requested-With': 'XMLHttpRequest', 'Cookie': 'locale=en'}
-        headers = {}
-        url = "https://javhd.com/en/player/" + externid.strip() + "?is_trailer=1"
+        externid = re.search(r'id/(\d+)/', response.url)
+        trailer = None
         if externid:
-            trailer = requests.post(url, data=json.dumps(payload), headers=headers)
-            jsondata = trailer.json()
-            trailer = jsondata['sources'][0]['src'].strip()
+            externid = externid.group(1)
+            payload = {'X-Requested-With': 'XMLHttpRequest', 'Cookie': 'locale=en'}
+            headers = {}
+            url = "https://javhd.com/en/player/" + externid.strip() + "?is_trailer=1"
+            if externid:
+                trailer = requests.post(url, data=json.dumps(payload), headers=headers)
+                jsondata = trailer.json()
+                trailer = jsondata['sources'][0]['src'].strip()
+        else:
+            trailer = re.search(r'poster\:.*?[\'\"](http.*?)[\'\"]', response.text)
+            if trailer:
+                trailer = trailer.group(1)
+
+        if trailer and "mp4" in trailer:
             return trailer
-        return ''
+        return None
 
     def get_description(self, response):
         description = super().get_description(response)

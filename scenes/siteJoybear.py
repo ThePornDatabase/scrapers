@@ -14,7 +14,7 @@ class SiteJoybearSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="wide grey"]/div/span[@class="wide title"]/text()',
+        'title': '//div[@class="wide grey"]/div/span[@class="wide title"]/text()|//span[@class="wide title"]/strong/text()',
         'description': '//div[@class="wide grey"]/div/span[@class="wide text"]/text()',
         'date': '//span[@class="wide source"]/text()[contains(., "Published")]',
         're_date': r'(\d{1,2}\w{2}? \w+ \d{4})',

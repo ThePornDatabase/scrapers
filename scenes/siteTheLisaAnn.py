@@ -29,7 +29,7 @@ class SiteTheLisaAnnSpider(BaseSceneScraper):
             item['site'] = "The Lisa Ann"
             item['parent'] = "The Lisa Ann"
             item['network'] = "The Lisa Ann"
-            item['date'] = self.parse_date('today').isoformat()
+            item['date'] = ""
 
             item['title'] = self.cleanup_title(scene.xpath('.//h3/a/text()').get())
             item['image'] = self.format_link(response, scene.xpath('.//img/@src').get())

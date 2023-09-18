@@ -16,7 +16,7 @@ def match_site(argument):
         '1000facials': "1000 Facials",
         '21sextreme': "21Sextreme",
         '21naturals': "21Naturals",
-        'activeduty': "Active Duty",
+        # ~ 'activeduty': "Active Duty",
         'allblackx': "All BlackX",
         'allgirlmassage': "All Girl Massage",
         'analacrobats': "Anal Acrobats",
@@ -116,7 +116,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # 'https://www.trannyfrombrazil.com',
 
 
-        'https://www.blowpass.com',
+        # 'https://www.blowpass.com',  Moved to Adult Time API
         # 'https://www.1000facials.com',
         # 'https://www.immorallive.com',
         # 'https://www.mommyblowsbest.com',
@@ -165,7 +165,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         # Standalone Sites
         ##############################
         # 'https://www.21naturals.com', Moved to AdultTime API
-        'https://www.activeduty.com',
+        # 'https://www.activeduty.com', Moved to Adulttime API
         # 'https://www.analacrobats.com', No longer active
         'https://www.bigfatcreampie.com',
         'https://www.bskow.com',
@@ -175,7 +175,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.christophclarkonline.com/',
         'https://www.cumshotoasis.com',
         'https://www.currycreampie.com',
-        # ~ 'https://www.dpfanatics.com', Moved to AdultTime API
+        # ~ # 'https://www.dpfanatics.com', Moved to AdultTime API
         'https://www.falconstudios.com',
         # 'https://www.footsiebabes.com', Moved to Adult Time API
         'https://www.gapingangels.com',
@@ -201,7 +201,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.povblowjobs.com',
         # 'https://www.povthis.com', Moved to Adult Time API
         # 'https://www.prettydirty.com', Moved to Adult Time API
-        'https://www.ragingstallion.com',
+        # 'https://www.ragingstallion.com', Moved to Adulttime
         'http://www.seemyflixxx.com',
         'https://www.soapymassage.com',
         'https://www.squirtingorgies.com',

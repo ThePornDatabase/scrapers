@@ -1,7 +1,9 @@
 import re
+import string
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
 class SitePornDudeCastingSpider(BaseSceneScraper):
@@ -9,7 +11,6 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
     network = 'Porn Dude Casting'
     parent = 'Porn Dude Casting'
     site = 'Porn Dude Casting'
-    days = 90
 
     start_urls = [
         'https://porndudecasting.com',
@@ -26,23 +27,6 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/latest-updates/%s/?sort_by=post_date&sort_by=post_date&sort_by=post_date'
     }
-
-    # ~ def start_requests(self):
-        # ~ if self.days < 90:
-            # ~ self.days = 90
-        # ~ url = "https://porndudecasting.com/latest-updates/"
-        # ~ yield scrapy.Request(url,
-                             # ~ callback=self.parse,
-                             # ~ meta={'page': self.page},
-                             # ~ headers=self.headers,
-                             # ~ cookies=self.cookies)
-
-    # ~ def parse(self, response, **kwargs):
-        # ~ scenes = self.get_scenes(response)
-        # ~ count = 0
-        # ~ for scene in scenes:
-            # ~ count += 1
-            # ~ yield scene
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="thumb__gallery"]/div/a[@class="thumb__gallery-col"][1]/@data-href').getall()
@@ -66,9 +50,59 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         return tags
 
     def get_date(self, response):
+        date = response.xpath('//div[@id="casting-block"]/div[contains(@class, "video__player")]/@data')
+        if date:
+            date = date.get()
+            if re.search(r'(\d{2}/\d{2}/\d{2})', date):
+                date = re.search(r'(\d{2}/\d{2}/\d{2})', date).group(1)
+                date = self.parse_date(date, date_formats=['%m/%d/%y']).isoformat()
+                return date
         date = self.process_xpath(response, self.get_selector_map('date'))
         if date:
             date = date.get()
             date = date.strip().replace(" ", " 1, ")
             return self.parse_date(date).isoformat()
-        return self.parse_date('today').isoformat()
+        return ''
+
+    def get_markers(self, response):
+        markers = []
+        durations = response.xpath('//li[contains(@class, "info-item")]/span//div[contains(@class, "time")]')
+        for duration in durations:
+            time = duration.xpath('./text()')
+            if time:
+                time = self.duration_to_seconds(time.get())
+            marker = duration.xpath('./@class')
+            if marker:
+                marker = marker.get()
+                if "time" in marker:
+                    marker = re.search(r'time (.*)', marker).group(1)
+                marker = string.capwords(marker)
+            if time and marker:
+                marking = {}
+                marking['name'] = marker
+                marking['start'] = time
+                markers.append(marking)
+        return markers
+
+    def parse_scene(self, response):
+        item = SceneItem()
+        item['title'] = self.get_title(response)
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = self.get_date(response)
+        item['image'] = self.get_image(response)
+        if "?" in item['image']:
+            item['image'] = re.search(r'(.*)\?', item['image']).group(1)
+        item['image_blob'] = self.get_image_blob(response)
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['markers'] = self.get_markers(response)
+        item['id'] = self.get_id(response)
+        item['trailer'] = self.get_trailer(response)
+        item['duration'] = self.get_duration(response)
+        item['url'] = self.get_url(response)
+        item['network'] = self.get_network(response)
+        item['parent'] = self.get_parent(response)
+        item['type'] = 'Scene'
+
+        yield self.check_item(item, self.days)

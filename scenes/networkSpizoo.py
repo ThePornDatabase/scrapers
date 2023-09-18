@@ -69,7 +69,7 @@ class SpizooSpider(BaseSceneScraper):
             titlexpath = '//div[@class="title"]/h1/text()'
         matches = ["firstclasspov", "mrluckypov"]
         if any(x in response.url for x in matches):
-            titlexpath = '//section[@id="scene"]/div/div/div/h1/text()'
+            titlexpath = '//section[@id="scene"]/div/div/div/h1/text()|//div[@class="title"]/h1/text()'
         if "rawattack" in response.url:
             titlexpath = '//title/text()'
         if "realsensual" in response.url:

@@ -31,3 +31,19 @@ class FiveKPornSpider(BaseSceneScraper):
         rsp = HtmlResponse(url=response.url, body=response.json()['html'], encoding='utf-8')
         for scene in rsp.css('.thumb-holder a::attr(href)').getall():
             yield scrapy.Request(url=scene, callback=self.parse_scene, cookies=self.cookies)
+
+    def get_site(self, response):
+        site = response.xpath('//p[contains(@class,"trailer-starring")]/span/text()')
+        if site:
+            site = site.get()
+            if "5kteen" in site.lower():
+                return "5K Teens"
+        return "5K Porn"
+
+    def get_parent(self, response):
+        site = response.xpath('//p[contains(@class,"trailer-starring")]/span/text()')
+        if site:
+            site = site.get()
+            if "5kteen" in site.lower():
+                return "5K Teens"
+        return "5K Porn"

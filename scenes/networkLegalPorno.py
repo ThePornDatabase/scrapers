@@ -1,5 +1,5 @@
 import scrapy
-from scrapy.utils.project import get_project_settings
+import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -8,41 +8,38 @@ class LegalPornoSpider(BaseSceneScraper):
     name = 'LegalPorno'
     network = 'Legal Porno'
 
-    settings = get_project_settings()
-    proxy_address = settings.get('PROXY_ADDRESS')
-
     start_urls = [
         'https://www.analvids.com',
-        # ~ 'https://pornworld.com'  # Located in networkLegaPornoPornworld.py
+        # ~ 'https://pornworld.com'  # Located in networkLegalPornoPornworld.py
     ]
 
     selector_map = {
-        'title': "//h1[@class='watchpage-title']//text()",
-        'description': '//div[@class="scene-description__row" and contains(., "Description")]//following-sibling::dd/text()',
-        'date': "//span[@class='scene-description__detail']//a[1]/text()",
-        'performers': "//h1[@class='watchpage-title']/a[contains(@href, '/model/')]/text()|//div[@class='scene-description__row']//dd//a[contains(@href, '/model/') and not(contains(@href, 'forum'))]/text()",
-        'tags': "//div[@class='scene-description__row']//dd//a[contains(@href, '/niche/')]/text()",
-        'duration': "//i[@class='fa fa-clock-o']/following-sibling::text()",
-        'external_id': '\\/watch\\/(\\d+)',
+        'title': '//h1[contains(@class, "title")]/text()',
+        'description': '//div[contains(@class, "text-light") and contains(text(), "Description")]/following-sibling::div[1]/text()',
+        'date': '//i[contains(@class, "calendar")]/text()',
+        'image': '//video/@data-poster',
+        'performers': '//span[contains(@class, "featuring_models")]/a/text()',
+        'tags': '//div[contains(@class, "genres-list")]/a[contains(@href, "genre/")]/text()',
+        'duration': '//i[contains(@class, "clock")]/text()',
+        'external_id': r'/watch/(\d+)',
         'trailer': '',
         'pagination': '/new-videos/%s'
     }
 
-    def get_image(self, response):
-        return response.xpath(
-            '//div[@id="player"]/@style').get().split('url(')[1].split(')')[0]
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        if self.limit_pages == 1:
+            self.limit_pages = 10
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_site(self, response):
-        return response.css('.studio-director__studio a::text').get().strip()
+        return response.xpath('//span[contains(text(), "Studio")]/following-sibling::a/text()').get().strip()
 
     def get_scenes(self, response):
         meta = response.meta
-        """ Returns a list of scenes
-        @url https://pornworld.com/new-videos/1
-        @returns requests 50 150
-        """
-        scenes = response.css(
-            '.thumbnails .thumbnail .thumbnail-title a::attr(href)').getall()
+        scenes = response.xpath('//div[@class="card-scene"]/div[1]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 
@@ -65,6 +62,7 @@ class LegalPornoSpider(BaseSceneScraper):
         item['date'] = self.get_date(response)
         item['image'] = self.get_image(response)
         item['image_blob'] = self.get_image_blob(response)
+        item['image'] = re.search(r'(.*)\?', item['image']).group(1)
         item['performers'] = self.get_performers(response)
         item['tags'] = self.get_tags(response)
         item['markers'] = self.get_markers(response)
@@ -75,5 +73,10 @@ class LegalPornoSpider(BaseSceneScraper):
         item['network'] = self.get_network(response)
         item['parent'] = 'Legal Porno'
 
-        if "bang bros" not in item['site'].lower() and "jeffsmodels" not in item['site'].lower() and "antoniosuleiman" not in item['site'].lower():
+        matches = ['bangbros', 'jeffsmodels', 'private', 'antoniosuleiman', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
+                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
+                   'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
+                   'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
+                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny']
+        if not any(x in item['site'].lower().replace(" ", "") for x in matches):
             yield self.check_item(item, self.days)

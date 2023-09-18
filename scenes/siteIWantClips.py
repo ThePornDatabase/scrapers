@@ -30,6 +30,9 @@ class SiteIWantClipsSpider(BaseSceneScraper):
             raise AttributeError('start_urls selector missing')
         page = int(self.page) - 1
 
+        if self.limit_pages == 1:
+            self.limit_pages = 50
+
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, page + 1), callback=self.parse_token, meta={'page': page, 'url': link}, cookies=self.cookies)
 

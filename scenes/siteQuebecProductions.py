@@ -1,7 +1,7 @@
 import re
 import string
 import scrapy
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -34,7 +34,6 @@ class SiteQuebecProductionsSpider(BaseSceneScraper):
                 yield scrapy.Request(url=(self.format_link(response, scene)), callback=(self.parse_scene))
 
     def get_title(self, response):
-        translator = Translator()
         title = super().get_title(response).lower()
         if title:
             if title == 'salope de bureau':
@@ -42,28 +41,26 @@ class SiteQuebecProductionsSpider(BaseSceneScraper):
             elif title == 'voleuses cochonnes':
                 title = 'Dirty Thieves'
             else:
-                title = translator.translate((title.lower()), src='fr', dest='en')
+                title = GoogleTranslator(source='fr', target='en').translate(title.lower())
                 title = string.capwords(title.text)
         return title
 
     def get_description(self, response):
-        translator = Translator()
         description = response.xpath('//div[contains(@class,"sceneDesc")]//text()')
         if description:
             description = list(map(lambda x: x.strip(), description.getall()))
             description = ' '.join(description)
-            description = translator.translate((description.strip()), src='fr', dest='en')
+            description = GoogleTranslator(source='fr', target='en').translate(description.strip())
             description = description.text.strip()
             return description
         return ''
 
     def get_tags(self, response):
-        translator = Translator()
         tags = super().get_tags(response)
         if tags:
             tags2 = []
             for tag in tags:
-                tag = translator.translate(tag, src='fr', dest='en')
+                tag = GoogleTranslator(source='fr', target='en').translate(tag)
                 tag = tag.text
                 tag = tag.lower().replace('cat', 'pussy')
                 tag = tag.lower().replace('buttocks', 'ass')

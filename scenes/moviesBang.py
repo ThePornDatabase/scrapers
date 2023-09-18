@@ -1,130 +1,154 @@
 import re
-import base64
-import string
+import html
 import json
+import unidecode
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class MoviesBangSpider(BaseSceneScraper):
+class SiteBangMoviesSpider(BaseSceneScraper):
     name = 'BangMovies'
     network = 'Bang'
     parent = 'Bang'
-    store = 'Bang'
+
+    start_urls = [
+        'https://www.bang.com',
+    ]
 
     selector_map = {
-        'external_id': 'video/(.+)'
+        'title': '',
+        'description': '',
+        'date': '',
+        'image': '',
+        'performers': '',
+        'tags': '//div[contains(@class, "actions")]/a[contains(@href, "with")]/text()',
+        'duration': '',
+        'trailer': '',
+        'external_id': r'video/(.*?)/',
+        'pagination': '',
+        'type': 'Scene',
     }
 
-    per_page = 10
-
-    def start_requests(self):
-        if self.page:
-            page = int(self.page)
-        else:
-            page = 0
-
-        yield scrapy.Request(
-            url='https://www.bang.com/api/search/dvds/dvd/_search',
-            method='POST',
-            headers={'Content-Type': 'application/json'},
-            meta={'page': page},
-            callback=self.parse,
-            body=json.dumps(self.get_elastic_payload(self.per_page, 0))
-        )
+    def get_next_page_url(self, base, page):
+        # ~ pagination = f"https://www.bang.com/movies?by=date.desc&page={page}"
+        pagination = f"https://www.bang.com/studio/157/video-art-holland/movies?by=date.desc&page={page}"
+        # ~ pagination = f"https://www.bang.com/studio/239/melting-images/movies?by=trending&page={page}"
+        # ~ pagination = f"https://www.bang.com/videos?by=date.desc&in=BANG%21%20Real%20Teens&page={page}"
+        # ~ pagination = f"https://www.bang.com/videos?in=BANG!%20Surprise&page={page}"
+        return pagination
 
     def parse(self, response, **kwargs):
-        movies = response.json()['hits']['hits']
-        movies = self.parse_movie_internal(movies)
+        meta = response.meta
+        movies = self.get_movies(response)
         count = 0
         for movie in movies:
             count += 1
+            meta['movie'] = movie
             yield movie
+            # ~ for sceneurl in movie['sceneurls']:
+                # ~ yield scrapy.Request(self.format_link(response, sceneurl), meta=meta, callback=self.parse_scene, headers=self.headers, cookies=self.cookies)
 
-        if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-            next_page = response.meta['page'] + 1
-            if (next_page * self.per_page) > response.json()['hits']['total']:
-                return
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
-            print('NEXT PAGE: ' + str(next_page))
-            yield scrapy.Request(url='https://www.bang.com/api/search/dvds/dvd/_search', method='POST', headers={'Content-Type': 'application/json'}, callback=self.parse, meta={'page': next_page}, body=json.dumps(self.get_elastic_payload(self.per_page, self.per_page * next_page)))
-
-    def parse_movie_internal(self, jsondata):
-        # ~ print(jsondata)
-        for movie in jsondata:
-            # ~ print(f'JSON: {movie}')
-            item = SceneItem()
-            item['format'] = string.capwords(movie['_type'])
-            if "dvd" not in item['format'].lower():
-                print(f'Type: {item["format"]}')
-            movie = movie['_source']
-            # ~ print ("   ")
-            item['id'] = movie['id']
-            item['trailer'] = ''
-
-            item['parent'] = string.capwords(movie['studio']['name'])
-            item['site'] = string.capwords(movie['studio']['name'])
-            item['store'] = self.store
-            item['network'] = self.store
-            item['title'] = string.capwords(movie['name'])
-            item['description'] = movie['description']
-            item['date'] = movie['releaseDate']
-            item['tags'] = list(map(lambda x: string.capwords(x['name']), movie['genres']))
-            item['performers'] = []
-            item['performers'] = list(map(lambda x: string.capwords(x['name']), movie['actors']))
-            item['image'] = f'https://i.bang.com/covers/{movie["identifier"]}/front.jpg'
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['back'] = f'https://i.bang.com/covers/{movie["identifier"]}/back.jpg'
-            item['back_blob'] = self.get_image_blob_from_link(item['back'])
-            if not item['back_blob']:
-                item['back'] = None
-
-            encode_url = self.encode_url(movie['id'])
-            item['url'] = f'https://www.bang.com/dvd/{encode_url}'
-
-            item['director'] = None
-            item['duration'] = None
-            item['sku'] = str(movie['identifier'])
-            item['type'] = 'Movie'
-
-            movie_query = '{"sort":[{"order":{"order":"asc"}}],"query": {"bool": {"must": [{"match": {"status": "ok"}}, {"nested": {"path": "dvd", "query": {"bool": {"must": [{"match": {"dvd.mongoId": {"query": "' + item['id'] + '", "operator": "AND"}}} ]}}}} ], "must_not": [{"match": {"type": "trailer"}} ]}}}'
-            # ~ print(movie_query)
-            yield scrapy.Request(url='https://www.bang.com/api/search/videos/video/_search', method='POST', headers={'Content-Type': 'application/json'}, meta={'item': item}, callback=self.parse_scenes, body=movie_query)
-
-    def parse_scenes(self, response):
-        item = response.meta['item']
-        item['markers'] = []
-        duration = 0
-        movies = response.json()['hits']['hits']
+    def get_movies(self, response):
+        meta = response.meta
+        movies = response.xpath('//div[contains(@class,"movie-preview")]/a/@href').getall()
         for movie in movies:
-            movie = movie['_source']
-            if "actions" in movie:
-                for timetag in movie['actions']:
-                    timestamp = {}
-                    timestamp['name'] = self.cleanup_title(timetag['name'])
-                    timestamp['start'] = str(int(timetag['timestamp']) + duration)
-                    timestamp['end'] = None
-                    item['markers'].append(timestamp)
-                    item['tags'].append(timestamp['name'])
-            if "genres" in movie:
-                for genre in movie['genres']:
-                    item['tags'].append(genre['name'])
-            duration = duration + int(movie['duration'])
-        item['duration'] = str(duration)
-        item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
-        if item['title'] and 'dvd' in item['format'].lower() and "bluebirdfilms" not in item['site'].lower().replace(" ", ""):
+            movieurl = self.format_link(response, movie)
+            yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse_movie(self, response):
+        meta = response.meta
+        scene_count = response.xpath('//div[@class="scene-section" and not(contains(./div/h2/text(), "Bonus"))]')
+        if len(scene_count) > 1:
+            item = SceneItem()
+            jsondata = response.xpath('//script[contains(@type, "json") and contains(text(), "duration")]/text()')
+            if jsondata:
+                jsondata = json.loads(jsondata.get(), strict=False)
+                item['title'] = self.cleanup_title(unidecode.unidecode(jsondata['name'])).replace("&", "and")
+                item['date'] = jsondata['datePublished']
+                if 'description' in jsondata:
+                    item['description'] = html.unescape(jsondata['description'])
+                else:
+                    item['description'] = ''
+                item['image'] = jsondata['thumbnailUrl']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['id'] = response.xpath('//a[contains(@href, "related-movie")]/@href').get()
+                item['id'] = re.search(r'movie=(.*)$', item['id']).group(1)
+                item['type'] = 'Movie'
+                item['url'] = response.url
+                item['duration'] = self.duration_to_seconds(jsondata['duration'])
+                item['performers'] = []
+                for person in jsondata['actor']:
+                    item['performers'].append(person['name'])
+
+                item['tags'] = response.xpath('//div[@class="relative"]/div/a[@class="genres"]/text()').getall()
+
+                item['site'] = re.sub('[^a-zA-Z0-9-]', '', response.xpath('//p[contains(text(), "Studio:")]/a/text()').get())
+                item['trailer'] = ""
+                item['store'] = 'Bang'
+                item['network'] = 'Bang'
+                item['parent'] = item['site']
+
+                # ~ sceneurls = response.xpath('//div[@class="scene-section"]/div/div/a[contains(@href, "/video/")][1]/@href').getall()
+                item['scenes'] = []
+                scenes = response.xpath('//div[@class="scene-section"]')
+                sceneurls = []
+                for scene in scenes:
+                    sceneurls.append(scene.xpath('.//h2/following-sibling::div[1]/a[1]/@href').get())
+                    sceneid = scene.xpath('.//div[contains(@class, "hidden") and contains(@class, "px-4")]/a[1]/@href').get()
+                    if "related-video" in sceneid:
+                        sceneid = re.search(r'related-video=(\w+)', sceneid).group(1)
+                    item['scenes'].append({'site': item['site'], 'external_id': sceneid})
+                meta['movie'] = item.copy()
+                # ~ matches = ['private', 'bluebird', 'lethalhardcore', 'thagson', 'samurai', 'premiumx', 'littledragon', 'karups', 'joybear', 'heatwave', 'fillyfilms', 'baeb']
+                matches = ['private', 'lethalhardcore', 'thagson', 'samurai', 'premiumx', 'littledragon', 'karups', 'joybear', 'heatwave', 'fillyfilms', 'baeb']
+                if not any(x in re.sub('[^a-zA-Z0-9]', '', item['site']).lower() for x in matches):
+                    if item['id']:
+                        yield self.check_item(item, self.days)
+                        # ~ if self.check_item(item, self.days):
+                            # ~ for sceneurl in sceneurls:
+                                # ~ yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse_scene(self, response):
+        meta = response.meta
+        item = SceneItem()
+        jsondata = response.xpath('//script[contains(@type, "json") and contains(text(), "duration")]/text()')
+        if jsondata:
+            jsondata = json.loads(jsondata.get(), strict=False)
+            item['title'] = self.cleanup_title(jsondata['name'])
+            item['date'] = jsondata['datePublished']
+            if 'description' in jsondata:
+                item['description'] = html.unescape(jsondata['description'])
+            else:
+                item['description'] = ''
+            item['image'] = jsondata['thumbnailUrl']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['id'] = jsondata['@id']
+            item['type'] = 'Scene'
+            item['url'] = response.url
+            item['duration'] = self.duration_to_seconds(jsondata['duration'])
+            item['performers'] = []
+            for person in jsondata['actor']:
+                item['performers'].append(person['name'])
+
+            item['tags'] = self.get_tags(response)
+            site = jsondata['productionCompany']['name']
+            item['site'] = re.sub('[^a-zA-Z0-9-]', '', site)
+            trailer = response.xpath('//video[@data-modal-target="videoImage"]/source[contains(@type, "mp4")]/@src')
+            if not trailer:
+                trailer = response.xpath('//video[@data-modal-target="videoImage"]/source[contains(@type, "webm")]/@src')
+            if trailer:
+                item['trailer'] = trailer.get()
+            else:
+                item['trailer'] = ''
+            item['movies'] = [{'site': meta['movie']['site'], 'external_id': meta['movie']['id']}]
+            item['network'] = 'Bang'
+            item['parent'] = 'Bang'
+
             yield self.check_item(item, self.days)
-        else:
-            print("Found one here!!!!")
-            print(item)
-
-    def get_elastic_payload(self, per_page, offset: int = 0):
-        return {"size": per_page, "from": offset, "sort": [{"releaseDate": {"order": "desc"}}, {"tracking.views.weekly": {"order": "desc", "nested_path": "tracking.views"}}], "query": {"bool": {"must": [{"match": {"status": "ok"}}, {"range": {"releaseDate": {"lte": "now"}}}], "must_not": [{"match": {"type": "trailer"}}]}}, "aggs": {"aggs": {"nested": {"path": "genres"}, "aggs": {"genres": {"terms": {"field": "genres.name.untouched", "size": 400}}}}}}
-
-    def encode_url(self, data):
-        data = bytes.fromhex(data)
-        data = base64.b64encode(data).decode('UTF-8')
-        data = data.replace('+', '-').replace('/', '_').replace('=', ',')
-        return data

@@ -1,7 +1,7 @@
 import re
 import string
 import scrapy
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -16,13 +16,13 @@ class Spider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="title"]/h1/text()',
-        'description': '//div[@class="descript"]/p/text()',
+        'title': '//div[contains(@class,"title")]/h1/text()',
+        'description': '//div[contains(@class,"descript")]/p/text()',
         'date': '//script[@class="yoast-schema-graph"]/text()',
         're_date': r'datePublished.*?(\d{4}-\d{2}-\d{2})T',
         'date_formats': ['%Y-%m-%d'],
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[@class="elenco"]/a/text()',
+        'performers': '//div[contains(@class,"elenco")]/a/text()',
         'tags': '',
         'trailer': '//video/source/@src',
         'external_id': r'.*/(.*?)/',
@@ -40,18 +40,15 @@ class Spider(BaseSceneScraper):
         return ['Latina', 'Brazil', 'Spanish']
 
     def get_title(self, response):
-        translator = Translator()
         title = super().get_title(response).lower()
         if title:
-            title = translator.translate((title.lower()), src='pt', dest='en')
-            title = string.capwords(title.text)
+            title = GoogleTranslator(source='pt', target='en').translate(title.lower())
+            title = string.capwords(title)
         return title
 
     def get_description(self, response):
-        translator = Translator()
         description = super().get_description(response)
         if description:
-            description = translator.translate((description.strip()), src='pt', dest='en')
-            description = description.text.strip()
+            description = GoogleTranslator(source='pt', target='en').translate(description.strip())
             return description
         return ''

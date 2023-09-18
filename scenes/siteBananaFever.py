@@ -31,13 +31,13 @@ class SiteBananaFeverSpider(BaseSceneScraper):
         'tags': '',
         'trailer': '',
         'external_id': r'',
-        'pagination': '/index.php/wp-json/wp/v2/portfolio?page=%s&per_page=10'
+        'pagination': '/index.php/wp-json/wp/v2/posts?page=%s&per_page=20'
     }
 
     def start_requests(self):
         tagdata = []
         for i in range(1, 10):
-            req = requests.get(f'https://bananafever.com//index.php//wp-json//wp//v2//portfolio_category?per_page=100&page={str(i)}')
+            req = requests.get(f'https://bananafever.com/index.php/wp-json/wp/v2/categories?per_page=100&page={str(i)}')
             if req and len(req.text) > 5:
                 tagtemp = []
                 tagtemp = json.loads(req.text)
@@ -57,10 +57,13 @@ class SiteBananaFeverSpider(BaseSceneScraper):
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = SceneItem()
-            if 'wp:featuredmedia' in scene['_links']:
-                image_url = scene['_links']['wp:featuredmedia'][0]['href']
+            if 'og_image' in scene["yoast_head_json"]:
+                item['image'] = scene["yoast_head_json"]['og_image'][0]['url']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
             else:
-                image_url = ""
+                item['image'] = ""
+                item['image_blob'] = ""
+
             item['id'] = str(scene['id'])
             item['date'] = scene['date']
             item['title'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).strip())
@@ -70,30 +73,32 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             if 'vc_raw_html' in item['description']:
                 item['description'] = ''
             item['performers'] = []
-            for category in scene['portfolio_category']:
+            for category in scene['categories']:
                 if '105' not in str(category) and '106' not in str(category) and '170' not in str(category) and '163' not in str(category):
                     for tag in meta['tagdata']:
                         if tag['id'] == category:
-                            item['performers'].append(tag['name'])
+                            item['tags'].append(tag['name'])
+            if "Upcoming" in item['tags']:
+                item['tags'].remove("Upcoming")
             item['site'] = 'Banana Fever'
             item['parent'] = 'Banana Fever'
             item['network'] = 'Banana Fever'
             item['url'] = scene['link']
 
-            meta['item'] = item
+            # ~ meta['item'] = item
 
-            if image_url:
-                req = requests.get(image_url)
-                if req and len(req.text) > 5:
-                    imagerow = json.loads(req.text)
-                else:
-                    imagerow = None
+            # ~ if image_url:
+                # ~ req = requests.get(image_url)
+                # ~ if req and len(req.text) > 5:
+                    # ~ imagerow = json.loads(req.text)
+                # ~ else:
+                    # ~ imagerow = None
 
-                item['image'] = imagerow['guid']['rendered']
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            else:
-                item['image'] = None
-                item['image_blob'] = None
+                # ~ item['image'] = imagerow['guid']['rendered']
+                # ~ item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            # ~ else:
+                # ~ item['image'] = None
+                # ~ item['image_blob'] = None
 
-            if " - Demo" not in item['title']:
+            if " - Demo" not in item['title'] and " - Trailer" not in item['title']:
                 yield item

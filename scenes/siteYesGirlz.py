@@ -1,6 +1,4 @@
 import re
-import html
-import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -8,60 +6,74 @@ from tpdb.items import SceneItem
 
 class SiteYesGirlzSpider(BaseSceneScraper):
     name = 'YesGirlz'
-    network = 'YesGirlz'
-    parent = 'YesGirlz'
-    site = 'YesGirlz'
 
-    start_urls = [
-        'https://yesgirlz.com/wp-json/wp/v2/scene?per_page=10&page=1',
-    ]
+    start_url = 'https://yesgirlz.com'
 
     selector_map = {
         'external_id': r'',
-        'pagination': 'https://yesgirlz.com/wp-json/wp/v2/scene?per_page=10&page=%s',
+        'pagination': '/_next/data/<buildID>/scenes.json?page=%s&order_by=publish_date&sort_by=desc',
     }
 
-    def get_scenes(self, response):
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://yesgirlz.com/', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
         meta = response.meta
-        jsondata = json.loads(response.text)
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
+
+    def get_scenes(self, response):
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
         for scene in jsondata:
             item = SceneItem()
-
+            item['title'] = self.cleanup_title(scene['title'])
             item['id'] = scene['id']
-            item['title'] = self.cleanup_title(scene['title']['rendered'])
-            item['description'] = ''
-            item['date'] = scene['date']
-            item['url'] = scene['link']
-            performers = re.sub(r'<[^<]+?>', '', scene['excerpt']['rendered']).strip().replace(" & ", ", ").replace("Bella Rose Brooklyn Rose", "Bella Rose, Brooklyn Rose")
-            performers = html.unescape(performers)
-            item['performers'] = performers.split(", ")
+            item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
+            item['image'] = self.format_link(response, scene['trailer_screencap']).replace(" ", "%20")
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if scene['trailer_url']:
+                item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
+            else:
+                item['trailer'] = ""
+            scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).isoformat()
+            item['date'] = ""
+            if scene_date:
+                item['date'] = scene_date
+            item['url'] = f"https://yesgirlz.com/scenes/{scene['slug']}"
             item['tags'] = []
-            item['trailer'] = ''
-            item['site'] = "YesGirlz"
-            item['parent'] = "YesGirlz"
-            item['network'] = "YesGirlz"
-            item['type'] = 'Scene'
-            meta['item'] = item
+            if "tags" in scene:
+                item['tags'] = scene['tags']
+            item['duration'] = scene['seconds_duration']
+            item['site'] = 'YesGirlz'
+            item['parent'] = 'YesGirlz'
+            item['network'] = 'YesGirlz'
+            item['performers'] = []
+            for model in scene['models_slugs']:
+                item['performers'].append(model['name'])
 
-            yield scrapy.Request(item['url'], callback=self.get_image, headers=self.headers, cookies=self.cookies, meta=meta)
-
-    def get_image(self, response):
-        item = response.meta['item']
-        image = response.xpath('//video/@data-poster').get()
-        item['image'] = self.format_link(response, image)
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        trailer = response.xpath('//div[contains(@class,"h5vp_player")]/@data-settings').getall()
-        trailer1 = trailer[0].replace("\\", "")
-        item['trailer'] = re.search(r'(http.*?\.mp4)', trailer1).group(1)
-        if "preview" not in item['trailer'].lower():
-            item['trailer'] = ''
-        # ~ if len(trailer) > 1:
-            # ~ trailer2 = trailer[1].replace("\\", "")
-            # ~ if re.search(r'(http.*?\.mp4)', trailer2):
-                # ~ item['back'] = re.search(r'(http.*?\.mp4)', trailer2).group(1)
-            # ~ if re.search(r'(http.*?\.m4v)', trailer2):
-                # ~ item['back'] = re.search(r'(http.*?\.m4v)', trailer2).group(1)
-            # ~ else:
-                # ~ print(trailer2)
-
-        yield item
+            yield self.check_item(item, self.days)
