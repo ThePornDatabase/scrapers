@@ -40,7 +40,7 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                str_height = re.findall('(\d{1,2})', height)
+                str_height = re.findall(r'(\d{1,2})', height)
                 if len(str_height):
                     feet = int(str_height[0])
                     if len(str_height) > 1:
@@ -54,8 +54,8 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
     def get_weight(self, response):
         if 'weight' in self.selector_map:
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
-            if weight and re.match('\d+', weight):
-                weight = re.search('(\d+)', weight).group(1)
+            if weight and re.match(r'\d+', weight):
+                weight = re.search(r'(\d+)', weight).group(1)
                 weight = int(weight)
                 if weight:
                     weight = str(round(weight*.453592)) + "kg"
