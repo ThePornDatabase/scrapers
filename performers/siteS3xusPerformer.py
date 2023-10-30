@@ -49,8 +49,8 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
                         inches = 0
                     heightcm = str(round(((feet*12)+inches) * 2.54)) + "cm"
                     return heightcm.strip()
-        return '' 
-    
+        return ''
+
     def get_weight(self, response):
         if 'weight' in self.selector_map:
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
@@ -60,9 +60,9 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
                 if weight:
                     weight = str(round(weight*.453592)) + "kg"
                     return weight
-                    
+
                 return weight.strip()
-        return ''        
+        return ''
 
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:

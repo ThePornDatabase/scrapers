@@ -14,9 +14,8 @@ class SiteS3xusSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1/text()',
         'description': '//meta[@property="og:description"]/@content',
-        # 'description': '//p[contains(@class, "description")]/text()',
         'date': '//ul[@class="info-wrapper"]/li[3]/span/text()',
-        'date_formats': [ "%b %d, %Y"],
+        'date_formats': ["%b %d, %Y"],
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="model-thumb"]/a/img/@alt',
