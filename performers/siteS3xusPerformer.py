@@ -47,7 +47,7 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
                         inches = int(str_height[1])
                     else:
                         inches = 0
-                    heightcm = str(round(((feet*12)+inches) * 2.54)) + "cm"
+                    heightcm = str(round(((feet * 12) + inches) * 2.54)) + "cm"
                     return heightcm.strip()
         return ''
 
@@ -58,7 +58,7 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
                 weight = re.search(r'(\d+)', weight).group(1)
                 weight = int(weight)
                 if weight:
-                    weight = str(round(weight*.453592)) + "kg"
+                    weight = str(round(weight * .453592)) + "kg"
                     return weight
 
                 return weight.strip()
