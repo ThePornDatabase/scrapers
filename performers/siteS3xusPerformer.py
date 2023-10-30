@@ -23,6 +23,7 @@ class SiteS3xusPerformerSpider(BasePerformerScraper):
     }
 
     name = 'S3xusPerformer'
+    network = 'S3xus'
 
     start_urls = [
         'https://www.s3xus.com',

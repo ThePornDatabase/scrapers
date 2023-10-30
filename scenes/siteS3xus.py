@@ -6,6 +6,9 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class SiteS3xusSpider(BaseSceneScraper):
     name = 'S3xus'
+    site = 'S3xus'
+    parent = 'S3xus'
+    network = 'S3xus'
 
     start_urls = [
         'https://s3xus.com/',
@@ -19,7 +22,7 @@ class SiteS3xusSpider(BaseSceneScraper):
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="model-thumb"]/a/img/@alt',
-        'tags': '//div[@class="tag-name"]/a/text()',
+        'tags': '//div[@class="tag-name"]/a/text()|//p[@class="tags"]/a/text()',
         'duration': '//ul[@class="info-wrapper"]/li[1]/span/text()',
         'external_id': r'scenes/(.+)',
         'trailer': '',
