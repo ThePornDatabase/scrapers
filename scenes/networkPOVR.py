@@ -235,6 +235,6 @@ class NetworkPOVRSpider(BaseSceneScraper):
         else:
             item['type'] = 'Scene'
 
-        matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush']
+        matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'milfvr']
         if not any(x in re.sub('[^a-zA-Z0-9-]', '', item['site']).lower() for x in matches):
             yield self.check_item(item, self.days)

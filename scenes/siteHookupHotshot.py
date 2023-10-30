@@ -55,6 +55,8 @@ class CumPerfectionSpider(BaseSceneScraper):
 
         if image:
             image = image.replace(" ", "%20")
+            image = image.replace("https//", "https://")
+            image = image.replace("http//", "http://")
             if "https://" not in image:
                 image = "https://hookuphotshot.com" + image
             return image

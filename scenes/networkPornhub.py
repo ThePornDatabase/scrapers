@@ -12,6 +12,10 @@ class NetworkPornhubSpider(BaseSceneScraper):
         ["/model/zirael_rem/videos?page=%s", "Zirael_Rem", "Pornhub: Zirael_Rem"],
         ["/model/siasiberia/videos?page=%s", "Sia Siberia", "Pornhub: Sia Siberia"],
         ["/model/sweetie-fox/videos?page=%s", "Sweetie Fox", "Pornhub: Sweetie Fox"],
+        ["/model/anntall/videos?page=%s", "Anntall", "Pornhub: Anntall"],
+        ["/model/fuckforeverever/videos?page=%s", "Fuckforeverever", "Pornhub: Fuckforeverever"],
+        ["/model/coconey/videos?page=%s", "Coconey", "Pornhub: Coconey"],
+        ["/model/emma-fiore/videos?page=%s", "Emma Fiore", "Pornhub: Emma Fiore"],
     ]
 
     selector_map = {

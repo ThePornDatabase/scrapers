@@ -44,6 +44,7 @@ class NetworkModelMediaSpider(BaseSceneScraper):
         yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
+        # ~ print(response.text)
         scenes = response.xpath('//div[contains(@class, "mus-reveal-video-widget")]')
         for scene in scenes:
             item = SceneItem()
@@ -67,7 +68,11 @@ class NetworkModelMediaSpider(BaseSceneScraper):
                 performerlink = re.search(r'models_name=(.*)', performerlink)
                 if performerlink:
                     item['performers'] = performerlink.group(1).split(",")
-            item['id'] = re.search(r'(?:trailers|plans)/(.*?)\?', item['url']).group(1)
+            sceneid = scene.xpath('.//a/@video-id')
+            if sceneid:
+                item['id'] = sceneid.get()
+            else:
+                item['id'] = re.search(r'(?:trailers|plans)/(.*?)\?', item['url']).group(1)
             item['date'] = ''
             if "delphine" in response.url:
                 item['site'] = "Delphine Films"

@@ -89,6 +89,6 @@ class SexLikeRealSpider(BaseSceneScraper):
         if not any(x in item['id'] for x in matches):
             matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush']
             if not any(x in item['id'] for x in matches):
-                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink']
+                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink', 'slr-milfvr', 'milfvr']
                 if not any(x in item['site'].lower() for x in matches):
                     yield self.check_item(item, self.days)

@@ -3,14 +3,14 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SiteFutanariXXXSpider(BaseSceneScraper):
-    name = 'FutanariXXX'
-    network = 'Futanari XXX'
-    parent = 'Futanari XXX'
-    site = 'Futanari XXX'
+class SiteFreezeSpider(BaseSceneScraper):
+    name = 'Freeze'
+    network = 'Freeze'
+    parent = 'Freeze'
+    site = 'Freeze'
 
     start_urls = [
-        'https://futanari.xxx',
+        'https://freeze.xxx',
     ]
 
     selector_map = {
@@ -30,10 +30,11 @@ class SiteFutanariXXXSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//center[@class="vidcont"]/a/@href').getall()
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene) and 'futanari' in scene:
+            if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_id(self, response):
-        id = response.xpath('//script[contains(@type, "application/json") and contains(@class, "gdrts")]/text()').get()
-        id = re.search(r'item_id.*?(\d+),\"nonce', id).group(1)
-        return str(id)
+    def get_site(self, response):
+        return "Freeze"
+
+    def get_parent(self, response):
+        return "Freeze"

@@ -35,25 +35,26 @@ class TeenMegaWorldSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': "//div[contains(@class, 'title-line')]//h1/text()",
-        'description': "//p[contains(@class, 'description')]/text() | //div[contains(@class, 'text')]/text() | //meta[@property='og:description']/@content",
-        'date': "//div[contains(@class, 'date')]//time/text()",
+        'title': "//div[contains(@class,'video-heading')]/h1[@id='video-title']/text()",
+        'description': "//div[@id='video-description']/p[@class='video-description-text']/text()",
+        'date': "//div[contains(@class,'video-info-data')]/span[contains(@class,'video-info-date')]/text()",
+        'date_formats': ['%B %d, %Y'],
         'image': '//deo-video/@poster | //video/@poster | //meta[@property="og:image"]/@content',
-        'performers': "//div[contains(@class, 'site')]//a[contains(@href, 'models')]/text()",
-        'tags': "//ul[contains(@class, 'tag-list')]//a/text()",
-        'external_id': 'trailers\\/(.+)\\.html',
+        'performers': "//span[contains(@class,'video-actor-list')]/a[contains(@class,'video-actor-link')]/text()",
+        'tags': "//div[contains(@class,'video-tag-list')]/a[@class='video-tag-link']/text()",
+        'external_id': r'trailers/(.+)\.html',
         'trailer': '//source/@src',
         'pagination': '/categories/movies_%s_d.html'
     }
 
     def get_scenes(self, response):
         # ~ scenes = response.xpath("//a[contains(@class, 'title')]/@href").getall()
-        scenes = response.xpath('//li[@class="video_card"]/a[contains(@class, "video_card")]/@href').getall()
+        scenes = response.xpath('//h2[@class="thumb__title"]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//div[contains(@class, "site")]//a[starts-with(@href, "/search")]/text()|//div[contains(@class, "site")]//a[starts-with(@href, "/site")]/text()').extract_first()
+        site = response.xpath('//div[contains(@class,"video-actors-block")]/a[contains(@class,"video-site-link")]/text()').extract_first()
         return tldextract.extract(site).domain
 
     def get_image(self, response):

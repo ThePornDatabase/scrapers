@@ -15,6 +15,8 @@ class SiteKimHollandSpider(BaseSceneScraper):
         'https://www.kimholland.nl',
     ]
 
+    cookies = {'khlanguage': 'NL'}
+
     selector_map = {
         'title': '//h1[contains(@id, "title")]/text()',
         'description': '//div[contains(@class, "player-description")]/text()',
@@ -25,7 +27,7 @@ class SiteKimHollandSpider(BaseSceneScraper):
         'duration': '',
         'trailer': '//video/source/@src',
         'external_id': r'.*-(\d+)\.htm',
-        'pagination': '/archief-%s.html',
+        'pagination': '/archief-%s.html?lang=nl',
         'type': 'Scene',
     }
 
@@ -41,7 +43,6 @@ class SiteKimHollandSpider(BaseSceneScraper):
                     scenedate = self.parse_date(scenedate, date_formats=['%d-%m-%y', '%Y-%m-%D']).strftime('%Y-%m-%d')
                     if scenedate:
                         meta['date'] = scenedate
-                        print(meta['date'])
             scene = scene.xpath('./a[1]/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

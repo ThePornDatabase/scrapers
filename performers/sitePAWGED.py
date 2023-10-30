@@ -1,10 +1,9 @@
-import scrapy
 import re
-
+import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
-class sitePAWGEDPerformerSpider(BasePerformerScraper):
+class SitePAWGedPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//meta[@name="description"]/@content',
         'image': '//div[contains(@class,"model_picture")]/img/@src0_1x',
@@ -12,7 +11,7 @@ class sitePAWGEDPerformerSpider(BasePerformerScraper):
         'height': '//span[@class="model_bio_heading"]/following-sibling::text()[contains(.,"Height")]',
         'astrology': '//span[@class="model_bio_heading"]/following-sibling::text()[contains(.,"Astrological")]',
         'pagination': '/tour/models/models_%s_d.html',
-        'external_id': 'girls/(.+)/?$'
+        'external_id': 'girls/(.+)/?$',
     }
 
     name = 'PAWGEDPerformer'
@@ -35,10 +34,9 @@ class sitePAWGEDPerformerSpider(BasePerformerScraper):
 
     def get_cupsize(self, response):
         if 'cupsize' in self.selector_map:
-            cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get().strip().replace("-","")
+            cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get().strip().replace("-", "")
             return cupsize
         return ''
-
 
     def get_image(self, response):
         if 'image' in self.selector_map:
@@ -51,7 +49,7 @@ class sitePAWGEDPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                height = height.replace("\n","").replace("\r","")
+                height = height.replace("\n", "").replace("\r", "")
                 height = re.search('Height:(.*)', height).group(1)
                 return height.strip()
         return ''
@@ -60,7 +58,7 @@ class sitePAWGEDPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = measurements.replace("\n","").replace("\r","")
+                measurements = measurements.replace("\n", "").replace("\r", "")
                 measurements = re.search('Measurements:(.*)', measurements).group(1)
                 return measurements.strip()
         return ''
@@ -69,7 +67,7 @@ class sitePAWGEDPerformerSpider(BasePerformerScraper):
         if 'astrology' in self.selector_map:
             astrology = self.process_xpath(response, self.get_selector_map('astrology')).get()
             if astrology:
-                astrology = astrology.replace("\n","").replace("\r","")
+                astrology = astrology.replace("\n", "").replace("\r", "")
                 astrology = re.search('Sign:(.*)', astrology).group(1)
                 return astrology.strip()
         return ''

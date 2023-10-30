@@ -12,12 +12,12 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class AdultDVDEmpireMovieSpider(BaseSceneScraper):
-    name = 'AdultDVDEmpireMovie'
-    store = "Adult DVD Empire"
+class GayDVDEmpireMovieSpider(BaseSceneScraper):
+    name = 'GayDVDEmpireMovie'
+    store = "Gay DVD Empire"
 
     start_urls = [
-        'https://www.adultdvdempire.com'
+        'https://www.gaydvdempire.com'
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -36,7 +36,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         'format': '//div[contains(@class, "pricing")]/h2/text()[1]',
         'duration': '//li/small[contains(text(), "Length:")]/following-sibling::text()',
         'sku': '//li/small[contains(text(), "SKU:")]/following-sibling::text()',
-        'pagination': '/new-release-porn-movies.html?page=%s',
+        'pagination': '/new-release-gay-porn-movies.html?page=%s',
         # ~ 'pagination': '/29773/studio/lethal-hardcore-porn-movies.html?page=%s&media=2',
     }
 
@@ -129,7 +129,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         item['title'] = self.clean_text(self.get_title(response))
         item['title'] = re.sub(r'\(.*?dvd.*?\)|\(.*?blu-ray.*?\)|\(.*?combo.*?\)', '', item['title'], flags=re.IGNORECASE)
         item['description'] = self.clean_text(self.get_description(response))
-        item['store'] = "Adult DVD Empire"
+        item['store'] = "Gay DVD Empire"
         item['date'] = self.get_date(response)
         item['image'] = self.get_image(response)
         item['image_blob'] = self.get_image_blob_from_link(item['image'])

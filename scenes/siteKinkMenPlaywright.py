@@ -8,32 +8,32 @@ from tpdb.items import SceneItem
 from tpdb.helpers.http import Http
 
 
-class NetworkKinkSpider(BaseSceneScraper):
-    name = 'KinkPlaywright'
+class NetworkKinkMenSpider(BaseSceneScraper):
+    name = 'KinkMenPlaywright'
     network = "Kink"
 
-    url = 'https://www.kink.com'
+    url = 'https://www.kinkmen.com'
 
     paginations = [
-        '/search?type=shoots&thirdParty=false&page=%s',
-        # ~ '/search?type=shoots&featuredIds=%s',
-        # ~ '/search?type=shoots&thirdParty=true&page=%s',
-        # ~ '/search?type=shoots&channelIds=wasteland&sort=published&page=%s',
+        '/shoots/latest?page=%s',
+        # ~ '/shoots/featured?page=%s',
+        # ~ '/shoots/partner?page=%s',
+        # ~ '/search?type=shoots&channelIds=poundhisass&sort=published&page=%s',
     ]
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "document",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-User": "?1",
-        "Cache-Control": "max-age=0",
-    }
+    # ~ headers = {
+        # ~ "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0",
+        # ~ "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        # ~ "Accept-Language": "en-US,en;q=0.5",
+        # ~ "Accept-Encoding": "gzip, deflate",
+        # ~ "Connection": "keep-alive",
+        # ~ "Upgrade-Insecure-Requests": "1",
+        # ~ "Sec-Fetch-Dest": "document",
+        # ~ "Sec-Fetch-Mode": "navigate",
+        # ~ "Sec-Fetch-Site": "none",
+        # ~ "Sec-Fetch-User": "?1",
+        # ~ "Cache-Control": "max-age=0",
+    # ~ }
 
     selector_map = {
         'title': '//title/text()',
@@ -71,11 +71,11 @@ class NetworkKinkSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        yield scrapy.Request("https://www.kink.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
+        yield scrapy.Request("https://www.kinkmen.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
 
     def start_requests2(self, response):
         for pagination in self.paginations:
-            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta={'page': self.page, 'pagination': pagination, "playwright": True}, headers=self.headers, cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta={'page': self.page, 'pagination': pagination, "playwright": True})
 
     def parse(self, response, **kwargs):
         if response.status == 200:
@@ -90,7 +90,7 @@ class NetworkKinkSpider(BaseSceneScraper):
                     meta = response.meta
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
-                    yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+                    yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
         meta = response.meta
@@ -258,3 +258,22 @@ class NetworkKinkSpider(BaseSceneScraper):
         matches = ['str8hell', 'cfnmeu', 'malefeet4u', 'williamhiggins', 'ambushmassage', 'swnude', 'sweetfemdom']
         if not any(x in item['site'] for x in matches):
             yield self.check_item(item, self.days)
+
+    def get_image_blob_from_link(self, image):
+        if image:
+            data = self.get_image_from_link(image)
+            if data:
+                try:
+                    img = BytesIO(data)
+                    img = Image.open(img)
+                    img = img.convert('RGB')
+                    width, height = img.size
+                    if height > 1080 or width > 1920:
+                        img.thumbnail((1920, 1080))
+                    buffer = BytesIO()
+                    img.save(buffer, format="JPEG")
+                    data = buffer.getvalue()
+                except:
+                    print(f"Could not decode image for evaluation: '{image}'")
+                return base64.b64encode(data).decode('utf-8')
+        return None

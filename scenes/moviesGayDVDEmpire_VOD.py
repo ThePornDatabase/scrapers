@@ -13,12 +13,12 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
-class AdultDVDEmpireMovieSpider(BaseSceneScraper):
-    name = 'AdultDVDEmpireMovie_VOD'
+class GayDVDEmpireMovieSpider(BaseSceneScraper):
+    name = 'GayDVDEmpireMovie_VOD'
     store = "Adult DVD Empire"
 
     start_urls = [
-        'https://www.adultdvdempire.com'
+        'https://www.gaydvdempire.com'
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
@@ -37,7 +37,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         'format': '//div[contains(@class, "pricing")]/h2/text()[1]',
         'duration': '//li/small[contains(text(), "Length:")]/following-sibling::text()',
         'sku': '//li/small[contains(text(), "SKU:")]/following-sibling::text()',
-        'pagination': '/new-addition-porn-videos.html?page=%s&media=14'
+        'pagination': '/new-release-gay-porn-videos.html?page=%s&media=14'
     }
 
     def get_scenes(self, response):
@@ -61,6 +61,8 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
                 if title:
                     title = title.group(1)
                     title = re.sub(r'\(\d{4}\)', '', title).strip()
+        if not title:
+            title = super().get_title(response)
         return self.clean_text(title)
 
     def get_studio(self, response):
@@ -84,7 +86,8 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             if description:
                 description = description.getall()
                 description = " ".join(description).replace("  ", " ").strip()
-
+        if not description:
+            description = super().get_description(response)
         return self.clean_text(description)
 
     def get_tags(self, response):
@@ -93,7 +96,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         if tags:
             tags = tags.getall()
         if not tags:
-            tags = self.process_xpath(response, self.get_selector_map('tags')).getall()
+            tags = super().get_tags(response)
         if tags:
             return list(map(lambda x: string.capwords(x.strip()), tags))
         return []
@@ -104,7 +107,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         if performers:
             performers = performers.getall()
         if not performers:
-            performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
+            performers = super().get_performers(response)
         if performers:
             return list(map(lambda x: string.capwords(x.strip()), performers))
         return []
@@ -124,7 +127,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
                 if scenedate:
                     scenedate = scenedate + "-01-01"
         if not scenedate:
-            return datetime.now().isoformat()
+            return super().get_date(response)
 
         return dateparser.parse(scenedate).isoformat()
 
@@ -139,6 +142,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         if not length:
             length = super().get_duration(response)
             if length:
+                length = re.search(r'(\d+)', length).group(1)
                 length = length.lower()
                 if "hr" in length and "min" in length:
                     if re.search(r'(\d{1,2}).+?hr.+?(\d{1,2}).+?min', length):
@@ -205,7 +209,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
         if len(num_scenes) > 1 or not len(num_scenes):
             item['title'] = self.clean_text(self.get_title(response))
             item['description'] = self.clean_text(self.get_description(response))
-            item['store'] = "Adult DVD Empire"
+            item['store'] = "Gay DVD Empire"
             item['date'] = self.get_date(response)
             item['image'] = self.get_image(response)
             item['image_blob'] = self.get_image_blob_from_link(item['image'])

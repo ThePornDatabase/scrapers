@@ -76,6 +76,8 @@ class AndomarkSpider(BaseSceneScraper):
         }
     }
 
+    cookies = {'warn': 'true'}
+
     start_urls = [
         'http://sexykarenxxx.com',
         'https://ariellynn.com',
@@ -193,10 +195,14 @@ class AndomarkSpider(BaseSceneScraper):
     def start_requests(self):
         meta = {}
         meta['page'] = self.page
-        meta['dont_redirect'] = True
-
+        # ~ meta['dont_redirect'] = True
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+            meta['link'] = link
+            yield scrapy.Request(link, callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests2(self, response):
+        meta = response.meta
+        yield scrapy.Request(url=self.get_next_page_url(meta['link'], self.page), callback=self.parse, meta=meta)
 
     def get_trailer(self, response):
         trailerxpath = self.get_selector_map('trailer')

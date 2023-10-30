@@ -62,6 +62,7 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "daddysboy",
         "dareweshare",
         "disruptivefilms",
+        "feedme",
         "Fine-Erotica",
         "fistingcentral",
         "fistinginferno",

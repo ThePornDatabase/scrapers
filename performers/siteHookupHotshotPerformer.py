@@ -1,8 +1,4 @@
 import scrapy
-import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
@@ -12,7 +8,7 @@ class HookupHotshotPerformerSpider(BasePerformerScraper):
         'image': '//div[@class="profile-pic"]/img/@src0_1x',
         'bio': '//div[@class="profile-about"]/p/text()',
         'pagination': '/models/%s/latest/?g=',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models\/(.*).html'
     }
 
     name = 'HookupHotshotPerformer'
@@ -38,9 +34,13 @@ class HookupHotshotPerformerSpider(BasePerformerScraper):
             image = self.process_xpath(response, self.get_selector_map('image')).get()
             if image:
                 image = image.replace(" ", "%20")
-                image = "https://hookuphotshot.com" + image
+                image = image.replace("https//", "https://")
+                image = image.replace("http//", "http://")
+                if "https://" not in image:
+                    image = "https://hookuphotshot.com" + image
                 return image.strip()
-        return ''
+            else:
+                return ''
 
     def get_name(self, response):
         name = self.process_xpath(response, self.get_selector_map('name')).get().strip()

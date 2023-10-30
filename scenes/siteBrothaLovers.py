@@ -85,7 +85,7 @@ class SiteBrothaLoversSpider(BaseSceneScraper):
                                 item['image'] = None
                                 item['image_blob'] = None
 
-                            item['description'] = None
+                            item['description'] = ""
                             item['trailer'] = None
                             item['tags'] = ['Interracial', 'BBC']
                             item['duration'] = None

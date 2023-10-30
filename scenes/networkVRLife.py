@@ -66,7 +66,7 @@ class VRLifeSpider(BaseSceneScraper):
         item['image'] = data['image']
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['id'] = response.meta['id']
-        item['trailer'] = self.format_link(response, data['trailer']['contentUrl'])
+        item['trailer'] = ""
         item['duration'] = self.duration_to_seconds(data['duration'])
         item['url'] = response.url
         item['date'] = self.parse_date(data['datePublished']).isoformat()

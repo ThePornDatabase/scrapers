@@ -10,7 +10,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 class siteFreeOnesPerformerSpider(BasePerformerScraper):
 
     selector_map = {
-        'name': '//div[@data-test="section-personal-information"]/div[@class="p-3"]/text()[1]',
+        'name': '//span[@data-test="link_span_name"]/text()',
         'image': '//div[contains(@class,"dashboard-image-container")]//img/@src',
         'birthplace': '//p[@class="mb-1 mt-3"]/a/span/text()',
         'nationality': '//a[@data-test="link-country"]/span/text()',
@@ -20,7 +20,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
         'height': '//span[@data-test="link_span_height"]/text()',
         'weight': '//span[@data-test="link_span_weight"]/text()',
         'measurements': '//span[@data-test="p-measurements"]/a/span/text()',
-        'cupsize': '//span[@data-test="p-measurements"]/a[1]/span/text()',
+        'cupsize': '//span[@data-test="link_span_bra"]/text()',
         'tattoos': '//span[@data-test="p_has_tattoos"]/span/text()',
         'piercings': '//span[@data-test="p_has_piercings"]/span/text()',
         'fakeboobs': '//span[@data-test="link_span_boobs"]/text()',
@@ -36,7 +36,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
     network = 'Free Ones'
     parent = 'Free Ones'
 
-    
+
     start_urls = [
         'https://freeones.ru',
     ]
@@ -48,9 +48,9 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
             yield scrapy.Request(
                 url=self.format_link(response, performer),
                 callback=self.parse_performer
-            )       
-    
-        
+            )
+
+
     def get_height(self, response):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
@@ -58,8 +58,8 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
                 if "cm" in height:
                     height = re.search('(.*cm)\ ', height).group(1)
                 return height.strip()
-        return '' 
-        
+        return ''
+
     def get_weight(self, response):
         if 'weight' in self.selector_map:
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
@@ -67,7 +67,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
                 if "kg" in weight:
                     weight = re.search('(.*kg)\ ', weight).group(1)
                 return weight.strip()
-        return '' 
+        return ''
 
 
     def get_birthday(self, response):
@@ -78,7 +78,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
                 if birthday:
                     return birthday.strip()
         return ''
-        
+
     def get_astrology(self, response):
         if 'astrology' in self.selector_map:
             astrology = self.process_xpath(response, self.get_selector_map('astrology')).get()
@@ -87,10 +87,10 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
                 if astrology:
                     return astrology.strip().title()
         return ''
-        
+
     def get_gender(self, response):
         return 'Female'
-        
+
     def get_image(self, response):
         if 'image' in self.selector_map:
             image = self.process_xpath(response, self.get_selector_map('image')).get()
@@ -99,14 +99,14 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
                     image = re.search('(.*)\?c',image).group(1)
                 if image:
                     return image.strip()
-        return ''        
+        return ''
 
     def get_birthplace(self, response):
         if 'birthplace' in self.selector_map:
             birthplace = self.process_xpath(response, self.get_selector_map('birthplace')).getall()
             birthplace = list(map(lambda x: x.strip(), birthplace))
             birthplacedisplay = ", ".join(birthplace)
-            
+
             return birthplacedisplay
         return ''
 
@@ -119,10 +119,10 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
                     fakeboobs = "Yes"
                 else:
                     fakeboobs = "No"
-                
+
                 return fakeboobs.strip()
         return ''
-        
+
     def get_aliases(self, response):
         if 'aliases' in self.selector_map:
             aliases = self.process_xpath(response, self.get_selector_map('aliases')).get()

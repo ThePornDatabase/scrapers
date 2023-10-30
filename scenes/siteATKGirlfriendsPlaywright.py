@@ -88,10 +88,54 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
             else:
                 meta['duration'] = None
             if "join.atkgirlfriends.com" not in link:
-                yield scrapy.Request(link, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
+                item = SceneItem()
+                title = scene.xpath('./div/a/text()').getall()
+                title = " ".join(title)
+                title = title.strip()
+                if title:
+                    item['title'] = self.cleanup_title(title)
+                else:
+                    item['title'] = ''
+                image = scene.xpath('.//img/@alt').get()
+                if "compilation" in image.lower():
+                    item['title'] = "Compilation: " + item['title']
+
+                item['date'] = meta['date']
+                item['duration'] = meta['duration']
+
+                image = scene.xpath('./div/a/img/@src').get()
+                if image:
+                    item['image'] = image.strip().replace("/sm_", "/")
+                else:
+                    item['image'] = None
+
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['image'] = re.search(r'(.*\.\w{3,4})', item['image']).group(1)
+
+                url = scene.xpath('./div/a[contains(@href,"/model/")]/@href').get()
+                if url:
+                    item['url'] = "https://www.atkgirlfriends.com" + url.strip()
+                else:
+                    item['url'] = ''
+                sceneid = re.search(r'.*/(\d+)/', item['image'])
+                if sceneid:
+                    item['id'] = sceneid.group(1)
+                item['performers'] = []
+                item['tags'] = []
+                item['trailer'] = ''
+                item['description'] = ''
+                item['site'] = "ATK Girlfriends"
+                item['parent'] = "ATK Girlfriends"
+                item['network'] = "ATK Girlfriends"
+
+                if item['title'] and item['image']:
+                    meta['item'] = item.copy()
+                    yield scrapy.Request(link, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
             else:
                 item = SceneItem()
-                title = scene.xpath('./div/a/text()').get()
+                title = scene.xpath('./div/a/text()').getall()
+                title = " ".join(title)
+                title = title.strip()
                 if title:
                     item['title'] = self.cleanup_title(title)
                 else:
@@ -152,19 +196,22 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
         item = SceneItem()
 
         item['title'] = self.get_title(response)
-        item['date'] = meta['date']
-        item['duration'] = meta['duration']
-        item['description'] = self.get_description(response)
-        item['image'] = self.get_image(response)
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['performers'] = self.get_performers(response)
-        item['tags'] = self.get_tags(response)
-        item['id'] = re.search(r'/movie/(\d+)/', response.url).group(1)
-        item['trailer'] = self.get_trailer(response)
-        item['url'] = response.url
-        item['network'] = "ATK Girlfriends"
-        item['parent'] = "ATK Girlfriends"
-        item['site'] = "ATK Girlfriends"
+        if item['title']:
+            item['date'] = meta['date']
+            item['duration'] = meta['duration']
+            item['description'] = self.get_description(response)
+            item['image'] = self.get_image(response)
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['performers'] = self.get_performers(response)
+            item['tags'] = self.get_tags(response)
+            item['id'] = re.search(r'/movie/(\d+)/', response.url).group(1)
+            item['trailer'] = self.get_trailer(response)
+            item['url'] = response.url
+            item['network'] = "ATK Girlfriends"
+            item['parent'] = "ATK Girlfriends"
+            item['site'] = "ATK Girlfriends"
+        else:
+            item = meta['item']
         yield self.check_item(item, self.days)
 
     def get_image(self, response):

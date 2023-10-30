@@ -1,5 +1,5 @@
-from datetime import datetime
-
+import re
+import string
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -48,7 +48,10 @@ class CzechAvSpider(BaseSceneScraper):
 
     selector_map = {
         'title': "//h2[@class='nice-title']/text()",
-        'description': "//div[contains(@class, 'description')]/text() | //div[@class='desc-text']//p/text()",
+        'date': '//script[contains(@type, "json")]/text()',
+        're_date': r'uploadDate[\'\"].*?(\d{4}-\d{2}-\d{2})',
+        'description': '//script[contains(@type, "json")]/text()',
+        're_description': r'description[\'\"].*?[\'\"](.*?)[\'\"]',
         'image': "//meta[@property='og:image']/@content",
         'tags': "",
         'external_id': '/tour\\/preview\\/(.+)/',
@@ -62,8 +65,12 @@ class CzechAvSpider(BaseSceneScraper):
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_performers(self, response):
-        return ['Unknown Czech Performer']
-
-    def get_date(self, response):
-        return datetime.now().isoformat()
+    def get_tags(self, response):
+        tags = response.xpath('//script[contains(@type, "json")]/text()')
+        if tags:
+            tags = re.search(r'keywords[\'\"].*?[\'\"](.*?)[\'\"]', tags.get())
+            if tags:
+                tags = tags.group(1)
+                tags = tags.split(",")
+                tags = list(map(lambda x: string.capwords(x.strip()), tags))
+        return tags
