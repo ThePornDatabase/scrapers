@@ -161,7 +161,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
     network = 'Gamma Enterprises'
 
     start_urls = [
-        # ~ #  # 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
+        #  # 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
         'https://www.21naturals.com',
         'https://www.21sextreme.com',
         'https://www.21sextury.com',
@@ -309,15 +309,24 @@ class AdultTimeAPISpider(BaseSceneScraper):
             # ~ continue
             item = SceneItem()
 
-            item['image'] = ''
-            for size in self.image_sizes:
-                if size in scene['pictures']:
-                    item['image'] = 'https://images-fame.gammacdn.com/movies' + \
-                                    scene['pictures'][size]
-                    break
+            force_update = self.settings.get('force_update')
+            if force_update:
+                force_update = True
+            force_fields = self.settings.get('force_fields').split(",")
 
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            # ~ item['image_blob'] = None
+            if not force_update or (force_update and "image" in force_fields):
+                item['image'] = ''
+                for size in self.image_sizes:
+                    if size in scene['pictures']:
+                        item['image'] = 'https://images-fame.gammacdn.com/movies' + \
+                                        scene['pictures'][size]
+                        break
+
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                # ~ item['image_blob'] = None
+            else:
+                item['image'] = ''
+                item['image_blob'] = ''
 
             item['trailer'] = ''
             for size in self.trailer_sizes:

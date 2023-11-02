@@ -16,6 +16,7 @@ class NetworkPornhubSpider(BaseSceneScraper):
         ["/model/fuckforeverever/videos?page=%s", "Fuckforeverever", "Pornhub: Fuckforeverever"],
         ["/model/coconey/videos?page=%s", "Coconey", "Pornhub: Coconey"],
         ["/model/emma-fiore/videos?page=%s", "Emma Fiore", "Pornhub: Emma Fiore"],
+        ["/users/cathycash/videos/public?page=%s", "Cathy Cravings", "Pornhub: Creampie Cathy"],
     ]
 
     selector_map = {
@@ -62,7 +63,7 @@ class NetworkPornhubSpider(BaseSceneScraper):
 
         for performer in self.performers:
             meta['pagination'] = performer[0]
-            meta['performers'] = [performer[1]]
+            meta['initial_performers'] = [performer[1]]
             meta['site'] = performer[2]
             meta['parent'] = "Pornhub"
 
@@ -89,3 +90,14 @@ class NetworkPornhubSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_performers(self, response):
+        meta = response.meta
+        performers = []
+        new_perf = response.xpath('//div[contains(@class,"pornstarsWrapper")]/a/@data-mxptext')
+        if new_perf:
+            new_perf = new_perf.getall()
+            performers = new_perf
+        if meta['initial_performers'][0] not in performers:
+            performers.append(meta['initial_performers'][0])
+        return performers

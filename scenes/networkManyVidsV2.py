@@ -205,6 +205,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['494106', 'Manyvids: AuroraXoxo', True],
         ['1001211849', 'Manyvids: Ksu Colt', True],
         ['1004472635', 'Manyvids: Sybil Raw', True],
+        ['1005948542', 'BJ World', False],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
