@@ -161,7 +161,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
     network = 'Gamma Enterprises'
 
     start_urls = [
-        #  # 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
+        # ~ #  # 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
         'https://www.21naturals.com',
         'https://www.21sextreme.com',
         'https://www.21sextury.com',
@@ -360,6 +360,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             item['tags'] = list(filter(None, item['tags']))
 
             item['duration'] = str(scene['length'])
+
+            if "directors" in scene and len(scene['directors']):
+                item['director'] = scene['directors'][0]['name']
 
             item['markers'] = []
             if 'action_tags' in scene:
