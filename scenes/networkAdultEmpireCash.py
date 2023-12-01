@@ -21,6 +21,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'https://latinoguysporn.com',
         # ~ # 'https://cospimps.com',
         'https://www.hotwivescheating.com',
+        'https://hotwifefun.com',
         'https://www.joannaangel.com',
         'https://www.jonathanjordanxxx.com',
         'https://www.kingsoffetish.com',
@@ -91,6 +92,13 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Smut Factor"
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        elif "hotwifefun" in response.url:
+            scenes = response.xpath('//a[contains(@class,"scene-update-details")]/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "Hot Wife Fun"
+                meta['parent'] = "Hot Wife Fun"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "wcpclub" in response.url:
             scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()
@@ -255,6 +263,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             pagination = "/videos/videos_page=%s"
         if "filthykings" in base:
             pagination = "/en/videos/page/%s"
+        if "hotwifefun" in base:
+            pagination = "hot-wife-fun-updates.html?page=%s&hybridview=member"
         if "pmggirls" in base:
             pagination = "/videos/videos_page=%s"
         if "lethalhardcore" in base:

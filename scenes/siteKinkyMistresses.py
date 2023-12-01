@@ -18,7 +18,7 @@ class SiteKinkyMistressesSpider(BaseSceneScraper):
         'title': '//div[@class="videodetails"]/h1/text()',
         'description': '//div[@class="videodetails"]/p/text()',
         'date': '',
-        'image': '//div[@class="videowrapper"]/img/@src',
+        'image': '//div[@class="videowrapper"]/img/@src|//div[@class="videowrapper"]/video/@poster',
         'performers': '//div[@class="featuredmodels"]/a/text()',
         'tags': '//div[@class="videocats"]/a/text()',
         'external_id': r'-(\d{5,20})-',
@@ -31,15 +31,6 @@ class SiteKinkyMistressesSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-
-    def get_image(self, response):
-        image = super().get_image(response)
-        if not image:
-            image = response.xpath('//div[@class="videowrapper"]/video/@poster')
-            if image:
-                image = self.format_link(response, image.get())
-
-        return image.replace(" ", "%20")
 
     def get_title(self, response):
         title = super().get_title(response)

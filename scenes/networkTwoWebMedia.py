@@ -67,6 +67,7 @@ class SiteNetworkTwoWebMediaSpider(BaseSceneScraper):
             if scene_date:
                 item['date'] = scene_date
             if item['date'] > "2023-09-06":
+                scene['title'] = scene['title'].replace('"', ' ')
                 item['title'] = string.capwords(self.cleanup_title(scene['title'].replace("\"", "")))
                 item['id'] = scene['id']
                 item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))

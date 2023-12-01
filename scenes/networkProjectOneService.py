@@ -265,6 +265,9 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             else:
                 item['site'] = tldextract.extract(response.meta['url']).domain
 
+            if "men.com" in response.url and item['site'] == 'tp':
+                item['site'] = 'Twink Pop'
+
             if tldextract.extract(
                     response.meta['url']).domain == 'digitalplayground':
                 item['site'] = 'digitalplayground'

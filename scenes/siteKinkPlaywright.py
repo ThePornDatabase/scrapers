@@ -15,10 +15,10 @@ class NetworkKinkSpider(BaseSceneScraper):
     url = 'https://www.kink.com'
 
     paginations = [
-        '/search?type=shoots&thirdParty=false&page=%s',
-        # ~ '/search?type=shoots&featuredIds=%s',
-        # ~ '/search?type=shoots&thirdParty=true&page=%s',
-        # ~ '/search?type=shoots&channelIds=wasteland&sort=published&page=%s',
+        '/search?type=shoots&thirdParty=false&sort=published&page=%s',
+        # ~ '/search?type=shoots&sort=published&featuredIds=%s',
+        # ~ '/search?type=shoots&sort=published&thirdParty=true&page=%s',
+        # ~ '/search?type=shoots&sort=published&channelIds=wasteland&sort=published&page=%s',
     ]
 
     headers = {

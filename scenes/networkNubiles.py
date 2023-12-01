@@ -50,7 +50,7 @@ class NubilesSpider(BaseSceneScraper):
         'performers': '//a[@class="content-pane-performer model"]/text()',
         'tags': '//*[@class="categories"]//a/text()',
         'external_id': '(\\d+)',
-        'trailer': '',
+        'trailer': '//div[contains(@class,"video-container")]//source[contains(@src, ".mp4") and contains(@src,"1280")]/@src|//div[contains(@class,"video-container")]//source[contains(@src, ".mp4") and contains(@src,"960")]/@src|//div[contains(@class,"video-container")]//source[contains(@src, ".mp4") and contains(@src,"640")]/@src|//meta[@property="og:video"]/@content',
         'pagination': '/video/gallery/%s'
     }
 
@@ -120,3 +120,16 @@ class NubilesSpider(BaseSceneScraper):
         if description:
             return description.replace('Description:', '').strip()
         return ""
+
+    def get_trailer(self, response, path=None):
+        if 'trailer' in self.get_selector_map():
+            trailer = self.get_element(response, 'trailer', 're_trailer')
+            if type(trailer) is list:
+                trailer = trailer[-1]
+            if trailer:
+                if path:
+                    return self.format_url(path, trailer)
+                else:
+                    return self.format_link(response, trailer)
+
+        return ''

@@ -235,6 +235,11 @@ class NetworkPOVRSpider(BaseSceneScraper):
         else:
             item['type'] = 'Scene'
 
-        matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'milfvr']
-        if not any(x in re.sub('[^a-zA-Z0-9-]', '', item['site']).lower() for x in matches):
-            yield self.check_item(item, self.days)
+        shortsite = re.sub(r'[^a-z0-9]', '', item['site'].lower())
+        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr', 'badoink', 'realvr', 'kinkvr', 'babevr', 'vrcosplayx', '18vr', 'wankzvr', 'vrhush', 'naughtyamerica']
+        if not any(x in shortsite for x in matches):
+            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush']
+            if not any(x in shortsite for x in matches):
+                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr', 'badoink', 'slr-milfvr', 'milfvr']
+                if not any(x in shortsite for x in matches):
+                    yield self.check_item(item, self.days)

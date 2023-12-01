@@ -123,7 +123,7 @@ class NetworkItsPOVSpider(BaseSceneScraper):
                 item['image'] = data[row]['video_cover']['original']
 
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['date'] = self.parse_date(data[row]['translations'][0]['created_at']).isoformat()
+            item['date'] = self.parse_date(data[row]['translations'][0]['scene']['original_publication_date']).strftime('%Y-%m-%d')
             item['performers'] = []
             for model in data[row]['models']:
                 item['performers'].append(data[row]['models'][model]['stage_name'])

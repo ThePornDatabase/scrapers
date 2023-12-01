@@ -17,10 +17,10 @@ class SiteAntonioSuleimanSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//div[contains(@class, "updatesBlock")]/div[contains(@class, "section-heading")]/h3/text()',
-        'description': '',
+        'description': '//div[contains(@class,"updatesBlock")]/div[@class="wrapper"]/p/span[contains(@class,"tour_update_models")]/../following-sibling::div[1]/text()',
         'date': '//div[contains(@class, "updateDetails")]//p/text()',
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '',
+        'performers': '//div[contains(@class,"updatesBlock")]/div[@class="wrapper"]/p/span[contains(@class,"tour_update_models")]/a/text()',
         'tags': '',
         'duration': '',
         'trailer': '',

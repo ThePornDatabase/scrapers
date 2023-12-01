@@ -12,20 +12,22 @@ class NetworkPornPlusSpider(BaseSceneScraper):
     start_url = 'https://pornplus.com'
 
     paginations = [
-        '/series/strip-club-tryouts',
-        '/series/double-trouble',
-        '/series/glory-hole-4k',
-        '/series/property-exploits',
-        '/series/caged-sex',
-        '/series/momcum',
+        '/series/asians-exploited',
         '/series/bbc-povd',
         '/series/bikini-splash',
+        '/series/caged-sex',
         '/series/creepy-pa',
-        '/series/shower-4k',
+        '/series/double-trouble',
+        '/series/glory-hole-4k',
         '/series/kinky-sluts-4k',
-        '/series/asians-exploited',
+        '/series/momcum',
+        '/series/property-exploits',
+        '/series/rv-adventures',
         '/series/school-of-cock',
+        '/series/shower-4k',
+        '/series/strip-club-tryouts',
         '/series/throat-creampies',
+        '/series/waxxxed',
     ]
 
     selector_map = {

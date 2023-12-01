@@ -90,6 +90,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://lonelymeow.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'LonelyMeow', ''],
         ['https://rydenarmani.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Ryden Armani', ''],
         ['https://lilcandy.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Lil Candy', 'Lil Candy'],
+        ['https://pvgirls.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Porn Valley Girls', ''],
+        ['https://idreamofjo.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'I Dream of Jo', 'Monica Sweet'],
     ]
 
     selector_map = {
@@ -275,6 +277,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         if "Lisa Rivera" in item['tags']:
             item['tags'].remove("Lisa Rivera")
             item['performers'].append("Lisa Rivera")
+        if "idreamofjo" in response.url and "Jo" in item['performers']:
+            item['performers'].remove("Jo")
         if "Nina Rivera" in item['tags']:
             item['tags'].remove("Nina Rivera")
             item['performers'].append("Nina Rivera")

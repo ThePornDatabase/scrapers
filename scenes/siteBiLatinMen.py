@@ -31,6 +31,8 @@ class SiteBiLatinMenSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page):
         if int(page) == 1:
+            return "http://bilatinmen.com/index1.html"
+        elif int(page) == 2:
             return "http://bilatinmen.com/nudelatinmen.html"
         else:
             page = str(int(page) - 1)
@@ -41,10 +43,21 @@ class SiteBiLatinMenSpider(BaseSceneScraper):
         meta = response.meta
         page = int(meta['page'])
         if page == 1:
+            scenes = response.xpath('//div[contains(@class, "update-item") and not(contains(.//a/@href, "erotic_stories")) and not(contains(.//a/@href, "erotic_art")) and not(contains(.//h3/a/text(), "Pics:")) and not(contains(.//h2/text(), "Free Stuff"))]')
+        elif page == 2:
             scenes = response.xpath('//div[contains(@class, "update-item")]//h3/a/@href').getall()
         else:
             scenes = response.xpath('//a[contains(@href, "latin_men_preview")]/@href').getall()
         for scene in scenes:
+            if page == 1:
+                scenedate = scene.xpath('.//p/text()')
+                if scenedate:
+                    scenedate = scenedate.get()
+                    scenedate = re.search(r'(\w+ \d{1,2}, \d{4})', scenedate)
+                    if scenedate:
+                        scenedate = scenedate.group(1)
+                        meta['date'] = self.parse_date(scenedate, date_formats=['%B %d, %Y']).strftime('%Y-%m-%d')
+                scene = scene.xpath('./div[1]/div[1]//a/@href').get()
             if page == 2:
                 scene = "latin_men_preview/" + scene
             if re.search(self.get_selector_map('external_id'), scene) and "previews_latin_men" not in scene:

@@ -23,7 +23,7 @@ link_to_info = {
 
 def format_nav_url(link, start, limit, v2=False):
     if v2:
-        nav_format = "https://store2.psmcdn.net/{link}-{navText}/_search?from={start}&size={limit}"
+        nav_format = "https://store2.psmcdn.net/{link}-{navText}/_search?sort=publishedDate:desc&q=isUpcoming:false&from={start}&size={limit}"
     else:
         nav_format = "https://store.psmcdn.net/{link}/{navText}/items.json?orderBy=\"$key\"&startAt=\"{start}\"&limitToFirst={limit}"
 
@@ -92,7 +92,7 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
                 is_v2 = False
             if is_v2:
                 start = "0"
-                limit = 50
+                limit = 150
             else:
                 start = "aaaaaaaa"
                 limit = 150  # Was originally 450.  Next Page is keyed at 450

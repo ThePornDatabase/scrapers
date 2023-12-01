@@ -9,33 +9,30 @@ class GirlsOutWestSpider(BaseSceneScraper):
     parent = "GirlsOutWest"
 
     start_urls = [
-        'https://tour.girlsoutwest.com/'
+        'https://tour.girlsoutwest.com'
     ]
 
     selector_map = {
-        'title': '//meta[@name="twitter:title"]/@content|//meta[@property="og:title"]/@content|//div[contains(@class, "centerwrap")]/h3/text()',
-        'description': '',
-        'date': "//div[@class='centerwrap clear']/p",
-        're_date': r'(\d{2}/\d{2}/\d{4})',
-        'image': '//div[@class="videoplayer"]/img/@src0_1x',
-        'performers': '//div[@class="centerwrap clear"]/p/a[contains(@href,"/models/")]/text()',
-        'tags': "",
+        'title': '//div[@class="vpTitle"]/h1/text()',
+        'description': '//div [@class="description"]/p//text()',
+        'date': '//h5[contains(text(), "Added:")]/following-sibling::p/text()',
+        'date_formats': ['%B %d, %Y'],
+        'duration': '//h5[contains(text(), "Runtime:")]/following-sibling::text()',
+        're_duration': r'(\d{1,2}\:?\d{1,2}\:\d{1,2})',
+        'image': '//div[@class="player-thumb"]//img/@src0_3x|//div[@class="player-thumb"]//img/@src0_2x|//div[@class="player-thumb"]//img/@src0_1x',
+        'performers': '//h5[contains(text(), "Featuring:")]/following-sibling::ul/li/a/text()',
+        'tags': '//h5[contains(text(), "Tags:")]/following-sibling::ul/li/a/text()',
         'external_id': r'/trailers/(.*).ht',
         'trailer': '',
-        'pagination': '/categories/Movies/%s/latest/'
+        'pagination': '/categories/Movies_%s_d.html'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            "//div[contains(@class,'latestScene') and not(contains(@class,'latestScenePic')) and not(contains(@class,'latestScenesBlock'))]/h4/a/@href").getall()
+        scenes = response.xpath('//div[contains(@class,"videothumb")]/a/@href|//div[contains(@class,"iLScenePic")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_date(self, response):
-        date = response.xpath(self.get_selector_map('date'))
-        if date:
-            date = re.search(self.get_selector_map('re_date'), date.get())
-            if date:
-                return self.parse_date(date.group(1)).isoformat()
-        return self.parse_date('today').isoformat()
+    def get_id(self, response):
+        scene_id = super().get_id(response)
+        return scene_id.lower()

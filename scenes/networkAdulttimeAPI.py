@@ -134,6 +134,7 @@ def match_site(argument):
         'tabooheat': 'Taboo Heat',
         'teachmefisting': 'Teach Me Fisting',
         'teensneaks': 'Teen Sneaks',
+        'thebrats': 'The Brats',
         'themikeandjoannashow': 'The Mike and Joanna Show',
         'tommydxxx': 'Tommy D XXX',
         'touchmywife': 'Touch My Wife',
@@ -194,7 +195,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.filthykings.com',
         'https://www.footsiebabes.com',
         'https://www.gangbangcreampie.com',
-        # 'https://www.genderx.com', Now GenderXFilms
+        # ~ # 'https://www.genderx.com', Now GenderXFilms
         'https://www.genderxfilms.com',
         'https://www.girlsway.com',
         'https://www.gloryholesecrets.com',
@@ -215,6 +216,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.ragingstallion.com',
         'https://www.roccosiffredi.com',
         'https://www.tabooheat.com',
+        'https://www.thebrats.com',
         'https://www.touchmywife.com',
         'https://www.transfixed.com',
         'https://www.transsexualroadtrip.com',
@@ -312,7 +314,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             force_update = self.settings.get('force_update')
             if force_update:
                 force_update = True
-            force_fields = self.settings.get('force_fields').split(",")
+            force_fields = self.settings.get('force_fields')
+            if force_fields:
+                force_fields = force_fields.split(",")
 
             if not force_update or (force_update and "image" in force_fields):
                 item['image'] = ''
@@ -536,6 +540,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if 'teen-sneaks' in referrerurl:
                 item['parent'] = "Teen Sneaks"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'thebrats' in referrerurl:
+                item['parent'] = "Teen Sneaks"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'the-mike-and-joanna-show' in referrerurl:
                 item['parent'] = "The Mike and Joanna Show"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
@@ -582,8 +589,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if ('activeduty' in item['url'] and item['date'] < "2023-02-20"):
                 donotyield = 1
 
-            if ('gangbangcreampie' in item['url'] and item['date'] < "2022-10-29"):
-                donotyield = 1
+            # ~ if ('gangbangcreampie' in item['url'] and item['date'] < "2022-10-29"):
+                # ~ donotyield = 1
 
             if ('gloryholesecrets' in item['url'] and item['date'] < "2022-10-01"):
                 donotyield = 1
@@ -720,6 +727,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&attributesToRetrieve=%5B%22isVR%22%2C%22video_formats%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%2C%22hasPpu%22%2C%22ppu_infos%22%2C%22action_tags%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\')&facets=%5B%22hasSubtitle%22%2C%22categories.name%22%2C%22video_formats.format%22%2C%22length_range_15min%22%2C%22actors.name%22%2C%22subtitles.languages%22%2C%22availableOnSite%22%2C%22upcoming%22%2C%22serie_name%22%2C%22network.lvl0%22%5D&tagFilters=&facetFilters=%5B%5B%22serie_name%3ASwitch%22%5D%2C%5B%22upcoming%3A0%22%5D%5D"}]}'
         if 'teen-sneaks' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=24&page=' + str(page) + '&attributesToRetrieve=%5B%22action_tags%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%5D&clickAnalytics=true&facets=%5B%5D&tagFilters=&facetFilters=%5B%22upcoming%3A0%22%2C%5B%22availableOnSite%3Ateensneaks%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%22action_tags%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%5D&clickAnalytics=false&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&facets=availableOnSite&facetFilters=%5B%22upcoming%3A0%22%5D"}]}'
+        if 'thebrats' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes","params":"query=&hitsPerPage=24&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&filters=&facets=%5B%22availableOnSite%22%2C%22categories.name%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3Athebrats%22%5D%5D"},{"indexName":"all_scenes","params":"query=&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&filters=&hitsPerPage=1&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=availableOnSite"}]}'
         if 'the-mike-and-joanna-show' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=24&page=' + str(page) + '&attributesToRetrieve=%5B%22action_tags%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%5D&clickAnalytics=true&facets=%5B%5D&tagFilters=&facetFilters=%5B%22upcoming%3A0%22%2C%5B%22availableOnSite%3Athemikeandjoannashow%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%22action_tags%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%5D&clickAnalytics=false&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&facets=availableOnSite&facetFilters=%5B%22upcoming%3A0%22%5D"}]}'
         if 'touchmywife' in referrer:
