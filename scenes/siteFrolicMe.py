@@ -17,13 +17,13 @@ class FrolicMeSpider(BaseSceneScraper):
     title_trash = ['- film', '- Film']
 
     selector_map = {
-        'title': '//div[@class="film-entry-title"]/text()',
-        'description': '//div[@class="film-content"]/p/text()|//div[@class="film-content"]/p/span/text()|//div[@class="film-content"]/div/p/text()',
+        'title': '//div[@class="entry-title"]/text()',
+        'description': '//div[@class="entry-content"]/p/text()|//div[@class="entry-content"]/p/span/text()|//div[@class="entry-content"]/div/p/text()',
         'date': '//script[contains(text(), "datePublished")]/text()',
         're_date': r'datePublished\": ?\"(\d{4}-\d{2}-\d{2}.*?)\"',
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//h3/a[contains(@href,"/models/")]/text()',
-        'tags': '//i[contains(@class,"fa-tags")]/following-sibling::a/text()',
+        'performers': '//div[contains(@class,"entry-meta")]/span/a[contains(@href,"models")]/text()',
+        'tags': '//div[contains(@class,"entry-meta")]/span/a[contains(@href,"erotic-films") or contains(@href,"porn-films")]/text()',
         'external_id': r'.*\/(.*?)\/$',
         'trailer': '',
         'pagination': '/publications/page/%s/'
