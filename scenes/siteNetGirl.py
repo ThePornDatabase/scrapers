@@ -41,7 +41,7 @@ class SiteNetGirlSpider(BaseSceneScraper):
                 for scene in jsongroup:
                     item = SceneItem()
 
-                    if "id" in scene:
+                    if "id" in scene and "omg the latest" not in scene['short_title'].lower():
                         item['network'] = 'NetVideoGirls'
                         item['parent'] = 'NetGirl'
                         item['site'] = 'NetGirl'
@@ -69,7 +69,8 @@ class SiteNetGirlSpider(BaseSceneScraper):
                         item['description'] = ''
                         item['performers'] = []
                         for model in scene['models']:
-                            item['performers'].append(model['model_name'])
+                            model_name = f"{model['model_name']}-ID{model['id']}"
+                            item['performers'].append(model_name)
                         item['tags'] = ['Amateur', 'Audition']
                         item['trailer'] = ''
                         yield item

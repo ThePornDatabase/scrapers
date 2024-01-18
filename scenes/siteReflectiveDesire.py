@@ -15,8 +15,8 @@ class ReflectiveDesireSpider(BaseSceneScraper):
     ]
 
     scene_urls = [
-        'https://reflectivedesire.com/videos/categories/scenes/',
-        'https://reflectivedesire.com/videos/categories/shorts/'
+        'https://reflectivedesire.com/videos/categories/scenes/?sort=chrono',
+        'https://reflectivedesire.com/videos/categories/shorts/?sort=chrono'
     ]
 
     def start_requests(self):

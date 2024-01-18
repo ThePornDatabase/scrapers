@@ -10,7 +10,7 @@ class SiteMenOfMontrealSpider(BaseSceneScraper):
     site = 'Men Of Montreal'
 
     start_urls = [
-        'https://menofmontreal.com',
+        # ~ 'https://menofmontreal.com',  Moved to BroNetwork Scraper
     ]
 
     selector_map = {

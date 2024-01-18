@@ -1,70 +1,137 @@
 import re
+import string
 import scrapy
-
 from tpdb.BasePerformerScraper import BasePerformerScraper
+from tpdb.items import PerformerItem
 
 
-class SiteAdultAuditionsPerformerSpider(BasePerformerScraper):
+class SiteBlackBullChallengePerformerSpider(BasePerformerScraper):
+    name = 'BlackBullChallengePerformer'
+    start_url = 'https://blackbullchallenge.com'
+
     selector_map = {
-        'name': '//div[contains(@class,"profile-details")]/h3[1]/text()',
-        'image': '//div[@class="profile-pic"]/img/@src0_1x',
-        'bio': '//div[@class="profile-about"]/p/text()',
-        'height': '//strong[contains(text(), "Height")]/following-sibling::text()',
-        'measurements': '//strong[contains(text(), "Measurements")]/following-sibling::text()',
-        'pagination': '/tour/models/%s/latest/?g=f',
-        'external_id': r'model/(.*)/'
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/models.json?page=%s&order_by=publish_date&sort_by=desc',
     }
 
-    name = 'BlackBullChallengePerformer'
-    network = 'Black Bull Challenge'
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://blackbullchallenge.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    start_urls = [
-        'https://www.blackbullchallenge.com',
-    ]
+    def start_requests_2(self, response):
+        meta = response.meta
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def get_gender(self, response):
-        return 'Female'
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
+
+    def parse(self, response, **kwargs):
+        performers = self.get_performers(response)
+        count = 0
+        for performer in performers:
+            count += 1
+            yield performer
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_performers(self, response):
-        performers = response.xpath('//div[@class="item-portrait"]/a/@href').getall()
-        for performer in performers:
-            yield scrapy.Request(
-                url=self.format_link(response, performer),
-                callback=self.parse_performer
-            )
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['models']['data']
+        for performer in jsondata:
+            item = PerformerItem()
 
-    def get_name(self, response):
-        name = super().get_name(response)
-        name = name.replace("About", "").strip()
-        return name
-
-    def get_height(self, response):
-        height = super().get_height(response)
-        if height:
-            heighttext = re.search(r'\((\d{3}.*?)\)', height)
-            if heighttext:
-                return heighttext.group(1).replace(" ", "").lower().strip()
-        return height
-
-    def get_cupsize(self, response):
-        if 'measurements' in self.selector_map:
-            cupsize = self.process_xpath(response, self.get_selector_map('measurements'))
-            if cupsize:
-                cupsize = cupsize.get()
-                if re.search(r'(\d+\w+)-\d+-\d+', cupsize):
-                    cupsize = re.search(r'(\d+\w+)-\d+-\d+', cupsize).group(1)
-                    if cupsize:
-                        return cupsize.strip().upper()
-        return ''
-
-    def get_bio(self, response):
-        bio_xpath = self.process_xpath(response, self.get_selector_map('bio'))
-        if bio_xpath:
-            if len(bio_xpath) > 1:
-                bio = list(map(lambda x: x.strip(), bio_xpath.getall()))
-                bio = ' '.join(bio)
+            item['name'] = performer['name']
+            item['image'] = performer['thumb']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['bio'] = ''
+            if "gender" in performer and performer['gender']:
+                item['gender'] = string.capwords(performer['gender'])
             else:
-                bio = bio_xpath.get()
-            return bio
+                item['gender'] = "female"
+            item['astrology'] = ''
+            if "Birthdate" in performer and performer['Birthdate']:
+                item['birthday'] = performer['Birthdate']
+            else:
+                item['birthday'] = ''
 
-        return ''
+            if "Born" in performer and performer['Born']:
+                item['birthplace'] = performer['Born']
+            else:
+                item['birthplace'] = ''
+
+            if "Measurements" in performer and performer['Measurements']:
+                item['measurements'] = performer['Measurements']
+            else:
+                item['measurements'] = ''
+
+            if re.search(r'(\d+\w+)-', item['measurements']):
+                item['cupsize'] = re.search(r'(\d+\w+)-', item['measurements']).group(1)
+            else:
+                item['cupsize'] = ''
+
+            item['ethnicity'] = ''
+
+            if "Eyes" in performer and performer['Eyes']:
+                item['eyecolor'] = performer['Eyes']
+            else:
+                item['eyecolor'] = ''
+            item['fakeboobs'] = ''
+
+            if "Hair" in performer and performer['Hair']:
+                item['haircolor'] = performer['Hair']
+            else:
+                item['haircolor'] = ''
+
+            if "Height" in performer and performer['Height']:
+                item['height'] = self.get_height(performer['Height'])
+            else:
+                item['height'] = ''
+
+            if "Weight" in performer and performer['Weight']:
+                item['weight'] = self.get_height(performer['Weight'])
+            else:
+                item['weight'] = ''
+
+            item['nationality'] = ''
+            item['piercings'] = ''
+            item['tattoos'] = ''
+            item['network'] = 'Black Bull Challenge'
+            item['url'] = f"https://blackbullchallenge.com/models/{performer['slug']}"
+
+            yield item
+
+    def get_weight(self, weight):
+        if weight:
+            weight = int(weight)
+            weight = int(weight * .45)
+        return str(weight) + "kg"
+
+    def get_height(self, height):
+        if "'" in height:
+            height = re.sub(r'[^0-9\']', '', height)
+            feet = re.search(r'(\d+)\'', height)
+            if feet:
+                feet = feet.group(1)
+                feet = int(feet) * 12
+            else:
+                feet = 0
+            inches = re.search(r'\'(\d+)', height)
+            if inches:
+                inches = inches.group(1)
+                inches = int(inches)
+            else:
+                inches = 0
+            return str(int((feet + inches) * 2.54)) + "cm"
+        return None

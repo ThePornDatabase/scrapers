@@ -34,16 +34,11 @@ class SitePassionsOnlySpider(BaseSceneScraper):
             image = scene.xpath('./img/@srcset')
             if image:
                 image = scene.xpath('./img/@srcset').get()
-                image = re.search(r'.*(http.*?768.*?\.jpg)', image)
+                image = image.split(",")
+                image = image[-1]
+                image = re.search(r'.*(http.*?\.\w{3,4})\s', image).group(1)
                 if image:
-                    meta['image'] = self.format_link(response, image.group(1))
-                    meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
-
-            if not image:
-                image = scene.xpath('./img/@srcset').get()
-                image = re.search(r'.*(http.*?360.*?\.jpg)', image)
-                if image:
-                    meta['image'] = self.format_link(response, image.group(1))
+                    meta['image'] = image
                     meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
 
             scene = scene.xpath('./@href').get()

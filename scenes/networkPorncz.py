@@ -74,7 +74,7 @@ class PornCZSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_site(self, response):
-        site = response.xpath('//a[contains(@class, "logo")]/img/@alt').get()
+        site = response.xpath('//a[contains(@class, "video-detail-logo")]/img/@alt').get()
         if site:
             return site.strip().title()
         else:
@@ -83,7 +83,7 @@ class PornCZSpider(BaseSceneScraper):
     def get_date(self, response):
         date = self.process_xpath(response, self.get_selector_map('date')).get()
         date = datetime.datetime.strptime(date, "%d.%m.%Y").strftime("%Y-%m-%d")
-        return dateparser.parse(date.strip()).isoformat()
+        return dateparser.parse(date.strip()).strftime('%Y-%m-%d')
 
     def get_network(self, response):
         return "Porn CZ"

@@ -219,6 +219,8 @@ class ScorePassSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        meta = response.meta
+        meta['ignore_sites'] = ['scorepass']
         if "pornmegaload" in response.url:
             scenes = response.xpath('//div[contains(@class, "li-item video")]')
         elif "tnatryouts" in response.url:
@@ -249,7 +251,8 @@ class ScorePassSpider(BaseSceneScraper):
                 scene = re.search(r'(.*)/\?nats=', scene).group(1)
             if "step=signup" not in scene and "join." not in scene:
                 if "pornmegaload" in response.url and site:
-                    yield scrapy.Request(url=scene, callback=self.parse_scene, meta={'site': site})
+                    meta['site'] = site
+                    yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
                 else:
                     yield scrapy.Request(url=scene, callback=self.parse_scene)
 

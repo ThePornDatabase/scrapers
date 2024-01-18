@@ -1,51 +1,47 @@
 import re
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteTheLisaAnnSpider(BaseSceneScraper):
     name = 'TheLisaAnn'
+    network = 'The Lisa Ann'
+    parent = 'The Lisa Ann'
+    site = 'The Lisa Ann'
 
     start_urls = [
-        'https://www.thelisaann.com',
+        'https://thelisaann.com',
     ]
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'trailer': '',
+        'title': '//div[@class="title_bar"]/span/text()',
+        'description': '//span[@class="update_description"]/text()',
+        'date': '//div[@class="gallery_info"]/div[@class="table"]/div/div[contains(@class, "date")]/text()',
+        'date_formats': ['%m/%d/%Y'],
+        'image': '//meta[@property="og:image"]/@content',
+        'performers': '//div[@class="gallery_info"]/span[contains(@class, "update_models")]/a/text()',
+        'tags': '//div[@class="gallery_info"]/span[contains(@class, "update_tags")]/a/text()',
+        'duration': '',
+        'trailer': '//script[contains(text(), "trailer")]/text()',
+        're_trailer': r'trailer.*?path:[\'\"](.*?)[\'\"]',
         'external_id': r'',
-        'pagination': '/updates/page_%s.html'
+        'pagination': '/vod/categories/movies_%s_d.html',
+        'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="updates clear"]')
+        meta = response.meta
+        scenes = response.xpath('//div[@class="update_details"]')
         for scene in scenes:
-            item = SceneItem()
-            item['site'] = "The Lisa Ann"
-            item['parent'] = "The Lisa Ann"
-            item['network'] = "The Lisa Ann"
-            item['date'] = ""
-
-            item['title'] = self.cleanup_title(scene.xpath('.//h3/a/text()').get())
-            item['image'] = self.format_link(response, scene.xpath('.//img/@src').get())
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['description'] = scene.xpath('./div/p/text()').get().strip()
-            item['tags'] = []
-            item['performers'] = ['Lisa Ann']
-            sceneid = re.search(r'/content/(.*)/', item['image']).group(1)
-            item['url'] = f"https://www.thelisaann.com/content/{sceneid}"
-            item['id'] = sceneid
-            trailer = scene.xpath('./div/a[contains(@onclick, "content")]/@onclick')
-            if trailer:
-                trailer = re.search(r'(/content.*?\.mp4)', trailer.get()).group(1)
-                trailer = self.format_link(response, trailer)
-            else:
-                trailer = ""
-            item['trailer'] = trailer
-
-            yield item
+            duration = scene.xpath('.//div[contains(@class,"update_counts")]/text()')
+            if duration:
+                duration = duration.get()
+                duration = duration.replace("&nbsp;", "").replace(" ", "").lower()
+                duration = re.sub(r'[^a-z0-9]', '', duration)
+                duration = re.search(r'(\d+)min', duration)
+                if duration:
+                    meta['duration'] = str(int(duration.group(1)) * 60)
+            meta['id'] = scene.xpath('./@data-setid').get()
+            scene = scene.xpath('./a[1]/@href').get()
+            if meta['id']:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

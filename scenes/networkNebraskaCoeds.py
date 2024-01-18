@@ -1,6 +1,5 @@
 import re
 from urllib.parse import urlparse
-from datetime import date, timedelta
 import scrapy
 
 from tpdb.items import SceneItem
@@ -21,14 +20,7 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
         'external_id': r'view/(\d+)/',
-        'trailer': '',
     }
 
     def start_requests(self):
@@ -87,9 +79,13 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
             else:
                 item['performers'] = []
 
-            image = scene.xpath('./div[@class="updateThumb"]/a/img/@src|./a/img/@src').get()
+            image = scene.xpath('./div[@class="updateThumb"]/a/img/@src0_4x|./div[@class="updateThumb"]/a/img/@src0_3x|./div[@class="updateThumb"]/a/img/@src0_2x')
             if image:
-                item['image'] = image.strip()
+                image = image.get()
+            else:
+                image = scene.xpath('./div[@class="updateThumb"]/a/img/@src|./a/img/@src').get()
+            if image:
+                item['image'] = self.format_link(response, image.strip())
             else:
                 item['image'] = None
 
@@ -122,21 +118,4 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
             item['parent'] = meta['site']
             item['network'] = "Nebraska Coeds"
 
-            if item['id'] and item['title']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
+            yield self.check_item(item, self.days)

@@ -95,6 +95,7 @@ class IFeelMyselfSpider(BaseSceneScraper):
         performers = [p.replace("_", " ") for p in performers]
         if performers != []:
             scene["performers"] = performers
+            print(performers)
         yield scene
 
     def parse_scene(self, response):

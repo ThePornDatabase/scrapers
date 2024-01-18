@@ -11,16 +11,44 @@ class SiteAltEroticSpider(BaseSceneScraper):
     parent = 'Alt Erotic'
     site = 'Alt Erotic'
 
-    start_urls = [
-        'https://alterotic.com',
-    ]
-
-    cookies = {'close-warning': '1'}
+    start_url = 'https://alterotic.com'
 
     selector_map = {
-        'external_id': r'updates/(.*?)\.html',
-        'pagination': '/_next/data/56lUITLyKsV3iowSLtu3y/videos.json?page=%s&order_by=publish_date&sort_by=desc'
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc'
     }
+
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://alterotic.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = response.meta
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
         jsondata = json.loads(response.text)

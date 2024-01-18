@@ -4,6 +4,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 true = True
 false = False
 
+
 class AdultEmpireCashScraper(BaseSceneScraper):
     name = 'AdultEmpireCash'
     network = 'AdultEmpireCash'
@@ -47,21 +48,16 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         'pagination': '/watch-newest-clips-and-scenes.html?page=%s&hybridview=member'
     }
 
-    cookies = [{"domain":"www.spankmonster.com","expirationDate":1700224680.169454,"hostOnly":true,"httpOnly":false,"name":"etoken","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"a1=6d69b27728ab0f0fa6f27c4847de995b2ae8294481f479d50f99a84237e75ec2&a2=fd6b579d6127507d96b861ca545cbd62fa2e1fb7c86dcf7a7cf0ba63d945f328&a3=99454396309237"},{"domain":"www.spankmonster.com","hostOnly":true,"httpOnly":false,"name":"use_lang","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"val=en"},{"domain":"www.spankmonster.com","hostOnly":true,"httpOnly":false,"name":"defaults","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"{'hybridView':'member'}"}]
+    cookies = [
+        {"name": "use_lang", "value": "val=en"},
+        {"name": "defaults", "value": "{'hybridView':'member'}"}
+    ]
 
     custom_scraper_settings = {
         'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
         'AUTOTHROTTLE_ENABLED': True,
         'AUTOTHROTTLE_START_DELAY': 1,
-        # ~ 'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
-        # ~ 'DOWNLOAD_DELAY': 2,
-        # ~ 'DOWNLOADER_MIDDLEWARES': {
-            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-            # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-        # ~ },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
             "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -73,11 +69,13 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         meta['page'] = self.page
         meta['playwright'] = True
         meta['dont_redirect'] = True
-        # ~ for link in self.start_urls:
-            # ~ yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+        yield scrapy.Request("https://www.18lust.com/tour", callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = response.meta
 
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
         if "spankmonster" in response.url:
@@ -85,7 +83,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             for scene in scenes:
                 meta = {}
                 meta['site'] = "Spank Monster"
-                url=self.format_link(response, scene)
+                url = self.format_link(response, scene)
                 yield scrapy.Request(url, callback=self.parse_scene, meta=meta)
         elif "smutfactor" in response.url:
             scenes = response.xpath('//div[@class="scene-preview-container"]/a/@href').getall()

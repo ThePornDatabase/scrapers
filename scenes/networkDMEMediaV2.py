@@ -118,14 +118,15 @@ class NetworkDMEMediaV2Spider(BaseSceneScraper):
 
     def get_image(self, response):
         image = super().get_image(response)
-        if "ghettogaggers" in response.url or "ebonycumdumps" in response.url:
-            image = response.xpath('//img[contains(@src, "full.jpg")]/@src')
-            if image:
-                image = image.get()
-            if "jpg" not in image:
-                image = response.xpath('//script[contains(text(), "poster")]/text()')
+        if ".jpg" not in image:
+            if "ghettogaggers" in response.url or "ebonycumdumps" in response.url:
+                image = response.xpath('//img[contains(@src, "full.jpg")]/@src')
                 if image:
-                    image = re.search(r'poster=\"(http.*?)\"', image.get()).group(1)
+                    image = image.get()
+                if "jpg" not in image:
+                    image = response.xpath('//script[contains(text(), "poster")]/text()')
+                    if image:
+                        image = re.search(r'poster=\"(http.*?)\"', image.get()).group(1)
         return image
 
     def get_image_blob(self, response):

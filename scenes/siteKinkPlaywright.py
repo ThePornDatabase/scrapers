@@ -1,11 +1,8 @@
 import re
+import string
 import scrapy
-from PIL import Image
-import base64
-from io import BytesIO
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-from tpdb.helpers.http import Http
 
 
 class NetworkKinkSpider(BaseSceneScraper):
@@ -37,13 +34,15 @@ class NetworkKinkSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//title/text()',
-        'description': '//span[@class="description-text"]/p/text()',
+        'description': '//span[@class="description-text"]/p/text()|//h4[contains(text(), "Description")]/following-sibling::span[1]/p/text()',
         'date': "//span[@class='shoot-date']/text()",
-        'image': '//meta[@name="twitter:image"]/@content',
-        'performers': '//p[@class="starring"]/span/a/text()',
-        'tags': "//a[@class='tag']/text()",
+        'image': '//meta[@name="twitter:image"]/@content|//video/@poster',
+        'duration': '//span[@class="clock"]/text()',
+        'performers': '//p[@class="starring"]/span/a/text()|//span[contains(@class, "text-primary fs-5")]/a[contains(@href, "/model/")]/text()',
+        'tags': '//a[@class="tag"]/text()|//h4[contains(text(), "Categories")]/following-sibling::span[1]/a/text()',
         'external_id': r'/shoot/(\d+)',
-        'trailer': '//meta[@name="twitter:player"]/@content',
+        'trailer': '//meta[@name="twitter:player"]/@content|//div[contains(@class,"kvjs-container")]/@data-setup',
+        're_trailer': r'trailer.*?quality.*?(http.*?)[\'\"]',
         'pagination': '/shoots/latest?page=%s'
     }
 
@@ -100,13 +99,17 @@ class NetworkKinkSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        return response.xpath('//div[@class="shoot-page"]/@data-sitename').get().strip()
+        return response.xpath('//div[@class="shoot-page"]/@data-sitename|//div[contains(@class, "shoot-detail-legend")]/span/a/text()').get().strip()
 
     def get_performers(self, response):
-        performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
-        performers_stripped = [s.strip() for s in performers]
-        performers_stripped = [s.rstrip(',') for s in performers_stripped]
-        return list(map(lambda x: x.strip(), performers_stripped))
+        performers = super().get_performers(response)
+        return list(map(lambda x: string.capwords(x.strip(",").strip().lower()), performers))
+
+    def get_tags(self, response):
+        tags = super().get_tags(response)
+        tags = list(map(lambda x: string.capwords(x.strip(",").strip().lower()), tags))
+        tags = list(filter(None, tags))
+        return tags
 
     def get_next_page_url(self, url, page, pagination):
         return self.format_url(url, pagination % page)
@@ -114,147 +117,32 @@ class NetworkKinkSpider(BaseSceneScraper):
     def parse_scene(self, response):
         item = SceneItem()
 
-        if 'title' in response.meta and response.meta['title']:
-            item['title'] = response.meta['title']
-        else:
-            item['title'] = self.get_title(response)
-
-        if 'description' in response.meta:
-            item['description'] = response.meta['description']
-        else:
-            item['description'] = self.get_description(response)
-
-        if hasattr(self, 'site'):
-            item['site'] = self.site
-        elif 'site' in response.meta:
-            item['site'] = response.meta['site']
-        else:
-            item['site'] = self.get_site(response)
-
-        if 'date' in response.meta:
-            item['date'] = response.meta['date']
-        else:
-            item['date'] = self.get_date(response)
-
-        if 'image' in response.meta:
-            item['image'] = response.meta['image']
-        else:
-            item['image'] = self.get_image(response)
-
-        if 'image' not in item or not item['image']:
-            item['image'] = None
-
-        if 'image_blob' in response.meta:
-            item['image_blob'] = response.meta['image_blob']
-        else:
-            item['image_blob'] = self.get_image_blob(response)
-
-        if ('image_blob' not in item or not item['image_blob']) and item['image']:
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-        if 'image_blob' not in item:
-            item['image_blob'] = None
-
-        if 'performers' in response.meta:
-            item['performers'] = response.meta['performers']
-        else:
-            item['performers'] = self.get_performers(response)
-
-        if 'tags' in response.meta:
-            item['tags'] = response.meta['tags']
-        else:
-            item['tags'] = self.get_tags(response)
-
-        if 'markers' in response.meta:
-            item['markers'] = response.meta['markers']
-        else:
-            item['markers'] = self.get_markers(response)
-
-        if 'id' in response.meta:
-            item['id'] = response.meta['id']
-        else:
-            item['id'] = self.get_id(response)
-
-        if 'trailer' in response.meta:
-            item['trailer'] = response.meta['trailer']
-        else:
-            item['trailer'] = self.get_trailer(response)
-
-        if 'duration' in response.meta:
-            item['duration'] = response.meta['duration']
-        else:
-            item['duration'] = self.get_duration(response)
-
-        if 'url' in response.meta:
-            item['url'] = response.meta['url']
-        else:
-            item['url'] = self.get_url(response)
-
-        if hasattr(self, 'network'):
-            item['network'] = self.network
-        elif 'network' in response.meta:
-            item['network'] = response.meta['network']
-        else:
-            item['network'] = self.get_network(response)
-
-        if hasattr(self, 'parent'):
-            item['parent'] = self.parent
-        elif 'parent' in response.meta:
-            item['parent'] = response.meta['parent']
-        else:
-            item['parent'] = self.get_parent(response)
-
-        # Movie Items
-
-        if 'store' in response.meta:
-            item['store'] = response.meta['store']
-        else:
-            item['store'] = self.get_store(response)
-
-        if 'director' in response.meta:
-            item['director'] = response.meta['director']
-        else:
-            item['director'] = self.get_director(response)
-
-        if 'format' in response.meta:
-            item['format'] = response.meta['format']
-        else:
-            item['format'] = self.get_format(response)
-
-        if 'back' in response.meta:
-            item['back'] = response.meta['back']
-        else:
-            item['back'] = self.get_back_image(response)
-
-        if 'back' not in item or not item['back']:
-            item['back'] = None
-            item['back_blob'] = None
-        else:
-            if 'back_blob' in response.meta:
-                item['back_blob'] = response.meta['back_blob']
-            else:
-                item['back_blob'] = self.get_image_back_blob(response)
-
-            if ('back_blob' not in item or not item['back_blob']) and item['back']:
-                item['back_blob'] = self.get_image_from_link(item['back'])
-
-        if 'back_blob' not in item:
-            item['back_blob'] = None
-
-        if 'sku' in response.meta:
-            item['sku'] = response.meta['sku']
-        else:
-            item['sku'] = self.get_sku(response)
-
-        if hasattr(self, 'type'):
-            item['type'] = self.type
-        elif 'type' in response.meta:
-            item['type'] = response.meta['type']
-        elif 'type' in self.get_selector_map():
-            item['type'] = self.get_selector_map('type')
-        else:
-            item['type'] = 'Scene'
+        item['title'] = self.get_title(response)
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = self.get_date(response)
+        item['image'] = self.get_image(response)
+        item['image_blob'] = self.get_image_blob(response)
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['markers'] = self.get_markers(response)
+        item['id'] = self.get_id(response)
+        item['trailer'] = self.get_trailer(response)
+        item['duration'] = self.get_duration(response)
+        item['url'] = self.get_url(response)
+        item['network'] = self.network
+        item['parent'] = self.get_site(response)
+        item['type'] = 'Scene'
 
         matches = ['str8hell', 'cfnmeu', 'malefeet4u', 'williamhiggins', 'ambushmassage', 'swnude', 'sweetfemdom']
         if not any(x in item['site'] for x in matches):
             yield self.check_item(item, self.days)
+
+    def get_date(self, response):
+        scenedate = response.xpath('//div[contains(@class,"kvjs-container")]/@data-setup')
+        if scenedate:
+            scenedate = scenedate.get()
+            scenedate = re.search(r'publishedDate.*?(\d{4}-\d{2}-\d{2})', scenedate)
+            if scenedate:
+                return scenedate.group(1)
+        return ''

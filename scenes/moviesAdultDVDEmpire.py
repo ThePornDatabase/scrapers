@@ -158,7 +158,7 @@ class AdultDVDEmpireMovieSpider(BaseSceneScraper):
             filter_date = filter_date.strftime('%Y-%m-%d')
 
         foundpointer = 0
-        matches = ['bangbros', 'jeffsmodels', 'private', 'dorcel', 'bluebirdfilms', 'privateblack']
+        matches = ['bangbros', 'jeffsmodels', 'private', 'dorcel', 'bluebirdfilms', 'privateblack', 'dorcelclub', 'evilangel', 'wicked']
         if item['title'] and item['site'] and not any(x in re.sub(r'[^a-zA-Z0-9]', '', item['site']).lower().replace(" ", "") for x in matches):
             year = re.search(r'(\d{4})-\d{2}-\d{2}', item['date']).group(1)
             teststring = item['title'] + year + item['site']

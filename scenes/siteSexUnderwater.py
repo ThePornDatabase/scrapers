@@ -16,7 +16,7 @@ class SiteSexUnderwaterSpider(BaseSceneScraper):
 
     selector_map = {
         'external_id': r'',
-        'pagination': '/categories/SexUnderwater_%s_d.html',
+        'pagination': '/categories/movies_%s_d.html',
         'type': 'Scene',
     }
 

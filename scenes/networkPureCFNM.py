@@ -13,7 +13,7 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
     parent = 'Pure CFNM'
 
     start_urls = [
-        ['https://www.purecfnm.com', '/categories/purecfnm_%s_d.html', 'Pure CFNM'],
+        ['https://www.purecfnm.com', '/categories/movies_%s_d.html', 'Pure CFNM'],
         ['https://www.ladyvoyeurs.com', '/categories/lady-voyeurs_%s_d.html', 'Lady Voyeurs'],
         ['https://www.amateurcfnm.com', '/categories/amateur-cfnm_%s_d.html', 'Amateur CFNM'],
         ['https://www.cfnmgames.com', 'categories/movies_%s_d.html', 'CFNM Games'],

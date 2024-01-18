@@ -1,6 +1,6 @@
 import re
 import scrapy
-
+from slugify import slugify
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -69,12 +69,32 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
         else:
             scenes = response.xpath('//div[contains(@class, "tourMovieContainer")]')
 
+        network = "ATK Girlfriends"
+        if "atkarchives" in response.url:
+            parent = "ATK Archives"
+            site = "ATK Archives"
+        if "atkexotics" in response.url:
+            parent = "ATK Exotics"
+            site = "ATK Exotics"
+        if "atkpremium" in response.url:
+            parent = "ATK Premium"
+            site = "ATK Premium"
+        if "atkpetites" in response.url:
+            parent = "ATK Petites"
+            site = "ATK Petites"
+        if "atkhairy" in response.url:
+            parent = "ATK Hairy"
+            site = "ATK Hairy"
+        if "amkingdom" in response.url:
+            parent = "ATK Galleria"
+            site = "ATK Galleria"
+
         for scene in scenes:
             if "atkexotics" in response.url or "amkingdom" in response.url:
                 link = scene.xpath('./div[@class="movie-image"]/a/@href').get()
                 scenedate = scene.xpath('./div[@class="date left clear"][2]/text()').get()
                 if scenedate:
-                    scenedate = self.parse_date(scenedate.strip()).isoformat()
+                    scenedate = self.parse_date(scenedate.strip()).strftime('%Y-%m-%d')
                 else:
                     scenedate = None
                 performer = scene.xpath('./div[@class="video-name"]/a/text()').get()
@@ -87,11 +107,20 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
                 else:
                     meta['duration'] = None
 
+                origtitle = scene.xpath('./div[@class="video-name"]/a/text()')
+                if origtitle:
+                    origtitle = self.cleanup_title(origtitle.get())
+
+                origimage = scene.xpath('.//img/@src')
+                if origimage:
+                    origimage = self.format_link(response, origimage.get())
+                    origimage_blob = self.get_image_blob_from_link(origimage)
+
             else:
                 link = scene.xpath('.//div[@class="player"]/a/@href').get()
                 scenedate = scene.xpath('.//span[contains(@class, "movie_date")]/text()').get()
                 if scenedate:
-                    scenedate = self.parse_date(scenedate.strip()).isoformat()
+                    scenedate = self.parse_date(scenedate.strip()).strftime('%Y-%m-%d')
                 else:
                     scenedate = None
                 performer = scene.xpath('./div/span[contains(@class,"video_name")]/a/text()').get()
@@ -106,6 +135,40 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
                 else:
                     meta['duration'] = None
 
+                origtitle = scene.xpath('./div/span/a/text()')
+                if origtitle:
+                    origtitle = self.cleanup_title(origtitle.get())
+
+                origimage = scene.xpath('.//img/@src')
+                if origimage:
+                    origimage = self.format_link(response, origimage.get())
+                    origimage_blob = self.get_image_blob_from_link(origimage)
+
+            sceneid = re.search(r'.*/(\d{4,8})/.*', link)
+            if sceneid:
+                sceneid = sceneid.group(1)
+            else:
+                sceneid = re.search(r'.*/(\d{4,8})/.*', origimage)
+                if sceneid:
+                    sceneid = sceneid.group(1)
+
+            urltitle = origtitle
+            origtitle = f"{site} : {origtitle} - {sceneid}"
+
+            linktitle = ''
+            if re.search(r'(movie/\d+/)', link) and "?w=" not in link and ".com?nats" not in link:
+                linktitle = re.search(r'.*/\d+/(.*?)$', link)
+                if linktitle:
+                    linktitle = linktitle.group(1)
+                    linktitle = linktitle.strip("/")
+
+            if len(linktitle) > len(urltitle):
+                origtitle = self.cleanup_title(linktitle.replace("-", " "))
+
+            meta['origtitle'] = origtitle
+            meta['origimage'] = origimage
+            meta['origimage_blob'] = origimage_blob
+
             meta['date'] = scenedate
             meta['performers'] = [performer]
 
@@ -113,39 +176,23 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
                 yield scrapy.Request(self.format_link(response, link), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
             else:
                 item = SceneItem()
-                item['network'] = "ATK Girlfriends"
-                if "atkarchives" in response.url:
-                    item['parent'] = "ATK Archives"
-                    item['site'] = "ATK Archives"
-                if "atkexotics" in response.url:
-                    item['parent'] = "ATK Exotics"
-                    item['site'] = "ATK Exotics"
-                if "atkpremium" in response.url:
-                    item['parent'] = "ATK Premium"
-                    item['site'] = "ATK Premium"
-                if "atkpetites" in response.url:
-                    item['parent'] = "ATK Petites"
-                    item['site'] = "ATK Petites"
-                if "atkhairy" in response.url:
-                    item['parent'] = "ATK Hairy"
-                    item['site'] = "ATK Hairy"
-                if "amkingdom" in response.url:
-                    item['parent'] = "ATK Galleria"
-                    item['site'] = "ATK Galleria"
-                title = scene.xpath('.//img/@alt')
-                if title:
-                    item['title'] = self.cleanup_title(title.get())
+                item['network'] = network
+                item['site'] = site
+                item['parent'] = parent
+
+                if origtitle:
+                    item['title'] = origtitle
                 else:
                     item['title'] = ''
                 item['date'] = scenedate
-                item['url'] = response.url
-                image = scene.xpath('.//img/@src')
-                if image:
-                    item['image'] = image.get().strip()
+                item['url'] = self.format_link(response, f"/tour/movies/{sceneid}/" + slugify(re.sub('[^a-z0-9- ]', '', urltitle.lower().strip())))
+                if origimage:
+                    item['image'] = origimage
+                    item['image_blob'] = origimage_blob
                 else:
                     item['image'] = ''
-                if item['image']:
-                    item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                    item['image_blob'] = ''
+
                 performer = scene.xpath('./div[@class="video-name"]/a/text()')
                 if performer:
                     item['performers'] = [performer.get().strip()]
@@ -179,15 +226,22 @@ class ATKKingdomPlaywrightSpider(BaseSceneScraper):
 
     def parse_scene(self, response):
         meta = response.meta
+        # ~ print(meta)
         item = SceneItem()
         item['date'] = meta['date']
         item['performers'] = meta['performers']
         item['duration'] = meta['duration']
 
         item['title'] = self.get_title(response)
+        if not item['title']:
+            item['title'] = meta['origtitle']
         item['description'] = self.get_description(response)
         item['image'] = self.get_image(response)
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        if item['image']:
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        else:
+            item['image'] = meta['origimage']
+            item['image_blob'] = meta['origimage_blob']
         item['tags'] = self.get_tags(response)
         if "" in item['tags']:
             item['tags'].remove("")

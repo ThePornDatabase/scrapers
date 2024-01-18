@@ -255,7 +255,7 @@ class NetworkKinkMenSpider(BaseSceneScraper):
         else:
             item['type'] = 'Scene'
 
-        matches = ['str8hell', 'cfnmeu', 'malefeet4u', 'williamhiggins', 'ambushmassage', 'swnude', 'sweetfemdom']
+        matches = ['str8hell', 'cfnmeu', 'malefeet4u', 'williamhiggins', 'ambushmassage', 'swnude', 'sweetfemdom', 'masqulin']
         if not any(x in item['site'] for x in matches):
             yield self.check_item(item, self.days)
 

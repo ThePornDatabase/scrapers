@@ -19,7 +19,7 @@ class SiteArchangelVideoSpider(BaseSceneScraper):
         'date': '//div[@class="info"]/p/text()',
         're_date': r'(\w+ \d{1,2}, \d{4})',
         'date_formats': ['%B %d, %Y'],
-        'image': '//meta[@property="og:image"]/@content',
+        'image': '//img[contains(@class,"update_thumb")]/@src0_4x|//img[contains(@class,"update_thumb")]/@src0_3x|//img[contains(@class,"update_thumb")]/@src0_2x|//img[contains(@class,"update_thumb")]/@src0_1x',
         'performers': '//div[@class="info"]/p/a/text()',
         'tags': '//ul[@class="tags"]//a/text()',
         'external_id': r'.*/(.*?).html',

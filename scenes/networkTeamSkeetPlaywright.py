@@ -167,7 +167,7 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
             item['parent'] = response.meta['site']
 
             if 'publishedDate' in data:
-                item['date'] = self.parse_date(data['publishedDate']).isoformat()
+                item['date'] = self.parse_date(data['publishedDate']).strftime('%Y-%m-%d')
             else:
                 item['date'] = None
 

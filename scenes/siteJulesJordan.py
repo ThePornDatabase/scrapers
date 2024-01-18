@@ -22,10 +22,10 @@ class JulesJordanSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.julesjordan.com',
-        # ~ 'https://www.manuelferrara.com',
-        # ~ 'https://www.theassfactory.com',
-        # ~ 'https://www.spermswallowers.com',
-        # ~ 'https://www.girlgirl.com'
+        'https://www.manuelferrara.com',
+        'https://www.theassfactory.com',
+        'https://www.spermswallowers.com',
+        'https://www.girlgirl.com'
     ]
 
     selector_map = {

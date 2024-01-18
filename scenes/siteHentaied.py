@@ -15,10 +15,10 @@ class siteHentaiedSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//h1/text()',
-        'description': '//div[@class="cont"]//p/text()',
+        'description': '//div[@class="cont"]//p/text()|//div[@id="fullstory"]/p/text()',
         'date': '//meta[@property="article:published_time"]/@content',
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[@class="tagsmodels"]/a/text()',
+        'performers': '//div[@class="tagsmodels"]/a/text()|//img[contains(@alt, "model")]/following-sibling::div[contains(@class, "taglist")]/a/text()',
         'tags': '//ul[@class="post-categories"]/li/a/text()',
         'external_id': '.*\/(.*?)\/$',
         'trailer': '//video/source/@src',
@@ -36,7 +36,7 @@ class siteHentaiedSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Hentaied"
-        
+
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description')).getall()

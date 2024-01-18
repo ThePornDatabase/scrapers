@@ -94,6 +94,18 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Play With Amai', 'Play With Amai', '47204', 'play-with-amai'],
         ['Clips4Sale', 'Fetish by Daisy Haze', 'Fetish by Daisy Haze', '71770', 'daisys-desires'],
         ['Clips4Sale', 'Jerk4PrincessUK', 'Jerk4PrincessUK', '36426', 'jerk4princessuk'],
+        ['Clips4Sale', 'Naughty Midwest Girls (Clips4Sale)', 'Naughty Midwest Girls (Clips4Sale)', '3664', 'naughty-midwest-girls-videoclips'],
+        ['Clips4Sale', 'Lilus Handjobs', 'Lilus Handjobs', '7325', 'i-jerk-off-100--strangers-hommme-hj'],
+        ['Clips4Sale', 'Miss Lilu', 'Miss Lilu', '3010', 'Miss-LiLu'],
+        ['Clips4Sale', 'Fetish Liza Clips', 'Fetish Liza Clips', '88414', 'fetish-liza-clips'],
+        ['Clips4Sale', 'Kinky Leather Clips', 'Kinky Leather Clips', '83433', 'kinky-leather-clips'],
+        ['Clips4Sale', 'GloveMansion', 'GloveMansion', '78265', 'glove-sex-clips'],
+        ['Clips4Sale', 'Lucid Dreaming', 'Lucid Dreaming', '145433', 'lucid-dreaming'],
+        ['Clips4Sale', 'Mandy Marx', 'Mandy Marx', '120911', 'mandy-marx'],
+        ['Clips4Sale', 'Divine Goddess Amber', 'Divine Goddess Amber', '229077', 'divine-goddess-amber'],
+        ['Clips4Sale', 'AstroDomina', 'AstroDomina', '56587', 'astrodomina'],
+        ['Clips4Sale', 'Custom Fetish Cumshots', 'Custom Fetish Cumshots', '104694', 'custom-fetish-cumshots'],
+        ['Clips4Sale', 'Cruel Anettes Fetish Store', 'Cruel Anettes Fetish Store', '122893', 'cruel-anettes-fetish-store'],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -131,7 +143,8 @@ class SiteClips4SaleSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['store'], meta['storename']), callback=self.parse, meta=meta)
 
     def get_next_page_url(self, base, page, store, storename):
-        url = f"https://www.clips4sale.com/studio/{store}/{storename}/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24/?onlyClips=true&_data=routes%2Fstudio.$id_.$studioSlug.$"
+        # ~ url = f"https://www.clips4sale.com/studio/{store}/{storename}/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24/?onlyClips=true&_data=routes%2Fstudio.$id_.$studioSlug.$"
+        url = f"https://www.clips4sale.com/en/studio/{store}/{storename}/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24/?onlyClips=true&_data=routes%2F($lang).studio.$id_.$studioSlug.$"
         return url
 
     def get_scenes(self, response):
@@ -194,8 +207,14 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         return tldextract.extract(response.url).domain
 
     def get_performers(self, response):
+        if "astrodomina" in response.url:
+            return ['AstroDomina']
         if "daisys-desires" in response.url:
             return ['Daisy Haze']
+        if "divine-goddess-amber" in response.url:
+            return ['Divine Goddess Amber']
         if "addie-juniper" in response.url:
             return ['Addie Juniper']
+        if "mandy-marx" in response.url:
+            return ['Mandy Marx']
         return []

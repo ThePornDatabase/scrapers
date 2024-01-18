@@ -24,6 +24,7 @@ class NetworkPornPlusSpider(BaseSceneScraper):
         '/series/property-exploits',
         '/series/rv-adventures',
         '/series/school-of-cock',
+        '/series/sexercise',
         '/series/shower-4k',
         '/series/strip-club-tryouts',
         '/series/throat-creampies',

@@ -57,7 +57,7 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
         'https://outdoorjp.com',
         'https://povjp.com',
         'https://tokyobang.com',
-        # ~ #'https://wierdjapan.com',  #Requires Membership
+        #'https://wierdjapan.com',  #Requires Membership
     ]
 
     selector_map = {
@@ -77,6 +77,7 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//a[contains(@class,"b-videos-item-link")]/@href').getall()
         for scene in scenes:
+            print(scene)
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 

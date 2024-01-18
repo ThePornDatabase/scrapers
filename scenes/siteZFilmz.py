@@ -2,45 +2,90 @@ import re
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
 class SiteZFilmzSpider(BaseSceneScraper):
     name = 'ZFilmz'
-    network = 'Z-Films'
 
-    start_urls = [
-        'https://www.z-filmz-originals.com',
-    ]
+    start_url = 'https://z-filmz-originals.com/'
 
     selector_map = {
-        'title': '//h1[@class="info-section--title"]/text()',
-        'description': '//div[@class="inner"]/div/p[1]/text()',
-        'date': '//i[@class="fas fa-calendar"]/following-sibling::span/text()',
-        'date_formats': ['%Y-%m-%d'],
-        'image': '//meta[@property="og:image"]/@content',
-        'performers': '//span[@title="Models"]/span/a/text()',
-        'tags': '//span[@title="Categories"]/span/a/text()',
-        'external_id': r'updates\/(.*).html',
-        'trailer': '//meta[@name="twitter:player:stream"]/@content',
-        'pagination': '/en/collections/page/%s?media=video'
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc',
     }
 
-    def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="control-card"]/div[@class="card-btns"]/a[2]')
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://z-filmz-originals.com/', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = response.meta
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
         for scene in scenes:
-            sceneid = scene.xpath('./@data-collection').get()
-            scene = scene.xpath('./@href').get()
-            if sceneid and scene:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'id': sceneid})
+            count += 1
+            yield scene
 
-    def get_site(self, response):
-        return "Z-Films"
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def get_parent(self, response):
-        return "Z-Filmz"
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
 
-    def get_image(self, response):
-        image = super().get_image(response)
-        if "jpg?" in image:
-            image = re.search(r'(.*)\?', image).group(1)
-        return image
+    def get_scenes(self, response):
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
+        for scene in jsondata:
+            item = SceneItem()
+            item['title'] = self.cleanup_title(scene['title'])
+            item['id'] = scene['id']
+            item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
+            if "trailer_screencap" in scene and scene['trailer_screencap']:
+                item['image'] = self.format_link(response, scene['trailer_screencap']).replace(" ", "%20")
+            elif "thumb" in scene and scene['thumb']:
+                item['image'] = self.format_link(response, scene['thumb']).replace(" ", "%20")
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if scene['trailer_url']:
+                item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
+            else:
+                item['trailer'] = ""
+            item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
+            scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).isoformat()
+            item['date'] = ""
+            if scene_date:
+                item['date'] = scene_date
+            item['url'] = f"https://z-filmz-originals.com/videos/{scene['slug']}"
+
+            item['tags'] = scene['tags']
+            for tag in item['tags']:
+                if "filmz" in tag.lower():
+                    item['tags'].remove(tag)
+            if "Z-filmz" in item['tags']:
+                item['tags'].remove("Z-filmz")
+
+            item['duration'] = scene['seconds_duration']
+            item['site'] = 'zfilmzofficial'
+            item['parent'] = 'Z Filmz'
+            item['network'] = 'Z Filmz'
+            item['performers'] = []
+            for model in scene['models_slugs']:
+                item['performers'].append(model['name'])
+                if model['name'] in item['tags']:
+                    item['tags'].remove(model['name'])
+
+            yield self.check_item(item, self.days)

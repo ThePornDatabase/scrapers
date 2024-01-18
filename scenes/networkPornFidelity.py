@@ -45,12 +45,16 @@ class PornFidelitySpider(BaseSceneScraper):
 
     def get_date(self, response):
         search = re.search('Published: (\\d+-\\d+-\\d+)', response.text)
-        return dateparser.parse(search.group(1)).isoformat()
+        if search:
+            return dateparser.parse(search.group(1)).strftime('%Y-%m-%d')
+        else:
+            return None
 
     def get_title_full(self, response):
         return response.xpath(self.get_selector_map('title'))[1].get().strip()
 
     def get_title(self, response):
+        print(response)
         title = self.get_title_full(response)
         search = re.search('(.+) - .+ \\#(\\d+)', title)
         if not search:

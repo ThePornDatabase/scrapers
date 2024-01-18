@@ -92,6 +92,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://lilcandy.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Lil Candy', 'Lil Candy'],
         ['https://pvgirls.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Porn Valley Girls', ''],
         ['https://idreamofjo.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'I Dream of Jo', 'Monica Sweet'],
+        ['https://jenysmith.net', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Jeny Smith', 'Jeny Smith'],
+        ['https://oopsmodels.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Oops Models (Official)', ''],
     ]
 
     selector_map = {
@@ -242,6 +244,9 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 item['tags'].append("Face Fuck")
                 item['tags'].append("Deepthroat")
 
+            if "oopsmodels" in response.url:
+                item['tags'] = []
+
             item['url'] = self.format_url(response.url, 'scene/' + str(item['id']))
             item['image'] = data['_resources']['primary'][0]['url'].strip()
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
@@ -364,7 +369,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             'Mistressluciana',
             'Request',
             'Rubber_Jeff',
-            'Whitney Morgan'
+            'Whitney Morgan',
         ]
         newlist = []
         for word in tags:
