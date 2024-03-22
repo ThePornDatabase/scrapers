@@ -135,7 +135,7 @@ class PrivateClassicsScenesSpider(BaseSceneScraper):
         item['trailer'] = ''
         item['duration'] = meta['duration']
         item['type'] = 'Scene'
-        item['movie'] = {'site': movie['site'], 'external_id': movie['id']}
+        item['movie'] = [{'site': movie['site'], 'external_id': movie['id']}]
         item['network'] = 'Private'
         item['parent'] = "Private Classics"
         item['site'] = "Private Classics"

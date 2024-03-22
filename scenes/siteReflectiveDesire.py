@@ -11,43 +11,40 @@ class ReflectiveDesireSpider(BaseSceneScraper):
     site = 'Reflective Desire'
 
     start_urls = [
-        'https://reflectivedesire.com/.com/',
-    ]
-
-    scene_urls = [
-        'https://reflectivedesire.com/videos/categories/scenes/?sort=chrono',
-        'https://reflectivedesire.com/videos/categories/shorts/?sort=chrono'
+        'https://reflectivedesire.com/videos/pain/?sort=chrono',
+        'https://reflectivedesire.com/videos/pleasure/?sort=chrono',
+        'https://reflectivedesire.com/videos/solos/?sort=chrono',
+        'https://reflectivedesire.com/videos/devices/?sort=chrono',
+        'https://reflectivedesire.com/videos/extras/?sort=chrono',
     ]
 
     def start_requests(self):
-        for link in self.scene_urls:
-            yield scrapy.Request(link,
-                                 callback=self.get_scenes,
-                                 meta={'page': self.page},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.get_scenes, meta={'page': self.page}, headers=self.headers, cookies=self.cookies)
 
     selector_map = {
-        'title': '//meta[@property="og:title"]/@content',
+        'title': '//h1/text()',
         'description': '//meta[@name="description"]/@content',
         'date': '//meta[@name="description"]/@content',
         're_date': r'Posted ([a-zA-Z]*? \d{4})',
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//h2[@class="subhead" and contains(text(), "Follow")]/text()',
-        're_performers': r'Follow (.*)',
-        'tags': '',
+        'performers': '//span[contains(text(), "Performers")]/a/text()',
+        'tags': '//span[contains(text(), "Categories")]/a/text()',
         'external_id': r'.*\/(.*?)\/',
-        'trailer': '//a[contains(@href,"https://hd.reflectivedesire.com")]/@href',
+        'trailer': '',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//article/a/@href').getall()
+        scenes = response.xpath('//main/section[1]//article/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_tags(self, response):
         tags = ['Bondage', 'Fetish', 'Latex / Rubber / Vinyl']
+        tags2 = super().get_tags(response)
+        for tag in tags2:
+            tags.append(tag)
         return tags
 
     def get_date(self, response):

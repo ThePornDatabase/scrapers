@@ -34,17 +34,28 @@ class PutaLocuraSpider(BaseSceneScraper):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-    def get_title(self, response):
-        title = self.process_xpath(
-            response, self.get_selector_map('title')).get()
-        if "|" in title:
-            title = re.search(r'(.*)\|', title).group(1)
-        if title:
-            return self.cleanup_title(title)
-        return ''
-
     def get_performers(self, response):
         return []
 
     def get_tags(self, response):
         return ["Spanish"]
+
+    def get_title(self, response):
+        title = response.xpath('//title/text()')
+        if title:
+            title = title.get()
+            if "|" in title:
+                title = re.search(r'(.*?)\|', title).group(1)
+        if not title:
+            title = self.process_xpath(response, self.get_selector_map('title')).get()
+            if "|" in title:
+                title = re.search(r'(.*)\|', title).group(1)
+
+        title = title.strip()
+        if title[0] == "!" or title[0] == "?" or title[0] == "¡" or title[0] == "¿":
+            title = title[1:]
+
+        if title:
+            return self.cleanup_title(title)
+        else:
+            return ''

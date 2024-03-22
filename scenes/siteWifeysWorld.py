@@ -37,7 +37,7 @@ class SiteWifeysWorldSpider(BaseSceneScraper):
             else:
                 item['image'] = None
                 item['image_blob'] = None
-            item['performers'] = None
+            item['performers'] = ['Sandra Otterson']
             item['tags'] = None
             item['markers'] = None
             item['id'] = scene.xpath('./@data-setid').get()

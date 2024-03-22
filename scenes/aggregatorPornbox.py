@@ -19,7 +19,7 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
     ]
 
     studios = [
-        {'studio': 144, 'site': 'Culioneros'}
+        {'studio': 5899, 'site': 'Oksana Katysheva'}
     ]
 
     content_json_url = 'https://pornbox.com/contents/%s'
@@ -83,7 +83,10 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
         item = SceneItem()
 
         item['title'] = jsondata['scene_name']
-        item['description'] = self.cleanup_description(jsondata['small_description'])
+        if "small_description" in jsondata and jsondata['small_description']:
+            item['description'] = self.cleanup_description(jsondata['small_description'])
+        else:
+            item['description'] = ""
         item['site'] = response.meta['site']
         item['date'] = self.parse_date(jsondata['publish_date']).isoformat()
         item['image'] = jsondata['player_poster']

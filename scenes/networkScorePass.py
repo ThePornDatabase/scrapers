@@ -176,7 +176,7 @@ class ScorePassSpider(BaseSceneScraper):
         # 'https://www.yourmomsgotbigtits.com',
         # 'https://www.yourwifemymeat.com',
 
-        'https://www.pornmegaload.com',
+        # 'https://www.pornmegaload.com', Moved to PornMegaLoad Playwright Scraper
         # -----------------------------------
         # 'https://www.18eighteen.com',
         # 'https://www.40somethingmag.com',

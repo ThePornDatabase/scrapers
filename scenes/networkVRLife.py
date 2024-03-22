@@ -49,7 +49,8 @@ class VRLifeSpider(BaseSceneScraper):
             scene_id = self.process_xpath(scene, self.get_selector_map('id')).get()
             title = self.process_xpath(scene, self.get_selector_map('title')).get()
             url = self.process_xpath(scene, self.get_selector_map('url')).get()
-            yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene, meta={'id': scene_id, 'title': title})
+            if url:
+                yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene, meta={'id': scene_id, 'title': title})
 
     def parse_scene(self, response):
         jslde = JsonLdExtractor()

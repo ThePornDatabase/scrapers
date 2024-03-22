@@ -68,38 +68,38 @@ class SiteLifeSelectorSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % (page, timestamp))
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class, "episodeBlock") and contains(@class, "normal")]')
+        scenes = response.xpath('//div[contains(@class, "episodeBlock") and contains(@class, "notOrdered")]')
         for scene in scenes:
             item = SceneItem()
-            item['title'] = self.cleanup_title(scene.xpath('.//img[contains(@class,"gamePic")]/@title').get())
+            item['title'] = self.cleanup_title(scene.xpath('./div/h3[@class="game-title"]/text()').get())
             item['description'] = ""
-            description = scene.xpath('.//div[@class="td story"]//text()[not(ancestor::a) and not(ancestor::em)]')
+            description = scene.xpath('.//div[@class="story"]//text()')
             if description:
                 item['description'] = " ".join(list(map(lambda x: x.strip(), description.getall()))).strip().replace("\n", "").replace("\t", "").replace("\r", "")
             item['date'] = ''
             item['image'] = ""
             item['image_blob'] = ""
-            image = scene.xpath('.//img[contains(@class,"gamePic")]/@src')
+            image = scene.xpath('./a[1]/img/@src')
             if image:
                 item['image'] = self.format_link(response, image.get())
                 if "list/soft/1.jpg" in item['image']:
                     item['image'] = item['image'].replace("list/soft/1", "poster/soft/1_size1200")
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            performers = scene.xpath('.//div[@class="details"]/div[@class="tr"]/div[@class="th" and contains(./text(), "Starring")]/following-sibling::div[@class="td"]/a/text()')
+            performers = scene.xpath('.//div[@class="models"]/a/text()')
             item['performers'] = []
             if performers:
                 item['performers'] = performers.getall()
-            tags = scene.xpath('.//div[@class="details"]/div[@class="tr"]/div[@class="th" and contains(./text(), "Labels")]/following-sibling::div[@class="td"]/a/text()')
+            tags = scene.xpath('.//div[@class="tags"]/a/text()')
             item['tags'] = []
             if tags:
                 item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags.getall()))
             item['trailer'] = ''
-            trailer = scene.xpath('.//a[contains(@class, "view-trailer")]/@data-video-src')
+            trailer = scene.xpath('.//div[contains(@class,"action")]/button[contains(@class, "trailer")]/@data-video-src')
             if trailer:
                 item['trailer'] = self.format_link(response, trailer.get())
             item['id'] = scene.xpath('./@id').get()
             item['network'] = "Life Selector"
             item['parent'] = "Life Selector"
             item['site'] = "Life Selector"
-            item['url'] = self.format_link(response, scene.xpath('./div[@class="thumb"]/a/@href').get())
+            item['url'] = self.format_link(response, scene.xpath('./a[1]/@href').get())
             yield self.check_item(item, self.days)

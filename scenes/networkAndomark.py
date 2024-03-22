@@ -103,7 +103,7 @@ class AndomarkSpider(BaseSceneScraper):
         'https://rionkingxxx.com',
         'https://seanmichaelsxxx.com',
         'https://secretsusan.com',
-        'https://sheseducedme.com',
+        # ~ # 'https://sheseducedme.com', Need new scraper
         'https://shinybound.com',
         'https://www.shinysboundsluts.com',
         'https://sofiemariexxx.com',
@@ -224,6 +224,8 @@ class AndomarkSpider(BaseSceneScraper):
         else:
             date = self.process_xpath(response, self.get_selector_map('date')).get()
             if not date:
+                date = response.xpath('//div[contains(@class, "gallery_info")]/div[@class="table"][1]//div[contains(@class, "update_date")]/text()').get()
+            if not date:
                 date = response.xpath('//span[@class="update_date"]/text()').get()
             if not date:
                 date = response.xpath('//div[contains(@class, "gallery_info")]/div/div/div[contains(@class,"update_date")]/text()').get()
@@ -233,7 +235,7 @@ class AndomarkSpider(BaseSceneScraper):
                 date = date.strip()
                 date = re.search(r'(\d{2}\/\d{2}\/\d{4})', date).group(1)
         if date:
-            return self.parse_date(date).isoformat()
+            return self.parse_date(date).strftime('%Y-%m-%d')
         return ''
 
     def get_title(self, response):

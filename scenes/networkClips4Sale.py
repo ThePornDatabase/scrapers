@@ -1,4 +1,5 @@
 import re
+import string
 import scrapy
 import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -86,7 +87,7 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'SilverCherrys Handjobs With a Twist', 'SilverCherrys Handjobs With a Twist', '79', 'silvercherrys-handjobs-with-a-twist'],
         ['Clips4Sale', 'Eros Handjobs N Blowjobs', 'Eros Handjobs N Blowjobs', '105416', '105416-eros-handjobs-n-blowjobs'],
         ['Clips4Sale', 'Lexis Taboo Diaries', 'Lexis Taboo Diaries', '113974', 'lexis-taboo-diaries'],
-        ['Clips4Sale', 'TABOO', 'TABOO', '58471', 'taboo'],
+        ['Clips4Sale', 'Clips4Sale: TABOO', 'Clips4Sale: TABOO', '58471', 'taboo'],
         ['Clips4Sale', 'Old School Ties By Steve Villa', 'Old School Ties By Steve Villa', '17008', 'tied-up---gagged-by-steve-villa'],
         ['Clips4Sale', 'Hardcore Foot Sex', 'Hardcore Foot Sex', '28231', 'hardcore-foot-sex'],
         ['Clips4Sale', 'FM Concepts 1080p Men In Bondage', 'FM Concepts 1080p Men In Bondage', '117240', 'FM-Concepts-1080p-Men-In-Bondage'],
@@ -106,6 +107,32 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'AstroDomina', 'AstroDomina', '56587', 'astrodomina'],
         ['Clips4Sale', 'Custom Fetish Cumshots', 'Custom Fetish Cumshots', '104694', 'custom-fetish-cumshots'],
         ['Clips4Sale', 'Cruel Anettes Fetish Store', 'Cruel Anettes Fetish Store', '122893', 'cruel-anettes-fetish-store'],
+        ['Clips4Sale', 'Kenny Kong AMWF Porn', 'Kenny Kong AMWF Porn', '105418', 'kenny-kong-amwf-porn'],
+        ['Clips4Sale', 'Cruel Punishments - Severe Femdom', 'Cruel Punishments - Severe Femdom', '20885', 'cruel-punishments---severe-femdom-'],
+        ['Clips4Sale', 'Princess Camryn', 'Princess Camryn', '117722', 'princess-camryn'],
+        ['Clips4Sale', 'Eva de Vil', 'Eva de Vil', '122965', 'eva-de-vil'],
+        ['Clips4Sale', 'Mandy Flores', 'Mandy Flores', '33729', 'mandy-flores'],
+        ['Clips4Sale', 'Angel The Dreamgirl', 'Angel The Dreamgirl', '68591', 'angel-the-dreamgirl'],
+        ['Clips4Sale', 'Lelu Love - Cum Inside, Lets Play', 'Lelu Love - Cum Inside, Lets Play', '44611', 'lelu-love---cum-inside--let-s-play'],
+        ['Clips4Sale', 'Naughty Girls', 'Naughty Girls', '148381', '148381-naughty-girls'],
+        ['Clips4Sale', 'Bratty Bunny', 'Bratty Bunny', '35587', 'Bratty-Bunny'],
+        ['Clips4Sale', 'POV Central', 'POV Central', '15933', 'pov-central'],
+        ['Clips4Sale', 'Mistress - T - Fetish Fuckery', 'Mistress - T - Fetish Fuckery', '23869', 'mistress---t---fetish-fuckery'],
+        ['Clips4Sale', 'Princess Camryn', 'Princess Camryn', '117722', 'princess-camryn'],
+        ['Clips4Sale', 'Nathan Blake XXX', 'Nathan Blake XXX', '94243', 'nathan-blake-xxx'],
+        ['Clips4Sale', 'JBC Videos Pantyhose', 'JBC Videos Pantyhose', '32173', 'jbc-videos-pantyhose'],
+        ['Clips4Sale', 'Alex Mack Clip Store', 'Alex Mack Clip Store', '143621', 'alex-mack-clip-store'],
+        ['Clips4Sale', 'J Macs POV', 'J Macs POV', '151671', 'j-macs-pov'],
+        ['Clips4Sale', 'Queens of Kink', 'Queens of Kink', '74545', 'queens-of-kink'],
+        ['Clips4Sale', 'Natalie Wonder Clips', 'Natalie Wonder Clips', '79477', 'natalie-wonder-clips'],
+        ['Clips4Sale', 'Hoby Buchanon Facefucks Chicks', 'Hoby Buchanon Facefucks Chicks', '116032', 'hoby-buchanon-facefucks-chicks'],
+        # ~ ['Clips4Sale', '', '', '', ''],
+        # ~ ['Clips4Sale', '', '', '', ''],
+        # ~ ['Clips4Sale', '', '', '', ''],
+        # ~ ['Clips4Sale', '', '', '', ''],
+        # ~ ['Clips4Sale', '', '', '', ''],
+        # ~ ['Clips4Sale', '', '', '', ''],
+        # ~ ['Clips4Sale', '', '', '', ''],
     ]
 
     url = 'https://www.clips4sale.com'
@@ -169,7 +196,14 @@ class SiteClips4SaleSpider(BaseSceneScraper):
             item['tags'] = []
             if "related_category_links" in scene and scene['related_category_links']:
                 for tag in scene['related_category_links']:
-                    item['tags'].append(tag['category'])
+                    if "category" in tag:
+                        item['tags'].append(tag['category'])
+                    if "clean_name" in tag:
+                        item['tags'].append(string.capwords(tag['clean_name']))
+            if "keyword_links" in scene and scene['keyword_links']:
+                for tag in scene['keyword_links']:
+                    if "keyword" in tag:
+                        item['tags'].append(string.capwords(tag['keyword']))
             if scene['duration']:
                 item['duration'] = str(int(scene['duration']) * 60)
             item['site'] = self.get_site(response)
@@ -217,4 +251,8 @@ class SiteClips4SaleSpider(BaseSceneScraper):
             return ['Addie Juniper']
         if "mandy-marx" in response.url:
             return ['Mandy Marx']
+        if "natalie-wonder" in response.url:
+            return ['Natalie Wonder']
+        if "princess-camryn" in response.url:
+            return ['Princess Camryn']
         return []

@@ -11,7 +11,7 @@ class PornFidelitySpider(BaseSceneScraper):
     network = 'pornfidelity'
 
     start_urls = [
-        # 'https://www.teenfidelity.com',
+        # ~ # 'https://www.teenfidelity.com',
         'https://www.pornfidelity.com',
         # 'https://www.kellymadison.com'
     ]
@@ -21,7 +21,8 @@ class PornFidelitySpider(BaseSceneScraper):
         'title': '//div[@class="level-item"]/text()',
         'description': '//div[@class="column is-three-fifths"]/text()',
         'date': "",
-        'image': '',
+        'image': '//script[contains(text(), ".jpg")]/text()',
+        're_image': r'poster.*?(http.*?)[\'\"]',
         'performers': '//a[@class="is-underlined"]/text()',
         'tags': "",
         'duration': '//li//text()[contains(., "mins")]',
@@ -32,16 +33,14 @@ class PornFidelitySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        rsp = HtmlResponse(url=response.url, body=response.json()[
-                           'html'], encoding='utf-8')
+        rsp = HtmlResponse(url=response.url, body=response.json()['html'], encoding='utf-8')
         scenes = rsp.css('.episode .card-link::attr(href)').extract()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, cookies=self.cookies)
 
-    def get_image(self, response):
-        res = re.search(self.get_selector_map('external_id'), response.url)
-        return 'https://tour-cdn.kellymadisonmedia.com/content/episode/poster_image/%s/poster.jpg' % res.group(
-            1)
+    # ~ def get_image(self, response):
+        # ~ res = re.search(self.get_selector_map('external_id'), response.url)
+        # ~ return 'https://tour-cdn.kellymadisonmedia.com/content/episode/poster_image/%s/poster.jpg' % res.group(1)
 
     def get_date(self, response):
         search = re.search('Published: (\\d+-\\d+-\\d+)', response.text)
@@ -54,7 +53,7 @@ class PornFidelitySpider(BaseSceneScraper):
         return response.xpath(self.get_selector_map('title'))[1].get().strip()
 
     def get_title(self, response):
-        print(response)
+        # ~ print(response)
         title = self.get_title_full(response)
         search = re.search('(.+) - .+ \\#(\\d+)', title)
         if not search:

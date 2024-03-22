@@ -40,7 +40,7 @@ class SiteLatinaRawSpider(BaseSceneScraper):
             'X-Nats-Cms-Area-Id': '2',
             'X-Nats-Entity-Decode': '1',
         }
-        link = 'https://idsandbox.hostednats.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=100&start=0&cms_area_id=2&cms_block_id=100695&orderby=published_desc&content_type=video&status=enabled&data_type_search=%7B%22100001%22:%22163%22%7D'
+        link = 'https://idsandbox.hostednats.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=100&start=0&cms_area_id=2&cms_block_id=100695&orderby=published_desc&content_type=video&status=enabled&text_search=&data_type_search=%7B%22100001%22:%22163%22%7D'
         yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=headers, cookies=self.cookies)
 
     def get_scenes(self, response):

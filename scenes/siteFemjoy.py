@@ -50,8 +50,10 @@ class SiteFemjoySpider(BaseSceneScraper):
             item = SceneItem()
 
             item['title'] = self.cleanup_title(scene.xpath('./div/h1/a[1]/text()').get())
-            item['date'] = self.parse_date(scene.xpath('./div//span[@class="posted_on"]/text()').get(), date_formats=['%b %d, %Y']).isoformat()
-            item['duration'] = self.duration_to_seconds(scene.xpath('./div//span[@class="posted_on"]/following-sibling::span/text()').get())
+            item['date'] = self.parse_date(scene.xpath('./div//span[@class="posted_on"]/text()').get(), date_formats=['%b %d, %Y']).strftime('%Y-%m-%d')
+            duration = scene.xpath('./div//span[@class="posted_on"]/following-sibling::span/text()').get()
+            if duration:
+                item['duration'] = self.duration_to_seconds(duration)
             item['director'] = scene.xpath('.//h2/a[contains(@href, "/director/")]/text()').get()
             item['performers'] = scene.xpath('.//h2/a[contains(@href, "/models/")]/text()').getall()
             item['site'] = 'Femjoy'

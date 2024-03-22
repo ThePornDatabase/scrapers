@@ -21,6 +21,7 @@ class NetworkPornPlusSpider(BaseSceneScraper):
         '/series/glory-hole-4k',
         '/series/kinky-sluts-4k',
         '/series/momcum',
+        '/series/pornstars-in-cars',
         '/series/property-exploits',
         '/series/rv-adventures',
         '/series/school-of-cock',

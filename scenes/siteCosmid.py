@@ -82,54 +82,39 @@ class CosmidFullImportSpider(BaseSceneScraper):
             if scenedate:
                 item['date'] = self.parse_date(scenedate, date_formats=['%Y-%m-%d']).isoformat()
             else:
-                item['date'] = self.parse_date('today').isoformat()
+                item['date'] = self.parse_date('today').strftime('%Y-%m-%d')
 
-            image = scene.xpath('.//div[contains(@class,"videothumb")]/img/@src').get()
-            if image:
-                item['image'] = "https://cosmid.net" + image.replace('//', '/').replace('#id#', '').strip()
-            else:
-                item['image'] = None
-
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-            trailer = scene.xpath('.//div[contains(@class,"videothumb")]/video/source/@src').get()
-            if trailer:
-                item['trailer'] = "https://cosmid.net" + trailer.replace(" ", "%20").replace('#id#', '').strip()
-            else:
-                item['trailer'] = ''
-
-            duration = scene.xpath('.//div[@class="time"]/text()')
-            if duration:
-                item['duration'] = self.duration_to_seconds(duration.get())
-
-            externalid = title.replace("_", "-").strip().lower()
-            externalid = externalid.replace("  ", " ")
-            externalid = externalid.replace(" ", "-")
-            externalid = re.sub('[^a-zA-Z0-9-]', '', externalid)
-            if externalid:
-                item['id'] = externalid
-            else:
-                item['id'] = ''
-
-            item['tags'] = []
-
-            item['url'] = response.url
-
-            if item['id'] and item['title'] and item['date']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
+            if self.check_item(item, self.days):
+                image = scene.xpath('.//div[contains(@class,"videothumb")]/img/@src').get()
+                if image:
+                    item['image'] = "https://cosmid.net" + image.replace('//', '/').replace('#id#', '').strip()
                 else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
+                    item['image'] = None
 
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
+                trailer = scene.xpath('.//div[contains(@class,"videothumb")]/video/source/@src').get()
+                if trailer:
+                    item['trailer'] = "https://cosmid.net" + trailer.replace(" ", "%20").replace('#id#', '').strip()
                 else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
+                    item['trailer'] = ''
+
+                duration = scene.xpath('.//div[@class="time"]/text()')
+                if duration:
+                    item['duration'] = self.duration_to_seconds(duration.get())
+
+                externalid = title.replace("_", "-").strip().lower()
+                externalid = externalid.replace("  ", " ")
+                externalid = externalid.replace(" ", "-")
+                externalid = re.sub('[^a-zA-Z0-9-]', '', externalid)
+                if externalid:
+                    item['id'] = externalid
+                else:
+                    item['id'] = ''
+
+                item['tags'] = []
+
+                item['url'] = response.url
+
+                if item['id'] and item['title'] and item['date']:
+                    yield self.check_item(item, self.days)

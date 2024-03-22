@@ -127,6 +127,8 @@ class NetworkDMEMediaV2Spider(BaseSceneScraper):
                     image = response.xpath('//script[contains(text(), "poster")]/text()')
                     if image:
                         image = re.search(r'poster=\"(http.*?)\"', image.get()).group(1)
+        if not image:
+            image = response.meta['image2']
         return image
 
     def get_image_blob(self, response):

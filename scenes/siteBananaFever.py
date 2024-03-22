@@ -57,12 +57,12 @@ class SiteBananaFeverSpider(BaseSceneScraper):
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = SceneItem()
-            if 'og_image' in scene["yoast_head_json"]:
-                item['image'] = scene["yoast_head_json"]['og_image'][0]['url']
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            else:
-                item['image'] = ""
-                item['image_blob'] = ""
+            # ~ if 'og_image' in scene["yoast_head_json"]:
+            # ~ item['image'] = scene["yoast_head_json"]['og_image'][0]['url']
+            # ~ item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            # ~ else:
+            # ~ item['image'] = ""
+            # ~ item['image_blob'] = ""
 
             item['id'] = str(scene['id'])
             item['date'] = scene['date']
@@ -85,20 +85,26 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             item['network'] = 'Banana Fever'
             item['url'] = scene['link']
 
-            # ~ meta['item'] = item
+            meta['item'] = item
 
-            # ~ if image_url:
-                # ~ req = requests.get(image_url)
-                # ~ if req and len(req.text) > 5:
-                    # ~ imagerow = json.loads(req.text)
-                # ~ else:
-                    # ~ imagerow = None
+            if "wp:attachment" in scene['_links'] and scene['_links']['wp:featuredmedia'][0]['href']:
+                image_url = scene['_links']['wp:featuredmedia'][0]['href']
+            else:
+                image_url = None
 
-                # ~ item['image'] = imagerow['guid']['rendered']
-                # ~ item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            # ~ else:
-                # ~ item['image'] = None
-                # ~ item['image_blob'] = None
+            item['image'] = None
+            item['image_blob'] = None
+            if image_url:
+                req = requests.get(image_url)
+                if req and len(req.text) > 5:
+                    imagerow = json.loads(req.text)
+                else:
+                    imagerow = None
+
+                if imagerow and 'guid' in imagerow:
+                    if 'rendered' in imagerow['guid'] and imagerow['guid']['rendered']:
+                        item['image'] = imagerow['guid']['rendered']
+                        item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             if " - Demo" not in item['title'] and " - Trailer" not in item['title']:
                 yield item

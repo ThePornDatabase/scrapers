@@ -79,7 +79,7 @@ class NetworkBangNewSpider(BaseSceneScraper):
             duration = duration.replace(":", "")
             if "H" in duration:
                 duration = re.search(r'(\d{1,2})H(\d{1,2})M(\d{1,2})S', duration)
-                hours = int(duration.group(1)) * 3660
+                hours = int(duration.group(1)) * 3600
                 minutes = int(duration.group(2)) * 60
                 seconds = int(duration.group(3))
                 duration = str(hours + minutes + seconds)

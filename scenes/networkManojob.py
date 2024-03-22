@@ -23,7 +23,7 @@ class networkManojobSpider(BaseSceneScraper):
         'title': '//h1/text()',
         'description': '//div[@class="row"]/div/div[@class="text-center"]/preceding-sibling::p[1]/text()',
         'date': '//meta[@itemprop="uploadDate"]/@content',
-        'image': '//div[@class="video"]//video/@poster',
+        'image': '//div[@class="video"]//video/@poster|//div[contains(@class,"video")]//video/@poster',
         'performers': '//h3[contains(text(),"Starring")]/a/text()',
         'tags': '//p[contains(text(),"Categories")]/a/text()',
         'external_id': '.*\/(.*)',
@@ -35,7 +35,7 @@ class networkManojobSpider(BaseSceneScraper):
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination':link[1], 'site':link[2], 'url':link[0]},
+                                 meta={'page': self.page, 'pagination':link[1], 'site':link[2], 'siteurl':link[0]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -52,7 +52,7 @@ class networkManojobSpider(BaseSceneScraper):
                     meta = response.meta
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
-                    url = meta['url']
+                    url = meta['siteurl']
                     yield scrapy.Request(url=self.get_next_page_url(url, meta['page'], meta['pagination']),
                                          callback=self.parse,
                                          meta=meta,

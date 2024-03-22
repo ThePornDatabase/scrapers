@@ -3,7 +3,7 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class CumPerfectionSpider(BaseSceneScraper):
+class SiteHookupHotshotSpider(BaseSceneScraper):
     name = 'HookupHotshot'
     network = "Hookup Hotshot"
     parent = "Hookup Hotshot"

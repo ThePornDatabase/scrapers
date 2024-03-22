@@ -21,6 +21,7 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
     parent = 'Vegas Dreamworks'
 
     start_urls = [
+        # ~ ['https://asiansexdiary.com/', '/models/page/%s/?sortby=date'],
         ['https://screwmetoo.com/', '/models/page/%s/?sortby=date'],
         ['https://milftrip.com/', '/models/page/%s/?sortby=date'],
         ['https://tuktukpatrol.com/', '/models/page/%s/?sortby=date'],
@@ -120,7 +121,8 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
                 bio = response.xpath('//div[@class="model-desc"]/text()').getall()
                 if bio:
                     bio = " ".join(bio)
-            return bio.strip()
+            if bio:
+                return bio.strip()
         return ''
 
     def get_gender(self, response):

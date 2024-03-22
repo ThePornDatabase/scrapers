@@ -27,6 +27,7 @@ class SiteMy18TeensSpider(BaseSceneScraper):
         'external_id': r'.*/(.*?)$',
         'trailer': '',
         'pagination': '/new?page=%s'
+        # ~ 'pagination': '/all?page=%s'
     }
 
     def get_scenes(self, response):
@@ -35,12 +36,15 @@ class SiteMy18TeensSpider(BaseSceneScraper):
             item = SceneItem()
 
             titledate = scene.xpath('./div[contains(@class, "video-preview__data")]/p[contains(@class, "title")]/text()')
+            item['date'] = ""
             if titledate:
                 titledate = titledate.get()
-                if re.search(r'(\d{2}\.\d{2}\.\d{4})', titledate):
-                    item['date'] = self.parse_date(re.search(r'(\d{2}\.\d{2}\.\d{4})', titledate).group(1), date_formats=['%d.%m.%Y']).isoformat()
-                else:
-                    item['date'] = self.parse_date('today').isoformat()
+                scenedate = re.search(r'(\d{2}\.\d{2}\.\d{4})', titledate)
+                if scenedate:
+                    scenedate = scenedate.group(1)
+                    scenedate = self.parse_date(scenedate, date_formats=['%d.%m.%Y'])
+                    if scenedate:
+                        item['date'] = scenedate.strftime('%Y-%m-%d')
                 item['title'] = string.capwords(titledate)
             else:
                 item['title'] = ''

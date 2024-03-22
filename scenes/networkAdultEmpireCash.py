@@ -16,7 +16,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         # ~ # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
-        'https://jayspov.net',
+        # ~ # 'https://jayspov.net', Now Cloudflared
         # 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
@@ -217,6 +217,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             return 'Smut Factor'
         if 'realgirlsfuck' in response.url:
             return 'Real Girls Fuck'
+        if 'thirdworld' in response.url:
+            return 'Third World Media'
         if 'wcpclub' in response.url:
             return 'West Coast Productions'
 
@@ -234,7 +236,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         if 'smutfactor' in response.url:
             return 'Smut Factor'
         if 'thirdworld' in response.url:
-            return 'Third World XXX'
+            return 'Third World Media'
         if 'wcpclub' in response.url:
             return 'West Coast Productions'
 

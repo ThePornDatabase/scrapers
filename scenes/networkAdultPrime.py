@@ -68,9 +68,10 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//h2[@class="update-info-title"]/text()',
-        'description': '//p[contains(@class,"ap-limited-description-text")]/text()',
-        'date': '//p[contains(@class,"update-info-line")]/i[@class="fa fa-calendar"][1]/following-sibling::b[1]/text()',
-        'date_formats': ['%d.%m.%Y'],
+        # ~ 'description': '//p[contains(@class,"ap-limited-description-text")]/text()',  # Blocked due to public scenes having generic site descriptions
+        'description': '',
+        'date': '//div[contains(@class, "player-wrapper")]//span[@class="description-releasedate"]/text()',
+        'date_formats': ['%d.%m.%Y','%d-%m-%Y'],
         'image': '//div[contains(@class,"update-video-wrapper")]/a/div/@style|//video/@poster',
         're_image': r'(http.*\.jpg)',
         'performers': '//p[contains(@class,"update-info-line")]/b[contains(text(), "Performer")]/following-sibling::a/text()',
@@ -117,6 +118,6 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = super().get_image(response)
-        if len(image) < 10:
+        if image and len(image) < 10:
             image = ""
         return image

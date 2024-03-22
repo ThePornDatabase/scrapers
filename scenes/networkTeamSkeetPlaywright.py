@@ -139,6 +139,7 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
         else:
             data = ''
         item = SceneItem()
+        # ~ print(data)
         if ('isUpcoming' in data and not data['isUpcoming']) or 'isUpcoming' not in data:
             is_v2 = "store2" in response.url
 
@@ -147,6 +148,8 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
             item['title'] = data['title']
             item['description'] = data['description']
             item['image'] = data['img']
+            if "med.jpg" in item['image']:
+                item['image'] = item['image'].replace("med.jpg", "hi.jpg")
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             if 'tags' in data:
@@ -182,6 +185,8 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
             if is_v2:
                 if "Say Uncle" in response.meta['site']:
                     item['url'] = "https://www.sayuncle.com/movies/" + data['id']
+                elif "MYLF" in response.meta['site']:
+                    item['url'] = "https://www.mylf.com/movies/" + data['id']
                 else:
                     item['url'] = "https://www.teamskeet.com/movies/" + data['id']
 

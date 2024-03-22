@@ -57,6 +57,10 @@ class Watch4BeautyScraper(BaseSceneScraper):
         if len(data):
             data = data[0]
             item['title'] = data['issue_title']
+            if len(item['title']) < 3:
+                item['title'] = item['title'] + "."
+            if len(item['title']) < 3:
+                item['title'] = item['title'] + "."
             item['date'] = data['issue_datetime']
             if "Z" in item['date']:
                 item['date'] = item['date'][:-1]
@@ -90,23 +94,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
 
         item['performers'] = performers
 
-        days = int(self.days)
-        if days > 27375:
-            filterdate = "0000-00-00"
-        else:
-            filterdate = date.today() - timedelta(days)
-            filterdate = filterdate.strftime('%Y-%m-%d')
-
-        if self.debug:
-            if not item['date'] > filterdate:
-                item['filtered'] = "Scene filtered due to date restraint"
-            print(item)
-        else:
-            if filterdate:
-                if item['date'] > filterdate:
-                    yield item
-            else:
-                yield item
+        yield self.check_item(item, self.days)
 
     def get_next_page_url(self, base, page, response=""):
         if response:

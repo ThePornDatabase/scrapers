@@ -80,66 +80,70 @@ class VixenScraper(BaseSceneScraper):
 
     def parse_scene(self, response):
         data = response.json()['data']['findOneVideo']
+        # ~ print(data)
         scene = SceneItem()
 
-        try:
-            scene['id'] = data['id']
+        # ~ try:
+        scene['id'] = data['id']
 
-            scene['title'] = self.cleanup_title(data['title'])
-            scene['description'] = self.cleanup_description(data['description']) if 'description' in data else ''
+        scene['title'] = self.cleanup_title(data['title'])
+        scene['description'] = self.cleanup_description(data['description']) if 'description' in data else ''
 
-            site = data['site']
-            if site.upper() in self.sites:
-                site = self.sites[site.upper()]
-            scene['site'] = site
+        site = data['site']
+        if site.upper() in self.sites:
+            site = self.sites[site.upper()]
+        scene['site'] = site
 
-            scene['network'] = 'Vixen'
-            scene['parent'] = site
+        scene['network'] = 'Vixen'
+        scene['parent'] = site
 
-            scene['date'] = self.parse_date(data['releaseDate']).isoformat()
-            scene['url'] = self.format_link(response, '/videos/' + data['slug'])
+        scene['date'] = self.parse_date(data['releaseDate']).isoformat()
+        scene['url'] = self.format_link(response, '/videos/' + data['slug'])
 
-            scene['performers'] = []
-            for model in data['models']:
-                scene['performers'].append(model['name'])
+        if "directors" in data and len(data['directors']):
+            scene['director'] = data['directors'][0]['name']
 
-            scene['tags'] = []
-            if data['tags']:
-                for tag in data['tags']:
-                    scene['tags'].append(tag)
+        scene['performers'] = []
+        for model in data['models']:
+            scene['performers'].append(model['name'])
 
-            scene['markers'] = []
-            if 'chapters' in data:
-                if data['chapters']:
-                    for timetag in data['chapters']['video']:
-                        timestamp = {}
-                        timestamp['name'] = self.cleanup_title(timetag['title'])
-                        timestamp['start'] = str(timetag['seconds'])
-                        scene['markers'].append(timestamp)
-                        scene['tags'].append(timestamp['name'])
+        scene['tags'] = []
+        if data['tags']:
+            for tag in data['tags']:
+                scene['tags'].append(tag)
 
-            scene['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(scene['tags']))))
+        scene['markers'] = []
+        if 'chapters' in data:
+            if data['chapters']:
+                for timetag in data['chapters']['video']:
+                    timestamp = {}
+                    timestamp['name'] = self.cleanup_title(timetag['title'])
+                    timestamp['start'] = str(timetag['seconds'])
+                    scene['markers'].append(timestamp)
+                    scene['tags'].append(timestamp['name'])
 
-            largest = 0
-            for image in data['images']['poster']:
-                if image['width'] > largest:
-                    scene['image'] = image['src']
-                largest = image['width']
+        scene['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(scene['tags']))))
 
-            largest = 0
-            scene['image_blob'] = self.get_image_blob_from_link(scene['image'])
+        largest = 0
+        for image in data['images']['poster']:
+            if image['width'] > largest:
+                scene['image'] = image['src']
+            largest = image['width']
 
-            for trailer in data['previews']['poster']:
-                if trailer['width'] > largest:
-                    scene['trailer'] = trailer['src']
-                largest = trailer['width']
+        largest = 0
+        scene['image_blob'] = self.get_image_blob_from_link(scene['image'])
 
-            scene['trailer'] = '' if 'trailer' not in scene or not scene['trailer'] else scene['trailer']
+        for trailer in data['previews']['poster']:
+            if trailer['width'] > largest:
+                scene['trailer'] = trailer['src']
+            largest = trailer['width']
 
-            yield self.check_item(scene, self.days)
+        scene['trailer'] = '' if 'trailer' not in scene or not scene['trailer'] else scene['trailer']
 
-        except Exception:
-            print(f"Failed Request on: {response.url}")
+        yield self.check_item(scene, self.days)
+
+        # ~ except Exception:
+            # ~ print(f"Failed Request on: {response.url}")
 
     def get_graphql_search_body(self, per_page, page, link):
         site_name = urlparse(link).hostname.replace('www.', '').replace('.com', '').upper()
@@ -222,6 +226,9 @@ query getVideo($videoSlug: String, $site: Site) {
         title
         seconds
       }
+    }
+    directors {
+      name
     }
     models {
       name

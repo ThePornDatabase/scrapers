@@ -12,7 +12,7 @@ class NetworkKinkSpider(BaseSceneScraper):
     url = 'https://www.kink.com'
 
     paginations = [
-        '/search?type=shoots&thirdParty=false&sort=published&page=%s',
+        '/shoots?thirdParty=false&sort=published&page=%s',
         # ~ '/search?type=shoots&sort=published&featuredIds=%s',
         # ~ '/search?type=shoots&sort=published&thirdParty=true&page=%s',
         # ~ '/search?type=shoots&sort=published&channelIds=wasteland&sort=published&page=%s',
@@ -49,7 +49,7 @@ class NetworkKinkSpider(BaseSceneScraper):
     custom_scraper_settings = {
         'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
         'AUTOTHROTTLE_ENABLED': True,
-        'USE_PROXY': True,
+        'USE_PROXY': False,
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 60,
         'CONCURRENT_REQUESTS': 1,
@@ -74,7 +74,8 @@ class NetworkKinkSpider(BaseSceneScraper):
 
     def start_requests2(self, response):
         for pagination in self.paginations:
-            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta={'page': self.page, 'pagination': pagination, "playwright": True}, headers=self.headers, cookies=self.cookies)
+            link = self.get_next_page_url(self.url, self.page, pagination)
+            yield scrapy.Request(link, callback=self.parse, meta={'page': self.page, 'pagination': pagination, "playwright": True}, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         if response.status == 200:
@@ -93,7 +94,7 @@ class NetworkKinkSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath("//a[@class='shoot-link']/@href").getall()
+        scenes = response.xpath('//div[contains(@class, "d-block")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

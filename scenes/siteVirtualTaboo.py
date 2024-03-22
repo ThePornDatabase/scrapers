@@ -13,12 +13,9 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
+        'title': './/div[@class="videoTitle"]/text()',
+        'date': '//div[@class="row video-detail"]//div[contains(@class, "info mt-5")]//span[@class="bullet"]/following-sibling::text()[1]',
+        'date_formats': ['%b %d, %Y'],
         'external_id': r'.*/(.*?)',
         'trailer': '',
         'duration': '//div[contains(@class,"video-detail")]//div[contains(@class,"info")]/text()',
@@ -52,7 +49,9 @@ class SiteVirtualTabooSpider(BaseSceneScraper):
         item['trailer'] = ''
         item['url'] = response.url
         item['id'] = re.search(r'videos/(.*)', item['url']).group(1)
-        item['date'] = self.parse_date(jsondata['uploadDate'].strip()).isoformat()
+        item['date'] = self.get_date(response)
+        if not item['date']:
+            item['date'] = self.parse_date(jsondata['uploadDate'].strip()).isoformat()
         item['site'] = "Virtual Taboo"
         item['parent'] = "Virtual Taboo"
         item['network'] = "Virtual Taboo"

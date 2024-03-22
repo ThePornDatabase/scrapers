@@ -13,7 +13,7 @@ class LetsDoeItSpider(BaseSceneScraper):
         'https://www.letsdoeit.com',
         'https://amateureuro.com',
         'https://mamacitaz.com/',
-        'https://dirtycosplay.com/',
+        # ~ # 'https://dirtycosplay.com/',  Paywalled
         'https://transbella.com/',
         'https://vipsexvault.com',
     ]
@@ -33,12 +33,15 @@ class LetsDoeItSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        meta = response.meta
         responsetext = response.xpath('//*').getall()
         responsetext = "".join(responsetext)
         scenes = re.findall(r'a\ target=\"_self\" class=\"-g-vc-fake\"\ href=\"(.*?.html)\"', responsetext)
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                meta['id'] = re.search(r'/watch/(.*)/', scene).group(1)
+                meta['url'] = self.format_link(response, scene)
+                yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         site = response.xpath('//div[@class="-mvd-grid-actors"]/span[1]/a[1]/text()').get().strip()
@@ -87,12 +90,13 @@ class LetsDoeItSpider(BaseSceneScraper):
         if scenedate:
             return scenedate
 
-        scenedate = response.xpath('//div[@class="-mvd-grid-stats"]/text()')
+        # ~ scenedate = response.xpath('//div[contains(@class,"video-top-details")]//div[contains(@class,"mvd-grid-stats")]//text()')
+        scenedate = response.xpath('//div[contains(text(), "Views")]/text()')
         if scenedate:
             scenedate = scenedate.get()
             scenedate = re.search(r'(\w+ \d{2}, \d{4})', scenedate)
             if scenedate:
                 scenedate = scenedate.group(1)
-                return self.parse_date(scenedate, date_formats=['%b %d, %Y']).isoformat()
+                return self.parse_date(scenedate, date_formats=['%b %d, %Y']).strftime('%Y-%m-%d')
 
         return None

@@ -19,6 +19,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://cheatingsis.com",
         "https://cumswappingsis.com",
         "https://daddyslilangel.com",
+        "https://datingmystepson.com",
         "https://deeplush.com",
         "https://detentiongirls.com",
         "https://driverxxx.com",

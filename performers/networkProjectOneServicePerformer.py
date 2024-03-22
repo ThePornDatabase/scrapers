@@ -51,6 +51,7 @@ class ProjectOneServicePerformerSpider(BasePerformerScraper):
         'https://www.trueamateurs.com',
         'https://www.tube8vip.com',
         'https://www.twistys.com',
+        'https://www.voyr.com',
         'https://www.whynotbi.com',
     ]
 

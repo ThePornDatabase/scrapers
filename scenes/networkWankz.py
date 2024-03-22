@@ -76,8 +76,12 @@ class NetworkWankzSpider(BaseSceneScraper):
     ]
 
     paginations = [
-        '/sites/teen-girls?p=%s',
-        '/videos?p=%s#',
+        # ~ '/sites/bubbly-massage?p=%s',
+        # ~ '/sites/cfnm-exposed?p=%s',
+        '/sites/my-milf-boss?p=%s',
+        # ~ '/sites/wankz-3d?p=%s',
+        # ~ '/sites/teen-girls?p=%s',
+        # ~ '/videos?p=%s#',
     ]
 
     selector_map = {
@@ -89,7 +93,7 @@ class NetworkWankzSpider(BaseSceneScraper):
         'image': '//a[@class="noplayer"]/img/@src',
         'performers': '//div[@class="models-wrapper actors"]/a/span/text()',
         'tags': "//a[@class='cat']/text()",
-        'external_id': '-(\\d+)$',
+        'external_id': r'-(\d+)$',
         'trailer': '',
         'pagination': '/videos?p=%s#'
     }

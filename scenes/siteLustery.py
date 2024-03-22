@@ -63,7 +63,7 @@ class SiteLusterySpider(BaseSceneScraper):
         item['title'] = video['title']
         item['duration'] = video['duration']
         item['tags'] = video['tags']
-        item['tags'] = item['tags'] = list(map(lambda x: string.capwords(x.replace("-", " ").strip()), item['tags']))
+        item['tags'] = list(map(lambda x: string.capwords(x.replace("-", " ").strip()), item['tags']))
         item['image'] = f"https://lustery.com/{video['posterFullPath']}"
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         performers = video['coupleName']

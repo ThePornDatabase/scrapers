@@ -30,7 +30,7 @@ class SiteDarkroomVRSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//a[@class="video-card__item"]/@href').getall()
+        scenes = response.xpath('//div[@class="video-card__item"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

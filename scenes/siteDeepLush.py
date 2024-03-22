@@ -7,7 +7,9 @@ class DeepLushSpider(BaseSceneScraper):
     network = 'Deep Lush'
     parent = 'Deep Lush'
 
-    start_urls = ["https://deeplush.com"]
+    start_urls = [
+        # ~ "https://deeplush.com"
+        ]
 
     selector_map = {
         'title': '//h2/text()',

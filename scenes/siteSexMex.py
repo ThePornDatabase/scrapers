@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -26,7 +27,7 @@ class SexMexSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"col-lg-4 col-md-4 col-xs-16 thumb")]')
+        scenes = response.xpath('//div[@class="videothumbnail"]')
         for scene in scenes:
             item = SceneItem()
 
@@ -47,9 +48,9 @@ class SexMexSpider(BaseSceneScraper):
                 image = re.search(r'url=(.*)', image).group(1)
             performers = scene.xpath('.//a[contains(@class, "modelnamesut") and contains(@href, "/models/")]/text()').getall()
 
-            sceneid = scene.xpath('./@data-setid').get()
+            sceneid = scene.xpath('./../@data-setid').get()
 
-            scene = scene.xpath('./div/a/@href').get()
+            scene = scene.xpath('./a[1]/@href').get()
 
             item['title'] = title
             item['date'] = date

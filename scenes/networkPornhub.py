@@ -8,6 +8,7 @@ class NetworkPornhubSpider(BaseSceneScraper):
     network = 'Pornhub'
 
     performers = [
+        ["/channels/pornhub-originals-vr?o=mr&page=%s", "", "Pornhub: Pornhub Originals VR"],
         ["/model/404hotfound/videos?o=mr&page=%s", "404HotFound", "Pornhub: 404HotFound"],
         ["/model/aestra-azure/videos/upload?o=mr&page=%s", "Aestra Azure", "Pornhub: Aestra Azure"],
         ["/model/agataruiz/videos?page=%s", "Agata Ruiz", "Pornhub: Agata Ruiz"],
@@ -41,6 +42,7 @@ class NetworkPornhubSpider(BaseSceneScraper):
         ["/model/fuckforeverever/videos?page=%s", "Fuckforeverever", "Pornhub: Fuckforeverever"],
         ["/model/gentlyperv/videos?o=mr&page=%s", "GentlyPerv", "Pornhub: GentlyPerv"],
         ["/model/harperthefox/videos?o=mr&page=%s", "HarperTheFox", "Pornhub: HarperTheFox"],
+        ["/model/helloelly/videos?o=mr&page=%s", "HelloElly", "Pornhub: HelloElly"],
         ["/model/joey-lee/videos?o=mr&page=%s", "Joey Lee", "Pornhub: Joey Lee"],
         ["/model/kelly-aleman/videos?o=mr&page=%s", "Kelly Aleman", "Pornhub: Kelly Aleman"],
         ["/model/loly-lips/videos?o=mr&page=%s", "Loly Lips", "Pornhub: Loly Lips"],
@@ -146,7 +148,10 @@ class NetworkPornhubSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//div[contains(@class,"videoUList")]//div[@class="phimage"]/a/@href').getall()
+        if "channels" in response.url:
+            scenes = response.xpath('//ul[contains(@id, "showAllChanelVideos")]//li[contains(@class, "VideoListItem")]/div/div[@class="phimage"]/a/@href').getall()
+        else:
+            scenes = response.xpath('//div[contains(@class,"videoUList")]//div[@class="phimage"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
@@ -154,10 +159,11 @@ class NetworkPornhubSpider(BaseSceneScraper):
     def get_performers(self, response):
         meta = response.meta
         performers = []
-        new_perf = response.xpath('//div[contains(@class,"pornstarsWrapper")]/a/@data-mxptext')
+        new_perf = response.xpath('//div[contains(@class,"pornstarsWrapper")]/a/@data-mxptext|//div[contains(@class,"pornstarsWrapper")]/a/img/following-sibling::text()[1]')
         if new_perf:
             new_perf = new_perf.getall()
             performers = new_perf
-        if meta['initial_performers'][0] not in performers:
-            performers.append(meta['initial_performers'][0])
-        return performers
+        if meta['initial_performers'][0]:
+            if meta['initial_performers'][0] not in performers:
+                performers.append(meta['initial_performers'][0])
+        return list(map(lambda x: self.cleanup_title(x.strip()), performers))

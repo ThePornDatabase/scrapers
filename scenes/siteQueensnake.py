@@ -11,9 +11,9 @@ class SiteQueensnakeSpider(BaseSceneScraper):
     site = 'Queensnake'
 
     start_urls = [
+        'https://queensect.com',
         'https://queensnake.com',
     ]
-
 
     cookies = {
         'cLegalAge': 'true',
@@ -57,10 +57,19 @@ class SiteQueensnakeSpider(BaseSceneScraper):
             item['tags'] = self.get_tags(scene)
             item['duration'] = self.get_duration(scene)
             item['trailer'] = ""
-            item['site'] = "Queensnake"
-            item['parent'] = "Queensnake"
-            item['network'] = "Queensnake"
+            if "queensnake" in response.url:
+                item['site'] = "Queensnake"
+                item['parent'] = "Queensnake"
+                item['network'] = "Queensnake"
+            if "queensect" in response.url:
+                item['site'] = "Queensect"
+                item['parent'] = "Queensect"
+                item['network'] = "Queensnake"
             yield self.check_item(item, self.days)
+
+    def get_next_page_url(self, base, page):
+        page = str(int(page) - 1)
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_performers(self, scene):
         performers = scene.xpath('.//div[@class="contentPreviewTags"]/a/text()').getall()

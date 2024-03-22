@@ -190,6 +190,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.wivesinpantyhose.com',
 
         'https://www.seancody.com',
+        'https://www.sexselector.com',
         'https://www.sexyhub.com',
         # 'https://www.danejones.com',
         # 'https://www.fitnessrooms.com',
@@ -228,6 +229,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.twistyshard.com',
         # 'https://www.whengirlsplay.com',
 
+        'https://www.voyr.com',
         'https://www.whynotbi.com',
     ]
 
@@ -363,6 +365,9 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
             yield_item = True
             if brand == "bangbros" and item['date'] < "2023-06-21":
+                yield_item = False
+
+            if item['site'] == "Sex Selector" and item['date'] < "2024-01-13":
                 yield_item = False
 
             if self.check_item(item, self.days) and yield_item:

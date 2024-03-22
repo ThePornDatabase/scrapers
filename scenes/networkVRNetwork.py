@@ -17,7 +17,7 @@ class NetworkVRNetworkSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1[contains(@class,"page-title")]/text()',
         'description': '//div[contains(@class,"second-text")]/div/p//text()',
-        'date': '//div[contains(@class, "info-item") and contains(.//text(), "Release")]//text()',
+        'date': '//div[contains(@class, "info-item") and contains(.//text(), "Release")]//text()|//span[contains(text(), "Release date")]/following-sibling::text()',
         're_date': r'(\w{2,4} \d{1,2}, \d{4})',
         'date_formats': ['%b %d, %Y'],
         'duration': '//span[contains(text(), "Duration")]/following-sibling::span[1]/text()',
@@ -64,7 +64,7 @@ class NetworkVRNetworkSpider(BaseSceneScraper):
             hour = re.search(r'(\d+) h', duration)
             if hour:
                 hour = hour.group(1)
-                hour = int(hour) * 3660
+                hour = int(hour) * 3600
                 totalduration = totalduration + hour
             return str(totalduration)
         return None

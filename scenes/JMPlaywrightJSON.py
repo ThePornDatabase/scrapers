@@ -2,7 +2,7 @@ import re
 import json
 import scrapy
 from scrapy.utils.project import get_project_settings
-
+import base64
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -10,8 +10,11 @@ from tpdb.items import SceneItem
 class JMPlaywrightJSONSpider(BaseSceneScraper):
     name = 'JMPlaywrightJSON'
 
-    start_urls = [
-        'https://www.jacquieetmicheltv.net',
+    start_url = 'https://www.jacquieetmicheltv.net'
+
+    paginations = [
+        '/en/content/list?studio=6352b65e8b4552ba57ee0e7d&page=%s',
+        '/en/content/list?studio=63626ce889913bab98631473&page=%s',
     ]
 
     # ~ cookies = {
@@ -61,39 +64,33 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        settings = get_project_settings()
-
-        if not hasattr(self, 'start_urls'):
-            raise AttributeError('start_urls missing')
-
-        if not self.start_urls:
-            raise AttributeError('start_urls selector missing')
-
         meta = {}
         # ~ meta['playwright'] = True
         meta['page'] = self.page
-        if 'USE_PROXY' in self.settings.attributes.keys():
-            use_proxy = self.settings.get('USE_PROXY')
-        elif 'USE_PROXY' in settings.attributes.keys():
-            use_proxy = settings.get('USE_PROXY')
-        else:
-            use_proxy = None
 
-        if use_proxy:
-            print(f"Using Settings Defined Proxy: True ({settings.get('PROXY_ADDRESS')})")
-        else:
-            try:
-                if self.proxy_address:
-                    meta['proxy'] = self.proxy_address
-                    print(f"Using Scraper Defined Proxy: True ({meta['proxy']})")
-            except Exception:
-                print("Using Proxy: False")
+        for pagination in self.paginations:
+            meta['pagination'] = pagination
+            yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page, meta['pagination']), callback=self.parse, meta=meta, headers={"Accept": "application/json"}, cookies=self.cookies)
 
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers={"Accept": "application/json"}, cookies=self.cookies)
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, pagination):
+        return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        print(response.text)
+        # ~ print(response.text)
         jsondata = json.loads(response.text)
         taglist = jsondata['facets']['tags']
         scenelist = jsondata['contents']
@@ -103,23 +100,31 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
             # ~ item['description'] = scene['description']
             # ~ item['description'] = re.sub('<[^<]+?>', '', item['description']).replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ").strip()
             # ~ item['duration'] = str(int(scene['duration']) * 60)
+            if "mixpanel" in scene and scene['mixpanel']:
+                mixpanel = json.loads(base64.b64decode(scene['mixpanel']))
+                if mixpanel['contentDuration']:
+                    item['duration'] = str(mixpanel['contentDuration'])
             item['description'] = ""
             item['date'] = scene['publication_date']['iso']
             item['image'] = scene['poster']['thumbnail']['srcSet']
             item['image'] = re.search(r'^(http.*?)\s', item['image']).group(1)
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['type'] = 'Scene'
-            item['id'] = scene['id']
             item['url'] = self.format_link(response, scene['routes']['content']).replace("www.", "")
-            item['site'] = "Jacquie et Michel"
+            item['id'] = re.search(r'content/(.*?)/', item['url']).group(1)
+            if "6352b65e8b4552ba57ee0e7d" in response.url:
+                item['site'] = "Jacquie et Michel"
+            if "63626ce889913bab98631473" in response.url:
+                item['site'] = "Dompteuse"
             item['parent'] = "Jacquie et Michel"
             item['network'] = "Jacquie et Michel"
             item['tags'] = []
-            for tag in scene['tags']:
-                for tagref in taglist:
-                    if tag == tagref['id']:
-                        item['tags'].append(tagref['name'])
-                        break
+            if "tags" in scene:
+                for tag in scene['tags']:
+                    for tagref in taglist:
+                        if tag == tagref['id']:
+                            item['tags'].append(tagref['name'])
+                            break
             item['performers'] = []
             item['trailer'] = ''
 

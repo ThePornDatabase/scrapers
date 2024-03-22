@@ -11,7 +11,7 @@ def match_path(argument):
         'www.filthykings.com': "/filthy-kings-porn-stars.html?page=%s&hybridview=member",
         'thirdworldxxx.com': "/third-world-media-porn-stars.html?page=%s&hybridview=member",
         'latinoguysporn.com': "/latino-guys-porn-stars.html?page=%s&hybridview=member",
-        'www.lethalhardcore.com': "/lethal-hardcore-porn-stars.html?page=%s&hybridview=member",
+        'www.lethalhardcore.com': "/porn-stars.html?sort=ag_added&page=%s&hybridview=member",
         'www.wcpclub.com': "/west-coast-productions-porn-stars.html?page=%s&hybridview=member",
     }
     return match.get(argument, "")

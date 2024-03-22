@@ -6,12 +6,12 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class NetworkCXWowPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//div[@class="graybox"]/div[contains(@class,"titlebox")]/h3[1]/span/text()',
-        'image': '//div[contains(@class,"profileimg")]//img/@src',
+        'name': '//div[@class="bioInfo"]/h1/text()',
+        'image': '//div[@class="bioPic"]/img/@src0_1x',
         'image_blob': True,
         'bio': '',
         'gender': '',
-        'astrology': '//span[contains(text(), "strological")]/following-sibling::text()[1]',
+        'astrology': '//div[@class="bioInfo"]//span[contains(text(), "Sign:")]/following-sibling::text()',
         'birthday': '',
         'birthplace': '',
         'cupsize': '',
@@ -19,14 +19,14 @@ class NetworkCXWowPerformerSpider(BasePerformerScraper):
         'eyecolor': '',
         'fakeboobs': '',
         'haircolor': '',
-        'height': '//span[contains(text(), "eight")]/following-sibling::text()[1]',
-        'measurements': '//span[contains(text(), "easure")]/following-sibling::text()[1]',
+        'height': '//div[@class="bioInfo"]//span[contains(text(), "Height:")]/following-sibling::text()',
+        'measurements': '//div[@class="bioInfo"]//span[contains(text(), "Measurements:")]/following-sibling::text()',
         'nationality': '',
         'piercings': '',
         'tattoos': '',
         'weight': '',
 
-        'pagination': '/tour/categories/models_%s_d.html',
+        'pagination': '/tour/models//models_%s_d.html',
         'external_id': r'model/(.*)/'
     }
 
@@ -44,12 +44,12 @@ class NetworkCXWowPerformerSpider(BasePerformerScraper):
     def get_gender(self, response):
         if "pure-bbw" in response.url:
             return 'Female'
-        if "pure-ts" in response.url or "tspov" in response.url or "becmoingfemme" in response.url:
+        if "pure-ts" in response.url or "tspov" in response.url or "becomingfemme" in response.url:
             return 'Transgender Female'
         return None
 
     def get_performers(self, response):
-        performers = response.xpath('//div[contains(@class, "models")]//a[contains(@href, "/models/")]/@href').getall()
+        performers = response.xpath('//div[@class="modelPic"]/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, cookies=self.cookies, headers=self.headers)
 
@@ -91,5 +91,5 @@ class NetworkCXWowPerformerSpider(BasePerformerScraper):
                 inches = int(inches)
             else:
                 inches = 0
-            return str(int((feet + inches) * 2.54))
+            return str(int((feet + inches) * 2.54)) + "cm"
         return None

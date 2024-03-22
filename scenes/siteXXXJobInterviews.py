@@ -32,22 +32,22 @@ class SiteXXXJobInterviewsSpider(BaseSceneScraper):
         meta = response.meta
         scenes = response.xpath('//div[@class="gallery-item"]')
         for scene in scenes:
-            duration = scene.xpath('.//div[contains(@class, "info-container")]/div/span[1]/text()')
+            duration = scene.xpath('.//div[@class="item"]/div[1]/span/text()')
             if duration:
                 duration = duration.get()
                 meta['duration'] = self.duration_to_seconds(duration.strip())
-            scenedate = scene.xpath('.//div[contains(@class, "info-container")]/div/span[2]/text()')
+            scenedate = scene.xpath('.//div[@class="item"]/div[2]/span/text()')
             if scenedate:
-                scenedate = scenedate.get()
-                meta['date'] = scenedate.strip()
-            scene = scene.xpath('./a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
+                meta['date'] = self.parse_date(scenedate.get(), date_formats=['%B %d, %Y']).strftime('%Y-%m-%d')
+            scene = scene.xpath('.//div[@class="description"]/a/@href').get()
+            if scene and re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
-        tags = response.xpath('//div[@class="tags"]/ul/li/a/text()').getall()
-        tags2 = []
-        for tag in tags:
-            if re.sub(r'[A-Z]', '', tag) == tag:
-                tags2.append(string.capwords(tag))
-        return tags2
+        tags = super().get_tags(response)
+        performers = self.get_performers(response)
+        for performer in performers:
+            for tag in tags:
+                if performer.lower() in tag.lower():
+                    tags.remove(performer)
+        return tags

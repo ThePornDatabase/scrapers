@@ -26,6 +26,26 @@ class SiteAngelaWhiteScenesSpider(BaseSceneScraper):
         'type': 'Scene',
     }
 
+    custom_scraper_settings = {
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 10,
+        'CONCURRENT_REQUESTS': 1,
+        'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'CONCURRENT_REQUESTS_PER_IP': 1,
+        'DOWNLOADER_MIDDLEWARES': {},
+        # ~ 'DOWNLOAD_DELAY': 30,
+        'DOWNLOAD_MAXSIZE': 0,
+        'DOWNLOAD_TIMEOUT': 100000,
+        'DOWNLOAD_WARNSIZE': 0,
+        'HTTPCACHE_ENABLED': False,
+        'RETRY_ENABLED': True,
+        "MEDIA_ALLOW_REDIRECTS": True,
+        "HTTPERROR_ALLOWED_CODES": [404],
+    }
+
     def start_requests(self):
         meta = {}
         meta['page'] = 1

@@ -72,7 +72,7 @@ def match_site(argument):
         'girlstryanal': 'Girls Try Anal',
         'girlsway': 'Girlsway',
         'givemeteens': 'Give Me Teens',
-        'gloryholesecreta': 'Gloryhole Secrets',
+        'gloryholesecrets': 'Gloryhole Secrets',
         'grandpasfuckteens': 'Grandpas Fuck Teens',
         'hairyundies': 'Hairy Undies',
         'homepornreality': 'Home Porn Reality',
@@ -164,7 +164,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
     network = 'Gamma Enterprises'
 
     start_urls = [
-        # ~ #  # 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
+        #  # 'https://www.agentredgirl.com', Disabled due to AdultTime being very protective
         'https://www.21naturals.com',
         'https://www.21sextreme.com',
         'https://www.21sextury.com',
@@ -213,6 +213,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'https://www.mommysgirl.com',
         'https://www.mypervyfamily.com',
         'https://www.nextdoorstudios.com',
+        'https://www.peternorth.com',
         'https://www.povthis.com',
         'https://www.prettydirty.com',
         'https://www.pridestudios.com',
@@ -390,7 +391,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if '21sextury' in referrerurl:
                 item['parent'] = "21Sextury"
-                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if '21naturals' in referrerurl:
                 item['parent'] = "21Naturals"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
@@ -518,6 +519,9 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'oopsie' in referrerurl:
                 item['parent'] = "Oopsie"
+                item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
+            if 'peternorth' in referrerurl:
+                item['parent'] = "Peter North"
                 item['url'] = self.format_url(response.meta['url'], '/en/video/' + scene['sitename'] + '/' + scene['url_title'] + '/' + str(scene['clip_id']))
             if 'povthis' in referrerurl:
                 item['parent'] = "POV This"
@@ -722,6 +726,8 @@ class AdultTimeAPISpider(BaseSceneScraper):
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Amypervyfamily%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&clickAnalytics=true&facets=%5B%22categories.name%22%2C%22channels.id%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=10&page=0&analytics=false&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Amypervyfamily%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&clickAnalytics=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&facets=upcoming"}]}'
         if 'naked-yoga-life' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=24&page=' + str(page) + '&attributesToRetrieve=%5B%22action_tags%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%5D&clickAnalytics=true&facets=%5B%5D&tagFilters=&facetFilters=%5B%22upcoming%3A0%22%2C%5B%22availableOnSite%3Anakedyogalife%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&page=0&attributesToRetrieve=%5B%22action_tags%22%2C%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%5D&clickAnalytics=false&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&facets=availableOnSite&facetFilters=%5B%22upcoming%3A0%22%5D"}]}'
+        if 'peternorth' in referrer:
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Apeternorth%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=&facets=%5B%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22availableOnSite%3Apeternorth%22%5D%5D"},{"indexName":"all_scenes_latest_desc"]}'
         if 'clubinfernodungeon' in referrer:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=20&maxValuesPerFacet=1000&page=' + str(page) + '&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&facets=%5B%22studio_name%22%2C%22categories.name%22%2C%22actors.name%22%2C%22download_sizes%22%2C%22length_range_15min%22%2C%22availableOnSite%22%2C%22upcoming%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%5D"},{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1&maxValuesPerFacet=1000&page=0&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=false&attributesToRetrieve=%5B%5D&attributesToHighlight=%5B%5D&attributesToSnippet=%5B%5D&tagFilters=&analytics=false&clickAnalytics=false&facets=upcoming"}]}'
         if 'nextdoorstudios' in referrer:

@@ -1,15 +1,9 @@
-import warnings
 from datetime import datetime
 import dateparser
 import scrapy
-
+import re
+from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
-# Ignore dateparser warnings regarding pytz
-warnings.filterwarnings(
-    "ignore",
-    message="The localize method is no longer necessary, as this time zone supports the fold attribute",
-)
 
 
 class BadoinkVrSpider(BaseSceneScraper):
@@ -38,20 +32,20 @@ class BadoinkVrSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            "//div[@class='tile-grid-item']//a[contains(@class, 'video-card-title')]/@href").getall()
+        scenes = response.xpath("//div[@class='tile-grid-item']//a[contains(@class, 'video-card-title')]/@href").getall()
         for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            scene = self.format_link(response, scene)
+            yield scrapy.Request(scene, callback=self.parse_scene)
 
     def get_next_page_url(self, base, page):
-        selector = '/vrpornvideos?page=%s'
+        selector = '/vrpornvideos/%s?order=newest'
 
         if 'vrbtrans' in base:
-            selector = '/videos?page=%s'
+            selector = '/videos/?category=all&sort=latest&page=%s'
         elif 'vrcosplay' in base:
-            selector = '/cosplaypornvideos?page=%s'
+            selector = '/cosplaypornvideos/%s?order=newest'
         elif 'kinkvr' in base:
-            selector = '/bdsm-vr-videos?page=%s'
+            selector = '/bdsm-vr-videos/%s?order=newest'
 
         return self.format_url(base, selector % page)
 
@@ -61,3 +55,31 @@ class BadoinkVrSpider(BaseSceneScraper):
         if date:
             return dateparser.parse(date.strip()).isoformat()
         return datetime.now().isoformat()
+
+    def parse_scene(self, response):
+        item = SceneItem()
+        item['title'] = self.get_title(response)
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', self.get_date(response)).group(1)
+        item['image'] = self.get_image(response)
+        if item['image']:
+            item['image_blob'] = self.get_image_blob(response)
+        else:
+            item['image_blob'] = ""
+
+        if item['image']:
+            if "?" in item['image'] and ("token" in item['image'].lower() or "expire" in item['image'].lower()):
+                item['image'] = re.search(r'(.*?)\?', item['image']).group(1)
+
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['id'] = self.get_id(response)
+        item['trailer'] = self.get_trailer(response)
+        item['duration'] = self.get_duration(response)
+        item['url'] = self.get_url(response)
+        item['network'] = self.network
+        item['parent'] = item['site']
+
+        item['type'] = 'Scene'
+        yield self.check_item(item, self.days)

@@ -1,96 +1,64 @@
 import re
-from datetime import date, timedelta
+import html
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteLasVegasAmateursSpider(BaseSceneScraper):
     name = 'LasVegasAmateurs'
+    site = 'Las Vegas Amateurs'
+    parent = 'Las Vegas Amateurs'
     network = 'Las Vegas Amateurs'
-    max_pages = 100
 
     start_urls = [
-        'http://lasvegasamateurs.com'
+        'https://lasvegasamateurs.com',
     ]
 
     selector_map = {
-        'title': '//h1[contains(@class, "title")]/text()',
-        'description': '//p[contains(@class, "description")]/text()',
-        'performers': '//span[contains(@class,"models")]/a/text()',
-        'date': '//div[contains(@class, "date")]/text()',
-        'image': '//meta[@property="og:image"]/@content',
-        'tags': '//div[contains(@class, "video-tags")]/a/text()',
-        'trailer': '',
-        'external_id': r'trailers/(.*)\.html',
-        'pagination': '/tour/categories/updates_%s_d.html'
+        'title': '//span[@class="update_title"]/text()',
+        'description': '//span[@class="latest_update_description"]//text()',
+        'date': '//span[@class="availdate"]/text()',
+        'date_formats': ['%m/%d/%Y'],
+        'image': '//comment()[contains(., "First Thumb Spot")]/following-sibling::a[1]/img/@src0_4x',
+        'performers': '//span[@class="tour_update_models"]/a/text()',
+        'tags': '//span[@class="update_tags"]/a/text()',
+        'duration': '//div[@class="update_counts_preview_table"]/text()[contains(., "min")]',
+        'trailer': '//div[@class="update_image"]/a[contains(@onclick, ".mp4")][1]/@onclick',
+        're_trailer': r'tload.*?(/.*?)[\'\"]',
+        'external_id': r'.*/(.*?)\.htm',
+        'pagination': '/tour/categories/updates_%s.html',
+        'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="updateItem"]')
-        if response.meta['page'] < self.max_pages:
-            for scene in scenes:
-                item = SceneItem()
-                title = scene.xpath('./div/h5/a/text()').get()
-                if title:
-                    item['title'] = self.cleanup_title(title)
-                else:
-                    item['title'] = ''
+        meta = response.meta
+        scenes = response.xpath('//div[@class="updateItem"]/div[1]/a[1]/@href').getall()
+        for scene in scenes:
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
-                item['description'] = ''
+    def get_duration(self, response):
+        duration = response.xpath('//div[@class="update_counts_preview_table"]/text()[contains(., "min")]')
+        if duration:
+            duration = duration.get()
+            duration =  re.sub('[^a-z0-9]', '', duration.lower())
 
-                performers = scene.xpath('.//span[@class="tour_update_models"]/a/text()')
-                if performers:
-                    performers = performers.getall()
-                    item['performers'] = list(map(lambda x: x.strip(), performers))
-                else:
-                    item['performers'] = []
+            duration = re.search(r'(\d+)min', duration)
+            if duration:
+                return str(int(duration.group(1)) * 60)
+        return None
 
-                scenedate = scene.xpath('./div/p/span[contains(text(), "/")]/text()')
-                item['date'] = self.parse_date('today').isoformat()
-                if scenedate:
-                    item['date'] = self.parse_date(scenedate.get(), date_formats=['%m/%d/%Y']).isoformat()
+    def get_image(self, response):
+        image = super().get_image(response)
+        image = image.replace(".com/content", ".com/tour/content")
+        return image
 
-                image = scene.xpath('./div/a/img/@src0_3x')
-                if image:
-                    image = image.get()
-                    item['image'] = "http://lasvegasamateurs.com/tour/" + image.strip().replace(" ", "%20")
-                else:
-                    item['image'] = None
+    def get_trailer(self, response):
+        trailer = super().get_trailer(response)
+        trailer = trailer.replace(".com/content", ".com/tour/content")
+        return trailer
 
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-                item['tags'] = []
-                trailer = scene.xpath('./div/a/@onclick')
-                item['trailer'] = ''
-                if trailer:
-                    trailer = trailer.get()
-                    trailer = re.search(r'\'(/.*.mp4)', trailer)
-                    if trailer:
-                        item['trailer'] = 'https://lasvegasamateurs.com' + trailer.group(1).strip().replace(" ", "%20")
-                item['site'] = "Las Vegas Amateurs"
-                item['parent'] = "Las Vegas Amateurs"
-                item['network'] = "Las Vegas Amateurs"
-
-                extern_id = re.search(r'content/(.*?)/.*?.jpg', item['image'])
-                if extern_id:
-                    item['id'] = extern_id.group(1).strip().lower()
-
-                item['url'] = response.url
-
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
+    def get_id(self, response):
+        image = self.get_image(response)
+        sceneid = re.search(r'.*/(.*?)/', image).group(1)
+        return sceneid.lower()

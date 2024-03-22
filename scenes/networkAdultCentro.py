@@ -94,6 +94,13 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://idreamofjo.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'I Dream of Jo', 'Monica Sweet'],
         ['https://jenysmith.net', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Jeny Smith', 'Jeny Smith'],
         ['https://oopsmodels.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Oops Models (Official)', ''],
+        ['https://ginagerson.xxx', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Gina Gerson', ''],
+        ['https://mugursworld.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Mugur Porn', ''],
+        ['https://hunglow.org', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Hung Low', 'Hung Lo'],
+        ['https://exploitedtalent.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Exploited Talent', ''],
+        ['https://dripdropprod.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'DripDrop', ''],
+        ['https://thepervempire.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'The Perv Empire', ''],
+        ['https://sallydangeloxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Sally Dangelo XXX', ''],
     ]
 
     selector_map = {
@@ -219,8 +226,14 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             if "vinasky" in response.url:
                 meta['performer'] = "Vina Sky"
 
+            if "ginagerson" in response.url:
+                meta['performer'] = "Gina Gerson"
+
             if "rydenarmani" in response.url:
                 meta['performer'] = "Ryden Armani"
+
+            if "mugursworld" in response.url:
+                meta['performer'] = "Mugur"
 
             if "backalleytoonz" in response.url:
                 item['tags'].append("Animation")
@@ -275,6 +288,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             item['performers'] = []
         if "lonelymeow" in response.url:
             item['performers'] = ['LonelyMeow']
+        if "sallydangelo" in response.url:
+            item['performers'] = ['Sally DAngelo']
 
         if "Don Whoe" in item['tags']:
             item['tags'].remove("Don Whoe")

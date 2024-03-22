@@ -52,6 +52,8 @@ class SitePornboxSpider(BaseSceneScraper):
         else:
             item['description'] = ""
         item['site'] = scene['studio']
+        if item['site'].lower().replace(" ", "") == "familysinners":
+            item['site'] = "FAMILY Sinners (Pornbox)"
         item['date'] = self.parse_date(scene['publish_date']).isoformat()
         item['image'] = scene['player_poster']
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
@@ -77,10 +79,10 @@ class SitePornboxSpider(BaseSceneScraper):
         item['network'] = 'Legal Porno'
         item['parent'] = 'Legal Porno'
 
-        matches = ['bangbros', 'jeffsmodels', 'private', 'antoniosuleiman', 'bradmontana', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
+        matches = ['bangbros', 'jeffsmodels', 'private', 'exposedlatinas', 'antoniosuleiman', 'bradmontana', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
                    'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
                    'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
-                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue']
+                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue', 'plantsvscunts', 'mugurporn']
         if not any(x in item['site'].lower().replace(" ", "") for x in matches):
             yield self.check_item(item, self.days)

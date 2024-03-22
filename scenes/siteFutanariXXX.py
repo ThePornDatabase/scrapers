@@ -5,7 +5,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class SiteFutanariXXXSpider(BaseSceneScraper):
     name = 'FutanariXXX'
-    network = 'Futanari XXX'
+    network = 'Hentaied'
     parent = 'Futanari XXX'
     site = 'Futanari XXX'
 
@@ -19,7 +19,7 @@ class SiteFutanariXXXSpider(BaseSceneScraper):
         'date': '//meta[@property="article:published_time"]/@content',
         'image': '//meta[@property="og:image"]/@content',
         'duration': '//div[contains(@class,"duration")]/img/following-sibling::text()',
-        'performers': '//div[contains(@class,"tagsmodels")]/a/text()',
+        'performers': '//div[contains(@class,"taglist")]/a/text()',
         'tags': '//ul[@class="post-categories"]/li/a/text()',
         'director': '//div[contains(@class,"director")]/span/a/text()',
         'external_id': '.*\/(.*?)\/$',

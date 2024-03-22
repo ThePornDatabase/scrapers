@@ -40,6 +40,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Alexxxis89', True, '1002515519'],
         ['Manyvids: Alice Bong', True, '1002715079'],
         ['Manyvids: Alice Red', True, '1007208921'],
+        ['Manyvids: Alice Stoner', True, '1005082413'],
         ['Manyvids: AliceNZ', False, '493690'],
         ['Manyvids: Alissa Foxy', True, '1005955692'],
         ['Manyvids: Alix Lynx', True, '30313'],
@@ -94,10 +95,12 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Brea Rose', True, '1000024307'],
         ['Manyvids: Brett TylerXXX', False, '1004700026'],
         ['Manyvids: Britney Amber', True, '1003387859'],
+        ['Manyvids: Brittanythingoz', True, '1006754881'],
         ['Manyvids: Brooke Dillinger', True, '376796'],
         ['Manyvids: Brooklyn Springvalley', True, '1001853938'],
         ['Manyvids: BuniBun', True, '49000'],
         ['Manyvids: CallMeBabyBlue', True, '1004603307'],
+        ['Manyvids: Carmita Bonita', True, '30655'],
         ['Manyvids: Carol Cox', True, '130540'],
         ['Manyvids: Casey Calvert', True, '1003999309'],
         ['Manyvids: Cassie Clarke', True, '1001062063'],
@@ -108,17 +111,20 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Chad Alva', True, '1000107977'],
         ['Manyvids: Chad Diamond', True, '577547'],
         ['Manyvids: Chanel Santini', True, '1000344210'],
+        ['Manyvids: Chantal Owens', True, '1002667100'],
         ['Manyvids: Charlette Webb', True, '35990'],
         ['Manyvids: Cherry Crush', True, '32539'],
         ['Manyvids: Cherry Fae', False, '110767'],
         ['Manyvids: Chezza Luna', True, '177172'],
         ['Manyvids: Chris And Mari', False, '1004131603'],
+        ['Manyvids: Ciren Verde', True, '1002613557'],
         ['Manyvids: Cmbprod', True, '1003696960'],
         ['Manyvids: Codi Vore', True, '574802'],
         ['Manyvids: Courtney Scott', True, '273124'],
         ['Manyvids: CrazyBella', True, '327770'],
         ['Manyvids: CreamBerryFairy', True, '1002527905'],
         ['Manyvids: CuckoldingMILF', False, '1002431767'],
+        ['Manyvids: CumSlutJenna', True, '1006212286'],
         ['Manyvids: CutieElly', False, '1002778789'],
         ['Manyvids: Daddys Rozay', True, '1002023399'],
         ['Manyvids: Daisy Haze', True, '261301'],
@@ -157,11 +163,13 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Eva Long', True, '1002576385'],
         ['Manyvids: Evie Rees', True, '1000468027'],
         ['Manyvids: Facial King Pro', False, '1001204864'],
+        ['Manyvids: Fay Valentine', True, '1001627467'],
         ['Manyvids: Felicia Vox', True, '321754'],
         ['Manyvids: Fell On Productions', False, '456897'],
         ['Manyvids: FFeZine', False, '1000045578'],
         ['Manyvids: Fiery Redhead', False, '527041'],
         ['Manyvids: Fiona Dagger', True, '759730'],
+        ['Manyvids: Fishnet Housepet', True, '222290'],
         ['Manyvids: FitSid', False, '1002419479'],
         ['Manyvids: Florida Milf', True, '1003205269'],
         ['Manyvids: Forbidden Perversions', False, '599647'],
@@ -172,9 +180,11 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Funsizedcumslut', True, '1007113302'],
         ['Manyvids: Gala MV', True, '830429'],
         ['Manyvids: Gia OhMy', True, '1003519826'],
+        ['Manyvids: Gin Lustig', True, '1006293001'],
         ['Manyvids: Ginger Banks', True, '37055'],
         ['Manyvids: GirlOnTop880', True, '1004830774'],
         ['Manyvids: Goddess Tangent', False, '427284'],
+        ['Manyvids: Godmother The Great', True, '228889'],
         ['Manyvids: Gogofukmexxx', False, '1002219117'],
         ['Manyvids: Golden Lace', True, '1002587264'],
         ['Manyvids: Goldie Blair', True, '380752'],
@@ -191,11 +201,13 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Heatherbby', True, '88086'],
         ['Manyvids: Hello Alice', True, '1005562667'],
         ['Manyvids: Hidori', True, '97815'],
+        ['Manyvids: Holland of Chicago', True, '1003631211'],
         ['Manyvids: Hope Penetration', True, '1004890226'],
         ['Manyvids: Hornnstudio', False, '1003146686'],
         ['Manyvids: Horny Lily', True, '1000862654'],
         ['Manyvids: Hottalicia1', False, '1000447453'],
         ['Manyvids: HouseholdFantasy', False, '1007157741'],
+        ['Manyvids: HugeBoobsErin', True, '1001183502'],
         ['Manyvids: Icy Winters', True, '697815'],
         ['Manyvids: Im Heather Harmon', False, '1003667583'],
         ['Manyvids: ImMeganLive', True, '491714'],
@@ -203,12 +215,16 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: InkedMonster', True, '1001576946'],
         ['Manyvids: ItsReeseRobins', False, '1005302009'],
         ['Manyvids: Ivy Starshine', True, '362540'],
+        ['Manyvids: Izzy Rosse', True, '1005964496'],
         ['Manyvids: Jack and Jill', False, '1001495638'],
         ['Manyvids: Jack Blaque', True, '536056'],
         ['Manyvids: Jack Ripher', True, '1001692458'],
+        ['Manyvids: Jackie Synn', True, '194026'],
         ['Manyvids: Jada Kai', True, '1000722201'],
         ['Manyvids: Jade Vow', True, '1002042328'],
+        ['Manyvids: JadedJuneBug', True, '1007315738'],
         ['Manyvids: Jane Cane', True, '1000718761'],
+        ['Manyvids: Jane Judge', True, '1000197274'],
         ['Manyvids: Jasper Nyx', True, '1003787164'],
         ['Manyvids: Jaybbgirl', True, '1001317123'],
         ['Manyvids: JaySmoothXXX', False, '525062'],
@@ -226,6 +242,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Kalina Ryu', True, '815701'],
         ['Manyvids: Karabella', False, '1000456360'],
         ['Manyvids: KarmannAndJosie', False, '1006611324'],
+        ['Manyvids: Kate Kuray', True, '1002855322'],
         ['Manyvids: Kathia Nobili', True, '1003527333'],
         ['Manyvids: Kati3kat', True, '354103'],
         ['Manyvids: Katie Cummings', True, '1000489998'],
@@ -512,7 +529,39 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Sloppy Toppy', False, '1002638751'],
         ['Undercover Sluts', False, '1001483477'],
         ['YouthLust', False, '1001216419'],
-        ['Manyvids: Helly Rite', True, '1002625980', "v2"],
+        ['Manyvids: Helly Rite', True, '1002625980'],
+        ['Manyvids: Samantha Flair', True, '1001379073'],
+        ['Manyvids: DrKInLA', True, '1003399990'],
+        ['Manyvids: JazminTorresBBW', True, '1001552380'],
+        ['Manyvids: juicyxjaden', True, '1004101467'],
+        ['Manyvids: KatesKurves', True, '1001897961'],
+        ['Manyvids: LilyLoveles', True, '1002028291'],
+        ['Manyvids: Melonie Kares', True, '1003030823'],
+        ['Manyvids: MissGothBooty', True, '33842'],
+        ['Manyvids: MZ NORMA STITZ', True, '1001723300'],
+        ['Manyvids: Nixlynka', True, '1002349390'],
+        ['Manyvids: QueenRhaena', True, '1004676688'],
+        ['Manyvids: Rebeca Cross', True, '1004469370'],
+        ['Manyvids: Rem Sequence', True, '1001345701'],
+        ['Manyvids: Rice Bunny', True, '410732'],
+        ['Manyvids: Shemeatress', True, '1000243328'],
+        ['Manyvids: SugarSweetmeatBBW', True, '1003902752'],
+        ['Manyvids: SuzyQ44ks', True, '1001155424'],
+        ['Manyvids: SweetheartMiaBBW', True, '1001145696'],
+        ['Manyvids: xPrincessAura', True, '1001967166'],
+        ['Manyvids: AriaNicoleXXX', True, '1006336627'],
+        ['Manyvids: Ayumi Anime', True, '1000907145'],
+        ['Manyvids: Bubblebumbutt', True, '1001007459'],
+        ['Manyvids: QueenieSteph', True, '1006752181'],
+        ['Manyvids: Kimswallows', True, '1001125267'],
+        ['Manyvids: PinkMaggit', True, '418469'],
+        ['Manyvids: Layndare', True, '1002480074'],
+        ['Manyvids: Ninadoll', True, '113109'],
+        ['Manyvids: Lolliepopxxx', True, '1004243105'],
+        ['Manyvids: Ema Lee', True, '1004698572'],
+        ['Manyvids: Evelin Stone', True, '1000691850'],
+        ['Manyvids: Throat GOAT', True, '1003432123'],
+        ['Manyvids: Mikaela_tx', True, '1007908784'],
     ]
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False', 'HTTPERROR_ALLOWED_CODES': [403, 404]}
@@ -541,7 +590,6 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
 
     def start_requests2(self, response):
         meta = response.meta
-        meta['mvtoken'] = response.xpath('//html/@data-mvtoken').get()
         self.headers['referer'] = 'https://www.manyvids.com/Profile/1003004427/Sweetie-Fox/Store/Videos/'
 
         for link in self.start_urls:
@@ -549,11 +597,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             meta['siteid'] = link[2]
             meta['site'] = link[0]
             meta['parse_performer'] = link[1]
-            meta['v2'] = False
-            if len(link) == 4:
-                if link[3].lower() == "v2":
-                    meta['v2'] = True
-            yield scrapy.Request(url=self.get_next_page_url(self.page, meta), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(self.page, meta), callback=self.parse, meta=meta, headers=self.headers)
 
     def parse(self, response):
         # ~ print(response.text)
@@ -567,24 +611,20 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta), callback=self.parse, meta=meta, headers=self.headers)
 
     def get_next_page_url(self, page, meta):
-        offset = str((int(page) - 1) * 30)
-        link = f"https://www.manyvids.com/api/model/{meta['siteid']}/videos?category=all&offset={offset}&sort=0&limit=30&mvtoken={meta['mvtoken']}"
+        link = f"https://www.manyvids.com/bff/store/videos/{meta['siteid']}/?page={page}"
         return link
 
     def get_scenes(self, response):
         meta = response.meta
         jsondata = json.loads(response.text)
-        data = jsondata['result']['content']['items']
+        data = jsondata['data']
         for jsonentry in data:
             meta['id'] = jsonentry['id']
             meta['title'] = string.capwords(html.unescape(jsonentry['title']))
-            if meta['v2']:
-                scenelink = f"https://www.manyvids.com/bff/store/video/{meta['id']}"
-            else:
-                scenelink = f"https://video-player-bff.estore.kiwi.manyvids.com/videos/{meta['id']}"
+            scenelink = f"https://www.manyvids.com/bff/store/video/{meta['id']}"
             if meta['id']:
                 # ~ print(meta)
                 yield scrapy.Request(scenelink, callback=self.parse_scene, meta=meta)
@@ -625,6 +665,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 return ['Cattie Candescent']
             if "Cherry Fae" in meta['site']:
                 return ['Krystal Orchid']
+            if "JazminTorresBBW" in meta['site']:
+                return ['Jazmin Torres']
             if "CuckoldingMILF" in meta['site']:
                 return ['Mila Rose']
             if "CutieElly" in meta['site']:
@@ -763,8 +805,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             item = SceneItem()
             meta = response.meta
             jsondata = json.loads(response.text)
-            if meta['v2']:
-                jsondata = jsondata['data']
+            jsondata = jsondata['data']
             item['title'] = meta['title']
             item['id'] = meta['id']
             if 'description' in jsondata:
@@ -775,6 +816,10 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 item['tags'] = jsondata['tags']
             else:
                 item['tags'] = []
+            if "tagList" in jsondata and jsondata['tagList']:
+                for tag in jsondata['tagList']:
+                    item['tags'].append(tag['label'])
+
             if "screenshot" in jsondata:
                 item['image'] = jsondata['screenshot'].replace(" ", "%20")
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
@@ -790,9 +835,14 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             item['site'] = self.get_site(response)
             item['parent'] = self.get_parent(response)
             item['url'] = "https://www.manyvids.com" + jsondata['url']
-            if "videoDuration" in jsondata:
-                duration = re.search(r'(\d{1,2}:\d{1,2}:?\d{1,2}?)', jsondata['videoDuration'])
-                item['duration'] = self.duration_to_seconds(duration.group(1))
+            if "videoDuration" in jsondata and jsondata['videoDuration']:
+                if ":" in jsondata['videoDuration']:
+                    duration = re.search(r'(\d{1,2}:\d{1,2}:?\d{1,2}?)', jsondata['videoDuration'])
+                    item['duration'] = self.duration_to_seconds(duration.group(1))
+                elif jsondata['videoDuration']:
+                    duration = int(jsondata['videoDuration'])
+                    if duration:
+                        item['duration'] = str(duration * 60)
             else:
                 item['duration'] = ""
             parse_scene = True

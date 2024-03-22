@@ -41,3 +41,11 @@ class SiteWankzVRSpider(BaseSceneScraper):
         tags = super().get_tags(response)
         tags.append("Virtual Reality")
         return tags
+
+    def get_duration(self, response):
+        duration = super().get_duration(response)
+        if "PT" in duration or "M" in duration:
+            duration = re.search(r'(\d+)', duration)
+            if duration:
+                duration = str(int(duration.group(1)) * 60)
+        return duration

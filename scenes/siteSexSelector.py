@@ -12,7 +12,7 @@ class SiteSexSelectorSpider(BaseSceneScraper):
     site = 'Sex Selector'
 
     start_urls = [
-        'https://www.sexselector.com',
+        # 'https://www.sexselector.com',  Moved into Project1Service scraper
     ]
 
     selector_map = {

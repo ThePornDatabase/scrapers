@@ -1,5 +1,4 @@
 import re
-import dateparser
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -16,8 +15,8 @@ class AllHerLuvSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//meta[@name="twitter:title"]/@content',
-        'description': '//div[@class="container"]/p[contains(@class,"text")]/strong/text()',
-        'image': '//img[contains(@class,"update_thumb")]/@src0_1x',  # Image is tokened
+        'description': '//div[@class="container"]/p[contains(@class,"text")]/strong/text()|//p[contains(text(), "Video Description:")]/following-sibling::p//text()',
+        'image': '//img[contains(@class,"update_thumb")]/@src0_4x',  # Image is tokened
         'image_blob': True,
         'performers': '//p[@class="dvd-scenes__data"]/a[contains(@href,"/models/")]/text()',
         'tags': '//p[@class="dvd-scenes__data"]/a[contains(@href,"/categories/")]/text()',
@@ -32,11 +31,20 @@ class AllHerLuvSpider(BaseSceneScraper):
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
     def get_date(self, response):
-        date = response.xpath('//p[@class="dvd-scenes__data" and contains(text(),"Added:")]').get()
-        if date:
-            date = re.search(r'(\d{2}\/\d{2}\/\d{4})', date).group(1)
-            if date:
-                return dateparser.parse(date).isoformat()
+        scenedate = response.xpath('//p[contains(@class,"dvd-scenes__data")]//text()[contains(., "Added:")]').get()
+        if scenedate:
+            scenedate = re.search(r'(\d{1,2}/\d{1,2}/\d{4})', scenedate).group(1)
+            if scenedate:
+                return self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
+
+    def get_duration(self, response):
+        duration = response.xpath('//p[contains(@class,"dvd-scenes__data")]//text()[contains(., "Added:")]')
+        if duration:
+            duration = duration.get()
+            duration = re.search(r'((?:\d{1,2}\:)?\d{2}\:\d{2})', duration)
+            if duration:
+                return self.duration_to_seconds(duration.group(1))
+        return None
 
     def get_site(self, response):
         if "allherluv" in response.url:
@@ -46,8 +54,11 @@ class AllHerLuvSpider(BaseSceneScraper):
             return "MissaX"
 
     def get_image(self, response):
-        image = self.process_xpath(response, self.get_selector_map('image')).get()
+        image = response.xpath(self.get_selector_map('image'))
+        if not image:
+            image = response.xpath('//img[contains(@class,"update_thumb")]/@src0_3x|//img[contains(@class,"update_thumb")]/@src0_2x|//img[contains(@class,"update_thumb")]/@src0_1x')
         if image:
+            image = image.get()
             return self.format_link(response, image)
 
         return ''
