@@ -27,15 +27,13 @@ class SiteStockyDudesSpider(BaseSceneScraper):
     def get_scenes(self, response):
         yield from self.extract_scenes(response, response.selector)
 
-
     def get_scenes_json(self, response):
         html = response.json()['html']
 
         selector = scrapy.Selector(text=html)
 
         yield from self.extract_scenes(response, selector)
-
-        
+     
     def extract_scenes(self, response, selector):
         scenes = selector.xpath(
             '//div[@class="scene_title"]//a[contains(@href,"/scene/")]/@href'
@@ -51,7 +49,6 @@ class SiteStockyDudesSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, str(scene)),
                                  callback=self.parse_scene, meta=meta)
 
-
     def get_tags(self, response):
         tags = super().get_tags(response)
 
@@ -59,12 +56,6 @@ class SiteStockyDudesSpider(BaseSceneScraper):
             tags.append("Homosexual")
 
         return tags
-    
-    def get_next_page(self, response):
-        if 'page' in response.meta:
-            return response.meta['page']
-        else:
-            return 1
         
     def get_pagin_data(self, response):
         page_data = {}
@@ -79,7 +70,6 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         return page_data
         
     def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
         count = 0
 
         if 'pagingData' not in response.meta:
