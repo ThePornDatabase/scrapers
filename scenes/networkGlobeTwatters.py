@@ -39,12 +39,12 @@ class networkGlobeTwatters(BaseSceneScraper):
 
         meta = response.meta
         site = response.xpath('//div[contains(@class,"amp-logo-footer")]//a/@title').get()
-        site = re.match(r'\b[\w\s?]*\s?\b',site).group(0).strip()
+        site = re.match(r'\b[\w\s?]*\s?\b', site).group(0).strip()
         meta['site'] = site
 
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,meta=meta)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_description(self, response):
         description = super().get_description(response)
