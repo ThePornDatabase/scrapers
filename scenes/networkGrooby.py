@@ -71,7 +71,7 @@ class NetworkGroobySpider(BaseSceneScraper):
         'description': '//div[@class="trailerpage_info"]/p[not(contains(@class, "trailertitle"))]/text()|//div[@class="trailer_videoinfo"]/p[not(./b)]/text()',
         'image': '//div[@class="trailerdata"]/div[contains(@class, "trailerposter")]/img/@src0_2x|//div[@class="videohere"]/img[contains(@src,".jpg")]/@src',
         'performers': '//div[@class="trailerpage_info"]//a[contains(@href, "/models/")]/text()|//div[@class="trailer_videoinfo"]//a[contains(@href, "/models/")]/text()',
-        'tags': '',
+        'tags': './/div[@class="set_tags"]/ul/li/a/text()',
         'trailer': '//div[@class="trailerdata"]/div[contains(@class, "trailermp4")]/text()',
         'external_id': r'.*/(.*?)\.htm',
         'pagination': '/tour/categories/movies/%s/latest/'
@@ -115,6 +115,9 @@ class NetworkGroobySpider(BaseSceneScraper):
         meta = response.meta
 
         tags = ['Trans']
+        tagset = map(str.strip, response.xpath(self.get_selector_map('tags')).getall())
+        tags.extend(tagset)
+        
         if "transexpov" in response.url:
             tags.append("POV")
         if "asian" in response.url:
