@@ -59,8 +59,8 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         
     def get_pagin_data(self, response):
         page_data = {}
-        page_data['from'] = response.xpath(
-            '//div[@id="scenesLoadMore"]/@data-from').get()
+        page_data['from'] = int(response.xpath(
+            '//div[@id="scenesLoadMore"]/@data-from').get())
         page_data['filter'] = response.xpath(
             '//div[@id="scenesLoadMore"]/@data-filter').get()
         page_data['sort'] = response.xpath(
@@ -78,9 +78,6 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         else:
             scenes = self.get_scenes_json(response)
 
-        if 'count' not in response.meta:
-            response.meta['count'] = 0
-
         for scene in scenes:
             count += 1
             yield scene
@@ -91,9 +88,7 @@ class SiteStockyDudesSpider(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
 
-                meta['count'] += count
-
-                meta['pagingData']['from'] = str(meta['count'])
+                meta['pagingData']['from'] += count
 
                 print('NEXT PAGE: ' + str(meta['page']))
 
