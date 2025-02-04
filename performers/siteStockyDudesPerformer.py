@@ -1,5 +1,4 @@
 import scrapy
-import re
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from urllib.parse import urlencode
 
@@ -49,14 +48,16 @@ class SiteStockyDudesPerformerSpider(BasePerformerScraper):
             yield performer
 
         if count:
-            if ('page' in response.meta and response.meta['page'] < self.limit_pages):
+            if ('page' in response.meta and
+               response.meta['page'] < self.limit_pages):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 meta['pagingData']['from'] += count
 
                 print('NEXT PAGE: ' + str(meta['page']))
 
-                link = self.format_link(response, '/_ajaxLoadModels.php?' + urlencode(meta['pagingData']))
+                link = self.format_link(response, '/_ajaxLoadModels.php?' +
+                                        urlencode(meta['pagingData']))
                 self.headers['x-requested-with'] = 'XMLHttpRequest'
 
                 yield scrapy.Request(url=link,
@@ -74,10 +75,10 @@ class SiteStockyDudesPerformerSpider(BasePerformerScraper):
         if ('json' in response.headers.get('Content-Type').decode('utf-8')
                 and 'html' in response.json()):
             selector = scrapy.Selector(text=response.json()['html'])
-
+        
         performers = selector.xpath(
             '//div[@class="model_title"]//a/@href').getall()
-
+        
         for performer in performers:
             yield scrapy.Request(url=self.format_link(response, performer),
                                  callback=self.parse_performer,
@@ -94,19 +95,3 @@ class SiteStockyDudesPerformerSpider(BasePerformerScraper):
         page_data['_'] = '1212121'
 
         return page_data
-
-    def get_height(self, response):
-        height = super().get_height(response)
-        height = re.search(r'(\d+).*?(\d+)', height)
-        if height:
-            feet = height.group(1)
-            inches = height.group(1)
-            return str(round(((int(feet) * 12) + int(inches)) * 2.54)) + "cm"
-        return None
-
-    def get_weight(self, response):
-        weight = super().get_weight(response)
-        weight = re.search(r'(\d+)', weight)
-        if weight:
-            return str(round(int(weight.group(1)) * 0.453592)) + "kg"
-        return None

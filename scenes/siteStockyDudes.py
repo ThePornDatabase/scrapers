@@ -1,6 +1,5 @@
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from urllib.parse import urlencode
-import re
 import scrapy
 
 
@@ -24,7 +23,7 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         'tags': '//a[@class="tagsRnd"]/text()',
         'duration': '//div[@class="row container_styled_1"]//div[@class="p-5"]'
         '//i[@class="icon-clock-1"]/following-sibling::text()',
-        'external_id': r'.*/(\d+).*?/?$',
+        'external_id': r'.*/(.*?)/?$',
         'pagination': '/scenes?Page=%s',
         'type': 'Scene',
     }
@@ -55,7 +54,7 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         tags = super().get_tags(response)
 
         if "Gay" not in tags:
-            tags.append("Gay")
+            tags.append("Homosexual")
 
         return tags
 
@@ -70,7 +69,7 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         page_data['_'] = '1212121'
 
         return page_data
-
+    
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
         count = 0
@@ -98,10 +97,3 @@ class SiteStockyDudesSpider(BaseSceneScraper):
                 yield scrapy.Request(url=link, callback=self.parse, meta=meta,
                                      headers=self.headers,
                                      cookies=self.cookies)
-
-    def get_duration(self, response):
-        duration = super().get_duration(response)
-        duration = re.search(r'(\d+)', duration)
-        if duration:
-            return str(int(duration.group(1)) * 60)
-        return None
