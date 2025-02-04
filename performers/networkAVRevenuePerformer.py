@@ -11,10 +11,10 @@ class NetworkAVRevenuePerformerSpiderPerformers(BasePerformerScraper):
     network = 'AV Revenue'
 
     start_urls = [
-        'https://baberotica.com/feed/models?limit=0',
-        'https://baberoticavr.com/feed/models?limit=0',
-        'https://japanhdv.com/feed/models?limit=0',
-        'https://tenshigao.com/feed/models?limit=0',
+        'https://baberotica.com/feed/models?limit=9999',
+        'https://baberoticavr.com/feed/models?limit=9999',
+        'https://japanhdv.com/feed/models?limit=9999',
+        'https://tenshigao.com/feed/models?limit=9999',
     ]
 
     selector_map = {

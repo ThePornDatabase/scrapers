@@ -18,17 +18,16 @@ class LegalPornoSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h1[contains(@class,"watch__title")]//text()',
-        'description': '//div[contains(text(), "Description")]/following-sibling::div//text()',
-        'date': '//i[contains(@class,"calendar")]/text()',
-        'date_formats': ['%Y-%m-%d'],
-        'image': '//video/@data-poster',
-        'performers': '//div[@class="container-fluid"]/h1/a[contains(@href, "/model/")]/text()|//h1[contains(@class,"watch__title")]//a/text()',
-        'tags': '//div[contains(@class,"genres-list")]/a/text()',
-        'external_id': r'\/watch\/(\d+)',
-        'duration': '//i[@class="bi bi-clock me-5"]/text()',
-        'trailer': '//video//source/@src',
-        'pagination': '/new-videos/%s'
+        'title': '//h1[contains(@class, "text-primary scene__title")]//text()',
+        'description': '//p/span[@class="text-body-tertiary" and contains(text(), "Description")]/following-sibling::text()',
+        'date': '//p/strong[@class="text-body-tertiary" and contains(text(), "Publication date:")]/following-sibling::span[1]/text()',
+        'image': '//video[@class="video-player"]/@poster',
+        'performers': '//a[contains(@class,"link-secondary") and contains(@href, "/model/")]/text()',
+        'tags': '//a[contains(@class, "link-secondary") and contains(@href, "/videos?tags=")]/text()',
+        'duration': '//p/i[@class="bi bi-clock-fill"]/following-sibling::text()',
+        'external_id': r'/watch/(\d+)',
+        'trailer': '//video[@class="video-player"]/source/@src',
+        'pagination': 'videos?page=%s',
     }
 
     def get_site(self, response):
@@ -39,12 +38,10 @@ class LegalPornoSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        """ Returns a list of scenes
-        @url https://pornworld.com/new-videos/1
-        @returns requests 50 150
-        """
-        scenes = response.xpath('//div[@class="card-scene__view"]/a/@href').getall()
+        scenes = response.xpath('//article[@class="card scene"]/a[1]/@href').getall()
         for scene in scenes:
+            if "http:" not in scene:
+                scene = "https:" + scene
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):

@@ -1,145 +1,69 @@
 import re
-from datetime import date, timedelta
+import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
-class HobyBuchanonSpider(BaseSceneScraper):
+class SiteHobyBuchanonSpider(BaseSceneScraper):
     name = 'HobyBuchanon'
-    network = 'Hoby Buchanon'
-    parent = 'Hoby Buchanon'
 
     start_urls = [
-        'https://hobybuchanon.com',
-    ]
-
-    pagination = [
-        '/updates?page=%s&order_by=publish_date&sort_by=desc',
-        '/behind-the-scenes?page=%s&order_by=publish_date&sort_by=desc',
-        '/suck-this-dick?page=%s&order_by=publish_date&sort_by=desc',
+        'https://hobybuchanon.com'
     ]
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'external_id': r'.*\/(.*?)\/$',
-        'trailer': '',
-        'pagination': '/updates/page/%s/'
+        'external_id': r'',
+        'pagination': '/updates?page=%s&order_by=publish_date&sort_by=desc',
     }
 
-    def start_requests(self):
-        if not hasattr(self, 'start_urls'):
-            raise AttributeError('start_urls missing')
-
-        if not self.start_urls:
-            raise AttributeError('start_urls selector missing')
-
-        for pagination in self.pagination:
-            for link in self.start_urls:
-                yield scrapy.Request(url=self.get_next_page_url(link, self.page, pagination),
-                                     callback=self.parse,
-                                     meta={'page': self.page, 'pagination': pagination},
-                                     headers=self.headers,
-                                     cookies=self.cookies)
-
-    def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
-        count = 0
-        for scene in scenes:
-            count += 1
-            yield scene
-
-        if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
-                meta['page'] = meta['page'] + 1
-                pagination = meta['pagination']
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], pagination),
-                                     callback=self.parse,
-                                     meta=meta,
-                                     headers=self.headers,
-                                     cookies=self.cookies)
-
-    def get_next_page_url(self, base, page, pagination):
-        return self.format_url(base, pagination % page)
+    cookies = {"close-warning": "1"}
 
     def get_scenes(self, response):
-        scenelist = []
-        scenes = response.xpath('//div[contains(@class,"post-item")]')
+        scenes = response.xpath('//div[@class="img-container"]/a/@href').getall()
         for scene in scenes:
-            item = SceneItem()
-            item['performers'] = []
-            item['tags'] = []
-            item['trailer'] = ''
-            item['image'] = None
-            item['description'] = ''
-            item['network'] = "Hoby Buchanon"
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, cookies=self.cookies, headers=self.headers)
+
+    def parse_scene(self, response):
+        jsondata = response.xpath('//script[@id="__NEXT_DATA__"]/text()')
+        if jsondata:
+            jsondata = json.loads(jsondata.get())
+            jsondata = jsondata['props']['pageProps']['content']
+            item = self.init_scene()
+            item['site'] = "Hoby Buchanon"
             item['parent'] = "Hoby Buchanon"
-            if "suck-this-dick" in response.url:
-                item['site'] = "Suck This Dick"
-            else:
-                item['site'] = "Hoby Buchanon"
+            item['network'] = "Hoby Buchanon"
+            item['title'] = self.cleanup_title(jsondata['title'])
+            item['description'] = self.cleanup_text(jsondata['description'])
+            performers = jsondata['models_thumbs']
 
-            url = scene.xpath('.//div[@class="image_wrapper"]/a/@href').get()
-            if url:
-                item['url'] = url.strip()
-                externid = re.search(r'.*/(.*?)/$', url).group(1)
-                if externid:
-                    item['id'] = externid.strip()
+            item['performers'] = []
+            item['performers_data'] = []
+            for performer in performers:
+                performer_extra = {}
+                performer_extra['name'] = performer['name']
+                performer_extra['site'] = "Hoby Buchanon"
+                performer_extra['extra'] = {}
+                performer_extra['extra']['gender'] = "Female"
+                perf_image = performer['thumb']
+                if perf_image:
+                    performer_extra['image'] = perf_image
+                    performer_extra['image_blob'] = self.get_image_blob_from_link(performer_extra['image'])
+                item['performers_data'].append(performer_extra)
+                item['performers'].append(performer['name'])
 
-            title = scene.xpath('.//h2[@class="entry-title"]/a/text()')
-            if title:
-                item['title'] = self.cleanup_title(title.get())
-            else:
-                item['title'] = ''
+            item['date'] = self.parse_date(jsondata['publish_date']).strftime('%Y-%m-%d')
+            item['duration'] = self.duration_to_seconds(jsondata['videos_duration'])
 
-            description = scene.xpath('.//div[@class="post-excerpt"]/text()')
-            if description:
-                item['description'] = self.cleanup_description(description.get())
-            else:
-                item['description'] = ''
-
-            scenedate = scene.xpath('.//div[@class="date_label"]/text()')
-            if scenedate:
-                item['date'] = self.parse_date(scenedate.get()).isoformat()
-            else:
-                item['date'] = self.parse_date('today').isoformat()
-
-            image = scene.xpath('.//div[@class="image_links double"]/a/@href').get()
-            if not image:
-                image = scene.xpath('.//div[@class="image_wrapper"]/a/img/@src').get()
-
-            if image:
-                item['image'] = image.strip()
-
+            item['id'] = jsondata['id']
+            item['image'] = jsondata['thumb']
+            if "http" not in item['image']:
+                item['image'] = "https:" + item['image']
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            if "tags" in jsondata and jsondata['tags']:
+                item['tags'] = jsondata['tags']
+            item['trailer'] = ""
+            item['url'] = f"https://hobybuchanon.com/updates/{jsondata['slug']}"
+            item['type'] = 'Scene'
 
-            if item['id'] and item['title'] and item['date']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            if "suck-this-dick" not in response.url or ("suck-this-dick" in response.url and item['date'] > "2021-01-01"):
-                                scenelist.append(item.copy())
-                    else:
-                        if "suck-this-dick" not in response.url or ("suck-this-dick" in response.url and item['date'] > "2021-01-01"):
-                            scenelist.append(item.copy())
-                item.clear()
-
-        return scenelist
+            if item['date'] > "2022-08-17":
+                yield self.check_item(item, self.days)

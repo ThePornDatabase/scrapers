@@ -6,7 +6,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class NetworkJavHDAltPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//div[@class="title"]/h1/text()|//div[@class="b-model"]/header[@class="b-content-header"]/h2[@class="b-content-title"]/text()',
+        'name': '//div[@class="model"]/div[@class="left"]/a/@title',
         'image': '//div[@class="model"]/div/a/img/@src|//div[@class="b-model-info"]/a/img[@class="b-thumb-img"]/@src',
         'height': '//ul[@class="params models_items"]/li/span[contains(text(), "Height")]/following-sibling::text()|//strong[contains(text(), "Height")]/following-sibling::text()',
         'weight': '//ul[@class="params models_items"]/li/span[contains(text(), "Weight")]/following-sibling::text()|//strong[contains(text(), "Weight")]/following-sibling::text()',
@@ -111,7 +111,7 @@ class NetworkJavHDAltPerformerSpider(BasePerformerScraper):
     def get_birthday(self, response):
         birthday = super().get_birthday(response)
         if birthday:
-            birthday = dateparser.parse(birthday, date_formats=['%d %B %Y'], settings={'TIMEZONE': 'UTC'}).isoformat()
+            birthday = dateparser.parse(birthday, date_formats=['%d %B %Y'], settings={'TIMEZONE': 'UTC'}).strftime('%Y-%m-%d')
         return birthday
 
     def get_birthplace(self, response):

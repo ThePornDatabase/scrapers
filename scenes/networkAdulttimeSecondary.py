@@ -44,6 +44,7 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "amateurgaypov",
         "analtrixxx",
         "anatomikmedia",
+        "anatomikmedia-channel",
         "annabellerogers",
         "atldisruptivefilms",
         "baremaidens",
@@ -62,7 +63,9 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "daddysboy",
         "dareweshare",
         "disruptivefilms",
+        "extremepickups",
         "feedme",
+        "femalesubmissions",
         "Fine-Erotica",
         "fistingcentral",
         "fistinginferno",
@@ -75,7 +78,9 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "gostuckyourself",
         "grinders",
         "hentaisexschool",
+        "hollyrandall",
         "howwomenorgasm",
+        "intimatelypov",
         "javstudio",
         "joimom",
         "jerkbuddies",
@@ -86,6 +91,7 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "latinoboysporn",
         "lesbiandatingstories",
         "milfoverload",
+        "milfoverload-channel",
         "mommysboy",
         "mugurporn",
         "muses",
@@ -107,6 +113,7 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
         "totalhentai",
         "touchmywife",
         "toughlovex",
+        "toywithme",
         "trans500",
         "unrelatedx",
         "upclosex",
@@ -154,6 +161,11 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
                         item['image'] = 'https://images-fame.gammacdn.com/movies' + \
                                         scene['pictures'][size]
                         break
+                if "-channel" in item['site']:
+                    item['site'] = item['site'].replace("-channel", "")
+                if item['site'].lower() == "hollyrandall":
+                    item['site'] = "Holly Randall Unfiltered"
+
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 item['trailer'] = ''
                 item['id'] = scene['objectID'].split('-')[0]
@@ -235,6 +247,8 @@ class AdultTimeAPISecondarySpider(BaseSceneScraper):
 
         # ~ jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&attributesToRetrieve=%5B%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22description%22%2C%22action_tags%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%2C%22hasPpu%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=&facets=%5B%22hasSubtitle%22%2C%22categories.name%22%2C%22download_sizes%22%2C%22length_range_15min%22%2C%22actors.name%22%2C%22subtitles.languages%22%2C%22content_tags%22%2C%22availableOnSite%22%2C%22upcoming%22%2C%22network.lvl0%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22content_tags%3Astraight%22%2C%22content_tags%3Alesbian%22%2C%22content_tags%3Abisex%22%2C%22content_tags%3Atrans%22%2C%22content_tags%3Agay%22%5D%5D"}]}'
         jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=1000&maxValuesPerFacet=1000&page=' + str(page) + '&attributesToRetrieve=%5B%22clip_id%22%2C%22title%22%2C%22url_title%22%2C%22description%22%2C%22action_tags%22%2C%22pictures%22%2C%22categories%22%2C%22actors%22%2C%22release_date%22%2C%22sitename%22%2C%22download_sizes%22%2C%22clip_length%22%2C%22upcoming%22%2C%22network_name%22%2C%22length%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22rating_rank%22%2C%22clip_path%22%2C%22channels%22%2C%22mainChannel%22%2C%22views%22%2C%22award_winning%22%2C%22directors%22%2C%22download_file_sizes%22%2C%22trailers%22%2C%22subtitles%22%2C%22objectID%22%2C%22subtitle_id%22%2C%22source_clip_id%22%2C%22hasPpu%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=&facets=%5B%22hasSubtitle%22%2C%22categories.name%22%2C%22download_sizes%22%2C%22length_range_15min%22%2C%22actors.name%22%2C%22subtitles.languages%22%2C%22content_tags%22%2C%22availableOnSite%22%2C%22upcoming%22%2C%22network.lvl0%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22content_tags%3Astraight%22%2C%22content_tags%3Alesbian%22%2C%22content_tags%3Abisex%22%2C%22content_tags%3Atrans%22%2C%22content_tags%3Agay%22%5D%5D"}]}'
+        # ~ jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')&facets=%5B%22hasSubtitle%22%2C%22categories.name%22%2C%22video_formats.format%22%2C%22length_range_15min%22%2C%22actors.name%22%2C%22subtitles.languages%22%2C%22availableOnSite%22%2C%22upcoming%22%2C%22network.lvl0%22%2C%22network.lvl1%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22network.lvl0%3AHolly%20Randall%22%5D%5D"}]}'
+        print(page)
         return scrapy.Request(
             url=algolia_url,
             method='post',

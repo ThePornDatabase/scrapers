@@ -11,42 +11,40 @@ class SiteBrothaLoversSpider(BaseSceneScraper):
     parent = 'Brotha Lovers'
     site = 'Brotha Lovers'
 
+    start_urls = ['https://www.interracialsexx.com/']
+
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'duration': '',
-        'trailer': '',
         'external_id': r'',
         'pagination': '',
         'type': 'Scene',
     }
 
-    def start_requests(self):
-        settings = get_project_settings()
-        meta = {}
-        if 'USE_PROXY' in self.settings.attributes.keys():
-            use_proxy = self.settings.get('USE_PROXY')
-        elif 'USE_PROXY' in settings.attributes.keys():
-            use_proxy = settings.get('USE_PROXY')
-        else:
-            use_proxy = None
+    pages = [
+        'https://www.interracialsexx.com/interracialsexx/updates.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2023pt2.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2023pt1.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2022pt2.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2022pt1.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2021pt2.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2021pt1.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2020pt2.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2020pt1.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2019pt2.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2019pt1.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2018pt2.htm',
+        'https://www.interracialsexx.com/interracialsexx/updates2018pt1.htm',
+    ]
 
-        if use_proxy:
-            print(f"Using Settings Defined Proxy: True ({settings.get('PROXY_ADDRESS')})")
+    def get_next_page_url(self, base, page):
+        links = self.pages
+        page = int(page) - 1
+        if page < len(links):
+            url = links[page]
+            print(url)
+            return url
         else:
-            try:
-                if self.proxy_address:
-                    meta['proxy'] = self.proxy_address
-                    print(f"Using Scraper Defined Proxy: True ({meta['proxy']})")
-            except Exception:
-                print("Using Proxy: False")
-
-        link = 'https://www.interracialsexx.com/interracialsexx/updates.htm'
-        yield scrapy.Request(link, callback=self.get_scenes, headers=self.headers, cookies=self.cookies)
+            return "https://www.google.com"
+        # ~ return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
         scenes = response.xpath('//p[@align="center"]/font[contains(text(), "/")]')
@@ -58,12 +56,12 @@ class SiteBrothaLoversSpider(BaseSceneScraper):
                 scenedate = re.search(r'(\d+/\d+/\d+)', scenedate)
                 if scenedate:
                     scenedate = scenedate.group(1).strip()
-                    item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y', '%m/%d/%y']).isoformat()
+                    item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y', '%m/%d/%y']).strftime('%Y-%m-%d')
                     search_query = f'//p[@align="center"]/font[contains(text(), "{scenedate}")]/../following-sibling::div[1]'
                     # ~ search_query = f'//p[@align="center"]/font[contains(text(), "{scenedate}")]/../following-sibling::table[1]'
                     scenemain = response.xpath(search_query)
                     if scenemain:
-                        title = scenemain.xpath('./table//td[@colspan="2"]//font[@size="2"]/text()')
+                        title = scenemain.xpath('./table//td[@colspan="2"]/p/font/text()[not(contains(.,"Pics")) and not(contains(.,"Movie"))]')
                         # ~ title = scenemain.xpath('.//font[@size="2" and contains(text(), "&")]/text()')
                         if title:
                             title = title.get()
@@ -80,7 +78,7 @@ class SiteBrothaLoversSpider(BaseSceneScraper):
                                 image = image.get()
                                 image = self.format_link(response, image.replace("..", ""))
                                 item['image'] = image
-                                item['image_blob'] = None
+                                item['image_blob'] = self.get_image_blob_from_link(item['image'])
                             else:
                                 item['image'] = None
                                 item['image_blob'] = None
@@ -94,7 +92,6 @@ class SiteBrothaLoversSpider(BaseSceneScraper):
                             item['network'] = 'Brotha Lovers'
                             item['parent'] = 'Brotha Lovers'
                             item['site'] = 'Brotha Lovers'
-
                             sceneid = scenemain.xpath('.//a[contains(@href, ".wmv") or contains(@href, ".mp4") and not(contains(@href, "-HD"))]/@href')
                             if sceneid:
                                 sceneid = sceneid.get()

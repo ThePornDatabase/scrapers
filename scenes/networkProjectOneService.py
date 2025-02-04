@@ -21,7 +21,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
                        }
 
     start_urls = [
-        # Only need one starting URL per "site", pulls everything through common feed
+        # ~ # Only need one starting URL per "site", pulls everything through common feed
 
         'https://www.babes.com',
         # 'https://www.babesunleashed.com',
@@ -35,6 +35,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
 
         'https://www.bangbros.com',
         'https://www.biempire.com',
+        'https://www.brazzersvr.com',
         'https://www.brazzers.com',
         # 'https://www.babygotboobs.com',
         # 'https://www.bigbuttslikeitbig.com',
@@ -66,6 +67,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.bromoblackmaleme.com',
         # 'https://www.bromous.com',
 
+        'https://www.dancingbear.com',
         'https://www.deviante.com',
         # 'https://www.eroticspice.com',
         # 'https://www.forgivemefather.com',
@@ -91,7 +93,9 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.femalefaketaxi.com',
         # 'https://www.publicagent.com',
 
+        'https://www.guyselector.com',
         'https://www.iconmale.com',
+        'https://www.letsdoeit.com',
         'https://www.men.com',
         'https://www.metrohd.com',
         # 'https://www.devianthardcore.com',
@@ -140,6 +144,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.strandedteens.com',
         # 'https://www.thesexscout.com',
 
+        'https://www.nextdoorhobby.com',
         'https://www.noirmale.com',
         'https://www.propertysex.com',
         'https://www.realitydudesnetwork.com',
@@ -229,6 +234,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
         # 'https://www.twistyshard.com',
         # 'https://www.whengirlsplay.com',
 
+        'https://virtualporn.com',
         'https://www.voyr.com',
         'https://www.whynotbi.com',
     ]
@@ -282,7 +288,10 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             if not item['trailer']:
                 item['trailer'] = ''
             item['date'] = self.parse_date(scene['dateReleased']).isoformat()
-            item['id'] = scene['id']
+            if "letsdoeit" in response.url:
+                item['id'] = scene['spartanId']
+            else:
+                item['id'] = scene['id']
             item['network'] = self.network
             item['parent'] = tldextract.extract(response.meta['url']).domain
 
@@ -297,17 +306,24 @@ class ProjectOneServiceSpider(BaseSceneScraper):
                 item['description'] = ''
 
             item['performers'] = []
-            for model in scene['actors']:
-                item['performers'].append(model['name'])
-
-            if 'actors' not in scene or not item['performers']:
-                item['performers'] = []
+            item['performers_data'] = []
+            if "actors" in scene and scene['actors']:
+                for model in scene['actors']:
+                    performer = string.capwords(model['name'])
+                    performer_extra = {}
+                    performer_extra['name'] = performer
+                    performer_extra['site'] = "Mindgeek"
+                    if "gender" in model and model['gender']:
+                        performer_extra['extra'] = {}
+                        performer_extra['extra']['gender'] = model['gender']
+                    item['performers_data'].append(performer_extra)
+                    item['performers'].append(performer)
 
             item['tags'] = []
             for tag in scene['tags']:
                 item['tags'].append(tag['name'])
 
-            if "isVR" in scene:
+            if "isVR" in scene or "virtualporn" in response.url:
                 if scene['isVR']:
                     item['tags'].append("VR")
 
@@ -347,12 +363,18 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             if item['site'] == "dlf":
                 item['site'] = "DILFed"
                 item['parent'] = "DILFed"
+            if item['site'] == "ndhe":
+                item['site'] = "Next Door Hobby"
+                item['parent'] = "Next Door Hobby"
+            if item['site'] == "zzvr":
+                item['site'] = "Brazzers VR"
+                item['parent'] = "Brazzers VR"
 
             siteurl = re.compile(r'\W')
             siteurl = re.sub(siteurl, '', item['site']).lower()
             brand = scene['brand'].lower().strip()
 
-            if brand == "brazzers" or brand == "deviante" or brand == "bangbros" or brand == "bromo":
+            if brand == "brazzers" or brand == "zzvr" or brand == "deviante" or brand == "bangbros" or brand == "bromo":
                 item['url'] = f"https://www.{brand}.com/video/{scene['id']}/{slugify(item['title'])}"
             elif brand == "men":
                 item['url'] = f"https://www.{brand}.com/sceneid/{scene['id']}/{slugify(item['title'])}"
@@ -364,10 +386,13 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             item['parent'] = string.capwords(item['parent'])
 
             yield_item = True
-            if brand == "bangbros" and item['date'] < "2023-06-21":
+            if brand == "bangbros" and item['date'] < "2023-06-21" and "dancing" not in item['site'].lower():
                 yield_item = False
 
             if item['site'] == "Sex Selector" and item['date'] < "2024-01-13":
+                yield_item = False
+
+            if item['site'] == "Virtual Porn" and item['date'] < "2024-06-07":
                 yield_item = False
 
             if self.check_item(item, self.days) and yield_item:
@@ -390,6 +415,7 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             'orderBy': '-dateReleased',
             'offset': (meta['page'] * meta['limit']),
             'referrer': meta['url'],
+            'adaptiveStreamingOnly': 'false',
         }
         meta = {
             'url': response.meta['url'],
@@ -404,7 +430,6 @@ class ProjectOneServiceSpider(BaseSceneScraper):
             urlencode(query)
         return scrapy.Request(url=link, callback=self.get_scenes,
                               headers=response.meta['headers'], meta=meta)
-
     def get_token(self, response):
         token = re.search('instance_token=(.+?);',
                           response.headers.getlist('Set-Cookie')[0].decode("utf-8"))

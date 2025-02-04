@@ -5,6 +5,8 @@ from scrapy.utils.project import get_project_settings
 import base64
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
+true = True
+false = False
 
 
 class JMPlaywrightJSONSpider(BaseSceneScraper):
@@ -23,7 +25,6 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
     # ~ 'ppndr': '1',
     # ~ 'force-my18pass-refresh	': '0',
     # ~ }
-
     headers = {"accept": "application/json"}
 
     # ~ custom_scraper_settings = {
@@ -110,7 +111,7 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
             item['image'] = re.search(r'^(http.*?)\s', item['image']).group(1)
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['type'] = 'Scene'
-            item['url'] = self.format_link(response, scene['routes']['content']).replace("www.", "")
+            item['url'] = self.format_link(response, scene['routes']['details']).replace("www.", "")
             item['id'] = re.search(r'content/(.*?)/', item['url']).group(1)
             if "6352b65e8b4552ba57ee0e7d" in response.url:
                 item['site'] = "Jacquie et Michel"

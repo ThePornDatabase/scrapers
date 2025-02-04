@@ -8,7 +8,7 @@ class SiteLasVegasAmateursSpider(BaseSceneScraper):
     name = 'LasVegasAmateurs'
     site = 'Las Vegas Amateurs'
     parent = 'Las Vegas Amateurs'
-    network = 'Las Vegas Amateurs'
+    network = 'Exposed Whores Media'
 
     start_urls = [
         'https://lasvegasamateurs.com',

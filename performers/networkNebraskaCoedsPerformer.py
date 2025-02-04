@@ -41,6 +41,8 @@ class NetworkNebraskaCoedsPornstarSpider(BasePerformerScraper):
                 item['image'] = image.strip()
             else:
                 item['image'] = None
+            if item['image'] and "http" not in item['image']:
+                item['image'] = self.format_link(response, item['image'])
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             url = performer.xpath('./a[1]/@href').get()

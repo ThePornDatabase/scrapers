@@ -26,7 +26,10 @@ class SiteLusterySpider(BaseSceneScraper):
 
     def start_requests_2(self, response):
         meta = response.meta
-        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        responsetext = response.text
+        responsetext = responsetext.replace('\\', '').replace("\n", "").replace("\r", "").replace("\t", "")
+        # ~ buildId = re.search(r'\"buildId\".*?\"(.*?)\"', response.text)
+        buildId = re.search(r'\"buildId.*?(\w+?)\\?\"', response.text)
         if buildId:
             meta['buildId'] = buildId.group(1)
             link = self.get_next_page_url(self.start_url, self.page)
@@ -46,7 +49,8 @@ class SiteLusterySpider(BaseSceneScraper):
                 meta['date'] = None
             if scene['videoPermalink']:
                 meta['id'] = scene['videoPermalink']
-                link = f"https://lustery.com/_next/data/{meta['buildId']}/video/{meta['id']}.json?permalink={meta['id']}"
+                link = f"https://lustery.com/modules/LusteryNew/template/assets/out/_next/data/{meta['buildId']}/video-preview/{meta['id']}.json"
+                # ~ link = f"https://lustery.com/_next/data/{meta['buildId']}/video/{meta['id']}.json?permalink={meta['id']}"
                 yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
@@ -64,7 +68,11 @@ class SiteLusterySpider(BaseSceneScraper):
         item['duration'] = video['duration']
         item['tags'] = video['tags']
         item['tags'] = list(map(lambda x: string.capwords(x.replace("-", " ").strip()), item['tags']))
-        item['image'] = f"https://lustery.com/{video['posterFullPath']}"
+        if "posterFullPath" in video and video['posterFullPath']:
+            item['image'] = f"https://lustery.com/{video['posterFullPath']}"
+        elif "poster" in video and video['poster']:
+            if "staticPath" in video['poster'] and video['poster']['staticPath']:
+                item['image'] = f"https://static.lustery.com/cdn-cgi/image/format=auto/{video['poster']['staticPath']}"
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         performers = video['coupleName']
         if "&" in performers:

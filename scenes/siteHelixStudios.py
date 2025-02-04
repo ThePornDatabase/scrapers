@@ -26,7 +26,7 @@ class SiteHelixStudiosSpider(BaseSceneScraper):
     }
 
     selector_map = {
-        'title': '//h1/text()',
+        'title': '//h1/text()|//div[contains(@class,"video-header")]/div[@class="video-info"]/span[1]/text()',
         'description': '//div[contains(@class,"description-content")]/p/text()',
         'date': '//div[@class="info-items"]/span[@class="info-item date"]/text()',
         'date_formats': ['%B %d, %Y', '%b %d, %Y'],

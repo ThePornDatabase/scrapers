@@ -24,9 +24,10 @@ class LittleCapriceSpider(BaseSceneScraper):
         'title': '//header[@class="project-header"]/h1/text()',
         'description': '//div[@class="desc-text"]/text()',
         'performers': '//div[@class="title"]/b[contains(text(), "Models")]/../following-sibling::div[1]/a/text()',
-        'date': '//meta[@property="article:published_time"]/@content',
+        'date': '//meta[@name="og:published_time"]/@content',
+        're_date': r'(\d{4}-\d{2}-\d{2})',
         'duration': '//b[contains(text(), "Video Duration")]/following-sibling::text()',
-        'image': '//meta[@property="og:image"]/@content',
+        'image': '//meta[@name="og:image"]/@content',
         'tags': '//div[@class="title"]/b[contains(text(), "Tags")]/../following-sibling::div[1]/a/text()',
         'external_id': '',
         'trailer': '',
@@ -49,28 +50,12 @@ class LittleCapriceSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        title = super().get_title(response)
-        title = re.sub('[^0-9a-z]', '', title.lower())
-        if "buttmuse" in title.lower():
-            return "Buttmuse"
-        if "capricedivas" in title.lower():
-            return "Caprice Divas"
-        if "nassty" in title.lower():
-            return "NasstyX"
-        if "pornlifestyle" in title.lower():
-            return "Pornlifestyle"
-        if "povdreams" in title.lower():
-            return "POV Dreams"
-        if "streetfuck" in title.lower():
-            return "Streetfuck"
-        if "superprivate" in title.lower() or "supeprivate" in title.lower():
-            return "Super Private X"
-        if "virtualreality" in title.lower():
-            return "Virtual Reality"
-        if "wecumtoyou" in title.lower():
-            return "We Cum To You"
-        if "xpervo" in title.lower():
-            return "Xpervo"
+        site = response.xpath('//div[@class="project-tags"]//b[contains(text(), "Series:")]/../following-sibling::div[@class="list"]/a[contains(@href, "/collection/")]/text()')
+        if site:
+            site = site.get().replace(" ", "")
+            if "series" in site.lower():
+                site = site.lower().replace("series", "")
+            return site
         return "Little Caprice Dreams"
 
     def get_parent(self, response):

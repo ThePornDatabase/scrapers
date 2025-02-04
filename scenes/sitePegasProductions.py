@@ -2,7 +2,10 @@ import re
 import string
 import unicodedata
 import scrapy
+import time
 from tpdb.BaseSceneScraper import BaseSceneScraper
+true = True
+false = False
 
 
 class SitePegasProductionsSpider(BaseSceneScraper):
@@ -19,8 +22,9 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         'langue': 'en',
         'consent': 'true',
         'Niche': 'Pegas',
-        'AB': 'B',
-        'limiteouvert': '0'
+        'AB': 'A',
+        'limiteouvert': '0',
+        'bypass-disclaimer': '1'
     }
 
     selector_map = {
@@ -38,31 +42,37 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         'pagination': '/videos-porno-tour/page/%s?lang=en'
     }
 
-    custom_scraper_settings = {
-        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
-        'AUTOTHROTTLE_ENABLED': True,
-        'USE_PROXY': True,
-        'AUTOTHROTTLE_START_DELAY': 1,
-        'AUTOTHROTTLE_MAX_DELAY': 60,
-        'CONCURRENT_REQUESTS': 1,
-        'DOWNLOAD_DELAY': 2,
-        'DOWNLOADER_MIDDLEWARES': {
-            # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-            'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-        },
-        'DOWNLOAD_HANDLERS': {
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        }
-    }
+    # ~ custom_scraper_settings = {
+        # ~ 'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        # ~ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        # ~ 'AUTOTHROTTLE_ENABLED': True,
+        # ~ 'USE_PROXY': True,
+        # ~ 'AUTOTHROTTLE_START_DELAY': 1,
+        # ~ 'AUTOTHROTTLE_MAX_DELAY': 60,
+        # ~ 'CONCURRENT_REQUESTS': 1,
+        # ~ 'DOWNLOAD_DELAY': 2,
+        # ~ 'DOWNLOADER_MIDDLEWARES': {
+            # ~ # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+            # 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+            # 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+        # ~ },
+        # ~ 'DOWNLOAD_HANDLERS': {
+            # ~ "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            # ~ "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        # ~ }
+    # ~ }
+
+    def get_next_page_url(self, base, page):
+        if page == 1:
+            return "https://www.pegasproductions.com/videos-porno-tour?lang=en"
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def start_requests(self):
-        yield scrapy.Request("https://www.pegasproductions.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
+        yield scrapy.Request("https://www.pegasproductions.com/front-en.php", callback=self.start_requests2, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
         meta = response.meta
@@ -88,11 +98,15 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         scenes = response.xpath('//span[contains(text(), "Latest") and not(contains(text(), "Girls"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href|//span[contains(text(), "Récentes") and not(contains(text(), "Filles"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href').getall()
         # ~ scenes = response.xpath('//span[contains(text(), "Récentes") and not(contains(text(), "Filles"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href').getall()
         for scene in scenes:
-            if "?" in scene:
-                scene = re.search(r'(.*)\?', scene).group(1)
-                scene = scene + "?lang=en&chlg=1&langue=en"
-                meta['id'] = re.search(r'\.com/(.*)\?', scene).group(1)
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+            # ~ print(scene)
+            if "langue=" in scene:
+                scene = re.sub(r'langue=\w{2}', 'langue=en', scene)
+            # ~ scene = re.search(r'(.*)\?', scene).group(1)
+            # ~ print(scene)
+            # ~ scene = scene + "?langue=en"
+            meta['id'] = re.search(r'\.com/(.*)\?', scene).group(1)
+            # ~ time.sleep(5)
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
         tags = response.xpath(self.get_selector_map('tags')).get()

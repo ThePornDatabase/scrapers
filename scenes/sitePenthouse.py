@@ -17,7 +17,7 @@ class PenthouseSpider(BaseSceneScraper):
         'date': '//meta[@itemprop="uploadDate"]/@content',
         'image': '//meta[@itemprop="thumbnailUrl"]/@content',
         'image_blob': True,
-        'performers': '//ul[@class="scene-models-list"]/li/a/text()',
+        'performers': '//a[@data-track="PORNSTAR_NAME"]/text()',
         'tags': '//ul[@class="scene-tags"]/li/a/text()',
         'external_id': r'\/scenes\/(.+)\.html',
         'trailer': '',  # A trailer is available, but is tokenized and expires

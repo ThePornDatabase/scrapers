@@ -1,6 +1,8 @@
 from datetime import date, timedelta
 import tldextract
+import requests
 import scrapy
+import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -26,8 +28,23 @@ class InterracialPassSpider(BaseSceneScraper):
         'https://www.backroomcastingcouch.com',
         'https://bbcsurprise.com',
         'https://exploitedcollegegirls.com',
-        'https://www.ikissgirls.com'
+        # 'https://www.ikissgirls.com'
     ]
+
+    custom_settings = {
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+        "HTTPERROR_ALLOWED_CODES": [500],
+        "RETRY_ENABLED": False
+    }
+
+    cookies = [{
+                        "name": "warn",
+                        "value": "true"
+                    }, {
+                        "name": "numheader",
+                        "value": "1"
+                    }
+                ]
 
     selector_map = {
         'title': '//div[@class="video-player"]/div[@class="title-block"]/h3[@class="section-title"]/text()|//div[@class="video-player"]/div[@class="title-block"]/h2[@class="section-title"]/text()',
@@ -35,7 +52,7 @@ class InterracialPassSpider(BaseSceneScraper):
         'date': '//div[@class="update-info-row"]/text()',
         'image': '//div[@class="player-thumb"]//img/@src0_1x | //img[contains(@class,"main-preview")]/@src',
         'performers': '//div[contains(@class, "models-list-thumbs")]//li//span/text()',
-        'duration': '//i[@class="fa fa-clock-o"]/following-sibling::strong/following-sibling::text()',
+        'duration': '//strong[contains(text(), "Runtime:")]/following-sibling::text()',
         're_duration': r'(\d{1,2}\:?\d{1,2}\:\d{1,2})',
         'tags': '//ul[@class="tags"]//li//a/text()',
         'external_id': 'trailers/(.+)\\.html',
@@ -44,14 +61,15 @@ class InterracialPassSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
+        meta = response.meta
+        meta['handle_httpstatus_list'] = [500]
         scenes = response.xpath('//div[contains(@class, "item-video")]')
         for scene in scenes:
             link = scene.css('a::attr(href)').get()
-            meta = {}
-            if scene.xpath('.//img/@src0_1x').get() is not None:
-                meta['image'] = self.format_link(
-                    response, scene.xpath('//img/@src0_1x').get())
-
+            image = scene.xpath('.//img/@src0_1x')
+            if image:
+                meta['image'] = self.format_link(response, image.get())
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
             if link:
                 yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
@@ -97,3 +115,33 @@ class InterracialPassSpider(BaseSceneScraper):
         parent = tldextract.extract(response.url).domain
         parent = match_site(parent)
         return parent
+
+    def get_id(self, response):
+        return super().get_id(response).lower()
+
+    def get_description(self, response):
+        description = super().get_description(response)
+        if not description:
+            alt_description = response.xpath('//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::p[contains(@class, "descriptionFull")]/text()')
+            if alt_description:
+                description = alt_description.getall()
+                description = " ".join(description)
+                description = description.replace('\r', ' ').replace('\t', ' ').replace('\n', ' ')
+                description = re.sub(r'\s+', ' ', description)
+                description = self.cleanup_description(description.strip())
+            else:
+                alt_description = response.xpath('//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::p[contains(@class, "description")]/text()')
+                if alt_description:
+                    description = alt_description.getall()
+                    description = " ".join(description)
+                    description = self.cleanup_description(description.strip())
+        return description
+
+    def get_image_from_link(self, image):
+        if image and self.cookies:
+            cookies = {cookie['name']:cookie['value'] for cookie in self.cookies}
+            req = requests.get(image, cookies=cookies, verify=False)
+
+            if req and req.ok:
+                return req.content
+        return None

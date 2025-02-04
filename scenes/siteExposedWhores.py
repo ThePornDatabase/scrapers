@@ -5,7 +5,7 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class ExposedWhoresSpider(BaseSceneScraper):
     name = 'ExposedWhores'
-    network = 'Exposed Whores'
+    network = 'Exposed Whores Media'
     parent = 'Exposed Whores'
 
     start_urls = [

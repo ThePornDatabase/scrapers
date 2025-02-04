@@ -5,7 +5,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class PuffyPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '.title span::text',
+        'name': '//h2[@class="title"]/span[1]/text()',
         'image': "//div[contains(@class,'image_area')]/img[@class='img-responsive']/@src",
         'nationality': '//dt[contains(text(),"Nationality")]/following-sibling::dd[1]/text()',
         'cupsize': '//dt[contains(text(),"Breast")]/following-sibling::dd[1]/text()',

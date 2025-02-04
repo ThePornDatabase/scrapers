@@ -1,6 +1,5 @@
 import re
-import string
-import scrapy
+import json
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -10,49 +9,50 @@ class SiteHardwerkSpider(BaseSceneScraper):
     parent = 'Hardwerk'
     site = 'Hardwerk'
 
+    start_urls = [
+        'https://hardwerk.com',
+    ]
+
     selector_map = {
-        'title': '//div[contains(@class,"video-card-header")]//h2[contains(@class, "video-header")]/text()',
-        'description': '//div[contains(@class,"video-card-header")]//p[contains(@class, "video-text")]/text()',
-        'image': '//div[contains(@class, "container")]//a[@class="d-block"]/img[@class="img-fluid"]/@src',
-        'performers': '//div[contains(@class,"video-card-header")]//h5[contains(text(), "Performers")]/following-sibling::h5/text()',
-        'tags': '//div[contains(@class,"video-card-header")]//h5[contains(text(), "Categories")]/following-sibling::h5/text()',
-        'trailer': '//video[@id="thisPlayer"]/source/@src',
-        'external_id': r'(\d+)\.htm',
-        'pagination': '',
+        'external_id': r'scenes/(.*?)_',
+        'pagination': '/films?page=%s&order_by=publish_date&sort_by=desc',
         'type': 'Scene',
     }
 
-    def start_requests(self):
-        url = 'https://www.hardwerk.com/most-recent/'
-        yield scrapy.Request(url, callback=self.get_scenes, headers=self.headers, cookies=self.cookies)
-
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class, "text-center")]/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        jsoncode = response.xpath('//script[contains(@id, "NEXT_DATA")]/text()')
+        if jsoncode:
+            jsondata = json.loads(jsoncode.get())
+            jsondata = jsondata['props']['pageProps']['contents']['data']
+            for scene in jsondata:
+                item = self.init_scene()
 
-    def get_performers(self, response):
-        performerlist = response.xpath(self.get_selector_map('performers'))
-        if performerlist:
-            performerlist = performerlist.get()
-            performers = []
-            if "," in performerlist:
-                performers = performerlist.split(",")
-            else:
-                performers = [performerlist]
-            return list(map(lambda x: string.capwords(x.strip()), performers))
-        return []
+                item['title'] = self.cleanup_title(scene['title'])
+                item['id'] = scene['id']
+                item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description'])).replace("\r", " ").replace("\n", " ").replace("\t", " ").strip()
+                item['image'] = scene['trailer_screencap']
+                if item['image'][:2] == '//':
+                    item['image'] = "https:" + item['image']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['trailer'] = scene['trailer_url']
+                scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).strftime('%Y-%m-%d')
+                if scene_date:
+                    item['date'] = scene_date
+                else:
+                    item['date'] = self.parse_date('today').strftime('%Y-%m-%d')
+                item['url'] = f"https://www.hardwerk.com/films/{scene['slug']}"
+                item['tags'] = scene['tags']
+                try:
+                    duration = str(int(float(scene['seconds_duration'])))
+                    item['duration'] = duration
+                except:
+                    item['duration'] = ''
+                item['site'] = 'Hardwerk'
+                item['parent'] = 'Hardwerk'
+                item['network'] = 'Hardwerk'
+                item['performers'] = []
+                item['type'] = "Scene"
+                for model in scene['models_slugs']:
+                    item['performers'].append(self.cleanup_title(model['name']))
 
-    def get_tags(self, response):
-        taglist = response.xpath(self.get_selector_map('tags'))
-        if taglist:
-            taglist = taglist.get()
-            tags = []
-            if "," in taglist:
-                tags = taglist.split(",")
-            else:
-                tags = [taglist]
-            return list(map(lambda x: string.capwords(x.strip()), tags))
-        return []
+                yield self.check_item(item, self.days)

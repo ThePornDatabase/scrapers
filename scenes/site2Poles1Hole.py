@@ -66,7 +66,8 @@ class Site2Poles1HoleSpider(BaseSceneScraper):
             for thumb in scene['preview_formatted']['thumb']:
                 scenethumb = thumb
             scenethumb = scene['preview_formatted']['thumb'][scenethumb][0]
-            image = "https://y2y8k2k4.ssl.hwcdn.net/" + scenethumb['fileuri'] + "?" + scenethumb['signature']
+            image = "https://c75c0c3063.mjedge.net" + scenethumb['fileuri'] + "?" + scenethumb['signature']
+            # ~ image = "https://y2y8k2k4.ssl.hwcdn.net/" + scenethumb['fileuri'] + "?" + scenethumb['signature']
             item['image'] = image.replace(" ", "%20")
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['image'] = re.search(r'(.*?)\?', image).group(1)

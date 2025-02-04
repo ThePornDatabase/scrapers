@@ -101,6 +101,12 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://dripdropprod.net', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'DripDrop', ''],
         ['https://thepervempire.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'The Perv Empire', ''],
         ['https://sallydangeloxxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Sally Dangelo XXX', ''],
+        ['https://slobjobz.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'SlobJobz', ''],
+        ['https://aikoprincess.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Aiko Princess', ''],
+        ['https://clubmaseratixxx.com', '&transitParameters[v1]=OhUOlmasXD&transitParameters[v2]=OhUOlmasXD', 'Club Maserati XXX', ''],
+        ['https://transtakenraw.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Trans Taken', ''],
+        ['https://mma-xxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'MMA XXX', ''],
+        ['https://jessydubairaw.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Jessy Dubai Raw', 'Jessy Dubai'],
     ]
 
     selector_map = {
@@ -226,11 +232,20 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             if "vinasky" in response.url:
                 meta['performer'] = "Vina Sky"
 
+            if "aikoprincess" in response.url:
+                meta['performer'] = "Aiko Moe"
+
             if "ginagerson" in response.url:
                 meta['performer'] = "Gina Gerson"
 
+            if "clubmaseratixxx" in response.url:
+                meta['performer'] = "Maserati XXX"
+
             if "rydenarmani" in response.url:
                 meta['performer'] = "Ryden Armani"
+
+            if "slobjobz" in response.url:
+                item['tags'].append("Blowjob")
 
             if "mugursworld" in response.url:
                 meta['performer'] = "Mugur"
@@ -250,6 +265,9 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
             if "lonelymeow" in response.url:
                 item['tags'].append("Asian")
+
+            if "mma-xxx" in response.url:
+                item['tags'].append("Wrestling")
 
             if "throatwars" in response.url:
                 item['tags'].append("Interracial")

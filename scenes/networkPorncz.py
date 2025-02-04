@@ -14,7 +14,7 @@ class PornCZSpider(BaseSceneScraper):
     parent = 'PornCZ'
 
     start_urls = [
-        'https://www.porncz.com'
+        # ~ 'https://www.porncz.com'
         # 'https://www.amateripremium.com',
         # 'https://www.amateursfrombohemia.com',
         # 'https://www.boysfuckmilfs.com',
@@ -47,7 +47,7 @@ class PornCZSpider(BaseSceneScraper):
         # 'https://www.sexwithmuslims.com',
         # 'https://www.susanayn.com',
         # 'https://www.teenfrombohemia.com',
-        # 'https://www.vrporncz.com',
+        'https://www.vrporncz.com',
     ]
 
     cookies = {
@@ -64,7 +64,7 @@ class PornCZSpider(BaseSceneScraper):
         'tags': '//div[contains(text(), "Genres")]/a/text()',
         'duration': '//meta[@property="video:duration"]/@content',
         'external_id': r'\/(\d+)$',
-        'trailer': '//meta[@property="og:video"]/@content',
+        # ~ 'trailer': '//meta[@property="og:video"]/@content',
         'pagination': '/en/new-videos?p=%s'
     }
 

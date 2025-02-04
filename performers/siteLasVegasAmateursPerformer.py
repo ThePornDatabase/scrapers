@@ -27,10 +27,9 @@ class SiteLasVegasAmateursPerformerSpider(BasePerformerScraper):
 
             image = performer.xpath('.//a/img/@src0_2x').get()
             if image:
-                item['image'] = "https://lasvegasamateurs.com/" + image.replace(" ", "%20")
+                item['image'] = "https://lasvegasamateurs.com" + image.replace(" ", "%20")
             else:
                 item['image'] = None
-            item['image'] = None
 
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
@@ -38,7 +37,7 @@ class SiteLasVegasAmateursPerformerSpider(BasePerformerScraper):
             if url:
                 item['url'] = self.format_link(response, url.strip()).replace(" ", "%20")
 
-            item['network'] = 'Las Vegas Amateurs'
+            item['network'] = 'Exposed Whores Media'
 
             item['astrology'] = ''
             item['bio'] = ''

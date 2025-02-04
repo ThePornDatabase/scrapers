@@ -163,6 +163,12 @@ class InTheCrackIPSpider(BaseSceneScraper):
         else:
             item['id'] = self.get_id(response)
 
+        # ~ tempid = re.search(r'(\d+)', item['title'])
+        # ~ if tempid:
+            # ~ tempid = int(tempid.group(1))
+            # ~ if tempid > 1821 and tempid < 1843:
+                # ~ item['id'] = item['id'] + "-1"
+
         if 'trailer' in response.meta:
             item['trailer'] = response.meta['trailer']
         else:

@@ -8,7 +8,7 @@ class SiteLucasRaunchSpider(BaseSceneScraper):
     network = 'Lucas Entertainment'
 
     start_urls = [
-        # ~ 'https://www.lucasraunch.com',
+        'https://www.lucasraunch.com',
         'https://www.sexinsuits.com',
     ]
 

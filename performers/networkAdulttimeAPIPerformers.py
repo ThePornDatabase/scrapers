@@ -13,6 +13,7 @@ class AdultTimeAPISpiderPerformers(BasePerformerScraper):
     start_urls = [
         'https://www.21sextreme.com',
         'https://www.devilsfilm.com',
+        'https://www.downlowboys.com',
         'https://www.eroticax.com',
         'https://www.falconstudios.com',
         'https://www.genderxfilms.com',
@@ -149,6 +150,9 @@ class AdultTimeAPISpiderPerformers(BasePerformerScraper):
 
         if 'devilsfilm' in referrer:
             jbody = '{"requests":[{"indexName":"all_actors_latest_desc","params":"query=&hitsPerPage=84&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Adevilsfilm%22%2C%22context%3Apornstars%22%2C%22device%3Adesktop%22%5D&attributesToRetrieve=%5B%22actor_id%22%2C%22name%22%2C%22pictures%22%2C%22gender%22%2C%22sitename%22%2C%22url_name%22%2C%22last_release_date%22%2C%22views%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22description%22%2C%22attributes%22%2C%22objectID%22%2C%22shemale%22%2C%22male%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=&facets=%5B%22availableOnSite%22%5D&tagFilters=&facetFilters=%5B%5B%22availableOnSite%3Adevilsfilm%22%2C%22availableOnSite%3Asquirtalicious%22%2C%22availableOnSite%3Ahairyundies%22%2C%22availableOnSite%3Alesbianfactor%22%2C%22availableOnSite%3Adevilsfilmparodies%22%2C%22availableOnSite%3Agivemeteens%22%2C%22availableOnSite%3Aoutofthefamily%22%2C%22availableOnSite%3Adevilsgangbangs%22%2C%22availableOnSite%3AJaneDoePictures%22%2C%22availableOnSite%3Adevilstgirls%22%5D%5D"}]}'
+
+        if 'downlowboys' in referrer:
+            jbody = '{"requests":[{"indexName":"all_actors_latest_desc","params":"analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Adownlowboys%22%2C%22context%3Apornstars%22%2C%22device%3Adesktop%22%5D&attributesToRetrieve=%5B%22actor_id%22%2C%22name%22%2C%22pictures%22%2C%22gender%22%2C%22sitename%22%2C%22url_name%22%2C%22last_release_date%22%2C%22views%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22description%22%2C%22attributes%22%2C%22objectID%22%2C%22shemale%22%2C%22male%22%5D&clickAnalytics=true&facetingAfterDistinct=true&facets=%5B%5D&filters=(availableOnSite%3A\'downlowboys\')%20AND%20(NOT%20female%3A\'1\')%20AND%20availableOnSite%3Adownlowboys&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=60&page=' + str(page) + '&query=&tagFilters="}]}'
 
         if 'eroticax' in referrer:
             jbody = '{"requests":[{"indexName":"all_actors_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=10&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Afreetour%22%2C%22site%3Aeroticax%22%2C%22context%3Apornstars%22%2C%22device%3Adesktop%22%5D&attributesToRetrieve=%5B%22actor_id%22%2C%22name%22%2C%22pictures%22%2C%22gender%22%2C%22sitename%22%2C%22url_name%22%2C%22last_release_date%22%2C%22views%22%2C%22ratings_up%22%2C%22ratings_down%22%2C%22description%22%2C%22attributes%22%2C%22objectID%22%2C%22shemale%22%2C%22male%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=&facets=%5B%22availableOnSite%22%2C%22male%22%5D&tagFilters=&facetFilters=%5B%5B%22male%3A0%22%5D%2C%5B%22availableOnSite%3Aeroticax%22%5D%5D"}]}'

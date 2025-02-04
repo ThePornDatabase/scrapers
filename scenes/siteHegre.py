@@ -32,3 +32,15 @@ class SiteHegreSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if image in response.url:
+            image = response.xpath('//meta[@property="og:image"]/@content')
+            if image:
+                image = self.format_link(response, image.get())
+        if image in response.url:
+            image = response.xpath('//meta[@name="twitter:image"]/@content')
+            if image:
+                image = self.format_link(response, image.get())
+        return image

@@ -17,13 +17,14 @@ class SiteFreezeSpider(BaseSceneScraper):
         'title': '//h1/text()',
         'description': '//div[@id="fullstory"]/p/text()',
         'date': '//meta[@property="article:published_time"]/@content',
+        're_date': r'(\d{4}-\d{2}-\d{2})',
         'image': '//meta[@property="og:image"]/@content',
         'duration': '//div[contains(@class,"duration")]/img/following-sibling::text()',
-        'performers': '//div[contains(@class,"tagsmodels")]/a/text()',
+        'performers': '//div[contains(@class,"tagsmodels")]/div[contains(@class, "taglist")]/a/text()',
         'tags': '//ul[@class="post-categories"]/li/a/text()',
         'director': '//div[contains(@class,"director")]/span/a/text()',
         'external_id': '.*\/(.*?)\/$',
-        'trailer': '//video/source/@src',
+        'trailer': '//video/@src',
         'pagination': '/all-videos/page/%s/'
     }
 

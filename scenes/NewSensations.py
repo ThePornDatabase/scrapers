@@ -41,35 +41,41 @@ class NewSensationsSpider(BaseSceneScraper):
             yield scrapy.Request(url=scene, callback=self.parse_scene)
 
     def get_site(self, response):
-        if self.get_selector_map('tags'):
-            taglist = self.process_xpath(response, self.get_selector_map('tags')).get()
-            taglist = taglist.replace(" ", "")
-            if "familyxxx" in taglist.lower():
-                return "Family XXX"
-            if "freshouttahighschool" in taglist.lower():
-                return "Fresh Outta High School"
-            if "heavyhandfuls" in taglist.lower():
-                return "Heavy Handfuls"
-            if "hotwifexxx" in taglist.lower():
-                return "HotWifeXXX"
-            if "parody" in taglist.lower():
-                return "Parody Pass"
-            if "povfantasy" in taglist.lower():
-                return "POV Fantasy"
-            if "stretchedoutsnatch" in taglist.lower():
-                return "Stretched Out Snatch"
-            if "tabutales" in taglist.lower():
-                return "Tabu Tales"
-            if "talesfromtheedge" in taglist.lower():
-                return "Tales From the Edge"
-            if "theromanceseries" in taglist.lower():
-                return "The Romance Series"
-            if "thelesbianexperience" in taglist.lower():
-                return "The Lesbian Experience"
-            if "unlimitedmilfs" in taglist.lower():
-                return "Unlimited Milfs"
-            print(f"{response.url} -> {taglist}")
-            return "New Sensations"
+        if not isinstance(response, str):
+            if self.get_selector_map('tags'):
+                taglist = self.process_xpath(response, self.get_selector_map('tags')).get()
+                taglist = taglist.replace(" ", "")
+        else:
+            taglist = response
+
+        if "familyxxx" in taglist.lower():
+            return "Family XXX"
+        if "girlgirlxxx" in taglist.lower():
+            return "Girl Girl XXX"
+        if "freshouttahighschool" in taglist.lower():
+            return "Fresh Outta High School"
+        if "heavyhandfuls" in taglist.lower():
+            return "Heavy Handfuls"
+        if "hotwifexxx" in taglist.lower():
+            return "HotWifeXXX"
+        if "parody" in taglist.lower():
+            return "Parody Pass"
+        if "povfantasy" in taglist.lower():
+            return "POV Fantasy"
+        if "stretchedoutsnatch" in taglist.lower():
+            return "Stretched Out Snatch"
+        if "tabutales" in taglist.lower():
+            return "Tabu Tales"
+        if "talesfromtheedge" in taglist.lower():
+            return "Tales From the Edge"
+        if "theromanceseries" in taglist.lower():
+            return "The Romance Series"
+        if "thelesbianexperience" in taglist.lower():
+            return "The Lesbian Experience"
+        if "unlimitedmilfs" in taglist.lower():
+            return "Unlimited Milfs"
+
+        return "New Sensations"
 
     def get_image(self, response):
         image = super().get_image(response)
@@ -108,3 +114,40 @@ class NewSensationsSpider(BaseSceneScraper):
         if sceneid:
             return re.search(r'data-id=\"(\d+)\"', sceneid.get()).group(1)
         return None
+
+    def parse_scene(self, response):
+        item = self.init_scene()
+
+        item['title'] = self.get_title(response)
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = self.get_date(response)
+
+        if self.check_item(item, self.days):
+            item['image'] = self.get_image(response)
+
+            if 'image' not in item or not item['image']:
+                item['image'] = None
+                item['image_blob'] = None
+            else:
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
+            if item['image']:
+                if "?" in item['image'] and ("token" in item['image'].lower() or "expire" in item['image'].lower()):
+                    item['image'] = re.search(r'(.*?)\?', item['image']).group(1)
+        else:
+            item['image'] = ''
+            item['image_blob'] = ''
+
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['id'] = self.get_id(response)
+        item['trailer'] = self.get_trailer(response)
+        item['duration'] = self.get_duration(response)
+        item['url'] = self.get_url(response)
+        item['network'] = "New Sensations"
+        item['parent'] = "New Sensations"
+
+        item['type'] = 'Scene'
+
+        yield self.check_item(item, self.days)

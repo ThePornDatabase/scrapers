@@ -14,17 +14,17 @@ class networkManojobSpider(BaseSceneScraper):
     ]
     start_urls = [
         ['https://www.finishesthejob.com', '/updates/manojob/%s', 'Manojob'],
-        ['https://www.finishesthejob.com', '/updates/mrpov/%s', 'Mister POV'],
+        ['https://www.finishesthejob.com', '/updates/mrpov/%s', 'MrPOV'],
         ['https://www.finishesthejob.com', '/updates/thedicksuckers/%s', 'The Dick Suckers'],
 
     ]
 
     selector_map = {
-        'title': '//h1/text()',
+        'title': '//h1/span/text()',
         'description': '//div[@class="row"]/div/div[@class="text-center"]/preceding-sibling::p[1]/text()',
         'date': '//meta[@itemprop="uploadDate"]/@content',
         'image': '//div[@class="video"]//video/@poster|//div[contains(@class,"video")]//video/@poster',
-        'performers': '//h3[contains(text(),"Starring")]/a/text()',
+        'performers': '//h2[contains(text(), "Starring")]/a/text()',
         'tags': '//p[contains(text(),"Categories")]/a/text()',
         'external_id': '.*\/(.*)',
         'trailer': '//div[@class="video"]//video/source/@src',

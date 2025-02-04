@@ -14,13 +14,17 @@ class siteHentaiedSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h1/text()',
-        'description': '//div[@class="cont"]//p/text()|//div[@id="fullstory"]/p/text()',
-        'date': '//meta[@property="article:published_time"]/@content',
+        'title': '//div[contains(@class,"shortcode-wrapper")]//script[contains(text(), "datePublished")]/text()',
+        're_title': r'\"name\".*?\"(.*?)\"',
+        'description': '//div[@id="fullstory"]/p//text()',
+        'date': '//div[contains(@class,"shortcode-wrapper")]//script[contains(text(), "datePublished")]/text()',
+        're_date': r'\"datePublished\".*?\"(.*?)\"',
         'image': '//meta[@property="og:image"]/@content',
+        'duration': '//div[contains(@class, "durationandtime")]/div/text()[contains(., ":")]',
         'performers': '//div[@class="tagsmodels"]/a/text()|//img[contains(@alt, "model")]/following-sibling::div[contains(@class, "taglist")]/a/text()',
         'tags': '//ul[@class="post-categories"]/li/a/text()',
-        'external_id': '.*\/(.*?)\/$',
+        'director': '//div[contains(@class, "director") and contains(@class, "tagsmodels")]//a/text()',
+        'external_id': '.*\/(.*?)$',
         'trailer': '//video/source/@src',
         'pagination': '/all-videos/page/%s/'
     }

@@ -3,9 +3,9 @@ from datetime import date
 import tldextract
 import dateparser
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
+true = True
+false = False
 
 def get_scenedate(scene):
     scenedate = scene.xpath('.//div[contains(@class,"fsdate")]/span/text()').get()
@@ -40,12 +40,15 @@ class NetworkVegasDreamworksSpider(BaseSceneScraper):
     network = 'Vegas Dreamworks'
     parent = 'Vegas Dreamworks'
 
+    cookies = [{"domain":"tuktukpatrol.com","hostOnly":true,"httpOnly":false,"name":"age_gate","path":"/","sameSite":"no_restriction","secure":true,"session":true,"storeId":"0","value":"18"}]
+
     start_urls = [
         ['https://asiansexdiary.com', '/category/diary/page/%s/', 'Asian Sex Diary'],
         ['https://milftrip.com/', '/all-updates/page/%s/', 'MILF Trip'],
         ['https://helloladyboy.com', '/all-updates/page/%s/', 'Hello Ladyboy'],
         ['https://paradisegfs.com', '/movies/page/%s/', 'Paradise GFs'],
         ['https://screwmetoo.com', '/all-updates/page/%s/', 'Screw Me Too'],
+        ['https://eurosexdiary.com', '/all-updates/page/%s/', 'Euro Sex Diary'],
         ['https://trikepatrol.com/', '/all-updates/page/%s/', 'Trike Patrol'],
         ['https://tuktukpatrol.com/', '/all-updates/page/%s/', 'TukTuk Patrol'],
     ]
@@ -68,12 +71,16 @@ class NetworkVegasDreamworksSpider(BaseSceneScraper):
         if not self.start_urls:
             raise AttributeError('start_urls selector missing')
 
+
         for link in self.start_urls:
+            cookie = self.cookies
+            domain = re.search(r'(\w+\.com)', link[0]).group(1)
+            cookie[0]['domain'] = domain
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
                                  meta={'page': self.page, 'pagination': link[1], 'site': link[2], 'url': link[0]},
                                  headers=self.headers,
-                                 cookies=self.cookies)
+                                 cookies=cookie)
 
     def parse(self, response, **kwargs):
         if response.status == 200:

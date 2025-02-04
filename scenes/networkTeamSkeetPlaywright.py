@@ -1,8 +1,7 @@
 import json
 import re
-from datetime import date, timedelta
 import scrapy
-
+import urllib.parse
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -15,39 +14,47 @@ false = False
 true = True
 
 link_to_info = {
-    "mylf-elastic-hka5k7vyuw": {"site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
-    "ts-elastic-d5cat0jl5o": {"site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
-    "sau-elastic-00gy5fg5ra": {"site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True},
+    "mylf-reg": {"urlid": "mylf-elastic-hka5k7vyuw", "site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": False},
+    "ts-reg": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": False},
+    "su-reg": {"urlid": "sau-elastic-00gy5fg5ra", "site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": False},
+    "mylf-xsite": {"urlid": "mylf-elastic-hka5k7vyuw", "site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": True},
+    "ts-xsite": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": True},
+    "freeusebundle": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": "Bundle"},
+    "swap_bundle": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": "Bundle"},
 }
 
 
-def format_nav_url(link, start, limit, v2=False):
-    if v2:
-        nav_format = "https://store2.psmcdn.net/{link}-{navText}/_search?sort=publishedDate:desc&q=isUpcoming:false&from={start}&size={limit}"
+def format_nav_url(link, start, limit, sitekey, v2=False, xsite=False):
+    if xsite is True:
+        nav_format = "https://tours-store.psmcdn.net/{link}-{navText}/_search?sort=publishedDate:desc&q=(isUpcoming:false%20AND%20isXSeries:%20true)&size={limit}&from={start}"
+        nav_url = nav_format.format(link=link, start=start, limit=limit, navText=link_to_info[sitekey]["navText"])
+    elif xsite == "Bundle":
+        nav_url = f"https://tours-store.psmcdn.net/{sitekey}/_search?sort=publishedDate:desc&q=(type:video%20)&size={limit}&from={start}"
+        # ~ print(nav_url)
     else:
-        nav_format = "https://store.psmcdn.net/{link}/{navText}/items.json?orderBy=\"$key\"&startAt=\"{start}\"&limitToFirst={limit}"
-
-    nav_url = nav_format.format(link=link, start=start, limit=limit, navText=link_to_info[link]["navText"])
+        nav_format = "https://tours-store.psmcdn.net/{link}-{navText}/_search?sort=publishedDate:desc&q=(isUpcoming:false%20AND%20isXSeries:%20false)&size={limit}&from={start}"
+        nav_url = nav_format.format(link=link, start=start, limit=limit, navText=link_to_info[sitekey]["navText"])
 
     return nav_url
 
 
-def format_scene_url(link, sceneId, v2=False):
-    if v2:
-        content_format = "https://store2.psmcdn.net/{link}-{contentText}/_doc/{sceneId}"
+def format_scene_url(link, sceneId, sitekey, v2=False, xsite=False):
+    if xsite != "Bundle":
+        content_format = "https://tours-store.psmcdn.net/{link}-{contentText}/_doc/{sceneId}"
+        return content_format.format(link=link, sceneId=sceneId, contentText=link_to_info[sitekey]["contentText"])
     else:
-        content_format = "https://store.psmcdn.net/{link}/{contentText}/{sceneId}.json"
-
-    return content_format.format(link=link, sceneId=sceneId, contentText=link_to_info[link]["contentText"])
+        content_format = f"https://tours-store.psmcdn.net/{sitekey}/_search?q=(id:{sceneId}%20AND%20type:video)&size=1"
+        # ~ print("Scene URL: " + content_format)
+        return content_format
 
 
 def get_site_link_text(url, v2=False):
-    if v2:
-        pattern = r"store2.psmcdn.net\/([^\/]+)-.*\/"
-    else:
-        pattern = r"store.psmcdn.net\/([^\/]+)\/"
-
-    site_link = re.search(pattern, url).groups()[0]
+    pattern = r"tours-store.psmcdn.net\/([^\/]+)-.*\/"
+    site_link = re.search(pattern, url)
+    if not site_link:
+        pattern = r"tours-store.psmcdn.net/(.*?)/"
+        site_link = re.search(pattern, url)
+    site_link = site_link.groups()[0]
 
     return site_link
 
@@ -56,82 +63,72 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
     name = 'TeamSkeetNetworkPlaywright'
     network = 'teamskeet'
 
-    custom_scraper_settings = {
-        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
-        'AUTOTHROTTLE_ENABLED': True,
-        'USE_PROXY': True,
-        'AUTOTHROTTLE_START_DELAY': 1,
-        'AUTOTHROTTLE_MAX_DELAY': 60,
-        'CONCURRENT_REQUESTS': 1,
-        'DOWNLOAD_DELAY': 2,
-        'DOWNLOADER_MIDDLEWARES': {
-            # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-            'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-        },
-        'DOWNLOAD_HANDLERS': {
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        }
-    }
+    # ~ custom_scraper_settings = {
+        # ~ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        # ~ 'AUTOTHROTTLE_ENABLED': True,
+        # ~ 'USE_PROXY': True,
+        # ~ 'AUTOTHROTTLE_START_DELAY': 1,
+        # ~ 'AUTOTHROTTLE_MAX_DELAY': 60,
+        # ~ 'CONCURRENT_REQUESTS': 1,
+        # ~ 'DOWNLOAD_DELAY': 2,
+        # ~ 'DOWNLOADER_MIDDLEWARES': {
+            #'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+            # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+            # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+        # ~ },
+        # ~ 'DOWNLOAD_HANDLERS': {
+            # ~ "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            # ~ "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        # ~ }
+    # ~ }
 
     selector_map = {
         'external_id': '\\/(.+)\\.json'
     }
 
     def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
 
         for linkName, siteInfo in link_to_info.items():
+            # ~ print(linkName, siteInfo)
             if 'v2' in siteInfo:
                 is_v2 = siteInfo['v2']
             else:
                 is_v2 = False
             if is_v2:
-                start = "0"
-                limit = 150
-            else:
-                start = "aaaaaaaa"
-                limit = 150  # Was originally 450.  Next Page is keyed at 450
-            yield scrapy.Request(url=format_nav_url(linkName, start, limit, is_v2),
-                                 callback=self.parse,
-                                 meta={'page': self.page, 'site': siteInfo['site'], 'is_v2': is_v2, "playwright": True},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+                start = str((int(meta['page']) - 1) * 30)
+                limit = "30"
+            url = format_nav_url(siteInfo['urlid'], start, limit, linkName, is_v2, siteInfo['xsite'])
+            print(f"Page 1 URL: {url}")
+            meta['sitekey'] = linkName
+            meta['xsite'] = siteInfo['xsite']
+            yield scrapy.Request(url, callback=self.parse, meta={'page': meta['page'], 'site': siteInfo['site'], 'xsite': siteInfo['xsite'], 'is_v2': is_v2, "playwright": False, 'sitekey': linkName}, headers=self.headers, cookies=self.cookies, dont_filter=True)
+            # ~ yield scrapy.Request(url, callback=self.parse, meta={'page': meta['page'], 'site': siteInfo['site'], 'xsite': siteInfo['xsite'], 'is_v2': is_v2}, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         meta = response.meta
-        highwater = ""
-        if not meta['is_v2']:
-            scene_list = re.search(r'({.*})', response.text)
-            if scene_list:
-                scene_list = scene_list.group(1)
-                scene_list = json.loads(scene_list)
-            if scene_list:
-                for key, scene in scene_list.items():
-                    if key > highwater:
-                        highwater = key
+        # ~ print(f"Back in Parse for Page {meta['page']}")
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
             count += 1
             yield scene
 
+        # ~ print(meta['page'], self.limit_pages)
         if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+            if 'page' in meta and meta['page'] < self.limit_pages:
                 meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], highwater),
-                                     callback=self.parse,
-                                     meta=meta,
-                                     headers=self.headers,
-                                     cookies=self.cookies)
+                url = self.get_next_page_url(response.url, meta['page'], meta['xsite'], meta['sitekey'])
+                print(f"Next Page #{meta['page']} URL: {url}")
+                yield scrapy.Request(url, callback=self.parse, meta=meta, dont_filter=True)
 
     def parse_scene(self, response):
+        meta = response.meta
         body = re.search(r'({.*})', response.text)
         if body:
             body = body.group(1)
@@ -141,10 +138,12 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
         item = SceneItem()
         # ~ print(data)
         if ('isUpcoming' in data and not data['isUpcoming']) or 'isUpcoming' not in data:
-            is_v2 = "store2" in response.url
+            is_v2 = "tours-store" in response.url
 
-            if "store2" in response.url:
+            if meta['xsite'] != "Bundle":
                 data = data['_source']
+            else:
+                data = data['hits']['hits'][0]['_source']
             item['title'] = data['title']
             item['description'] = data['description']
             item['image'] = data['img']
@@ -156,6 +155,8 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
                 item['tags'] = data['tags']
             else:
                 item['tags'] = []
+            # ~ print(item['tags'])
+            # ~ print()
             item['id'] = data['id']
 
             if 'videoTrailer' in data:
@@ -184,76 +185,79 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
 
             if is_v2:
                 if "Say Uncle" in response.meta['site']:
-                    item['url'] = "https://www.sayuncle.com/movies/" + data['id']
+                    item['url'] = "https://www.sayuncle.com/movies/" + urllib.parse.quote_plus(data['id'])
                 elif "MYLF" in response.meta['site']:
-                    item['url'] = "https://www.mylf.com/movies/" + data['id']
+                    item['url'] = "https://www.mylf.com/movies/" + urllib.parse.quote_plus(data['id'])
                 else:
-                    item['url'] = "https://www.teamskeet.com/movies/" + data['id']
+                    item['url'] = "https://www.teamskeet.com/movies/" + urllib.parse.quote_plus(data['id'])
 
             else:
-                item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + data['id']
+                item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + urllib.parse.quote_plus(data['id'])
             item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
             item['url'] = item['url'].replace("-–", "-")
             # ~ print(item['url'])
 
             item['performers'] = []
             if 'models' in data:
+                item['performers_data'] = []
                 for model in data['models']:
-                    item['performers'].append(model['modelName'])
+                    if "modelName" in model:
+                        performer = model['modelName']
+                    elif "name" in model:
+                        performer = model['name']
+                    performer_extra = {}
+                    performer_extra['site'] = "Team Skeet"
+                    performer_extra['name'] = performer
+                    performer_extra['extra'] = {}
+                    if "gender" in model and model['gender']:
+                        performer_extra['extra']['gender'] = model['gender'].title()
+                    if "ethnicity" in model and model['ethnicity']:
+                        performer_extra['extra']['ethnicity'] = model['ethnicity']
+                    if "hairColor" in model and model['hairColor']:
+                        performer_extra['extra']['haircolor'] = model['hairColor']
+                    if "img" in model and model['img']:
+                        perf_image = model['img']
+                        if perf_image:
+                            perf_image = perf_image
+                            performer_extra['image'] = perf_image
+                            performer_extra['image_blob'] = self.get_image_blob_from_link(performer_extra['image'])
+                            if not performer_extra['image_blob']:
+                                performer_extra['image_blob'] = ""
+                                performer_extra['image'] = ""
+                    item['performers'].append(performer)
+                    if performer_extra['extra']:
+                        item['performers_data'].append(performer_extra)
+            if "performers_data" in item and not item['performers_data']:
+                del item['performers_data']
 
-            days = int(self.days)
-            if days > 27375:
-                filterdate = "0000-00-00"
-            else:
-                filterdate = date.today() - timedelta(days)
-                filterdate = filterdate.strftime('%Y-%m-%d')
-
-            if self.debug:
-                if not item['date'] > filterdate:
-                    item['filtered'] = "Scene filtered due to date restraint"
-                print(item)
-            else:
-                if filterdate:
-                    if (item['date'] and item['date'] > filterdate) or not item['date']:
-                        yield item
-                else:
-                    yield item
+            yield self.check_item(item, self.days)
 
     def get_scenes(self, response):
+        meta = response.meta
         body = re.search(r'({.*})', response.text)
         if body:
             body = body.group(1)
             scene_info = json.loads(body)
-            is_v2 = "store2" in response.url
+            if 'hits' not in scene_info or 'hits' not in scene_info['hits'] or not len(scene_info['hits']['hits']):
+                print(f"Retrying index page {response.url}")
+                yield scrapy.Request(response.url, callback=self.parse, meta=meta, dont_filter=True)
+
+            is_v2 = "tours-store" in response.url
             site_link = get_site_link_text(response.url, is_v2)
-            meta = response.meta
             meta['body'] = body
 
-            if is_v2:
-                for scene in scene_info['hits']['hits']:
-                    scene = scene['_source']
-                    if "id" in scene:
-                        scene_id = scene["id"]
-                        scene_url = format_scene_url(site_link, scene_id, is_v2)
-                        yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=meta)
-            else:
-                if scene_info:
-                    for key, scene in scene_info.items():
-                        if "id" in scene:
-                            scene_id = scene["id"]
-                            scene_url = format_scene_url(site_link, scene_id, is_v2)
-                            yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=meta)
+            for scene in scene_info['hits']['hits']:
+                scene = scene['_source']
+                # ~ print(scene)
+                if "id" in scene:
+                    scene_id = scene["id"]
+                    scene_url = format_scene_url(site_link, scene_id, meta['sitekey'], is_v2, meta['xsite'])
+                    # ~ print("Scene URL: " + scene_url)
+                    yield scrapy.Request(url=scene_url, callback=self.parse_scene, meta=meta)
 
-    def get_next_page_url(self, base, page, highwater):
-        limit = 25
-        if 'store2' in base:
-            start = str(25 * (page - 1))
-            is_v2 = True
-        else:
-            is_v2 = False
-            if highwater:
-                start = highwater
-            else:
-                start = 'aaaaabka'
+    def get_next_page_url(self, base, page, xsite, sitekey):
+        limit = "30"
+        start = str(int(limit) * (page - 1))
+        is_v2 = True
         linkName = get_site_link_text(base, is_v2)
-        return format_nav_url(linkName, start, limit, is_v2)
+        return format_nav_url(linkName, start, limit, sitekey, is_v2, xsite)

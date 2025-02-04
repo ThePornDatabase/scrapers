@@ -34,7 +34,7 @@ class SiteGuysInSweatpantsSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//li[@class="gallery-item-1"]/a/@href').getall()
+        scenes = response.xpath('//li[@class="gallery-item-1"]/a[not(contains(./div[@class="title"]/text(), "Coming")) and not(contains(./div[@class="title"]/text(), ":"))]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

@@ -16,22 +16,22 @@ class Spider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[contains(@class,"title")]/h1/text()',
-        'description': '//div[contains(@class,"descript")]/p/text()',
+        'title': '//div[contains(@class, "mx-auto flex w-full flex-col")]/div[contains(@class, "xl:text-lg")]/text()',
+        'description': '//div[contains(@class, "mx-auto flex w-full flex-col")]/div[contains(@class, "leading-relaxed")]/p/text()',
         'date': '//script[@class="yoast-schema-graph"]/text()',
         're_date': r'datePublished.*?(\d{4}-\d{2}-\d{2})T',
         'date_formats': ['%Y-%m-%d'],
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[contains(@class,"elenco")]/a/text()',
+        'performers': '//div[contains(@class,"models-slider-single")]//a/@title',
         'tags': '',
-        'trailer': '//video/source/@src',
+        'trailer': '',
         'external_id': r'.*/(.*?)/',
-        'pagination': '/videos/page/%s/?theme=active'
+        'pagination': '/videos/page/%s'
     }
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//li[@class="post"]/a/@href').getall()
+        scenes = response.xpath('//a[@class="flex flex-col gap-3 group"]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

@@ -26,12 +26,12 @@ class PrivateSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//meta[@itemprop="name"]/@content',
+        'title': '//meta[@itemprop="name"]/@content|//div[contains(@class, "title-zone")]/h1/text()',
         'description': '//meta[@itemprop="description"]/@content',
         'date': '//meta[@itemprop="uploadDate"]/@content',
-        'image': '//meta[@itemprop="thumbnailUrl"]/@content',
-        'performers': '//ul[contains(@class,"scene-models-list")]/li/a[@data-track="PORNSTAR_NAME"]/text()',
-        'tags': '//ul[@class="scene-tags"]/li/a/text()',
+        'image': '//meta[@itemprop="thumbnailUrl"]/@content|//meta[@property="og:image"]/@content',
+        'performers': '//ul[contains(@class,"scene-models-list")]/li/a[@data-track="PORNSTAR_NAME"]/text()|//ul[contains(@class,"scene-models-list")]/li/a[contains(@href, "/pornstar/")]/text()',
+        'tags': '//ul[@class="scene-models-list-tags-sites"]/li[@class="tag-tags"]/a/text()|//ul[@class="scene-tags"]/li/a/text()',
         'external_id': '\\/(\\d+)$',
         'trailer': '',
         'pagination': '/scenes/%s/'

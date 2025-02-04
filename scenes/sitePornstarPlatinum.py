@@ -23,26 +23,26 @@ class SitePornstarPlatinumSpider(BaseSceneScraper):
         'tags': '//div[@class="panel-content"]/div[@class="widget"]/div[@class="tagcloud"]/a/text()',
         'external_id': r'.*/(.*)\.html',
         'trailer': '',
-        'pagination': '/tour/latest.php?page=%s'
+        'pagination': '/tour/scenes.php?page=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@id="videos-list"]//div[@class="item no-nth"]')
+        scenes = response.xpath('//div[@id="videos-list"]//div[contains(@class,"item no-nth")]')
         for scene in scenes:
             meta = response.meta
             performers = []
-            performers = scene.xpath('./div[@class="item-content"]/div/span[@class="marker left"]/text()')
+            performers = scene.xpath('.//div[@class="video-meta-container"]/div[contains(@class, "left")]/text()')
             if performers:
                 performers = performers.getall()
                 meta['performers'] = list(map(lambda x: x.strip().title(), performers))
 
-            image = scene.xpath('./div[@class="item-header"]/a/img/@rel')
+            image = scene.xpath('.//a[contains(@class, "thumbnail-link")]/img/@src')
             if image:
                 image = image.get()
                 meta['image'] = image.strip()
                 meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
 
-            scene = scene.xpath('./div[@class="item-content"]/h3/a/@href').get()
+            scene = scene.xpath('./div[@class="item-content"]/div/a/@href').get()
             if ".html" in scene:
                 if re.search(self.get_selector_map('external_id'), scene) and "signup.php" not in scene:
                     yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

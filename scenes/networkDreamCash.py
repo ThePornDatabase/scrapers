@@ -20,7 +20,7 @@ class NetworkDreamCashSpider(BaseSceneScraper):
     start_urls = [
         'https://www.lesarchive.com',
         'https://www.teendreams.com',
-        'https://www.teen-depot.com',
+        # ~ 'https://www.teen-depot.com',
     ]
 
     selector_map = {
@@ -74,3 +74,14 @@ class NetworkDreamCashSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return match_site(super().get_parent(response))
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if "content" not in image:
+            image = response.xpath('//div[contains(@class, "player-window")]/following-sibling::img[contains(@class, "update_thumb")]/@src0_1x')
+            if image:
+                image = image.get()
+                image = self.format_link(response, image)
+        if "-1x" in image:
+            image = image.replace("-1x", "-full")
+        return image

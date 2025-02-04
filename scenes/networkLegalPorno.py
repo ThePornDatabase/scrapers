@@ -11,6 +11,7 @@ class LegalPornoSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.analvids.com',
+        'https://pissvids.com',
         # ~ 'https://pornworld.com'  # Located in networkLegalPornoPornworld.py
     ]
 
@@ -41,7 +42,7 @@ class LegalPornoSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//div[@class="card-scene"]/div[1]/a/@href').getall()
+        scenes = response.xpath('//div[@class="card-scene"]/div[1]/a/@href|//div[contains(@class,"card-scene") and contains(./div/@class, "view")]/div[1]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 
@@ -83,6 +84,7 @@ class LegalPornoSpider(BaseSceneScraper):
                    'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
                    'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
-                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue']
-        if not any(x in item['site'].lower().replace(" ", "") for x in matches):
+                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue',
+                   'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'sexmex', 'alexlegend', 'aglaeaproductions']
+        if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
             yield self.check_item(item, self.days)

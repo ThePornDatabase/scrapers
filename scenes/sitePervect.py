@@ -1,6 +1,4 @@
-import re
-import string
-import scrapy
+import json
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -24,25 +22,56 @@ class SitePervectSpider(BaseSceneScraper):
         'trailer': '//script[contains(text(), "contentUrl")]/text()',
         're_trailer': r'contentUrl.*?(http.*?\.mp4)',
         'external_id': r'.*/(.*?)/',
-        'pagination': '/scenes/?mode=async&function=get_block&block_id=list_videos_latest_videos_list&sort_by=post_date&from=%s',
+        'pagination': '/scenes?order_by=publish_date&sort_by=desc&page=%s',
         'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class,"card-item")]/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        jsondata = response.xpath('//script[contains(text(), "site_domain")]/text()')
+        if jsondata:
+            jsondata = json.loads(jsondata.get())
+            jsondata = jsondata['props']['pageProps']['contents']['data']
+            for scene in jsondata:
+                item = self.init_scene()
+                item['site'] = scene['site']
+                item['parent'] = scene['site']
+                item['network'] = "Pervect"
+                item['title'] = self.cleanup_title(scene['title'])
+                item['description'] = self.cleanup_text(scene['description'])
+                item['performers'], item['performers_data'] = self.get_performers_data(scene)
+                item['date'] = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d']).strftime('%Y-%m-%d')
+                if item['date'] < "2024-12-28":
+                    item['id'] = scene['slug']
+                else:
+                    item['id'] = scene['id']
 
-    def get_tags(self, response):
-        tags = super().get_tags(response)
-        tags = list(map(lambda x: x.lower(), tags))
-        changetags = [['ass2mouth', 'ATM'], ['bigbooty', 'Big Butt'], ['bigdildo', 'Dildo'], ['bigtits', 'Big Boobs'], ['sextoys', 'Toys']]
-        for tag in changetags:
-            if tag[0] in tags:
-                tags.remove(tag[0])
-                tags.append(tag[1])
-        tags = list(map(lambda x: string.capwords(x), tags))
-        return tags
+                item['image'] = scene['thumb']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
+                item['duration'] = self.duration_to_seconds(scene['videos_duration'])
+                item['tags'] = scene['tags']
+                item['trailer'] = scene['trailer_url'].replace(" ", "%20")
+                item['url'] = f"https://www.pervect.com/scenes/{scene['slug']}"
+
+                yield self.check_item(item, self.days)
+
+    def get_performers_data(self, jsondata):
+        performers = []
+        performers_data = []
+        if "models_thumbs" in jsondata and jsondata['models_thumbs']:
+            for model in jsondata['models_thumbs']:
+                perf = {}
+                performers.append(model['name'])
+                perf['name'] = model['name']
+                perf['extra'] = {}
+                perf['extra']['gender'] = "Female"
+                perf['network'] = "Pervect"
+                perf['site'] = "Pervect"
+                perf['image'] = model['thumb']
+                perf['image_blob'] = self.get_image_blob_from_link(model['thumb'])
+                performers_data.append(perf)
+        if "models_slugs" in jsondata and jsondata['models_slugs']:
+            for model in jsondata['models_slugs']:
+                if model['name'] not in performers:
+                    performers.append(model['name'])
+        return performers, performers_data

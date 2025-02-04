@@ -1,6 +1,8 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+true = True
+false = False
 
 
 class SiteEnjoyxSpider(BaseSceneScraper):
@@ -13,17 +15,30 @@ class SiteEnjoyxSpider(BaseSceneScraper):
         'https://enjoyx.com',
     ]
 
+    cookies = [{
+                    "domain": "enjoyx.com",
+                    "hostOnly": true,
+                    "httpOnly": false,
+                    "name": "cookieConsent",
+                    "path": "/",
+                    "sameSite": "unspecified",
+                    "secure": false,
+                    "session": false,
+                    "storeId": "0",
+                    "value": "{\"essential\":[\"all\"],\"nonessential\":[\"all\"]}"
+                }]
+
     selector_map = {
         'title': '//div[contains(@class, "video-detail__title")]/text()',
         'description': '',
-        'date': '//div[contains(@class,"desktop-sidebar")]//div[contains(@class, "video-info__time")]/text()',
+        'date': '//div[contains(@class, "hide-xxs-max")]//div[contains(@class, "video-info__time")]/text()',
         're_date': r'(\d{1,2} \w+, \d{4})',
         'date_formats': ['%d %B, %Y'],
         'image': '//script[contains(text(), "poster") and contains(text(), "coreSettings")]/text()',
         're_image': r'poster.*?url.*?(http.*?)[\'\"]',
-        'performers': '//div[contains(@class,"desktop-sidebar")]//div[@class="video-info__text"]/a/text()',
+        'performers': '//div[contains(@class,"hide-xxs-max")]/div[@class="video-info__text"]/a/text()',
         'tags': '//div[contains(@class, "tags__container")]/a/text()',
-        'duration': '//div[contains(@class,"desktop-sidebar")]//div[contains(@class, "video-info__time")]/text()',
+        'duration': '//div[contains(@class, "hide-xxs-max")]//div[contains(@class, "video-info__time")]/text()',
         're_duration': r'((?:\d{1,2}\:)?\d{2}\:\d{2})',
         'trailer': '',
         'external_id': r'.*/(.*?)$',
@@ -33,7 +48,7 @@ class SiteEnjoyxSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//a[contains(@class, "videos-item")]/@href').getall()
+        scenes = response.xpath('//a[contains(@class, "video-card")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

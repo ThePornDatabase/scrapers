@@ -1,5 +1,5 @@
 import re
-import scrapy
+import json
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -29,14 +29,38 @@ class SiteVRHushSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//h4[@class="latest-scene-title"]/../@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        jsoncode = response.xpath('//script[contains(@id, "NEXT_DATA")]/text()')
+        if jsoncode:
+            jsondata = json.loads(jsoncode.get())
+            jsondata = jsondata['props']['pageProps']['contents']['data']
+            for scene in jsondata:
+                item = self.init_scene()
 
-    def get_tags(self, response):
-        tags = super().get_tags(response)
-        tags.append("Virtual Reality")
-        tags.append("VR")
-        return tags
+                item['title'] = scene['title']
+                item['id'] = scene['id']
+                item['description'] = re.sub('<[^<]+?>', '', scene['description'])
+                item['image'] = scene['trailer_screencap']
+                if item['image'][:2] == '//':
+                    item['image'] = "https:" + item['image']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['trailer'] = ""
+                scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).strftime('%Y-%m-%d')
+                if scene_date:
+                    item['date'] = scene_date
+                else:
+                    item['date'] = self.parse_date('today').strftime('%Y-%m-%d')
+                item['url'] = f"https://www.vrhush.com/scenes/{scene['slug']}"
+                item['tags'] = scene['tags']
+                try:
+                    duration = str(int(float(scene['videos_duration'])))
+                    item['duration'] = duration
+                except:
+                    item['duration'] = ''
+                item['site'] = 'VR Hush'
+                item['parent'] = 'VR Hush'
+                item['network'] = 'VR Hush'
+                item['performers'] = []
+                for model in scene['models_slugs']:
+                    item['performers'].append(model['name'])
+
+                yield self.check_item(item, self.days)

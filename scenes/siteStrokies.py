@@ -39,10 +39,10 @@ class SiteStrokiesSpider(BaseSceneScraper):
             # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+            # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -58,8 +58,8 @@ class SiteStrokiesSpider(BaseSceneScraper):
         'image': '//div[@id="video-player-section"]//video/@poster',
         'performers': '//div[@class="model-tags"]/a[contains(@href, "/model/")]/text()',
         'tags': '//div[@class="model-tags"]/span/a[contains(@href, "/search/")]/text()',
-        'duration': 'div class="video-info"',
-        're_duration': r'(\d{1,2}:\d{2})',
+        'duration': '//div[@class="video-info"]//p[contains(text(), "Length:")]/text()',
+        're_duration': r'((?:\d{1,2}\:)?\d{2}\:\d{2})',
         'external_id': r'.*/(.*?)/',
         'trailer': '',
         'pagination': '/page%s'
@@ -102,9 +102,7 @@ class SiteStrokiesSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        # ~ print(response.text)
         scenes = response.xpath('//a[contains(@href, "/video/")]/@href').getall()
         for scene in scenes:
-            print(scene)
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

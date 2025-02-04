@@ -39,7 +39,7 @@ class SexLikeRealSpider(BaseSceneScraper):
             except Exception:
                 print(f"Failed on scene: {scene}")
             url = f"https://api.sexlikereal.com/virtualreality/video/id/{idnum}"
-            print(url)
+            # ~ print(url)
             if idnum:
                 yield scrapy.Request(url, callback=self.parse_scene, meta=meta)
 
@@ -90,7 +90,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
         matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr','badoink','realvr','kinkvr','babevr','vrcosplayx','18vr','wankzvr','vrhush','naughtyamerica']
         if not any(x in item['id'] for x in matches) and not any(x in shortsite for x in matches):
-            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers']
+            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers', 'porncorn', 'porncornvr']
             if not any(x in item['id'] for x in matches) and not any(x in shortsite for x in matches):
                 matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink', 'slr-milfvr', 'milfvr', 'tranzvr']
                 if not any(x in item['site'].lower() for x in matches) and not any(x in shortsite for x in matches):

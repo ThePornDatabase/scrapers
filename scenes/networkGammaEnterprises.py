@@ -179,7 +179,7 @@ class GammaEnterprisesSpider(BaseSceneScraper):
         'https://www.falconstudios.com',
         # 'https://www.footsiebabes.com', Moved to Adult Time API
         'https://www.gapingangels.com',
-        'https://www.girlfriendsfilms.com',
+        # ~ # 'https://www.girlfriendsfilms.com', Moved to Adulttime API
         'https://www.girlsandstuds.com',
         'https://www.girlstryanal.com',
         'https://www.grannyghetto.com',

@@ -10,7 +10,7 @@ class SiteAVIdolzSpider(BaseSceneScraper):
     site = 'AVIdolz'
 
     start_urls = [
-        'https://avidolz.com',
+        # ~ 'https://avidolz.com', # Moved into AVRevenue scraper
     ]
 
     selector_map = {

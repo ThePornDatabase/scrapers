@@ -30,12 +30,14 @@ class SiteMrLuckyLifeSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         jsondata = re.search(r'var set = (\[\{.*\}\])', response.text)
-        imagerow = re.search(r'.*array_img_gallery.*?(\[.*?\]);', response.text)
+        imagerow = re.search(r'var array_img_gallery.*?(\[.*?\]);', response.text)
         if imagerow:
             imagerow = imagerow.group(1)
+            imagerow = imagerow.encode('ascii').decode('unicode-escape')
             imagerow = imagerow.replace('\\/', '/').replace('\\"', '"')
         if jsondata:
             jsondata = json.loads(jsondata.group(1))
+            # ~ print(jsondata)
             for scene in jsondata:
                 item = SceneItem()
 
@@ -50,7 +52,7 @@ class SiteMrLuckyLifeSpider(BaseSceneScraper):
                 item['trailer'] = self.format_link(response, scene['trailer_url'])
                 item['id'] = scene['Id']
                 item['url'] = f'https://www.mrluckylife.com/updates/{scene["SEOname"]}.html'
-                item['image'] = re.search(f'.*img src.*?\"(.*?{scene["Directory"]}.*?)\".*', imagerow).group(1)
+                item['image'] = re.search(f'.*[\'\"](https.*?{scene["Directory"]}.*?)[\'\"].*', imagerow).group(1)
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 item['performers'] = []
                 if "models" in scene['info'] and scene['info']['models']:

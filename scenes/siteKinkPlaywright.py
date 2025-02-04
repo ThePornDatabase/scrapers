@@ -15,7 +15,8 @@ class NetworkKinkSpider(BaseSceneScraper):
         '/shoots?thirdParty=false&sort=published&page=%s',
         # ~ '/search?type=shoots&sort=published&featuredIds=%s',
         # ~ '/search?type=shoots&sort=published&thirdParty=true&page=%s',
-        # ~ '/search?type=shoots&sort=published&channelIds=wasteland&sort=published&page=%s',
+        # ~ '/shoots?channelIds=behindkink&thirdParty=false&sort=published&page=%s',
+        # ~ '/shoots?channelIds=brutalsessions&thirdParty=false&sort=published&page=%s',
     ]
 
     headers = {
@@ -35,8 +36,8 @@ class NetworkKinkSpider(BaseSceneScraper):
     selector_map = {
         'title': '//title/text()',
         'description': '//span[@class="description-text"]/p/text()|//h4[contains(text(), "Description")]/following-sibling::span[1]/p/text()',
-        'date': "//span[@class='shoot-date']/text()",
-        'image': '//meta[@name="twitter:image"]/@content|//video/@poster',
+        'date': '//span[@class="shoot-date"]/text()|//div[contains(@class, "shoot-detail-legend")]/span[contains(@class, "text-muted")]/text()',
+        'image': '//meta[@name="twitter:image"]/@content|//video/@poster|//a[contains(@class, "ratio-poster")]/img/@src',
         'duration': '//span[@class="clock"]/text()',
         'performers': '//p[@class="starring"]/span/a/text()|//span[contains(@class, "text-primary fs-5")]/a[contains(@href, "/model/")]/text()',
         'tags': '//a[@class="tag"]/text()|//h4[contains(text(), "Categories")]/following-sibling::span[1]/a/text()',
@@ -104,7 +105,10 @@ class NetworkKinkSpider(BaseSceneScraper):
 
     def get_performers(self, response):
         performers = super().get_performers(response)
-        return list(map(lambda x: string.capwords(x.strip(",").strip().lower()), performers))
+        performers = list(map(lambda x: string.capwords(x.strip(",").strip().lower()), performers))
+        if performers == ['Assorted Cast']:
+            performers = []
+        return performers
 
     def get_tags(self, response):
         tags = super().get_tags(response)
@@ -124,6 +128,10 @@ class NetworkKinkSpider(BaseSceneScraper):
         item['date'] = self.get_date(response)
         item['image'] = self.get_image(response)
         item['image_blob'] = self.get_image_blob(response)
+        if "&amp" in item['image']:
+            item['image'] = re.search(r'(.*?)\&amp', item['image']).group(1)
+        if "&s" in item['image']:
+            item['image'] = re.search(r'(.*?)\&s', item['image']).group(1)
         item['performers'] = self.get_performers(response)
         item['tags'] = self.get_tags(response)
         item['markers'] = self.get_markers(response)
@@ -146,4 +154,16 @@ class NetworkKinkSpider(BaseSceneScraper):
             scenedate = re.search(r'publishedDate.*?(\d{4}-\d{2}-\d{2})', scenedate)
             if scenedate:
                 return scenedate.group(1)
+        if not scenedate:
+            scenedate = response.xpath('//div[contains(@class, "shoot-detail-legend")]/span[contains(@class, "text-muted")]/text()')
+            if scenedate:
+                scenedate = self.parse_date(scenedate.get()).strftime('%Y-%m-%d')
+                if scenedate:
+                    return scenedate
         return ''
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        if "|" in title:
+            title = re.search(r'(.*?)\|', title).group(1)
+        return title.strip()

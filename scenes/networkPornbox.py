@@ -1,5 +1,7 @@
 import string
 import scrapy
+import json
+import requests
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 true = True
@@ -23,7 +25,8 @@ class SitePornboxSpider(BaseSceneScraper):
         'duration': "//i[@class='fa fa-clock-o']/following-sibling::text()",
         'external_id': '\\/watch\\/(\\d+)',
         'trailer': '',
-        'pagination': '/store/new-scenes/%s'
+        # ~ 'pagination': '/store/new-scenes/%s'
+        'pagination': '/niche/234/?skip=%s&sort=latest&_=1731108446109'
         # ~ 'pagination': '/studio/1275/?skip=%s&sort=recent&_=1688689939'
     }
 
@@ -31,7 +34,10 @@ class SitePornboxSpider(BaseSceneScraper):
         meta = {}
         meta['page'] = self.page
         if self.limit_pages == 1:
-            self.limit_pages = 10
+            self.limit_pages = 100
+
+        countries = requests.get("https://pornbox.com/model/country", verify=False).content
+        meta['countries'] = json.loads(countries)
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
@@ -44,6 +50,7 @@ class SitePornboxSpider(BaseSceneScraper):
             yield scrapy.Request(url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
 
     def parse_scene(self, response):
+        meta = response.meta
         scene = response.json()
         item = SceneItem()
         item['title'] = string.capwords(scene['scene_name'])
@@ -54,16 +61,40 @@ class SitePornboxSpider(BaseSceneScraper):
         item['site'] = scene['studio']
         if item['site'].lower().replace(" ", "") == "familysinners":
             item['site'] = "FAMILY Sinners (Pornbox)"
-        item['date'] = self.parse_date(scene['publish_date']).isoformat()
+        item['date'] = self.parse_date(scene['publish_date']).strftime('%Y-%m-%d')
         item['image'] = scene['player_poster']
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         # ~ item['image_blob'] = ""
         item['performers'] = []
+        item['performers_data'] = []
         for model in scene['models']:
             item['performers'].append(string.capwords(model['model_name']))
+            performer_extra = {}
+            performer_extra['name'] = string.capwords(model['model_name'])
+            performer_extra['site'] = "Legal Porno"
+            performer_extra['extra'] = {}
+            performer_extra['extra']['gender'] = string.capwords(model['sex'])
+            for country in meta['countries']:
+                if model['country_id'] == country['country_id']:
+                    performer_extra['extra']['nationality'] = string.capwords(country['nationality'])
+                    performer_extra['extra']['birthplace'] = string.capwords(country['name'])
+                    performer_extra['extra']['birthplace_code'] = country['code']
+            item['performers_data'].append(performer_extra)
+
         if scene['male_models']:
             for model in scene['male_models']:
                 item['performers'].append(string.capwords(model['model_name']))
+                performer_extra = {}
+                performer_extra['name'] = string.capwords(model['model_name'])
+                performer_extra['site'] = "Legal Porno"
+                performer_extra['extra'] = {}
+                performer_extra['extra']['gender'] = string.capwords(model['sex'])
+                for country in meta['countries']:
+                    if model['country_id'] == country['country_id']:
+                        performer_extra['extra']['nationality'] = string.capwords(country['nationality'])
+                        performer_extra['extra']['birthplace'] = string.capwords(country['name'])
+                        performer_extra['extra']['birthplace_code'] = country['code']
+                item['performers_data'].append(performer_extra)
 
         item['tags'] = []
         if scene['niches']:
@@ -83,6 +114,7 @@ class SitePornboxSpider(BaseSceneScraper):
                    'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
                    'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
-                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue', 'plantsvscunts', 'mugurporn']
-        if not any(x in item['site'].lower().replace(" ", "") for x in matches):
+                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouchx', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue', 'plantsvscunts',
+                   'mugurporn', 'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'gotfilled', 'alexlegend', 'aglaeaproductions']
+        if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
             yield self.check_item(item, self.days)

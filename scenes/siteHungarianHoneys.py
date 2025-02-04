@@ -1,6 +1,8 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+true = True
+false = False
 
 
 class SiteHungarianHoneysSpider(BaseSceneScraper):
@@ -12,6 +14,8 @@ class SiteHungarianHoneysSpider(BaseSceneScraper):
     start_urls = [
         'https://www.hungarianhoneys.com',
     ]
+
+    # ~ cookies =
 
     selector_map = {
         'title': '//article/section/div/div/div[@class="title-block"]/h2[@class="section-title"]/text()',
@@ -28,6 +32,13 @@ class SiteHungarianHoneysSpider(BaseSceneScraper):
         'pagination': '/categories/movies_%s_d.html',
         'type': 'Scene',
     }
+
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        print(self.cookies)
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta

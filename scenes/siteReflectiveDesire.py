@@ -12,15 +12,44 @@ class ReflectiveDesireSpider(BaseSceneScraper):
 
     start_urls = [
         'https://reflectivedesire.com/videos/pain/?sort=chrono',
-        'https://reflectivedesire.com/videos/pleasure/?sort=chrono',
+        'https://reflectivedesire.com/videos/pleasure/?sort=chrono&priority=videos',
         'https://reflectivedesire.com/videos/solos/?sort=chrono',
         'https://reflectivedesire.com/videos/devices/?sort=chrono',
         'https://reflectivedesire.com/videos/extras/?sort=chrono',
     ]
 
+    custom_scraper_settings = {
+        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        'AUTOTHROTTLE_ENABLED': True,
+        # ~ 'USE_PROXY': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
+        'CONCURRENT_REQUESTS': 1,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'CONCURRENT_REQUESTS_PER_IP': 1,
+        'DOWNLOAD_DELAY': 5,
+        'PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT': 60000,  # 60s
+        'DOWNLOADER_MIDDLEWARES': {
+            # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+            # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+            # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+        },
+        'DOWNLOAD_HANDLERS': {
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        }
+    }
+
     def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        meta['playwright'] = True
         for link in self.start_urls:
-            yield scrapy.Request(link, callback=self.get_scenes, meta={'page': self.page}, headers=self.headers, cookies=self.cookies)
+            yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     selector_map = {
         'title': '//h1/text()',

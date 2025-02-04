@@ -34,3 +34,15 @@ class SiteLucasEntertainmentSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_title(self, response):
+        title = super().get_title(response)
+        if "|" in title:
+            title = re.search(r'(.*?)\|(.*)', title)
+            title_1 = title.group(1)
+            title_2 = title.group(2)
+            if "," not in title_1:
+                title = title_1.strip() + " " + title_2.strip()
+            else:
+                title = title_2.strip()
+        return title.strip()

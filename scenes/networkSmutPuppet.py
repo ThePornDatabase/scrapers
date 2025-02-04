@@ -9,13 +9,13 @@ class NetworkSmutPuppetSpider(BaseSceneScraper):
     network = 'Smut Puppet'
 
     start_urls = [
-        'https://smutpuppet.com',
+        'https://porngutter.com',
     ]
 
     selector_map = {
         'title': '//div[@class="section-title"]/h4/text()',
         'description': '//p[@class="read-more"]/text()',
-        'date': '',
+        'date': '//small[@class="updated-at"]/text()',
         'image': '//div[@class="model-player"]/a/img/@src|//video/@poster',
         'performers': '//h4/a[contains(@href, "/models/")]/text()',
         'tags': '//span[contains(text(), "ategories")]/following-sibling::a/text()',

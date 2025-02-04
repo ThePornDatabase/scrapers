@@ -17,13 +17,14 @@ class NetworkPOVRSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//h1[@class="player__title"]/text() | //h4/text() | //h1[contains(@class,"heading-title")]/text()',
-        'description': '//p[contains(@class,"description")]/text() | //div[@class="player__description"]/p/text()',
+        'description': '//p[contains(@class,"description")]/text() | //div[contains(@class,"player__description")]/p/text()',
         'performers': '//a[contains(@class,"actor")]/text() | //ul/li/a[contains(@class,"btn--eptenary")]/text()|//ul[contains(@class,"category-link")]/li/a[contains(@href, "/pornstars/")]/text()',
         'date': '//div[@class="player__meta"]/div[3]/span/text() | //p[contains(@class,"player__date")]/text()',
+        're_date': r'(\d{1,2} \w+, \d{4})',
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': '//meta[@property="og:image"]/@content',
-        'tags': '//a[contains(@class,"tag")]/text() | //ul/li/a[contains(@class,"btn--default")]/text()',
-        'site': '//a[contains(@class,"source")]/text() | //ul/li/a[contains(@class,"btn--secondary")]/text()',
+        'tags': '//ul[contains(@class, "category-link")]/li/a[contains(@href, "/tags/")]/text()',
+        'site': '//ul[contains(@class, "category-link")]/li/a[contains(@href, "/studios/")]/text()',
         'external_id': r'.*-(\d+)$',
         'trailer': '',
         # ~ 'pagination': '/?p=%s'
@@ -50,10 +51,20 @@ class NetworkPOVRSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="teaser-video"]/a/@href | //a[@class="thumbnail__link"]/@href').getall()
+        scenes = response.xpath('//div[contains(@class, "thumbnail") and contains(@class, "scene")]/a[1]/@href').getall()
         for scene in scenes:
             if "czech-vr" not in scene:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+
+    def get_duration(self, response):
+        duration = response.xpath('//div[@class="player__meta"]/div[3]/span/text() | //p[contains(@class,"player__date")]/text()')
+        if duration:
+            duration = duration.get()
+            duration = re.sub(r'[^a-z0-9]+', '', duration.lower())
+            duration = re.search(r'(\d+)min', duration)
+            if duration:
+                return str(int(duration.group(1)) * 60)
+        return ''
 
     def get_site(self, response):
         site = self.process_xpath(response, self.get_selector_map('site')).get()
@@ -61,185 +72,30 @@ class NetworkPOVRSpider(BaseSceneScraper):
             return site
         return super().get_site(response)
 
-    def get_date(self, response):
-        date = self.process_xpath(response, self.get_selector_map('date')).get()
-        if date:
-            date.replace('Released:', '').replace('Added:', '').strip()
-            if "min" in date or "•" in date and "," in date:
-                date = re.search(r'.*\ (\d{1,2}\ .*\d{4})', date).group(1)
-        return self.parse_date(date.strip()).isoformat()
-
-    def get_performers(self, response):
-        performers = self.process_xpath(
-            response, self.get_selector_map('performers')).getall()
-        if performers:
-            return list(map(lambda x: string.capwords(x.strip()), performers))
-        return []
-
-    def get_duration(self, response):
-        duration = response.xpath('//p[contains(@class,"player__date")]/text()')
-        if duration:
-            duration = duration.get()
-            if " min" in duration:
-                duration = re.search(r'(\d+) [mM]in', duration)
-                if duration:
-                    return str(int(duration.group(1)) * 60)
-        return ''
-
     def parse_scene(self, response):
-        item = SceneItem()
-
-        if 'title' in response.meta and response.meta['title']:
-            item['title'] = response.meta['title']
-        else:
-            item['title'] = self.get_title(response)
-
-        if 'description' in response.meta:
-            item['description'] = response.meta['description']
-        else:
-            item['description'] = self.get_description(response)
-
-        if hasattr(self, 'site'):
-            item['site'] = self.site
-        elif 'site' in response.meta:
-            item['site'] = response.meta['site']
-        else:
-            item['site'] = self.get_site(response)
-
-        if 'date' in response.meta:
-            item['date'] = response.meta['date']
-        else:
-            item['date'] = self.get_date(response)
-
-        if 'image' in response.meta:
-            item['image'] = response.meta['image']
-        else:
-            item['image'] = self.get_image(response)
-
-        if 'image' not in item or not item['image']:
-            item['image'] = None
-
-        if 'image_blob' in response.meta:
-            item['image_blob'] = response.meta['image_blob']
-        else:
-            item['image_blob'] = self.get_image_blob(response)
-
-        if ('image_blob' not in item or not item['image_blob']) and item['image']:
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-        if 'image_blob' not in item:
-            item['image_blob'] = None
-
-        if 'performers' in response.meta:
-            item['performers'] = response.meta['performers']
-        else:
-            item['performers'] = self.get_performers(response)
-
-        if 'tags' in response.meta:
-            item['tags'] = response.meta['tags']
-        else:
-            item['tags'] = self.get_tags(response)
-
-        if 'markers' in response.meta:
-            item['markers'] = response.meta['markers']
-        else:
-            item['markers'] = self.get_markers(response)
-
-        if 'id' in response.meta:
-            item['id'] = response.meta['id']
-        else:
-            item['id'] = self.get_id(response)
-
-        if 'merge_id' in response.meta:
-            item['merge_id'] = response.meta['merge_id']
-        else:
-            item['merge_id'] = self.get_merge_id(response)
-
-        if 'trailer' in response.meta:
-            item['trailer'] = response.meta['trailer']
-        else:
-            item['trailer'] = self.get_trailer(response)
-
-        if 'duration' in response.meta:
-            item['duration'] = response.meta['duration']
-        else:
-            item['duration'] = self.get_duration(response)
-
-        if 'url' in response.meta:
-            item['url'] = response.meta['url']
-        else:
-            item['url'] = self.get_url(response)
-
-        if hasattr(self, 'network'):
-            item['network'] = self.network
-        elif 'network' in response.meta:
-            item['network'] = response.meta['network']
-        else:
-            item['network'] = self.get_network(response)
-
-        if hasattr(self, 'parent'):
-            item['parent'] = self.parent
-        elif 'parent' in response.meta:
-            item['parent'] = response.meta['parent']
-        else:
-            item['parent'] = self.get_parent(response)
-
-        # Movie Items
-
-        if 'store' in response.meta:
-            item['store'] = response.meta['store']
-        else:
-            item['store'] = self.get_store(response)
-
-        if 'director' in response.meta:
-            item['director'] = response.meta['director']
-        else:
-            item['director'] = self.get_director(response)
-
-        if 'format' in response.meta:
-            item['format'] = response.meta['format']
-        else:
-            item['format'] = self.get_format(response)
-
-        if 'back' in response.meta:
-            item['back'] = response.meta['back']
-        else:
-            item['back'] = self.get_back_image(response)
-
-        if 'back' not in item or not item['back']:
-            item['back'] = None
-            item['back_blob'] = None
-        else:
-            if 'back_blob' in response.meta:
-                item['back_blob'] = response.meta['back_blob']
-            else:
-                item['back_blob'] = self.get_image_back_blob(response)
-
-            if ('back_blob' not in item or not item['back_blob']) and item['back']:
-                item['back_blob'] = self.get_image_from_link(item['back'])
-
-        if 'back_blob' not in item:
-            item['back_blob'] = None
-
-        if 'sku' in response.meta:
-            item['sku'] = response.meta['sku']
-        else:
-            item['sku'] = self.get_sku(response)
-
-        if hasattr(self, 'type'):
-            item['type'] = self.type
-        elif 'type' in response.meta:
-            item['type'] = response.meta['type']
-        elif 'type' in self.get_selector_map():
-            item['type'] = self.get_selector_map('type')
-        else:
-            item['type'] = 'Scene'
+        item = self.init_scene()
+        item['title'] = self.get_title(response)
+        item['description'] = self.get_description(response)
+        item['site'] = self.get_site(response)
+        item['date'] = self.get_date(response)
+        item['image'] = self.get_image(response)
+        item['performers'] = self.get_performers(response)
+        item['tags'] = self.get_tags(response)
+        item['url'] = self.get_url(response)
+        item['id'] = re.search(r'.*-(\d+)$', response.url).group(1)
+        item['trailer'] = self.get_trailer(response)
+        item['duration'] = self.get_duration(response)
+        item['network'] = self.get_network(response)
+        item['parent'] = item['site']
+        item['type'] = 'Scene'
 
         shortsite = re.sub(r'[^a-z0-9]', '', item['site'].lower())
-        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr', 'badoink', 'realvr', 'kinkvr', 'babevr', 'vrcosplayx', '18vr', 'wankzvr', 'vrhush', 'naughtyamerica']
-        if not any(x in shortsite for x in matches):
-            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers']
-            if not any(x in shortsite for x in matches):
-                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr', 'badoink', 'slr-milfvr', 'milfvr', 'tranzvr']
-                if not any(x in shortsite for x in matches):
-                    yield self.check_item(item, self.days)
+        # ~ matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr', 'badoink', 'realvr', 'kinkvr', 'babevr', 'vrcosplayx', '18vr', 'wankzvr', 'vrhush', 'naughtyamerica']
+        # ~ if not any(x in shortsite for x in matches):
+            # ~ matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers', 'porncorn', 'porncornvr']
+            # ~ if not any(x in shortsite for x in matches):
+                # ~ matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr', 'badoink', 'slr-milfvr', 'milfvr', 'tranzvr']
+                # ~ if not any(x in shortsite for x in matches):
+                    # ~ yield self.check_item(item, self.days)
+        if shortsite == "povroriginals":
+            yield self.check_item(item, self.days)

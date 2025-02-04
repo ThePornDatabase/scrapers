@@ -1,12 +1,6 @@
 import re
-import html
-import json
-import base64
-from datetime import date, timedelta
-import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class NetworkItsPOVSpider(BaseSceneScraper):
@@ -15,149 +9,122 @@ class NetworkItsPOVSpider(BaseSceneScraper):
 
     url = 'https://itspov.com/'
 
-    sites = [
-        ['OfficePOV', '77'],
-        ['BackdoorPOV', '74'],
-        ['IntimatePOV', '76'],
-        ['FeetishPOV', '75'],
-        ['AcademyPOV', '78'],
-        ['StepPOV', '102'],
-        ['PetitePOV', '107'],
-        ['MorePOV', '108'],
-        ['ILovePOV', '109']
+    paginations = [
+        '/collection/officepov/more?lang=en&page=%s&sorting=new',
+        '/collection/backdoorpov/more?lang=en&page=%s&sorting=new',
+        '/collection/intimatepov/more?lang=en&page=%s&sorting=new',
+        '/collection/feetishpov/more?lang=en&page=%s&sorting=new',
+        '/collection/academypov/more?lang=en&page=%s&sorting=new',
+        '/collection/steppov/more?lang=en&page=%s&sorting=new',
+        '/collection/petitepov/more?lang=en&page=%s&sorting=new',
+        '/collection/morepov/more?lang=en&page=%s&sorting=new',
+        '/collection/ilovepov/more?lang=en&page=%s&sorting=new',
     ]
 
     headers = {
-        'siteId': '102',
-        'token': 'mysexmobile',
-        'Referer': 'https://itspov.com/',
-        'Origin': 'https://itspov.com',
-        'locale': 1,
+        'x-requested-with': 'XMLHttpRequest',
     }
 
-    custom_settings = {'CONCURRENT_REQUESTS': '1',
-                       'AUTOTHROTTLE_ENABLED': 'True',
-                       'AUTOTHROTTLE_DEBUG': 'False',
-                       'DOWNLOAD_DELAY': '2',
-                       'CONCURRENT_REQUESTS_PER_DOMAIN': '1',
+    # ~ custom_settings = {'CONCURRENT_REQUESTS': '1',
+    # ~ 'AUTOTHROTTLE_ENABLED': 'True',
+    # ~ 'AUTOTHROTTLE_DEBUG': 'False',
+    # ~ 'DOWNLOAD_DELAY': '2',
+    # ~ 'CONCURRENT_REQUESTS_PER_DOMAIN': '1',
 
-                       'ITEM_PIPELINES': {
-                           'tpdb.pipelines.TpdbApiScenePipeline': 400,
-                       },
-                       'DOWNLOADER_MIDDLEWARES': {
-                           'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-                       }
-                       }
+    # ~ 'ITEM_PIPELINES': {
+    # ~ 'tpdb.pipelines.TpdbApiScenePipeline': 400,
+    # ~ },
+    # ~ 'DOWNLOADER_MIDDLEWARES': {
+    # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+    # ~ }
+    # ~ }
 
     selector_map = {
-        'image': '//div[@class="tour-video-title"]/following-sibling::a/img/@style',
-        're_image': r'\((.*\.jpg)\)',
-        'tags': '//a[contains(@class,"btn-outline-secondary")]/text()',
-        'performers': '//a[contains(@class,"btn-secondary")]/text()',
-        'external_id': '',
-        'pagination': ''
+        'title': '//h1[@class="title"]/text()',
+        'description': '//div[contains(@class,"content-description")]//span[@class="full"]/p/span/text()',
+        'date': '//div[@class="right"]/span[@class="publish_date"]/text()',
+        'date_formats': ['%B %d, %Y'],
+        'performers': '//h1[@class="title"]/following-sibling::div[@class="actress"]/a/text()',
+        'type': 'Scene',
+        'external_id': r'/(\d+)/',
     }
 
+    def get_next_page_url(self, base, page, pagination):
+        return self.format_url(base, pagination % page)
+
     def start_requests(self):
-        yield scrapy.Request("https://itspov.com/en/",
-                             callback=self.start_requests2,
-                             headers=self.headers,
-                             cookies=self.cookies)
+        yield scrapy.Request("https://itspov.com/en/", callback=self.start_requests2, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
-        for site in self.sites:
-            # ~ url = "https://content-api.itspov.com/24api/v1/sites/{}/freetour".format(site[1])
-            url = "https://api.itspov.com/24api/v1/sites/{}/freetour".format(site[1])
-            yield scrapy.Request(url,
-                                 callback=self.get_scenes,
-                                 meta={'page': self.page, 'site': site[0], 'group': site[1]},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+        for pagination in self.paginations:
+            meta = {}
+            meta['page'] = self.page
+            meta['pagination'] = pagination
+            meta['check_date'] = "2023-10-03"
+            url = self.get_next_page_url(response.url, meta['page'], meta['pagination'])
+            yield scrapy.Request(url, method='POST', callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        print(response.text)
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), method='POST', callback=self.parse, meta=meta, headers=self.headers)
 
     def get_scenes(self, response):
         meta = response.meta
-        jsondata = json.loads(response.text)
-        jsonslice = jsondata['payload']['sites'][meta['group']]['scenes']
+        scenes = response.xpath('//div[contains(@class,"scene thumbnail")]/a/@href').getall()
+        for scene in scenes:
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
-        # set up pseudo-paging
-        counter = 0
-        if not self.limit_pages:
-            limit_pages = 1
-        elif self.limit_pages == "all" or not int(self.limit_pages):
-            limit_pages = 999
-        else:
-            limit_pages = int(self.limit_pages)
-
-        for data in jsonslice:
-            counter += 1
-            if counter > (limit_pages * 5):
-                break
-
-            url = "https://api.itspov.com/24api/v1/sites/{}/freetour/videos/".format(meta['group']) + str(jsondata['payload']['sites'][meta['group']]['scenes'][data]['id'])
-            yield scrapy.Request(url,
-                                 callback=self.parse_scene,
-                                 meta=meta,
-                                 headers=self.headers,
-                                 cookies=self.cookies)
-
-    def parse_scene(self, response):
+    def get_site(self, response):
         meta = response.meta
-        # The site uses a rate limit of 40 requests in a given minute.
-        if 'X-Ratelimit-Remaining' in response.headers:
-            ratelimit = int(response.headers['X-Ratelimit-Remaining'])
-        try:
-            jsondata = json.loads(response.text)
-        except:
-            print(f'Failed retrieving {response.url}.  X-Ratelimit was: {ratelimit}')
+        return re.search(r'collection/(.*?)/', meta['pagination']).group(1)
 
-        data = jsondata['payload']['scenes']
-        for row in data:
-            item = SceneItem()
-            item['id'] = data[row]['id']
-            item['title'] = html.unescape(re.sub('<[^<]+?>', '', data[row]['title']))
-            item['description'] = html.unescape(re.sub('<[^<]+?>', '', data[row]['story']))
-            item['url'] = "https://itspov.com/" + data[row]['routePaths'][f'scene({row})']['en']
-            if '1500' in data[row]['video_cover']:
-                item['image'] = data[row]['video_cover']['1500']
-            else:
-                item['image'] = data[row]['video_cover']['original']
+    def get_parent(self, response):
+        meta = response.meta
+        return re.search(r'collection/(.*?)/', meta['pagination']).group(1)
 
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['date'] = self.parse_date(data[row]['translations'][0]['scene']['original_publication_date']).strftime('%Y-%m-%d')
-            item['performers'] = []
-            for model in data[row]['models']:
-                item['performers'].append(data[row]['models'][model]['stage_name'])
-            item['tags'] = []
-            for tag in data[row]['main_scenetags']:
-                item['tags'].append(data[row]['main_scenetags'][tag]['name'].strip().title())
-
-            item['trailer'] = ''
-            item['site'] = meta['site']
-            item['parent'] = meta['site']
-            item['network'] = 'Its POV'
-
-            if item['id'] and item['title']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
+    def get_image(self, response):
+        images = response.xpath('//div[@class="player_container"]/span[@class="thumb-ratio"]//source/@data-srcset')
+        final_image = ""
+        if images:
+            images = images.getall()
+            for image in images:
+                image = re.search(r',.*?(http.*?)\s', image)
+                if image:
+                    image = image.group(1)
+                    if not final_image:
+                        final_image = image
                     else:
-                        yield item
+                        final_res = re.search(r'(\d+)_\d+_crop', final_image)
+                        image_res = re.search(r'(\d+)_\d+_crop', image)
+                        if final_res and image_res:
+                            final_res = final_res.group(1)
+                            image_res = image_res.group(1)
+                            if int(image_res) > int(final_res):
+                                final_image = image
+        return final_image
 
-    def get_image_blob_from_link(self, image):
+    def get_tags(self, response):
+        return ['POV']
 
-        header_dict = {'Referer': 'https://itspov.com/'}
-        if image:
-            return base64.b64encode(requests.get(image, headers=header_dict).content).decode('utf-8')
+    def get_duration(self, response):
+        duration = response.xpath('//div[@class="right"]/span[@class="duration"]/text()')
+        if duration:
+            duration = duration.get()
+            duration = re.search(r'(\d+)m(\d+)', duration.lower())
+            if duration:
+                minutes = int(duration.group(1)) * 60
+                seconds = int(duration.group(2))
+                return str(minutes + seconds)
         return None

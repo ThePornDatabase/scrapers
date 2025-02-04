@@ -11,7 +11,7 @@ class MetArtNetworkSpider(BaseSceneScraper):
 
     start_urls = [
         "https://www.alsscan.com",
-        # ~ # "https://www.eroticbeauty.com",
+        # "https://www.eroticbeauty.com",
         "https://www.errotica-archives.com",
         "https://www.eternaldesire.com",
         "https://www.lovehairy.com",
@@ -23,8 +23,8 @@ class MetArtNetworkSpider(BaseSceneScraper):
         "https://www.stunning18.com",
         "https://www.thelifeerotic.com",
         "https://www.vivthomas.com",
-        'https://www.hustler.com',
-        'https://www.barelylegal.com/'
+        # 'https://www.hustlerunlimited.com',
+        # 'https://www.barelylegal.com/'
     ]
 
     selector_map = {

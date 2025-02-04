@@ -46,8 +46,9 @@ class SiteXXXJobInterviewsSpider(BaseSceneScraper):
     def get_tags(self, response):
         tags = super().get_tags(response)
         performers = self.get_performers(response)
+        tags2 = []
         for performer in performers:
             for tag in tags:
-                if performer.lower() in tag.lower():
-                    tags.remove(performer)
-        return tags
+                if performer.lower() not in tag.lower():
+                    tags2.append(tag)
+        return tags2

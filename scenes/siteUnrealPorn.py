@@ -26,16 +26,16 @@ class siteUnrealPornSpider(BaseSceneScraper):
     network = 'Czech Casting'
 
     start_urls = [
-        'https://creativeporn.com',
-        'https://dirtysarah.com',
-        'https://extremestreets.com',
-        'https://horrorporn.com',
-        'https://movieporn.com',
-        'https://perversefamily.com',
-        'https://perversefamilylive.com',
-        'https://spy26.com',
-        'https://unrealporn.com',
-        'https://xvirtual.com',
+        # ~ 'https://creativeporn.com',
+        # ~ 'https://dirtysarah.com',
+        # ~ 'https://extremestreets.com',
+        # ~ 'https://horrorporn.com',
+        # ~ 'https://movieporn.com',
+        # ~ 'https://perversefamily.com',
+        # ~ 'https://perversefamilylive.com',
+        # ~ 'https://spy26.com',
+        # ~ 'https://unrealporn.com',
+        # ~ 'https://xvirtual.com',
     ]
 
     selector_map = {

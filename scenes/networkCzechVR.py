@@ -7,27 +7,26 @@ class NetworkCzechVRSpider(BaseSceneScraper):
     name = 'CzechVR'
     network = 'Mental Pass'
 
-    cookies = {
-        'iagree': 'ano',
-        }
+    cookies = {'name': 'iagree', 'value': 'ano'}
 
     start_urls = [
         # ~ 'https://www.czechvr.com',
         'https://www.czechvrcasting.com',
         'https://www.czechvrfetish.com',
-        'https://www.vrintimacy.com'
+        'https://www.vrintimacy.com',
+        'https://www.czechar.com',
     ]
 
     selector_map = {
         'title': '//div[contains(@class,"nazev")]/h1/span/following-sibling::text()|//div[contains(@class,"nazev")]/h2/span/following-sibling::text()',
-        'description': '//div[@class="textDetail"]/text()',
-        'date': '//article[@class="detail"]//div[contains(@class,"nazev")]/div[@class="datum"]/text()',
-        'date_formats': ['%b %d %Y'],
-        'image': '//article[@class="detail"]//div[@class="foto"]/dl8-video/@poster',
-        'performers': '//article[@class="detail"]//div[contains(@class,"nazev")]/div[@class="featuring"]/a[contains(@href, "model")]/text()',
-        'tags': '//div[@id="MoreTags"]//a/text()',
-        'duration': '//div[@class="casDetail"]/span[1]/text()',
-        'trailer': '//article[@class="detail"]//div[@class="foto"]/dl8-video/source/@src',
+        'description': '//div[@class="textDetail"]/text()|//div[@class="cistic"]/following-sibling::div[@class="text"]/text()',
+        'date': '//article[@class="detail"]//div[contains(@class,"nazev")]/div[@class="datum"]/text()|//div[@class="datum"]/text()',
+        'date_formats': ['%b %d %Y', '%b %d, %Y'],
+        'image': '//article[@class="detail"]//div[@class="foto"]/dl8-video/@poster|//dl8-video/@poster',
+        'performers': '//article[@class="detail"]//div[contains(@class,"nazev")]/div[@class="featuring"]/a[contains(@href, "model")]/text()|//div[@class="modelky"]/a//span/text()',
+        'tags': '//div[@id="MoreTags"]//a/text()|//div[@id="VideoTagy"]//a/text()',
+        'duration': '//div[@class="casDetail"]/span[1]/text()|//div[@class="datum"]/following-sibling::div[@class="cas"][1]/text()',
+        'trailer': '//article[@class="detail"]//div[@class="foto"]/dl8-video/source/@src|//dl8-video/source/@src',
         'external_id': r'detail-(\d+)-',
         'pagination': '/vr-porn-videos?&next=%s',
         'type': 'Scene',
@@ -38,6 +37,8 @@ class NetworkCzechVRSpider(BaseSceneScraper):
             pagination = "/vr-porn-videos"
         if "intimacy" in base:
             pagination = "intimate-vr-porn-videos"
+        elif "czechar" in base:
+            pagination = "/passthrough-ar-porn-videos"
         else:
             pagination = "/vr-porn-videos"
 

@@ -60,6 +60,7 @@ class SiteFreakMobMediaSpider(BaseSceneScraper):
             elif "thumb" in scene and scene['thumb']:
                 item['image'] = self.format_link(response, scene['thumb']).replace(" ", "%20")
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['image'] = re.sub(r'[^A-Za-z0-9:/\.\-\%\$]+', "", item['image'])
             if scene['trailer_url']:
                 item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
             else:
@@ -81,5 +82,4 @@ class SiteFreakMobMediaSpider(BaseSceneScraper):
             for model in scene['models_slugs']:
                 item['performers'].append(model['name'])
 
-            if item['date'] > '2023-12-01':
-                yield self.check_item(item, self.days)
+            yield self.check_item(item, self.days)

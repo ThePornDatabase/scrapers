@@ -26,17 +26,8 @@ class networkDungeonCorpSpider(BaseSceneScraper):
         'tags': '//td[contains(text(),"Categories")]/following-sibling::td/a/text()',
         'external_id': 'id=(\d+)',
         'trailer': '',
-        'pagination': '/trial/index.php?page=%s'
+        'pagination': '/?page=updates&p=%s'
     }
-
-
-    def start_requests(self):
-
-        url = "http://dungeoncorp.com/NEWS/updates_guest_all.js"
-        yield scrapy.Request(url, callback=self.get_scenes,
-                             meta={'page': self.page},
-                             headers=self.headers,
-                             cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta

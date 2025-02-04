@@ -10,7 +10,7 @@ class LetsDoeItSpider(BaseSceneScraper):
     network = "LetsDoeIt"
 
     start_urls = [
-        'https://www.letsdoeit.com',
+        # ~ 'https://www.letsdoeit.com', # Moved to ProjectOne
         'https://amateureuro.com',
         'https://mamacitaz.com/',
         # ~ # 'https://dirtycosplay.com/',  Paywalled

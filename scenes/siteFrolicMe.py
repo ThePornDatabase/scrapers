@@ -30,20 +30,20 @@ class FrolicMeSpider(BaseSceneScraper):
         'pagination': '/films/page/%s/?order_by=date_desc'
     }
 
-    def start_requests(self):
-        meta = {}
-        meta['page'] = self.page
-        yield scrapy.Request('https://www.frolicme.com', callback=self.age_verify, meta=meta, headers=self.headers, cookies=self.cookies)
+    # ~ def start_requests(self):
+        # ~ meta = {}
+        # ~ meta['page'] = self.page
+        # ~ yield scrapy.Request('https://www.frolicme.com', callback=self.age_verify, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def age_verify(self, response):
-        meta = response.meta
-        yield scrapy.FormRequest(url="https://www.frolicme.com/wp-json/frolic/v1/verify", meta=meta, formdata={"dob": "1985-05-02", "country": "US", "search_terms": ""}, callback=self.start_requests_2)
+    # ~ def age_verify(self, response):
+        # ~ meta = response.meta
+        # ~ yield scrapy.FormRequest(url="https://www.frolicme.com/wp-json/frolic/v1/verify", meta=meta, formdata={"dob": "1985-05-02", "country": "US", "search_terms": ""}, callback=self.start_requests_2)
 
-    def start_requests_2(self, response):
-        meta = response.meta
+    # ~ def start_requests_2(self, response):
+        # ~ meta = response.meta
 
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+        # ~ for link in self.start_urls:
+            # ~ yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta

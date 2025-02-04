@@ -23,7 +23,7 @@ class SiteWhornyFilmsPlaywrightSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_IP': 1,
         'DOWNLOAD_DELAY': 5,
-        'PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT': 60000, # 60s
+        'PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT': 60000,  # 60s
         'DOWNLOADER_MIDDLEWARES': {
             # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
@@ -42,7 +42,7 @@ class SiteWhornyFilmsPlaywrightSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1[contains(@class,"elementor-heading-title")]/text()|//meta[@property="og:image:alt"]/@content',
         'description': '',
-        'date': '//meta[@property="article:published_time"]/@content|//meta[@property="og:updated_time"]/@content',
+        'date': '//meta[@property="article:published_time"]/@content',
         're_date': r'(\d{4}-\d{2}-\d{2})',
         'image': '//script[contains(@type, "application/ld+json")]/text()',
         're_image': r'primaryImageOfPage.*?(http.*?)[\'\"]',
@@ -116,3 +116,19 @@ class SiteWhornyFilmsPlaywrightSpider(BaseSceneScraper):
             if image:
                 return self.format_link(response, image.group(1))
         return ""
+
+    def get_date(self, response):
+        scenedate = super().get_date(response)
+
+        if not scenedate:
+            scenedate = response.xpath('//meta[@property="og:updated_time"]/@content')
+            if scenedate:
+                scenedate = re.search(r'(\d{4}-\d{2}-\d{2})', scenedate.get()).group(1)
+            else:
+                scenedate = response.xpath('//meta[@property="og:modified_time"]/@content')
+                if scenedate:
+                    scenedate = re.search(r'(\d{4}-\d{2}-\d{2})', scenedate.get()).group(1)
+        if scenedate:
+            return scenedate
+        else:
+            return ""

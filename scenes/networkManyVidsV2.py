@@ -15,10 +15,9 @@ from tpdb.items import SceneItem
 
 
 class NetworkManyVidsV2Spider(BaseSceneScraper):
-    name = 'ManyVidsV2'
 
     start_urls = [
-        # ~ # ['Submissive Teen POV', False, '574529'],  # Seems to have gone away, leaving for reference
+        # ['Submissive Teen POV', False, '574529'],  # Seems to have gone away, leaving for reference
         ['A Taboo Fantasy', False, '1000286888'],
         ['Adult Candy Store', False, '694469'],
         ['BJ World', False, '1005948542'],
@@ -562,7 +561,254 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Evelin Stone', True, '1000691850'],
         ['Manyvids: Throat GOAT', True, '1003432123'],
         ['Manyvids: Mikaela_tx', True, '1007908784'],
+        ['Manyvids: Alyssia Vera', True, '1005246426'],
+        ['Manyvids: Hotwife Heidi Haze', True, '1006555513'],
+        ['Manyvids: DireDesires', False, '1003430946'],
+        ['Manyvids: Hailey Rose', True, '1005765177'],
+        ['Manyvids: Max Fills', True, '1006435546'],
+        ['Manyvids: DickHerDownDaily', True, '1002541551'],
+        ['Manyvids: Alex Mack', True, '1002787813'],
+        ['Manyvids: Jessica Starling', True, '1000109566'],
+        ['Manyvids: Theangelyoungs', False, '1004142584'],
+        ['Manyvids: Thorri and Jax', False, '1004382198'],
+        ['Manyvids: Ninacola', True, '1004836982'],
+        ['Manyvids: Chris Marxxx', True, '1003245114'],
+        ['Manyvids: Lucy Mochi', True, '1004503279'],
+        ['Manyvids: Ruth Lee', True, '1002380360'],
+        ['Manyvids: Sammm Next Door', True, '1005661691'],
+        ['Manyvids: Cassie Bender', True, '1004671475'],
+        ['Manyvids: Denise Anders', True, '1007127347'],
+        ['Manyvids: Miss Lexa', True, '1001853993'],
+        ['Manyvids: MadBros', False, '1007147288'],
+        ['Manyvids: The Little Red', True, '1007787775'],
+        ['Manyvids: Hayley Davies', True, '1007327920'],
+        ['Manyvids: Allie Asia', True, '1004512140'],
+        ['Manyvids: Kathryn Mae', True, '1000864948'],
+        ['Manyvids: LeoLulu', True, '1000585143'],
+        ['Manyvids: Lilyiskawaii', True, '1003844153'],
+        ['Manyvids: pokemonfit', True, '1004995873'],
+        ['Manyvids: sura_raya', True, '1004897680'],
+        ['Manyvids: Nick Winter', True, '1005220898'],
+        ['Manyvids: Onlyping', True, '1006754211'],
+        ['Manyvids: Rocket Powers', True, '1006739926'],
+        ['Manyvids: Katy Fit', True, '1007576103'],
+        ['Manyvids: Ariel Anderssen', True, '454058'],
+        ['Manyvids: Alex Bishop', True, '561134'],
+        ['Manyvids: Christian Clay', True, '1004471534'],
+        ['Manyvids: Flightlifexxx', True, '1006349004'],
+        ['Manyvids: Girthmasterr', True, '1006311658'],
+        ['Manyvids: Jakknife', True, '1006789072'],
+        ['Manyvids: Videoxxx', True, '254265'],
+        ['Manyvids: Misscjmiles', False, '1003570213'],
+        ['Manyvids: Azumi Zeitline', True, '1003971662'],
+        ['Manyvids: Thaliagomex', True, '1004028605'],
+        ['Manyvids: Maxine_Milf', True, '1006016940'],
+        ['Manyvids: Freakytuk', True, '1006881757'],
+        ['Manyvids: aranacoyotebbw', True, '1005058948'],
+        ['Manyvids: TabithaXXX', True, '1004115587'],
+        ['Manyvids: Sp00pybeans', True, '1007723999'],
+        ['Manyvids: Jia lulu', True, '1007367342'],
+        ['Manyvids: Themotionoftheocean1', True, '1002935965'],
+        ['Manyvids: Funsizedasian', True, '1001182120'],
+        ['Manyvids: Daring Kiara', True, '1005971382'],
+        ['Manyvids: Foreign Affairs XXX', False, '1006609881'],
+        ['Manyvids: Reya Sunshine', True, '721966'],
+        ['Manyvids: Littleponywife', True, '1006368600'],
+        ['Manyvids: Max Sinbros', True, '1006281405'],
+        ['Manyvids: Tyler Saber', True, '1006739002'],
+        ['Manyvids: Lora Cross', True, '1002502469'],
+        ['Manyvids: FirstclassJD', True, '1004263958'],
+        ['Manyvids: Luiza Marcato', True, '1004862068'],
+        ['Manyvids: Freckledred', True, '426998'],
+        ['Manyvids: Debauchery Desired', True, '1006704082'],
+        ['Manyvids: Nikita Belle', True, '1002437812'],
+        ['Manyvids: ButteryBubbleButt', True, '428331'],
+        ['Manyvids: Kali Roses', True, '580406'],
+        ['Manyvids: TgirlOneGuy', False, '1001105501'],
+        ['Manyvids: John Legendary', True, '1005086754'],
+        ['Manyvids: JayToy', True, '1002541986'],
+        ['Manyvids: Exoticasian', True, '1003473493'],
+        ['Manyvids: Mila Mae XO', True, '1005016492'],
+        ['Manyvids: The Cupcake SinClair', True, '1003958034'],
+        ['Manyvids: JessieHH', True, '1008264323'],
+        ['Manyvids: Lora Cross', True, '1002502469'],
+        ['Manyvids: Angela Salvagno', True, '308967'],
+        ['Manyvids: Jolie Lyon', True, '1001506737'],
+        ['Manyvids: FeistyBlackBeauty', True, '1007728603'],
+        ['Manyvids: Juliette Crimson', True, '1005821442'],
+        ['Manyvids: BirdyLovesIt', True, '246789'],
+        ['Manyvids: Harley Rose', True, '326561'],
+        ['Manyvids: Ezra', True, '1000376982'],
+        ['Manyvids: Isiah Maxwell', True, '1001687261'],
+        ['Manyvids: Janet Mason', True, '1005452249'],
+        ['Manyvids: Mandy Madison', True, '1003321586'],
+        ['Manyvids: Ellie Idol', True, '354029'],
+        ['Manyvids: Pure Pleasure', True, '1005394759'],
+        ['Manyvids: Cosmic Broccoli', True, '1003335972'],
+        ['Manyvids: Casey Kisses', True, '1000310737'],
+        ['Manyvids: Lore Shane', True, '1001880948'],
+        ['Manyvids: Maggie Landrin', True, '1002621924'],
+        ['Manyvids: Lucy Alexandra', True, '1001339090'],
+        ['Manyvids: Kinky Kristi', True, '507555'],
+        ['Manyvids: Aria Allure', True, '1001620152'],
+        ['Manyvids: Mandy Mitchell', True, '760384'],
+        ['Manyvids: Kendra Sinclaire', True, '768875'],
+        ['Manyvids: Julie Prim', True, '1000877561'],
+        ['Manyvids: Sashade Sade', True, '1000138542'],
+        ['Manyvids: Karmen Karma', True, '261541'],
+        ['Manyvids: Skylar Quinn', True, '610013'],
+        ['Manyvids: Lindsey Leigh', True, '481862'],
+        ['Manyvids: Charlie Z', True, '36719'],
+        ['Manyvids: Massimo Films', False, '1003761827'],
+        ['Manyvids: Caylin', True, '114968'],
+        ['Manyvids: InsideTatum', True, '1008353358'],
+        ['Manyvids: Molly Stewart', True, '17808'],
+        ['Manyvids: Stacy Valentine X', True, '1006966255'],
+        ['Manyvids: Yasmina Khan', True, '1006840318'],
+        ['Manyvids: Leila Cherry', True, '1002076838'],
+        ['Manyvids: Ashley Aoki', True, '1001127010'],
+        ['Manyvids: April Bunny', True, '1008342676'],
+        ['Manyvids: HuneyBaked', True, '1003427367'],
+        ['Manyvids: Petite Nymphet', True, '1000213623'],
+        ['Manyvids: Zara Sutra', True, '374487'],
+        ['Manyvids: Jasmine Teaa', True, '1001524782'],
+        ['Manyvids: Indian BabeXX69XX', True, '1001903948'],
+        ['Manyvids: kissystudio', False, '1005662608'],
+        ['Manyvids: nokithai', True, '1006200966'],
+        ['Manyvids: Japanstraycat', True, '1007451603'],
+        ['Manyvids: Nymph_Candy', True, '1005541669'],
+        ['Manyvids: Reel_Plans', False, '1007141447'],
+        ['Manyvids: Finnys Playhouse', False, '1002809912'],
+        ['Manyvids: Erin Moore', True, '1004957418'],
+        ['Manyvids: Elle Brooke', True, '1007008684'],
+        ['Manyvids: Emma Paige', True, '1006543449'],
+        ['Manyvids: Daphanezz', True, '1006227545'],
+        ['Manyvids: Lorena Brink', True, '1000055009'],
+        ['Manyvids: Natasha_4_love', True, '1003022080'],
+        ['Manyvids: Clarissa Brightstar', True, '1002333590'],
+        ['Manyvids: Olivia Jay', True, '1003730153'],
+        ['Manyvids: Nicole Kitt', True, '1004219823'],
+        ['Manyvids: TeenyNene', True, '1006626235'],
+        ['Manyvids: Softbby123', True, '1002459499'],
+        ['Manyvids: ravenswallowz', True, '1008009861'],
+        ['Manyvids: Babykittyp', True, '1006603670'],
+        ['Manyvids: Asia Drake', True, '1002663330'],
+        ['Manyvids: Vina Moon', True, '1003983984'],
+        ['Manyvids: Xoxolane', True, '1005604015'],
+        ['Manyvids: Trixxxie Rose', True, '1003927600'],
+        ['Manyvids: mechanicalhymen', True, '1003867159'],
+        ['Manyvids: Ember Snow', True, '1000518974'],
+        ['Manyvids: Gianna Dior', True, '1003784874'],
+        ['Manyvids: ThaiTease', True, '1008515508'],
+        ['Manyvids: ThaiSpark', True, '1008570174'],
+        ['Manyvids: ThaiMinx', True, '1006494534'],
+        ['Manyvids: Luci Power', True, '1002527111'],
+        ['Manyvids: bbybimbogamer', True, '1007319325'],
+        ['Manyvids: Elly Clutch', True, '1006760641'],
+        ['Manyvids: Alexis Tae', True, '1002428437'],
+        ['Manyvids: Tony Rope UK', False, '1005853482'],
+        ['Manyvids: xxNaughtyGirlxx', True, '1001631391'],
+        ['Manyvids: Ella Kojira', True, '1003119513'],
+        ['Manyvids: Sloane Sabbath', True, '1004407943'],
+        ['Manyvids: SweetVickie', True, '1004875734'],
+        ['Manyvids: ShotPOV', False, '1004525496'],
+        ['Manyvids: Kisankanna', True, '1006193093'],
+        ['Manyvids: Panamero 088', True, '1008261778'],
+        ['Manyvids: Danika Mori', True, '1001100824'],
+        ['Manyvids: TheStartOfUs', False, '1004374197'],
+        ['Manyvids: UnfriendlyBlckHottie', True, '1002248211'],
+        ['Manyvids: August Skye', True, '1004206736'],
+        ['Manyvids: DaBBLWhisperer', True, '1008119301'],
+        ['Manyvids: Lily Fox', True, '1006055071'],
+        ['Manyvids: MissMiserlou', True, '1002488290'],
+        ['Manyvids: xxbebegrrlxx', True, '1002245098'],
+        ['Manyvids: Paypeaches', True, '173770'],
+        ['Manyvids: Tattooed Temptress', True, '1002436250'],
+        ['Manyvids: Katerina Piglet', True, '1002155472'],
+        ['Manyvids: Kimberly X', True, '1002334075'],
+        ['Manyvids: Miss Alika White', True, '1002975678'],
+        ['Manyvids: Gypsy Page', True, '1001650513'],
+        ['Manyvids: Alice Skary', True, '1001895402'],
+        ['Manyvids: LATEXnCHILL', True, '1004021302'],
+        ['Manyvids: Sugary Little', True, '1001801942'],
+        ['Manyvids: Faye Taylor', True, '267758'],
+        ['Manyvids: peachypoppy', True, '1004271325'],
+        ['Manyvids: PureLatex', True, '1004399213'],
+        ['Manyvids: Trixie Miss Rebecca', True, '1000698132'],
+        ['Manyvids: Wendy Warrior', True, '761263'],
+        ['Manyvids: An Li', True, '1001756028'],
+        ['Manyvids: Cristal Kinky', True, '1003781419'],
+        ['Manyvids: Gwen Adora', True, '1001118385'],
+        ['Manyvids: Sugarbooty CB', True, '10314'],
+        ['Manyvids: Long Toe Sally', True, '1001734618'],
+        ['Manyvids: Adrienne Luxe', True, '1006113987'],
+        ['Manyvids: TheFacialParty', False, '1004994721'],
+        ['Manyvids: LittleMouchette', True, '1006811545'],
+        ['Manyvids: hayleyxyz', True, '1004098334'],
+        ['Manyvids: NatashaTy9', True, '1001777859'],
+        ['Manyvids: KnottyNatasha', True, '1006330421'],
+        ['Manyvids: icanbeurnuocmami', True, '1004549717'],
+        ['Manyvids: Ellie Idol', True, '354029'],
+        ['Manyvids: Mandy Madison', True, '1003321586'],
+        ['Manyvids: Anastangel', True, '1007679603'],
+        ['Manyvids: JohnnyLovexxx', True, '1002514420'],
+        ['Manyvids: Monte Cristo XV', True, '1002514963'],
+        ['Manyvids: Jameshardon007', True, '1005403401'],
+        ['Manyvids: Maasai Warrior BBC', True, '1006713480'],
+        ['Manyvids: Jayinne', True, '1003837091'],
+        ['Manyvids: Johnny Sins', True, '1000255726'],
+        ['Manyvids: iamannawilde', True, '1007454708'],
+        ['Manyvids: HulkandIsa', True, '1006335580'],
+        ['Manyvids: thedakotalyn', True, '1005244027'],
+        ['Manyvids: NikkiMagic', True, '1002937596'],
+        ['Manyvids: Liz Raw', True, '1002632960'],
+        ['Manyvids: Fiona Sprouts', True, '1002953146'],
+        ['Manyvids: Madiiitay', True, '1004382358'],
+        ['Manyvids: CrushedVelvetX', True, '1003352933'],
+        ['Manyvids: Elle Marz', True, '1004416590'],
+        ['Manyvids: Petite Professor XXX', True, '1006171419'],
+        ['Manyvids: Cooldehla1', True, '1003557054'],
+        ['Manyvids: Melissa Stratton', True, '1005154748'],
+        ['Manyvids: fmnclub', False, '1007048754'],
+        ['Manyvids: Creamy_Spot', True, '1002782907'],
+        ['Manyvids: TruKait', True, '1002963530'],
+        ['Manyvids: Yessy D Waifu', True, '1007827546'],
+        ['Manyvids: MyAsianGF', False, '1008083027'],
+        ['Manyvids: BBC Worldwide', True, '1003626645'],
+        ['Manyvids: Balenci Bby', True, '1006527632'],
+        ['Manyvids: Lisa the Succubrat', True, '1001433106'],
+        ['Manyvids: Peachy Riya', True, '1002335610'],
+        ['Manyvids: Faye Lockwood', True, '1003925936'],
+        ['Manyvids: Cockteau Twink', True, '1002125840'],
+        ['Manyvids: Queen Zara Sutra', False, '1005512279'],
+        ['Manyvids: Steffy Moreno', True, '1001960967'],
+        ['Manyvids: NaughtyBonnie69', True, '1007210480'],
+        ['Manyvids: Danny Luckee', False, '1006315784'],
+        ['Manyvids: AudreyReid', True, '1008673774'],
+        ['Manyvids: ZIAxBITE', True, '1001721841'],
+        ['Manyvids: Sweetlilhotwife', True, '1008036477'],
+        ['Manyvids: lenapolanski', True, '1008201765'],
+        ['Manyvids: VanessaArizonaxxx', True, '1007497076'],
+        ['Manyvids: shamelessxx', True, '1003209511'],
+        ['Manyvids: Sage_Roux', True, '1005023663'],
+        ['Manyvids: miaipanema', True, '1005001845'],
+        ['Manyvids: DirtyDanii_69', True, '1005002465'],
+        ['Manyvids: Rogita26', True, '1005404372'],
+        ['Manyvids: TyroneLovePOV', True, '1005380780'],
+        ['Manyvids: April_Maxima', True, '1004780609'],
+        ['Manyvids: The Thai Godess', True, '1006654354'],
+        ['Manyvids: Asianbbcluvr', True, '1005194704'],
+        ['Manyvids: Tiny Miu', True, '1006531494'],
+        ['Manyvids: alaiarose', True, '1004810253'],
+        ['Manyvids: Loupanxxx', True, '1003128949'],
+        ['Manyvids: ArinaFox', True, '1005789601'],
+        ['Manyvids: TeddyTarantino', True, '1007033675'],
+        ['Manyvids: Mmmickeyy', True, '1003093106'],
+        # ~ ['Manyvids: ', True, ''],
+        # ~ ['Manyvids: ', True, ''],
     ]
+
+    name = 'ManyVidsV2'
 
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False', 'HTTPERROR_ALLOWED_CODES': [403, 404]}
 
@@ -645,6 +891,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 return ['Freya Jade']
             if "420SexTime" in meta['site']:
                 return ['Asteria']
+            if "Queen Zara Sutra" in meta['site']:
+                return ['Zara Sutra']
             if "OhItsEmmaRose" in meta['site']:
                 return ['Emma Rose']
             if "OmankoVivi" in meta['site']:
@@ -653,6 +901,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 return ['Rhiannon Ryder']
             if "Kiittenymph" in meta['site']:
                 return ['Lex Kiittenymph']
+            if "Misscjmiles" in meta['site']:
+                return ['CJ Miles']
             if "Aathenatheslut" in meta['site']:
                 return ['Athena May']
             if "AliceNZ" in meta['site']:
@@ -701,6 +951,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 return ['Cam Damage']
             if "Hottalicia1" in meta['site']:
                 return ['Hott Alicia']
+            if "Hotwife Heidi Haze" in meta['site']:
+                return ['Heidi Haze']
             if "ItsReeseRobins" in meta['site']:
                 return ['Reese Robbins']
             if "KalicoKats" in meta['site']:
@@ -745,14 +997,20 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 return ['Chloe Temple']
             if "TheSophieJames" in meta['site']:
                 return ['Sophie James']
+            if "TheStartOfUs" in meta['site']:
+                return ['Adhara Skai']
             if "TheLedaLotharia" in meta['site']:
                 return ['Leda Lotharia']
             if "TheFleshMechanic" in meta['site']:
                 return ['The Flesh Mechanic']
+            if "Theangelyoungs" in meta['site']:
+                return ['Angel Youngs']
             if "TheLunaLain" in meta['site']:
                 return ['Luna Lain']
             if "THEYLOVEFLAXK" in meta['site']:
                 return ['They Love Flaxk']
+            if "tgirloneguy" in meta['site'].lower():
+                return ['Kendall Penny']
             if "ThisIsFuckingFun" in meta['site']:
                 return ['Eli']
             if "Vince May" in meta['site']:
@@ -800,6 +1058,15 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
     def get_network(self, response):
         return "Manyvids"
 
+    def parse_tags(self, tags):
+        re_outer = re.compile(r'([^A-Z ])([A-Z])')
+        re_inner = re.compile(r'(?<!^)([A-Z])([^A-Z])')
+        tags2 = []
+        for tag in tags:
+            tag = re_outer.sub(r'\1 \2', re_inner.sub(r' \1\2', tag))
+            tags2.append(tag)
+        return tags2
+
     def parse_scene(self, response):
         if response.status not in [403]:
             item = SceneItem()
@@ -819,6 +1086,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             if "tagList" in jsondata and jsondata['tagList']:
                 for tag in jsondata['tagList']:
                     item['tags'].append(tag['label'])
+
+            item['tags'] = self.parse_tags(item['tags'])
 
             if "screenshot" in jsondata:
                 item['image'] = jsondata['screenshot'].replace(" ", "%20")

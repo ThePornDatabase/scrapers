@@ -142,9 +142,9 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/updates/page_%s.html'
         elif 'ariellynn' in base:
             selector = '/tour/categories/updates_%s_d.html'
-        elif 'britstudio' in base or 'houseoffyre' in base:
+        elif 'houseoffyre' in base:
             selector = '/categories/updates_%s_p.html'
-        elif 'charlie' in base:
+        elif 'charlie' in base or 'britstudio' in base:
             selector = '/categories/updates_%s_d.html'
         elif 'houseofyre' in base:
             selector = '/access/categories/movies_%s_d.html'
@@ -173,7 +173,7 @@ class AndomarkSpider(BaseSceneScraper):
     def get_scenes(self, response):
         if 'britstudio' in response.url:
             scenes = response.xpath('//div[@class="update_details"]/div[contains(text(),"of video")]/../a[1]/@href').getall()
-        if 'meanawolf' in response.url:
+        elif 'meanawolf' in response.url:
             scenes = response.xpath('//div[contains(@class,"videothumb")]/a[contains(@href,"/scenes/")]/@href').getall()
         elif 'minkaxxx' in response.url:
             scenes = response.xpath('//div[@class="modelimg"]/a/@href').getall()
@@ -187,6 +187,7 @@ class AndomarkSpider(BaseSceneScraper):
             scenes = response.xpath('//div[contains(@class,"updatesAreaTop")]/div[@class="updateItem"]/a/@href').getall()
         else:
             scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
+
         for scene in scenes:
             if len(scene) > 10:
                 yield scrapy.Request(url=scene, callback=self.parse_scene,

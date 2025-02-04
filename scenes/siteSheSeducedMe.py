@@ -26,7 +26,7 @@ class SiteSheSeducedMeSpider(BaseSceneScraper):
         'trailer': '//script[contains(text(), "df_movie")]/text()',
         're_trailer': r'df_movie.*?path.*?[\'\"](.*?)[\'\"]',
         'external_id': r'.*/(.*?)\.htm',
-        'pagination': '/vod/categories/movies_%s_d.html',
+        'pagination': '/vod/updates/page_%s.html',
         'type': 'Scene',
     }
 
@@ -44,8 +44,9 @@ class SiteSheSeducedMeSpider(BaseSceneScraper):
                     meta['duration'] = str(int(duration.group(1)) * 60)
 
             scene = scene.xpath('./following-sibling::a[1]/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+            if scene:
+                if re.search(self.get_selector_map('external_id'), scene):
+                    yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_id(self, response):
         sceneid = super().get_id(response)

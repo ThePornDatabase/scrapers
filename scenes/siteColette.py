@@ -30,12 +30,11 @@ class SiteColetteSpider(BaseSceneScraper):
         'tags': '',
         'external_id': r'.*/(.*?)/$',
         'trailer': '',
-        'pagination': '/index.php?show=videos&pref=items&page=%s&catname=&order=recent'
+        'pagination': 'https://www.colette.com/index.php?show=videos&sort=recent&page=%s'
     }
 
     def get_scenes(self, response):
-        scene_text = response.text.replace('\\/', '/').replace('\\"', '"')
-        scenes = re.findall('href=\"(https.*?videos.*?)\"', scene_text)
+        scenes = response.xpath(r'//comment()[contains(., "ITEM")]/following-sibling::li/a/@href').getall()
         for scene in scenes:
             scene = scene.replace(" ", "%20")
             if re.search(self.get_selector_map('external_id'), scene):

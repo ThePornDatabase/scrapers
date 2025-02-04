@@ -1,5 +1,6 @@
 import string
 import scrapy
+from requests import get
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -7,71 +8,96 @@ from tpdb.items import SceneItem
 class SiteHotGuysFuckSpider(BaseSceneScraper):
     name = 'HotGuysFuck'
 
-    start_urls = [
-        'https://api.hotguysfuck.com/api/videos?type=&page=2',
+    start_url = 'https://api.hotguysfuck.com'
+
+    sites = [
+        # ~ {"site": "Gayhoopla", "sitenum": "1", "referer": "https://www.gayhoopla.com"},
+        {"site": "Hot Guys Fuck", "sitenum": "2", "referer": "https://www.hotguysfuck.com"},
+        {"site": "Sugar Daddy Porn", "sitenum": "4", "referer": "https://www.sugardaddyporn.com"},
+        {"site": "Bi Guys Fuck", "sitenum": "5", "referer": "https://www.biguysfuck.com"},
+        {"site": "Hot Guys House", "sitenum": "9", "referer": "https://www.hotguyshouse.com"}
     ]
 
-    headers = {
-        "origin": "https://www.hotguysfuck.com",
-        "referer": "https://www.hotguysfuck.com/",
-        "site": "2",
-    }
-
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'duration': '',
-        'trailer': '',
         'external_id': r'',
         'pagination': '/api/videos?type=&page=%s',
         'type': 'Scene',
     }
 
+    def start_requests(self):
+        ip = get('https://api.ipify.org').content.decode('utf8')
+        print('My public IP address is: {}'.format(ip))
+
+        meta = {}
+        meta['page'] = self.page
+
+        for site in range(300, 500):
+            meta = {}
+            meta['siteheaders'] = {
+                "origin": "https://www.hotguysfuck.com",
+                "referer": "https://www.hotguysfuck.com/",
+                "site": str(site)
+            }
+
+            yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page), callback=self.parse, meta=meta, headers=meta['siteheaders'], cookies=self.cookies, dont_filter=True)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+
     def get_scenes(self, response):
         meta = response.meta
-        jsondata = response.json()
-        jsondata = jsondata['videos']['data']
-        for scene in jsondata:
-            if ("id" in scene and scene['id']) and ("slug" in scene and scene['slug']):
-                link = f"https://api.hotguysfuck.com/api/video?slug={scene['slug']}"
-                yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=self.headers)
+        if "Unhandled match case" not in response.text:
+            jsondata = response.json()
+            jsondata = jsondata['videos']['data']
+            print()
+            print(meta['siteheaders']['site'] + ": ", jsondata[1])
+            print()
+
+            # ~ for scene in jsondata:
+                # ~ if ("id" in scene and scene['id']) and ("slug" in scene and scene['slug']):
+                    # ~ link = f"https://api.hotguysfuck.com/api/video?slug={scene['slug']}"
+                    # ~ yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=meta['siteheaders'], dont_filter=True)
+        else:
+            print(f"No site found for #{meta['siteheaders']['site']}")
 
     def parse_scene(self, response):
+        meta = response.meta
         scene = response.json()
         item = SceneItem()
-        item['title'] = self.cleanup_title(scene['video']['title'])
+        if "video" in scene and scene["video"]:
+            item['title'] = self.cleanup_title(scene['video']['title'])
 
-        item['date'] = scene['video']['dateRelease']
+            item['date'] = scene['video']['dateRelease']
 
-        if item['date'] > '2023-12-18':
-            item['id'] = scene['video']['id']
-        else:
-            item['id'] = scene['video']['slug']
+            if item['date'] > '2023-12-18':
+                item['id'] = scene['video']['id']
+            else:
+                item['id'] = scene['video']['slug']
 
-        item['description'] = self.cleanup_description(scene['video']['description'])
+            if "description" in scene['video'] and scene['video']['description']:
+                item['description'] = self.cleanup_description(scene['video']['description'])
+            else:
+                item['description'] = ""
 
-        item['image'] = self.format_link(response, scene['video']['mainPhoto']).replace(" ", "%20")
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['trailer'] = ""
+            item['image'] = self.format_link(response, scene['video']['mainPhoto']).replace(" ", "%20")
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['trailer'] = ""
 
-        item['url'] = f"https://www.hotguysfuck.com/video/{scene['video']['slug']}"
+            item['url'] = f"{meta['sitedef']['referer']}/video/{scene['video']['slug']}"
 
-        item['tags'] = []
-        if "tags" in scene and scene['tags']:
-            for tag in scene['tags']:
-                item['tags'].append(string.capwords(tag['name']))
+            item['tags'] = []
+            if "tags" in scene and scene['tags']:
+                for tag in scene['tags']:
+                    item['tags'].append(string.capwords(tag['name']))
 
-        item['duration'] = self.duration_to_seconds(scene['video']['duration'])
+            item['duration'] = self.duration_to_seconds(scene['video']['duration'])
 
-        item['site'] = 'Hot Guys Fuck'
-        item['parent'] = 'Hot Guys Fuck'
-        item['network'] = 'Hot Guys Fuck'
-        item['performers'] = []
-        for model in scene['video']['models']:
-            item['performers'].append(model['name'])
+            item['site'] = meta['sitedef']['site']
+            item['parent'] = meta['sitedef']['site']
+            item['network'] = "Blurred Media"
+            item['performers'] = []
+            for model in scene['video']['models']:
+                item['performers'].append(model['name'])
 
-        yield self.check_item(item, self.days)
+            yield self.check_item(item, self.days)

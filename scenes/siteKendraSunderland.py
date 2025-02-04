@@ -16,7 +16,7 @@ class SiteKendraSunderlandVIPSpider(BaseSceneScraper):
 
     selector_map = {
         'external_id': r'',
-        'pagination': '/wp-json/wp/v2/video_posts?per_page=10&page=%s',
+        'pagination': '/wp-json/wp/v2/video_posts?per_page=100&page=%s',
     }
 
     def get_scenes(self, response):
@@ -59,5 +59,5 @@ class SiteKendraSunderlandVIPSpider(BaseSceneScraper):
                         item['image'] = imagerow['guid']['rendered']
                         item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-            if "VIP" in item['title']:
-                yield self.check_item(item, self.days)
+            # ~ if "vip" in item['title'].lower():
+            yield self.check_item(item, self.days)

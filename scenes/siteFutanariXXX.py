@@ -35,5 +35,9 @@ class SiteFutanariXXXSpider(BaseSceneScraper):
 
     def get_id(self, response):
         id = response.xpath('//script[contains(@type, "application/json") and contains(@class, "gdrts")]/text()').get()
-        id = re.search(r'item_id.*?(\d+),\"nonce', id).group(1)
+        id = re.search(r'item_id.*?(\d+),\"nonce', id)
+        if id:
+            id = str(id.group(1))
+        else:
+            id = re.search(r'.*/(.*?)/$', response.url).group(1)
         return str(id)

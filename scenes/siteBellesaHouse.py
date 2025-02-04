@@ -88,6 +88,8 @@ class SiteBellesaHouseSpider(BaseSceneScraper):
             item['tags'] = scene['tags'].split(",")
             item['tags'] = list(map(lambda x: string.capwords(x.strip()), item['tags']))
             item['tags'] = self.clean_tags(item['tags'], item['performers'])
+            item['tags'].append("Unscripted")
+            item['tags'].append("Ethical Porn")
             item['image'] = self.format_link(response, scene['image'])
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['trailer'] = None

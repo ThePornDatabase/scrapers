@@ -1,6 +1,6 @@
 import re
 import scrapy
-
+import requests
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -26,9 +26,24 @@ class AllHerLuvSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="photo-thumb_body"]/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="photo-thumb_body"]')
         for scene in scenes:
-            yield scrapy.Request(url=scene, callback=self.parse_scene)
+            image = scene.xpath('./a/img/@src0_4x')
+            if not image:
+                image = scene.xpath('./a/img/@src0_3x')
+            if not image:
+                image = scene.xpath('./a/img/@src0_2x')
+            if not image:
+                image = scene.xpath('./a/img/@src0_1x')
+            if image:
+                image = image.get()
+                meta['image'] = image
+                meta['image_blob'] = self.get_image_blob_from_link(image)
+
+
+            scene = scene.xpath('./a/@href').get()
+            yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
 
     def get_date(self, response):
         scenedate = response.xpath('//p[contains(@class,"dvd-scenes__data")]//text()[contains(., "Added:")]').get()
@@ -62,3 +77,10 @@ class AllHerLuvSpider(BaseSceneScraper):
             return self.format_link(response, image)
 
         return ''
+
+    def get_image_from_link(self, image):
+        if image:
+            req = requests.get(image)
+            if req and req.ok:
+                return req.content
+        return None

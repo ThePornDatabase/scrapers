@@ -21,9 +21,9 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         'description': '//span[@class="desc icon"]/div/text()',
         'date': '//li[@class="model__info-item"]/span[contains(text(), "Cast")]/following-sibling::span/text()',
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[@class="model__img"]//h5[@class="model__head-name"]/text()',
+        'performers': '//div[@class="model__content"]//div[@class="model__head-name"]/text()',
         'tags': '//div[@class="btn btn--green btn--small header__login-btn"]/text()',
-        'external_id': r'casting/(\d+)/',
+        'external_id': r'.*/(\d+)/',
         'trailer': '',
         'pagination': '/latest-updates/%s/?sort_by=post_date&sort_by=post_date&sort_by=post_date'
     }
@@ -31,8 +31,7 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="thumb__gallery"]/div/a[@class="thumb__gallery-col"][1]/@data-href').getall()
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_description(self, response):
         description = self.process_xpath(response, self.get_selector_map('description'))
@@ -91,13 +90,13 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         item['site'] = self.get_site(response)
         item['date'] = self.get_date(response)
         item['image'] = self.get_image(response)
-        if "?" in item['image']:
+        if item['image'] and "?" in item['image']:
             item['image'] = re.search(r'(.*)\?', item['image']).group(1)
         item['image_blob'] = self.get_image_blob(response)
         item['performers'] = self.get_performers(response)
         item['tags'] = self.get_tags(response)
         item['markers'] = self.get_markers(response)
-        item['id'] = self.get_id(response)
+        item['id'] = re.search(r'.*/(\d+)', response.xpath('//meta[@name="twitter:player"]/@content').get()).group(1)
         item['trailer'] = self.get_trailer(response)
         item['duration'] = self.get_duration(response)
         item['url'] = self.get_url(response)
@@ -106,3 +105,14 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
         item['type'] = 'Scene'
 
         yield self.check_item(item, self.days)
+
+    def get_duration(self, response):
+        duration = response.xpath('//script[@type="application/ld+json" and contains(text(), "duration")]/text()').get()
+        duration = duration.replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", "").strip()
+        duration = re.search(r'(PT\d+H\d+M\d+S)', duration)
+        if duration:
+            duration = duration.group(1)
+            duration = self.duration_to_seconds(duration)
+        else:
+            duration = None
+        return duration

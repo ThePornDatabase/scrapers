@@ -22,8 +22,8 @@ class VixenIntimatesScraper(BaseSceneScraper):
         'Compilations': 'Vixen Compilations'
     }
 
-    slugs = ["intimates", "behind-the-scenes", "compilations"]
-    # ~ slugs = ["behind-the-scenes"]
+    # ~ slugs = ["intimates", "behind-the-scenes", "compilations"]
+    slugs = ["compilations"]
 
     selector_map = {
         'external_id': '',

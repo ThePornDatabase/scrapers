@@ -7,11 +7,11 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
     name = 'PlayboyPlus'
     network = "Playboy"
     parent = "Playboy"
-    
+
     headers =  {
         'X-Requested-With': 'XMLHttpRequest'
     }
-    
+
     start_urls = [
         'https://www.playboyplus.com',
     ]
@@ -22,7 +22,7 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
         'date': '//p[@class="date label"]/text()',
         'date_formats': ['%B %d, %Y'],
         'image': '//div[@class="imageContainer"]//picture/source[1]/@data-srcset',
-        'performers': '//p[@class="contributorName"]/a/text()',
+        'performers': '//p[@class="label" and contains(text(), "Model")]/following-sibling::p[1]/a/text()',
         'tags': '//div[contains(@class,"headline-container")]/a[contains(@class,"tag")]/text()',
         'external_id': '.*\/(.*)$',
         'trailer': '',
@@ -30,14 +30,14 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        
+
         htmlcode = response.text
         results = re.findall('cardLink.*?href=\\\\"(.*?)\\\\"', htmlcode)
         for scene in results:
             scene = "https://www.playboyplus.com" + scene.replace("\\","")
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-        
+
     def get_site(self, response):
         return "Playboy Plus"
 
@@ -45,7 +45,7 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
     def get_description(self, response):
         description = response.xpath(self.get_selector_map('description')).getall()
         if description:
-            description = " ".join(description)   
+            description = " ".join(description)
             description = description.replace(" ... ","").replace("\n","").replace("  ","")
             return description.strip()
 
@@ -59,9 +59,23 @@ class sitePlayboyPlusSpider(BaseSceneScraper):
             imagelist = re.findall('(https:\/\/.*?.jpg)',image)
             if len(imagelist):
                 image = imagelist[0]
-            
+
         if image:
             image = image.replace(" ","%20")
             return self.format_link(response, image)
         else:
             return ''
+
+    def get_performers_data(self, response):
+        performers = self.get_performers(response)
+        performers_data = []
+        if len(performers):
+            for performer in performers:
+                perf = {}
+                perf['name'] = performer
+                perf['extra'] = {}
+                perf['extra']['gender'] = "Female"
+                perf['network'] = self.get_network(response)
+                perf['site'] = self.get_network(response)
+                performers_data.append(perf)
+        return performers_data

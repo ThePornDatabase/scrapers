@@ -75,7 +75,7 @@ class PornprosSpider(BaseSceneScraper):
         for scene in scenes:
             link = self.format_link(response, scene.css('a::attr(href)').get())
 
-            # if link = /join we can guestimate by using the title and slugifying
+            # if link = /join we can guesstimate by using the title and slugifying
             if link == self.format_link(response, "/join"):
                 link = self.format_link(response, "/video/" + slugify(scene.xpath(".//a[contains(@class, 'title')]/text()").get()))
 
@@ -103,6 +103,9 @@ class PornprosSpider(BaseSceneScraper):
 
     def get_image(self, response):
         image = None
+        if "wetvr" in response.url:
+            image = response.xpath('//dl8-video/@poster').get()
+
         if response.xpath('//meta[@name="twitter:image"]').get() is not None:
             image = response.xpath('//meta[@name="twitter:image"]/@content').get()
 

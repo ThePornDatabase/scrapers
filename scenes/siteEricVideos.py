@@ -18,7 +18,8 @@ class SiteEricVideosSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1[contains(@class,"video_titre")]/text()',
         'description': '//div[@class="video-info"]//div[@class="texte"]/text()',
-        'image': '//div[@class="vid"]/@data-poster',
+        'image': '//script[contains(text(), "poster")]/text()',
+        're_image': r'poster.*?[\'\"](.*?)[\'\"]',
         'performers': '//div[@class="acteurs"]//div[@class="nom"]/text()',
         'tags': '//div[@class="categories"]/ul/li/a/text()',
         'trailer': '//div[@class="vid"]/@data-hls',
@@ -42,3 +43,13 @@ class SiteEricVideosSpider(BaseSceneScraper):
                 duration = re.search(r'(\d+)', duration).group(1)
                 duration = str(int(duration) * 60)
         return duration
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image:
+            image = response.xpath('.//div[@class="video-wrapper"]/div/img/@src')
+            if image:
+                image = image.get()
+                image = self.format_link(response, image)
+
+        return image

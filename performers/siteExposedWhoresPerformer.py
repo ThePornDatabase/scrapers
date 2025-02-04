@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
-# Note: Age is listed on the website, but is as of being put on the site.  
+# Note: Age is listed on the website, but is as of being put on the site.
 # Compared to bio text in a few they were off by several years
 
 class ExposedWhoresPerformerSpider(BasePerformerScraper):
@@ -15,11 +15,11 @@ class ExposedWhoresPerformerSpider(BasePerformerScraper):
         'bio': '//comment()[contains(.,"Bio Extra Field") and not(contains(.,"Accompanying"))]/following-sibling::text()',
         'height': '//span[@class="model_bio_heading"]/following-sibling::text()',
         'pagination': '/new-tour/models/models_%s.html',
-        'external_id': 'models\/(.*)\/'
+        'external_id': r'models/(.*)/'
     }
 
     name = 'ExposedWhoresPerformer'
-    network = "Exposed Whores"
+    network = "Exposed Whores Media"
     parent = "Exposed Whores"
 
     start_urls = [
@@ -58,11 +58,11 @@ class ExposedWhoresPerformerSpider(BasePerformerScraper):
                         height = height.replace(" ","")
                         return height.strip()
         return ''
-        
+
     def get_image(self, response):
         if 'image' in self.selector_map:
             image = self.process_xpath(response, self.get_selector_map('image')).get()
             if image:
                 image = "https://exposedwhores.com" + image
                 return image.strip()
-        return ''        
+        return ''

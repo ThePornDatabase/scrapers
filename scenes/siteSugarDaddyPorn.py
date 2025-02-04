@@ -1,31 +1,77 @@
+import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.items import SceneItem
 
 
-class SugarDaddyPornSpider(BaseSceneScraper):
+class SiteSugarDaddyPornSpider(BaseSceneScraper):
     name = 'SugarDaddyPorn'
-    network = 'Sugar Daddy Porn'
-    parent = 'Sugar Daddy Porn'
 
     start_urls = [
-        'https://www.sugardaddyporn.com'
+        'https://api.hotguysfuck.com/api/videos?type=&page=2',
     ]
 
+    headers = {
+        "origin": "https://www.sugardaddyporn.com",
+        "referer": "https://www.sugardaddyporn.com/",
+        "site": "4",
+    }
+
     selector_map = {
-        'title': '//meta[@property="og:title"]/@content',
-        'description': '//meta[@property="og:description"]/@content',
-        'performers': '//nav[contains(@class,"video__actors")]/a/text()',
-        'date': '//meta[@property="og:video:release_date"]/@content',
-        'date_formats': ['%Y-%m-%d'],
-        'image': '//meta[@property="og:image"]/@content',
-        'tags': '//div[contains(@class,"video__tags")]/a/text()',
-        'duration': '//span[contains(@class, "duration")]/time/text()',
-        'external_id': r'.*/(.*)$',
+        'title': '',
+        'description': '',
+        'date': '',
+        'image': '',
+        'performers': '',
+        'tags': '',
+        'duration': '',
         'trailer': '',
-        'pagination': '/videos/recent/%s'
+        'external_id': r'',
+        'pagination': '/api/videos?type=&page=%s',
+        'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="image-container"]/a/@href').getall()
-        for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene.strip()), callback=self.parse_scene)
+        meta = response.meta
+        jsondata = response.json()
+        jsondata = jsondata['videos']['data']
+        for scene in jsondata:
+            if ("id" in scene and scene['id']) and ("slug" in scene and scene['slug']):
+                link = f"https://api.hotguysfuck.com/api/video?slug={scene['slug']}"
+                yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=self.headers)
+
+    def parse_scene(self, response):
+        scene = response.json()
+        item = SceneItem()
+        item['title'] = self.cleanup_title(scene['video']['title'])
+
+        item['date'] = scene['video']['dateRelease']
+
+        if item['date'] > '2023-11-13':
+            item['id'] = scene['video']['id']
+        else:
+            item['id'] = scene['video']['slug']
+
+        item['description'] = self.cleanup_description(scene['video']['description'])
+
+        item['image'] = self.format_link(response, scene['video']['mainPhoto']).replace(" ", "%20")
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        item['trailer'] = ""
+
+        item['url'] = f"https://www.sugardaddyporn.com/video/{scene['video']['slug']}"
+
+        item['tags'] = []
+        if "tags" in scene and scene['tags']:
+            for tag in scene['tags']:
+                item['tags'].append(string.capwords(tag['name']))
+
+        item['duration'] = self.duration_to_seconds(scene['video']['duration'])
+
+        item['site'] = 'Sugar Daddy Porn'
+        item['parent'] = 'Sugar Daddy Porn'
+        item['network'] = 'Sugar Daddy Porn'
+        item['performers'] = []
+        for model in scene['video']['models']:
+            item['performers'].append(model['name'])
+
+        yield self.check_item(item, self.days)

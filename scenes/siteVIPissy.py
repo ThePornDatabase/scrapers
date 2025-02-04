@@ -20,7 +20,7 @@ class siteVIPissySpider(BaseSceneScraper):
         'description': '//div[contains(@class,"show_more")]/text()',
         'date': '//i[@class="glyphicon glyphicon-calendar"]/../following-sibling::dd[1]/text()',
         'date_formats': ['%b %d, %Y'],
-        'image': '//div[contains(@class,"row-with-video")]//video/@poster',
+        'image': '//div[contains(@class,"row-with-video")]//video/@poster|//div[@id="videoplayer"]/img/@src',
         'performers': '//dl/dd/a[contains(@href,"girls/")]/text()',
         'tags': '//section[@class="downloads"]//a[contains(@href,"tag")]/text()',
         'external_id': '.*\/(.*?)\/$',
@@ -29,11 +29,11 @@ class siteVIPissySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//a[@class="image-wrapper"]/@href').getall()
+        scenes = response.xpath('//picture/img[@class="thumb"]/../../@href|//a[@class="image-wrapper"]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
-        
+
     def get_site(self, response):
         return "VIPissy"
 

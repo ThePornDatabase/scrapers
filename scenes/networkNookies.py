@@ -12,11 +12,10 @@ class NetworkNookiesSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="video-box"]/h1/text()',
-        'description': '//div[contains(@class,"video-content")]/h6/following-sibling::p//text()',
-        'date': '',
+        'title': '//div[@class="video-box"]/h1/text()|//div[contains(@class,"video-content")]/h1/text()',
+        'description': '//div[contains(@class,"video-content")]/h6/following-sibling::p//text()|//div[@class="desc-container"]/p/text()',
         'performers': '//div[@class="tags"]/a[contains(@href, "/model/")]/span/text()',
-        'tags': '',
+        'tags': '//a[@class="pill-link" and contains(@href, "/tag/")]/text()',
         'duration': '',
         'trailer': '//div[@class="video-box"]/div[@class="player"]//source/@src',
         'external_id': r'.*/(.*)$',

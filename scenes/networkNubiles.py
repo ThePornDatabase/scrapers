@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta, datetime
 import dateparser
 import scrapy
 
@@ -38,9 +39,11 @@ class NubilesSpider(BaseSceneScraper):
         "https://petitehdporn.com",
         "https://petiteballerinasfucked.com",
         "https://princesscum.com",
+        "https://realitysis.com",
         "https://stepsiblingscaught.com",
         "https://teacherfucksteens.com",
         "https://thatsitcomshow.com",
+        "https://thepovgod.com",
     ]
 
     selector_map = {
@@ -89,17 +92,20 @@ class NubilesSpider(BaseSceneScraper):
                 elif "nubiles.net" in response.url:
                     meta['site'] = "Nubiles"
                     meta['parent'] = "Nubiles"
+                elif "thepovgod" in response.url:
+                    meta['site'] = "The POV God"
+                    meta['parent'] = "The POV God"
                 if 'site' not in meta or not meta['site']:
                     meta['site'] = scene.xpath('.//a[@class="site-link"]/text()').get()
                     meta['parent'] = scene.xpath('.//a[@class="site-link"]/text()').get()
-                yield scrapy.Request(
-                    url=self.format_link(response, link),
-                    callback=self.parse_scene, meta=meta)
+                url=self.format_link(response, link)
+                yield scrapy.Request(url,callback=self.parse_scene, meta=meta)
 
     def get_next_page_url(self, base, page):
+        if "nubiles.net" in base and page == 1:
+            return "https://nubiles.net/video/gallery"
         page = ((page - 1) * 12)
-        return self.format_url(
-            base, self.get_selector_map('pagination') % page)
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_description(self, response):
         if 'description' not in self.get_selector_map():

@@ -34,7 +34,7 @@ class SiteIWantClipsSpecificSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, page + 1), callback=self.parse_token, meta={'page': page, 'url': link}, cookies=self.cookies)
 
     def get_next_page_url(self, base, page):
-        return f"https://iwantclips.com/store/1425368/CarlaCute?page={page}"
+        return f"https://iwantclips.com/store/1179915/nicolettebloom?page={page}"
 
     def parse_token(self, response):
         match = re.search(r'searchClient.*?, \'(.*?)\'', response.text)

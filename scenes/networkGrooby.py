@@ -21,12 +21,14 @@ def match_site(argument):
         'grooby-archives': "Grooby Archives",
         'groobygirls': "Grooby Girls",
         'ladyboyxxx': "Ladyboy.xxx",
+        'realtgirls': "Real TGirls",
         'tgirljapanhardcore': "TGirl Japan Hardcore",
         'tgirljapancom': "TGirl Japan",
         'tgirlsporn': "TGirls Porn",
         'tgirlsex': "TGirl Sex",
         'tgirltops': "TGirl Tops",
         'tgirlsxxx': "TGirls.xxx",
+        'tgirlx': "TGirlX",
         'tgirlsfuck': "TGirls Fuck",
         'transexpov': "Transex POV",
         'transgasm': "Transgasm",
@@ -40,38 +42,40 @@ class NetworkGroobySpider(BaseSceneScraper):
 
     start_urls = [
         # ~ # 'https://www.asianamericantgirls.com', In grooby.club
-        'https://www.black-tgirls.com',
-        'https://www.blacktgirlshardcore.com',
-        'https://www.bobstgirls.com',
-        'https://www.brazilian-transsexuals.com',
-        'https://www.braziltgirls.xxx',
+        # ~ 'https://www.black-tgirls.com',
+        # ~ 'https://www.blacktgirlshardcore.com',
+        # ~ 'https://www.bobstgirls.com',
+        # ~ 'https://www.brazilian-transsexuals.com',
+        # ~ 'https://www.braziltgirls.xxx',
         # ~ # 'https://www.canada-tgirl.com', In grooby.club
         # ~ # 'https://www.euro-tgirls.com', In grooby.club
-        'https://www.grooby.club/',
-        'https://www.femout.xxx',
-        'https://www.femoutsex.xxx',
-        'https://www.franks-tgirlworld.com',
-        'https://www.futa.xxx',
-        'https://www.grooby-archives.com',
-        'https://www.groobygirls.com',
-        'https://www.ladyboy.xxx',
-        'https://www.tgirljapan.com',
-        'https://www.tgirljapanhardcore.com',
-        'https://www.tgirltops.com',
-        'https://www.tgirls.porn',
+        # ~ 'https://www.grooby.club/',
+        # ~ 'https://www.femout.xxx',
+        # ~ 'https://www.femoutsex.xxx',
+        # ~ 'https://www.franks-tgirlworld.com',
+        # ~ 'https://www.futa.xxx',
+        # ~ 'https://www.grooby-archives.com',
+        # ~ 'https://www.groobygirls.com',
+        # ~ 'https://www.ladyboy.xxx',
+        # ~ 'https://www.realtgirls.com',
+        # ~ 'https://www.tgirljapan.com',
+        # ~ 'https://www.tgirljapanhardcore.com',
+        # ~ 'https://www.tgirltops.com',
+        # ~ 'https://www.tgirls.porn',
         'https://www.tgirls.xxx',
-        'https://www.tgirlsex.xxx',
-        'https://www.tgirlsfuck.com',
-        'https://www.transexpov.com',
-        'https://www.transgasm.com',
+        # ~ 'https://www.tgirlsex.xxx',
+        # ~ 'https://www.tgirlsfuck.com',
+        # ~ 'https://www.tgirlx.com',
+        # ~ 'https://www.transexpov.com',
+        # ~ 'https://www.transgasm.com',
     ]
 
     selector_map = {
         'title': '//div[@class="trailerpage_info"]/p[contains(@class, "trailertitle")]/text()|//div[@class="trailer_toptitle_left"]//text()',
         'description': '//div[@class="trailerpage_info"]/p[not(contains(@class, "trailertitle"))]/text()|//div[@class="trailer_videoinfo"]/p[not(./b)]/text()',
-        'image': '//div[@class="trailerdata"]/div[contains(@class, "trailerposter")]/img/@src0_2x|//div[@class="videohere"]/img[contains(@src,".jpg")]/@src',
+        'image': '//div[@class="trailerdata"]/div[contains(@class, "trailerposter")]/img/@src0_2x|//div[@class="trailerdata"]/div[contains(@class, "trailerposter")]/img/@src0_1x|//div[@class="videohere"]/img[contains(@src,".jpg")]/@src',
         'performers': '//div[@class="trailerpage_info"]//a[contains(@href, "/models/")]/text()|//div[@class="trailer_videoinfo"]//a[contains(@href, "/models/")]/text()',
-        'tags': '',
+        'tags': '//div[@class="set_tags"]/ul/li/a/text()',
         'trailer': '//div[@class="trailerdata"]/div[contains(@class, "trailermp4")]/text()',
         'external_id': r'.*/(.*?)\.htm',
         'pagination': '/tour/categories/movies/%s/latest/'
@@ -97,7 +101,7 @@ class NetworkGroobySpider(BaseSceneScraper):
             if title:
                 meta['title'] = self.cleanup_title(title.get())
 
-            site = scene.xpath('./div/div[@class="sitename"]/comment()/following-sibling::text()')
+            site = scene.xpath('./div/div[@class="sitename"]//text()')
             if site:
                 site = site.getall()
                 site = self.cleanup_title("".join(site).strip())
@@ -113,8 +117,11 @@ class NetworkGroobySpider(BaseSceneScraper):
 
     def get_tags(self, response):
         meta = response.meta
+        tags = super().get_tags(response)
 
-        tags = ['Trans']
+        if "Trans" not in tags:
+            tags.append("Trans")
+
         if "transexpov" in response.url:
             tags.append("POV")
         if "asian" in response.url:
@@ -142,7 +149,13 @@ class NetworkGroobySpider(BaseSceneScraper):
                 tags.append("Russian")
             if "40" in meta['site'].lower():
                 tags.append("Older / Younger")
-        return tags
+
+        tags2 = []
+        for tag in tags:
+            if "photo" not in tag.lower():
+                tags2.append(tag)
+
+        return tags2
 
     def get_site(self, response):
         site = super().get_site(response)
@@ -154,10 +167,14 @@ class NetworkGroobySpider(BaseSceneScraper):
             site = "femoutxxx"
         if ".ladyboy.xxx" in response.url:
             site = "ladyboyxxx"
+        if ".realtgirls.com" in response.url:
+            site = "realtgirls"
         if ".tgirljapan.com" in response.url:
             site = "tgirljapancom"
         if ".tgirls.xxx" in response.url:
             site = "tgirlsxxx"
+        if ".tgirlx.com" in response.url:
+            site = "tgirlx"
         return match_site(site)
 
     def get_parent(self, response):
@@ -170,10 +187,14 @@ class NetworkGroobySpider(BaseSceneScraper):
             site = "femoutxxx"
         if ".ladyboy.xxx" in response.url:
             site = "ladyboyxxx"
+        if ".realtgirls.com" in response.url:
+            site = "realtgirls"
         if ".tgirljapan.com" in response.url:
             site = "tgirljapancom"
         if ".tgirls.xxx" in response.url:
             site = "tgirlsxxx"
+        if ".tgirlx.com" in response.url:
+            site = "tgirlx"
         return match_site(site)
 
     def get_date(self, response):

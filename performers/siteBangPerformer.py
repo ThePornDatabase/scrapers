@@ -6,9 +6,8 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class SiteBangPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//h2[contains(@class,"capitalize")]/text()',
-        'image': '//meta[@property="og:image"]/@content',
-        're_image': r'(.*)\?',
+        'name': '//div[contains(@class, "items-start")]/h2/text()',
+        'image': '',
         'image_blob': True,
         'bio': '',
         'gender': '',
@@ -46,3 +45,19 @@ class SiteBangPerformerSpider(BasePerformerScraper):
         performers = response.xpath('//div[contains(@class, "rounded-xl")]/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, cookies=self.cookies, headers=self.headers)
+
+    def get_image(self, response):
+        image = response.xpath('//section[contains(@class, "relative")]/div[contains(@class, "relative")]//picture/source/@srcset')
+        if image:
+            image = image.get()
+            if "," in image:
+                image = image.split(",")
+            else:
+                image = [image]
+            for image_test in image:
+                if "200" in image_test:
+                    return re.search(r'(http.*?) ', image_test).group(1)
+            for image_test in image:
+                if "144" in image_test:
+                    return re.search(r'(http.*?) ', image_test).group(1)
+        return ""

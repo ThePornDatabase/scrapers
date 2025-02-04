@@ -16,7 +16,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         # ~ # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
-        # ~ # 'https://jayspov.net', Now Cloudflared
+         'https://jayspov.net', # Now Cloudflared
         # 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
@@ -49,8 +49,9 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     }
 
     cookies = [
+        {"name": "ageConfirmed", "value": "true"},
         {"name": "use_lang", "value": "val=en"},
-        {"name": "defaults", "value": "{'hybridView':'member'}"}
+        {"name": "defaults", "value": "{'hybridView':'member'}"},
     ]
 
     custom_scraper_settings = {
@@ -67,15 +68,16 @@ class AdultEmpireCashScraper(BaseSceneScraper):
     def start_requests(self):
         meta = {}
         meta['page'] = self.page
-        meta['playwright'] = True
+        # ~ meta['playwright'] = True
         meta['dont_redirect'] = True
-        yield scrapy.Request("https://www.18lust.com/tour", callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+        for link in self.start_urls:
+            meta['link'] = link
+            yield scrapy.Request(f"{link}/tour", callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
         meta = response.meta
 
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta)
+        yield scrapy.Request(url=self.get_next_page_url(meta['link'], self.page), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
         if "spankmonster" in response.url:
@@ -250,7 +252,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         if "wcpclub" in base or "thirdworld" in base:
             pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "conorcoxxx" in base:
-            pagination = "/conor-coxxx-clips.html?page=%s&hybridview=member"
+            # ~ pagination = "/conor-coxxx-clips.html?page=%s&hybridview=member"
+            pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "hornyhousehold" in base:
             pagination = "/watch-newest-clips-and-scenes.html?page=%s&hybridview=member"
         if "jayspov" in base:

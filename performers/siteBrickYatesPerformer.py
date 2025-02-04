@@ -7,7 +7,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class siteBrickYatesPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//h3[contains(text(),"About")]/text()',
+        'name': '//h1/strong/text()',
         'image': '//div[@class="profile-pic"]/img/@src0_3x',
         'cupsize': '//strong[contains(text(),"Measurements")]/following-sibling::text()',
         'weight': '//strong[contains(text(),"Measurements")]/following-sibling::text()',
@@ -19,9 +19,9 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
     }
 
     url = 'http://www.brickyates.com/'
-    
+
     paginations = {
-        '/tour/models/%s/latest/?g=f',
+        # ~ '/tour/models/%s/latest/?g=f',
         '/tour/models/%s/latest/?g=m',
     }
 
@@ -64,7 +64,7 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
         name = self.process_xpath(response, self.get_selector_map('name')).get().strip()
         name = name.replace("About", "").strip()
         return name
-        
+
     def get_performers(self, response):
         meta = response.meta
         performers = response.xpath('//div[@class="item-portrait"]/a/@href').getall()
@@ -91,8 +91,8 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
                     cupsize = measurements.replace(strip,"")
                     if cupsize and re.search('(\d+[a-z])', cupsize):
                         return cupsize.upper().strip()
-        return ''   
-        
+        return ''
+
 
     def get_weight(self, response):
         if 'cupsize' in self.selector_map:
@@ -103,8 +103,8 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
                     weight = re.search('(\d+lbs)', measurements).group(1)
                     if weight:
                         return weight.strip()
-        return ''   
-        
+        return ''
+
     def get_bio(self, response):
         return ''
 

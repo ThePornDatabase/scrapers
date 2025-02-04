@@ -111,7 +111,7 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
 
             try:
                 if item['url'] and item['id']:
-                    yield self.check_item(item, self.days)
+                    yield item
             except:
                 print(item)
     def get_next_page_url(self, base, page):

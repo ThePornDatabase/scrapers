@@ -11,7 +11,7 @@ class NetworkModelMediaSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.delphinefilms.com',
-        'https://www.modelmediaasia.com',
+        # 'https://www.modelmediaasia.com', # Split into standalone json scraper
         'https://www.jerkaoke.com',
     ]
 

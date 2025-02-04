@@ -1,7 +1,8 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
+true = True
+false = False
 
 class SiteCorbinFisherSpider(BaseSceneScraper):
     name = 'CorbinFisher'
@@ -12,6 +13,10 @@ class SiteCorbinFisherSpider(BaseSceneScraper):
     start_urls = [
         'https://www.corbinfisher.com',
     ]
+
+    custom_settings = {
+        'HTTPERROR_ALLOWED_CODES': [500]
+    }
 
     selector_map = {
         'title': '//div[contains(@class,"blogSpace")]/h2/text()',
@@ -25,7 +30,7 @@ class SiteCorbinFisherSpider(BaseSceneScraper):
         'tags': '',
         'external_id': r'.*/(.*?).html',
         'trailer': '',
-        'pagination': '/tour/categories/movies/%s/latest/'
+        'pagination': '/tour/categories/guys/%s/latest/'
     }
 
     def get_scenes(self, response):

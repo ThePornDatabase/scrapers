@@ -40,7 +40,7 @@ class PuffySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//a[@class="image-wrapper"]/@href').getall()
+        scenes = response.xpath('//li/div[contains(@style, "relative")]/a[1]/@href|//a[@class="image-wrapper"]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

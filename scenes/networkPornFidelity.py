@@ -11,14 +11,14 @@ class PornFidelitySpider(BaseSceneScraper):
     network = 'pornfidelity'
 
     start_urls = [
-        # ~ # 'https://www.teenfidelity.com',
+        # 'https://www.teenfidelity.com',
         'https://www.pornfidelity.com',
         # 'https://www.kellymadison.com'
     ]
     cookies = {'nats': 'MC4wLjMuNTguMC4wLjAuMC4w'}
 
     selector_map = {
-        'title': '//div[@class="level-item"]/text()',
+        'title': '//h1[@class="level-item"]/span/following-sibling::text()',
         'description': '//div[@class="column is-three-fifths"]/text()',
         'date': "",
         'image': '//script[contains(text(), ".jpg")]/text()',
@@ -50,7 +50,7 @@ class PornFidelitySpider(BaseSceneScraper):
             return None
 
     def get_title_full(self, response):
-        return response.xpath(self.get_selector_map('title'))[1].get().strip()
+        return response.xpath(self.get_selector_map('title')).get().strip()
 
     def get_title(self, response):
         # ~ print(response)
@@ -61,7 +61,7 @@ class PornFidelitySpider(BaseSceneScraper):
         return search.group(1).strip() + ' E' + search.group(2).strip()
 
     def get_site(self, response):
-        title = response.xpath(self.get_selector_map('title'))[1].get().strip()
+        title = response.xpath(self.get_selector_map('title')).get().strip()
         search = re.search('.+ - (.+) #(\\d+)', title)
         if search:
             return search.group(1).strip()
@@ -77,3 +77,13 @@ class PornFidelitySpider(BaseSceneScraper):
         description = super().get_description(response)
         description = description.replace("Episode Summary", "").strip()
         return description
+
+    def get_duration(self, response):
+        duration = response.xpath('//li//text()[contains(., "mins") and contains(., "Episode")]')
+        if duration:
+            duration = duration.get()
+            duration = re.sub(r'[^a-z0-9:]+', '', duration.lower().strip())
+            duration = re.search(r'(\d{1,2}\:\d{2})mins', duration)
+            if duration:
+                return self.duration_to_seconds(duration.group(1))
+        return ""

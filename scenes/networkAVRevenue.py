@@ -22,10 +22,16 @@ class NetworkAVRevenueSpider(BaseSceneScraper):
     }
 
     start_urls = [
+        'https://avidolz.com/feed?limit=0',
         'https://baberotica.com/feed?limit=0',
         'https://baberoticavr.com/feed?limit=0',
         'https://japanhdv.com/feed?limit=0',
         'https://tenshigao.com/feed?limit=0',
+        'https://avjiali.com/feed/?limit=0',
+        'https://nucosplay.com/feed/?limit=0',
+        'https://teenthais.com/feed/?limit=0',
+        'https://suckmevr.com/feed/?limit=0',
+        'https://vrpornpass.com/feed/?limit=0',
     ]
 
     selector_map = {
@@ -80,11 +86,15 @@ class NetworkAVRevenueSpider(BaseSceneScraper):
                     item['date'] = scenedate.isoformat()
             item['performers'] = self.get_fields(scene, './category[contains(@domain,"model")]//text()')
             tags = self.get_fields(scene, './category[not(contains(@domain,"model"))]//text()')
-            tags2 = tags.copy()
-            for tag in tags2:
-                matches = ['new model', 'cup size', 'hair color', 'teaser']
-                if any(x in tag.lower() for x in matches) or not len(tag) > 2:
-                    tags.remove(tag)
+            if tags:
+                tags2 = tags.copy()
+            else:
+                tags = []
+            if tags and tags2:
+                for tag in tags2:
+                    matches = ['new model', 'cup size', 'hair color', 'teaser']
+                    if any(x in tag.lower() for x in matches) or not len(tag) > 2:
+                        tags.remove(tag)
             item['tags'] = list(map(lambda x: x.strip().title(), tags))
 
             image = self.get_field(scene, './/media:content[@isDefault="true"]/@url')
@@ -96,18 +106,36 @@ class NetworkAVRevenueSpider(BaseSceneScraper):
             item['trailer'] = self.get_field(scene, './/media:content[contains(@url, "mp4")]/@url')
             item['url'] = self.get_field(scene, './link/text()').replace("https:https:", "https:").replace("http:http:", "http:")
             item['id'] = self.get_field(scene, './/guid//text()')
+            if "avidolz" in response.url:
+                item['site'] = "AVIdolz"
+                item['parent'] = "AVIdolz"
+            if "avjiali" in response.url:
+                item['site'] = "AVJiali"
+                item['parent'] = "AVJiali"
             if "japanhdv" in response.url:
                 item['site'] = "Japan HDV"
                 item['parent'] = "Japan HDV"
+            if "nucosplay" in response.url:
+                item['site'] = "NUCOSPLAY"
+                item['parent'] = "NUCOSPLAY"
             elif "baberoticavr" in response.url:
                 item['site'] = "Baberotica VR"
                 item['parent'] = "Baberotica VR"
             elif "baberotica" in response.url:
                 item['site'] = "Baberotica"
                 item['parent'] = "Baberotica"
+            elif "teenthais" in response.url:
+                item['site'] = "Teen Thais"
+                item['parent'] = "Teen Thais"
+            elif "suckmevr" in response.url:
+                item['site'] = "Suck Me VR"
+                item['parent'] = "Suck Me VR"
             elif "tenshigao" in response.url:
                 item['site'] = "Tenshigao"
                 item['parent'] = "Tenshigao"
+            elif "vrpornpass" in response.url:
+                item['site'] = "VR Porn Pass"
+                item['parent'] = "VR Porn Pass"
             item['network'] = 'AV Revenue'
 
             yield self.check_item(item, self.days)

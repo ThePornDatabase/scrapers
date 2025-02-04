@@ -57,12 +57,7 @@ class MetArtIntimateNetworkSpider(BaseSceneScraper):
         else:
             item['image'] = None
 
-        if 'hustler' in response.url:
-            item['image'] = 'https://cdn-hustlernetwork.metartnetwork.com/' + movie['media']['siteUUID'] + item['image']
-        elif 'lovehairy' in response.url or 'straplez' in response.url or 'alsscan' in response.url:
-            item['image'] = 'https://cdn.metartnetwork.com/' + movie['siteUUID'] + movie['splashImagePath']
-        else:
-            item['image'] = self.format_link(response, item['image'])
+        item['image'] = 'https://cdn.metartnetwork.com/' + movie['siteUUID'] + item['image']
 
         item['image_blob'] = self.get_image_blob_from_link(item['image'])
         item['duration'] = ''
@@ -70,7 +65,7 @@ class MetArtIntimateNetworkSpider(BaseSceneScraper):
             if movie['runtime'] > 60:
                 item['duration'] = movie['runtime']
 
-        item['date'] = self.parse_date(movie['publishedAt']).isoformat()
+        item['date'] = self.parse_date(movie['publishedAt']).strftime('%Y-%m-%d')
         item['tags'] = movie['tags']
         item['trailer'] = self.format_url(
             response.url, '/api/m3u8/' + movie['UUID'] + '.m3u8')

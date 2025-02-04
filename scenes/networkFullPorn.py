@@ -64,12 +64,12 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'https://analviolation.com',
         'https://badbrotherpov.com',
         'https://baddaddypov.com',
-        # ~ #'https://badfamilypov.com',  # Sites pulled from the sub-sites
-        'https://badmommypov.com',
+        'https://badfamilypov.com',  # Sub sites no longer available
+        # 'https://badmommypov.com',
         'https://brokensluts.net',
-        'https://badsisterpov.com',
+        # ~ # 'https://badsisterpov.com',
         'http://www.cumdumpsterteens.com/',
-        'https://daughterjoi.com',
+        # 'https://daughterjoi.com',
         'https://downtofuckdating.com/',
         'https://dtfsluts.com',
         'https://girlfaction.com',
@@ -77,7 +77,7 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'https://homemadeanalwhores.com',
         'https://jamesdeen.com',
         'https://lesbiananalsluts.com',
-        'https://mommyjoi.com',
+        # 'https://mommyjoi.com',
         'https://mugfucked.com',
         'https://onlyprince.com',
         'https://pervertgallery.com',
@@ -115,7 +115,8 @@ class FullPornNetworkSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"video_preview")]/a/@href').getall()
+        # ~ scenes = response.xpath('//div[contains(@class,"video_preview")]/a/@href').getall()
+        scenes = response.xpath('//div[contains(@class,"video-thumbnail-link")]/ancestor::a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

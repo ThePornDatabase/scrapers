@@ -12,6 +12,7 @@ class SexMexSpider(BaseSceneScraper):
 
     start_urls = [
         'https://sexmex.xxx/'
+        'https://exposedlatinas.com'
     ]
 
     selector_map = {
@@ -63,7 +64,10 @@ class SexMexSpider(BaseSceneScraper):
             item['id'] = sceneid
             item['type'] = 'Scene'
             item['trailer'] = ''
-            item['site'] = 'SexMex'
+            if "exposedlatinas" in response.url:
+                item['site'] = 'Exposed Latinas'
+            else:
+                item['site'] = 'SexMex'
             item['parent'] = 'SexMex'
             item['network'] = 'SexMex'
             item['url'] = scene

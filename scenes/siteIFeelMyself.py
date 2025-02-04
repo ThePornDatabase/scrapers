@@ -40,18 +40,22 @@ class IFeelMyselfSpider(BaseSceneScraper):
                         datealt = datealt.group(1)
                         passdate = self.parse_date(datealt, ['%d %b %Y']).isoformat()
                 scenelink = scene.xpath('.//a[contains(@href, "javascript")]').get()
+                scene_id = ""
+                artist_id = ""
                 try:
                     split = scenelink.split("'")
+                    scene_id = split[1]
+                    artist_id = split[3]
                 except:
                     errortext = scene.xpath('.//b/a[contains(@href, "public")]/../..//text()').getall()
                     errortext = " ".join(errortext).replace("\n", " ").replace("  ", " ")
+                    # ~ print(f"Scenelink: {scenelink}")
                     print(f"Error on parsing: {errortext}")
-                scene_id = split[1]
-                artist_id = split[3]
 
-                yield scrapy.Request(
-                    url="https://ifeelmyself.com/public/main.php?page=flash_player&out=bkg&media_id=" + scene_id + "&artist_id=" + artist_id,
-                    callback=self.parse_scene, meta={'site': 'I Feel Myself', 'imagealt': imagealt, 'datealt': passdate})
+                if scene_id and artist_id:
+                    yield scrapy.Request(
+                        url="https://ifeelmyself.com/public/main.php?page=flash_player&out=bkg&media_id=" + scene_id + "&artist_id=" + artist_id,
+                        callback=self.parse_scene, meta={'site': 'I Feel Myself', 'imagealt': imagealt, 'datealt': passdate})
 
     def get_title(self, response):
         title = response.xpath('//span[@class="entryHeadingFlash"]//a[1]/text()').get().replace("_", " ")
@@ -59,7 +63,14 @@ class IFeelMyselfSpider(BaseSceneScraper):
         return title
 
     def get_performers(self, response):
-        return [response.xpath('//span[@class="entryHeadingFlash"]/a[2]/text()').get().replace("_", " ")]
+        # ~ print(response.text)
+        # ~ print()
+        # ~ print()
+        # ~ print()
+        # ~ print()
+        # ~ print()
+        performers = response.xpath('//div[@class="blog-title-left"]/span[@class="entryHeadingFlash"]/a[2]/text()').get().replace("_", " ")
+        return [performers]
 
     def get_tags(self, response):
         tags = response.xpath('//table[@class="news_bottom_line"]/tr//text()').getall()
@@ -71,11 +82,22 @@ class IFeelMyselfSpider(BaseSceneScraper):
         fulltags2 = []
         for t in fulltags:
             t = t.replace(";", "")
-            t = t.replace("\\r", "")
-            t = t.replace("\\n", "")
-            t = t.replace("\\t", "")
+            t = t.replace("\r", "")
+            t = t.replace("\n", "")
+            t = t.replace("\t", "")
             t = t.replace("Explicit Content Solo", "")
             t = t.strip()
+            if "," in t:
+                t = t.split(",")
+                for tag in t:
+                    tag = tag.replace(";", "")
+                    tag = tag.replace("\r", "")
+                    tag = tag.replace("\n", "")
+                    tag = tag.replace("\t", "")
+                    tag = tag.replace("Explicit Content Solo", "")
+                    tag = tag.strip()
+                    fulltags2.append(tag)
+                t = ""
             if t:
                 fulltags2.append(t)
         return fulltags2
@@ -90,18 +112,22 @@ class IFeelMyselfSpider(BaseSceneScraper):
         for key in response.meta["scene"]:
             scene[key] = response.meta["scene"][key]
 
+        # ~ print(scene)
+
         # Override performers with search results (if other performers found)
         performers = response.xpath("//a[contains(@href,'artist')]/text()").getall()
-        performers = [p.replace("_", " ") for p in performers]
+        performers = [p.replace("_", " ").replace("\t", "").replace("\r", "").replace("\n", "") for p in performers]
+        performers = list(filter(None, performers))
+        # ~ print(f".{performers}.")
         if performers != []:
             scene["performers"] = performers
-            print(performers)
         yield scene
 
     def parse_scene(self, response):
         meta = response.meta
         for item in super().parse_scene(response):
-            keywords = item["title"].replace(" ", "+")
+            # ~ keywords = item["title"].replace(" ", "+")
+            keywords = item["title"]
             if "tags.png" in item['image']:
                 item['image'] = meta['imagealt']
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])

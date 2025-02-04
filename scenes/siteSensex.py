@@ -24,7 +24,7 @@ class SiteSensexSpider(BaseSceneScraper):
         'duration': '',
         'trailer': '',
         'external_id': r'.*/(.*?)$',
-        'pagination': '/videos/%s/',
+        'pagination': '/videos/d/%s/',
         'type': 'Scene',
     }
 

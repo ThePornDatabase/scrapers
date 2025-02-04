@@ -1,150 +1,81 @@
-import json
+import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SmartMediaStarSpider(BaseSceneScraper):
-    name = 'SmartMediaStar'
+class NetworkSmartMediaStarJSONSpider(BaseSceneScraper):
+    name = 'SmartMediaStarJSON'
     network = 'Smart Media Star'
     parent = 'Smart Media Star'
 
-    per_page = 15
-
-    # Creates individual versions if multiple perspectives are found
-    split_versions = True
-    # Use perspective thumbnail instead of main thumbnail found on /videos page
-    use_perspective_thumbnail = False
-    # Always add (<perspective>) to video title regardless of whether perspective is main perspective
-    always_label_perspective = False
-
     start_urls = [
-        'https://realitylovers.com',
-        'https://tsvirtuallovers.com'
+        'https://engine.realitylovers.com',
+        'https://engine.tsvirtuallovers.com'
     ]
 
     selector_map = {
-        'description': '//p[@itemprop="description"]//text()',
-        'performers': '//a[@itemprop="actor"]/text()',
-        'tags': '//a[@itemprop="keyword"]/text()',
-        're_scene_data': r'const sceneData = (\{[^;]+)\;',
-        'external_id': r'\/vd\/([0-9]+)\/',
-        'pagination': '',
+        'external_id': r'',
+        'pagination': '/content/videos?max=12&page=%s&pornstar=&category=&perspective=&sort=NEWEST',
         'type': 'Scene',
     }
 
-    sites = {
-        'realitylovers': "Reality Lovers",
-        'tsvirtuallovers': "TS Virtual Lovers"
-    }
-
-    def start_requests(self):
-        for link in self.start_urls:
-            yield scrapy.Request(
-                url=f"{link}/videos/search",
-                callback=self.parse,
-                method='POST',
-                headers={'Content-Type': 'application/json', 'Referer': f"{link}/videos"},
-                meta={'page': self.page},
-                body=self.create_post_data(self.page, self.per_page)
-            )
-
-    def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
-        count = 0
-        for scene in scenes:
-            count += 1
-            yield scene
-
-        if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
-                meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=response.url,
-                                     callback=self.parse,
-                                     meta=meta,
-                                     method="POST",
-                                     body=self.create_post_data(meta['page'], self.per_page),
-                                     headers={'Content-Type': 'application/json'},
-                                     cookies=self.cookies)
+    def get_next_page_url(self, base, page):
+        page = str(int(page) - 1)
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.json()['contents']
-        for scene in scenes:
-            meta['id'] = scene['id']
-            meta['title'] = scene['title']
-            meta['date'] = self.parse_date(scene['released']).isoformat()
-            meta['image'] = self.get_main_image_from_srcset(scene['mainImageSrcset'])
+        jsondata = response.json()
+        for scene in jsondata['contents']:
+            sceneid = scene['id']
+            if "tsvirtuallovers" in response.url:
+                link = f"https://engine.tsvirtuallovers.com/content/videoDetail?contentId={sceneid}"
+            elif "realitylovers" in response.url:
+                link = f"https://engine.realitylovers.com/content/videoDetail?contentId={sceneid}"
+            yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
-            url = scene['videoUri']
-            yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene, meta=meta)
+    def parse_scene(self, response):
+        scene = response.json()
+        item = self.init_scene()
 
-    def parse_scene(self, response, **kwargs):
-        item = next(super().parse_scene(response, **kwargs))
+        item['title'] = self.cleanup_title(scene['title'])
+        if "vr porn video" in item['title'].lower():
+            item['title'] = self.cleanup_title(item['title'].lower().replace("vr porn video", "").strip())
 
-        if self.split_versions:
-            scenedata = self.get_scene_data(response)
+        item['description'] = self.cleanup_description(scene['description'])
+        item['date'] = scene['releaseDate']
 
-            for scene in scenedata:
-                localitem = item.copy()
+        if "mainImages" in scene and scene['mainImages']:
+            image = scene['mainImages'][0]['imgSrcSet']
+            image = re.search(r'.*?(http.*?)\s', image).group(1)
 
-                localitem['id'] = scene['id']
-
-                if self.use_perspective_thumbnail:
-                    localitem['image'] = self.get_main_image_from_srcset(scene['imgSrcSet'])
-
-                localitem['duration'] = scene['durationSec']
-
-                if not scene['main'] or self.always_label_perspective:
-                    localitem['title'] += f" ({scene['perspective']})"
-
-                yield self.check_item(localitem, self.days)
+        if image:
+            item['image'] = image
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
         else:
-            yield self.check_item(item, self.days)
+            item['image'] = ''
+            item['image_blob'] = ''
 
-    def get_site(self, response):
-        site = super().get_site(response)
-        return self.sites[site]
+        if "tsvirtuallovers" in response.url:
+            item['url'] = f"https://tsvirtuallovers.com/{scene['canonicalUri']}"
+            item['site'] = "TS Virtual Lovers"
+        elif "realitylovers" in response.url:
+            item['url'] = f"https://realitylovers.com/{scene['canonicalUri']}"
+            item['site'] = "Reality Lovers"
 
-    def get_tags(self, response):
-        tags = super().get_tags(response)
-        if "Virtual Reality" not in tags:
-            tags.append("Virtual Reality")
-        return tags
+        item['id'] = scene['contentId']
+        item['trailer'] = scene['trailerUrl']
+        item['network'] = self.network
+        item['parent'] = self.parent
 
-    def get_description(self, response):
-        description = super().get_description(response)
-        description = self.cleanup_description(description.replace(" … Read more", ""))
-        return description
+        item['performers'] = []
+        if "starring" in scene and scene['starring']:
+            for perf in scene['starring']:
+                item['performers'].append(perf['name'])
 
-    def get_scene_data(self, response):
-        script = response.xpath('//script[contains(text(),"const sceneData")]/text()').get()
-        jsondata = self.get_from_regex(script, "re_scene_data")
-        data = json.loads(jsondata.strip())
+        item['tags'] = []
+        if "categories" in scene and scene['categories']:
+            for tag in scene['categories']:
+                item['tags'].append(tag['name'])
 
-        perspectivedata = []
-        for scene in data['povScenes']:
-            scene['perspective'] = "POV"
-            scene['main'] = scene['id'] == data['firstSceneId']
-            perspectivedata.append(scene)
-
-        for scene in data['voyeurScenes']:
-            scene['perspective'] = "Voyeur"
-            scene['main'] = scene['id'] == data['firstSceneId']
-            perspectivedata.append(scene)
-
-        return perspectivedata
-
-    @staticmethod
-    def create_post_data(page, per_page):
-        return json.dumps({"searchQuery": "", "categoryId": None, "perspective": None, "actorId": None, "offset": (page - 1) * per_page, "isInitialLoad": False, "sortBy": "NEWEST", "videoView": "MEDIUM", "device": "DESKTOP"})
-
-    @staticmethod
-    def get_main_image_from_srcset(srcset):
-        images = dict(map(lambda image: (image.split(" ")[1], image.split(" ")[0]), srcset.split(",")))
-        for size in ['2x', '1x']:
-            if size in images:
-                return images[size]
-
-        return None
+        yield self.check_item(item, self.days)

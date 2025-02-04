@@ -67,7 +67,7 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h2[@class="update-info-title"]/text()',
+        'title': '//span[@class="active-crumb"]/text()',
         # ~ 'description': '//p[contains(@class,"ap-limited-description-text")]/text()',  # Blocked due to public scenes having generic site descriptions
         'description': '',
         'date': '//div[contains(@class, "player-wrapper")]//span[@class="description-releasedate"]/text()',

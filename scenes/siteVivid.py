@@ -41,6 +41,10 @@ class SiteVividSpider(BaseSceneScraper):
         jsondata = response.json()
         jsondata = jsondata['responseData']
         for scene in jsondata:
+            print(scene)
+            print()
+            print()
+            print()
             meta = {}
             meta['id'] = scene['id']
             meta['title'] = scene['name']
@@ -48,9 +52,11 @@ class SiteVividSpider(BaseSceneScraper):
             meta['parent'] = "Vivid"
             meta['network'] = "Vivid"
             meta['date'] = scene['release_date']
-            meta['image'] = scene['placard_800']
-            if not meta['image']:
+            if "placard_800" in scene and scene['placard_800']:
+                meta['image'] = scene['placard_800']
+            else:
                 meta['image'] = scene['placard']
+
             if "cast" in scene:
                 meta['performers'] = []
                 for model in scene['cast']:
@@ -69,3 +75,7 @@ class SiteVividSpider(BaseSceneScraper):
         page = str((int(page) - 1) * 24)
         url = self.format_url(base, self.get_selector_map('pagination') % page)
         return url
+
+    def get_image(self, response):
+        meta = response.meta
+        return meta['image']

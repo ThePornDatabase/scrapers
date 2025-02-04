@@ -62,6 +62,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         ['Marica Hase', '108'],
         ['Mason Moore', '6'],
         ['Mia Lelani', '80'],
+        ['Misha Montana', '141'],
         ['Mr. Facial', '17'],
         ['My Doll Parts', '125'],
         ['Nadia White', '121'],
@@ -140,6 +141,10 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
             meta['parent'] = meta['site']
             meta['network'] = "Puba Network"
             meta['trailer'] = ''
+            if "time" in jsonentry and jsonentry['time']:
+                meta['duration'] = self.duration_to_seconds(jsonentry['time'])
+            else:
+                meta['duration'] = None
             if meta['url'] and meta['id']:
                 yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta)
 
@@ -161,6 +166,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         item['description'] = self.cleanup_description(meta['title'])
         item['description'] = item['description'].replace("&amp;", "&")
         item['performers'] = self.get_performers(response)
+        item['duration'] = meta['duration']
         item['id'] = meta['id']
         item['site'] = meta['site']
         item['parent'] = meta['parent']

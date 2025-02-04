@@ -22,9 +22,9 @@ class SiteFit18Spider(BaseSceneScraper):
                 "after": "",
                 "limit": 15
             },
-            "query": "query ListVideo($order: [OrderEntry!], $after: ID, $limit: Int) {\n  video {\n    list(input: {order: $order, after: $after, first: $limit}) {\n      result {\n        edges {\n          node {\n            videoId\n            title\n            description {\n              long\n            }\n            talent {\n              type\n              talent {\n                talentId\n                name\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+            "query": "query ListVideo($order: [OrderEntry!], $after: ID, $limit: Int) {\n  video {\n    list(input: {order: $order, after: $after, first: $limit}) {\n      result {\n        edges {\n          node {\n            videoId\n            title\n            duration\n     description {\n              long\n            }\n            talent {\n              type\n              talent {\n                talentId\n                name\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
         }
-        url = "https://fit18.team18.app/graphql"
+        url = "https://fit18.team18media.app/graphql"
         scenequery = json.dumps(scenequery)
         yield Request(url, headers=self.headers, body=scenequery, method="POST", callback=self.get_scenes)
 
@@ -48,6 +48,7 @@ class SiteFit18Spider(BaseSceneScraper):
             sceneid = jsonrow['node']['videoId']
             item['id'] = sceneid.replace(":", "-")
             item['title'] = self.cleanup_title(jsonrow['node']['title'])
+            item['duration'] = jsonrow['node']['duration']
             item['description'] = self.cleanup_description(jsonrow['node']['description']['long'])
             item['performers'] = []
             for performer in jsonrow['node']['talent']:
@@ -71,7 +72,7 @@ class SiteFit18Spider(BaseSceneScraper):
                     ]
                 },
                 "query": "query BatchFindAssetQuery($paths: [String!]!) {\n  asset {\n    batch(input: {paths: $paths}) {\n      result {\nserve {\n uri\n}\n}\n}\n}\n}\n"}
-            url = "https://fit18.team18.app/graphql"
+            url = "https://fit18.team18media.app/graphql"
             imagequery = json.dumps(imagequery)
             yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
 
