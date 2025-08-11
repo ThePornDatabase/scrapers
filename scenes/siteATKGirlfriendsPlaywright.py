@@ -217,11 +217,14 @@ class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):
     def get_image(self, response):
         image = super().get_image(response)
         if not image or "/" not in image:
-            imagealt = response.xpath('//div[contains(@style,"background")]/@style')
-            if imagealt:
-                imagealt = re.search(r'url\(\"(http.*)\"\)', imagealt.get())
-                if imagealt:
-                    imagealt = imagealt.group(1)
-                    imagealt = self.format_link(response, imagealt)
-                    return imagealt.replace(" ", "%20")
-        return image
+            image = response.xpath('//div[contains(@style,"background")]/@style')
+            if image:
+                image = image.get()
+        if "url(" in image:
+            image = re.search(r'url\([\"\'](http.*)(?:[\"\']\))?$', image)
+            if image:
+                image = image.group(1)
+
+        if image:
+            image = self.format_link(response, image)
+        return image.replace(" ", "%20")

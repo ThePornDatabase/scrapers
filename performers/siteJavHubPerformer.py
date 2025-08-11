@@ -1,12 +1,12 @@
 import html
-
+import json
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 
 
 class SiteJavHubPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'pagination': '/models?page=%s',
+        'pagination': '/models?page=%s&order_by=publish_date&sort_by=desc',
         'external_id': 'girls/(.+)/?$'
     }
 
@@ -17,45 +17,67 @@ class SiteJavHubPerformerSpider(BasePerformerScraper):
     ]
 
     def get_performers(self, response):
-        performers = response.xpath('//div[@class="model-item"]')
-        for performer in performers:
-            item = PerformerItem()
+        jsondata = response.xpath('//script[@id="__NEXT_DATA__"]/text()')
+        if jsondata:
+            jsondata = json.loads(jsondata.get())
+            jsondata = jsondata['props']['pageProps']
+            for jsonrow in jsondata['models']['data']:
+                item = PerformerItem()
+                item['name'] = self.cleanup_title(jsonrow['name'])
+                item['image'] = jsonrow['thumb']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['url'] = f"https://javhub.com/models/{jsonrow['slug']}"
+                item['network'] = 'JavHub'
+                item['astrology'] = None
 
-            name = performer.xpath('./h3/a/text()')
-            if name:
-                item['name'] = html.unescape(name.get().strip().title())
+                if "Bio" in jsonrow:
+                    item['bio'] = self.cleanup_text(jsonrow['Bio'])
+                else:
+                    item['bio'] = None
 
-            image = performer.xpath('./div/a/@data-image')
-            if image:
-                item['image'] = self.format_link(response, image.get())
-            else:
-                item['image'] = None
+                if "Birthdate" in jsonrow:
+                    item['birthday'] = self.parse_date(jsonrow['Birthdate']).isoformat()
+                else:
+                    item['birthday'] = None
 
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                if "Born" in jsonrow:
+                    item['birthplace'] = self.cleanup_text(jsonrow['Born'])
+                else:
+                    item['birthplace'] = None
 
-            url = performer.xpath('./div/a/@href')
-            if url:
-                item['url'] = self.format_link(response, url.get().strip()).replace(" ", "%20")
-            else:
-                item['url'] = response.url
+                if "Eyes" in jsonrow:
+                    item['eyecolor'] = self.cleanup_text(jsonrow['Eyes'])
+                else:
+                    item['eyecolor'] = None
 
-            item['network'] = 'JavHub'
+                if "Hair" in jsonrow:
+                    item['haircolor'] = self.cleanup_text(jsonrow['Hair'])
+                else:
+                    item['haircolor'] = None
 
-            item['astrology'] = ''
-            item['bio'] = ''
-            item['birthday'] = ''
-            item['birthplace'] = ''
-            item['cupsize'] = ''
-            item['ethnicity'] = ''
-            item['eyecolor'] = ''
-            item['fakeboobs'] = ''
-            item['gender'] = 'Female'
-            item['haircolor'] = ''
-            item['height'] = ''
-            item['measurements'] = ''
-            item['nationality'] = ''
-            item['piercings'] = ''
-            item['tattoos'] = ''
-            item['weight'] = ''
+                if "Height" in jsonrow:
+                    item['height'] = self.cleanup_text(jsonrow['Height'])
+                else:
+                    item['height'] = None
 
-            yield item
+                if "Weight" in jsonrow:
+                    item['weight'] = self.cleanup_text(jsonrow['Weight'])
+                else:
+                    item['weight'] = None
+
+                item['ethnicity'] = None
+                item['fakeboobs'] = None
+                item['gender'] = 'Female'
+
+                if "Measurements" in jsonrow and re.search(r'(\d{1,3}\w+?)-\d{2,3}-\d{2,3}', jsonrow['Measurements']):
+                    item['measurements'] = jsonrow['Measurements']
+                    item['cupsize'] = re.search(r'(\d{1,3}\w+?)-\d{2,3}-\d{2,3}', jsonrow['Measurements']).group(1)
+                else:
+                    item['measurements'] = None
+                    item['cupsize'] = None
+
+                item['nationality'] = None
+                item['piercings'] = None
+                item['tattoos'] = None
+
+                yield item

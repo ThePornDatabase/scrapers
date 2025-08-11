@@ -20,6 +20,7 @@ class GayDVDEmpireMovieSpider(BaseSceneScraper):
         'https://www.gaydvdempire.com'
     ]
 
+    cookies = [{"name":"ageConfirmed","value":"true"},{"name":"defaults","value":"{}"}]
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
 
     selector_map = {
@@ -139,7 +140,7 @@ class GayDVDEmpireMovieSpider(BaseSceneScraper):
         item['tags'] = self.get_tags(response)
         item['id'] = self.get_id(response)
         item['trailer'] = self.get_trailer(response)
-        item['network'] = "Adult DVD Empire"
+        item['network'] = self.get_studio(response)
         item['site'] = self.get_studio(response)
         item['parent'] = self.get_studio(response)
         item['director'] = self.get_director(response)

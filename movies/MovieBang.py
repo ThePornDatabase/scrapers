@@ -92,7 +92,7 @@ class MovieBangSpider(BaseSceneScraper):
                 item['site'] = re.sub('[^a-zA-Z0-9-]', '', response.xpath('//p[contains(text(), "Studio:")]/a/text()').get())
                 item['trailer'] = ""
                 item['store'] = 'Bang'
-                item['network'] = 'Bang'
+                item['network'] = item['site']
                 item['parent'] = item['site']
 
                 # ~ sceneurls = response.xpath('//div[@class="scene-section"]/div/div/a[contains(@href, "/video/")][1]/@href').getall()

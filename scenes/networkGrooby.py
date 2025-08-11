@@ -39,14 +39,14 @@ class NetworkGroobySpider(BaseSceneScraper):
     network = 'Grooby Network'
 
     start_urls = [
-        # ~ # 'https://www.asianamericantgirls.com', In grooby.club
+        # 'https://www.asianamericantgirls.com', In grooby.club
         'https://www.black-tgirls.com',
         'https://www.blacktgirlshardcore.com',
         'https://www.bobstgirls.com',
         'https://www.brazilian-transsexuals.com',
         'https://www.braziltgirls.xxx',
-        # ~ # 'https://www.canada-tgirl.com', In grooby.club
-        # ~ # 'https://www.euro-tgirls.com', In grooby.club
+        # 'https://www.canada-tgirl.com', In grooby.club
+        # 'https://www.euro-tgirls.com', In grooby.club
         'https://www.grooby.club/',
         'https://www.femout.xxx',
         'https://www.femoutsex.xxx',
@@ -79,7 +79,10 @@ class NetworkGroobySpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//div[contains(@class,"sexyvideo")]')
+        if "grooby.club" in response.url:
+            scenes = response.xpath('//div[@class="videoblock"]/ancestor::div[contains(@class,"sexyvideo")][1]')
+        else:
+            scenes = response.xpath('//div[contains(@class,"sexyvideo")]')
         for scene in scenes:
             scenedate = scene.xpath('.//i[contains(@class, "fa-calendar")]/following-sibling::text()')
             if scenedate:
@@ -98,17 +101,24 @@ class NetworkGroobySpider(BaseSceneScraper):
                 meta['title'] = self.cleanup_title(title.get())
 
             site = scene.xpath('./div/div[@class="sitename"]/comment()/following-sibling::text()')
+            if not site:
+                site = scene.xpath('./div/div[@class="sitename"]/a/i/following-sibling::text()')
             if site:
                 site = site.getall()
-                site = self.cleanup_title("".join(site).strip())
+                site = self.cleanup_title("".join(site).strip()).replace("&nbsp;", "")
                 if site.lower() == "uk-tgirls.com":
                     site = "UK TGirls"
                 meta['site'] = site
                 meta['parent'] = site
 
-            scene = scene.xpath('.//h4/a/@href|.//div[@class="videohere"]/a/@href').get()
-            scene = self.format_link(response, scene)
-            if re.search(self.get_selector_map('external_id'), scene):
+            if "grooby.club" in response.url:
+                scene = scene.xpath('.//h4/a/@href').get()
+            else:
+                scene = scene.xpath('.//h4/a/@href|.//div[@class="videohere"]/a/@href').get()
+            if scene and scene.startswith("//"):
+                scene =  "https:" + scene
+
+            if scene and re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
@@ -117,7 +127,7 @@ class NetworkGroobySpider(BaseSceneScraper):
         tags = ['Trans']
         tagset = map(str.strip, response.xpath(self.get_selector_map('tags')).getall())
         tags.extend(tagset)
-        
+
         if "transexpov" in response.url:
             tags.append("POV")
         if "asian" in response.url:

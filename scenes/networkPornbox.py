@@ -16,6 +16,15 @@ class SitePornboxSpider(BaseSceneScraper):
         'https://pornbox.com',
     ]
 
+    headers = {
+        'X-Requested-With': 'XMLHttpRequest',
+    }
+
+    cookies = [
+        {"name": "agree18", "value": "1"},
+        {"name": "version_website_id", "value": "j:[25,1013,1401,1402]"},
+    ]
+
     selector_map = {
         'title': "//h1[@class='watchpage-title']//text()",
         'description': '//div[@class="scene-description__row" and contains(., "Description")]//following-sibling::dd/text()',
@@ -25,8 +34,8 @@ class SitePornboxSpider(BaseSceneScraper):
         'duration': "//i[@class='fa fa-clock-o']/following-sibling::text()",
         'external_id': '\\/watch\\/(\\d+)',
         'trailer': '',
-        # ~ 'pagination': '/store/new-scenes/%s'
-        'pagination': '/niche/234/?skip=%s&sort=latest&_=1731108446109'
+        'pagination': '/store/new-scenes/%s'
+        # ~ 'pagination': '/niche/234/?skip=%s&sort=latest&_=1731108446109'
         # ~ 'pagination': '/studio/1275/?skip=%s&sort=recent&_=1688689939'
     }
 
@@ -47,7 +56,7 @@ class SitePornboxSpider(BaseSceneScraper):
         jsondata = jsondata['contents']
         for scene in jsondata:
             url = f"https://pornbox.com/contents/{scene['id']}"
-            yield scrapy.Request(url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
+            yield scrapy.Request(url, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
         meta = response.meta
@@ -107,14 +116,14 @@ class SitePornboxSpider(BaseSceneScraper):
         else:
             item['trailer'] = ""
         item['url'] = f"https://pornbox.com/application/watch-page/{scene['id']}"
-        item['network'] = 'Legal Porno'
-        item['parent'] = 'Legal Porno'
+        item['network'] = item['site']
+        item['parent'] = item['site']
 
         matches = ['bangbros', 'jeffsmodels', 'private', 'exposedlatinas', 'antoniosuleiman', 'bradmontana', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
-                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
+                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov', 'joibabes',
                    'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
                    'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouchx', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue', 'plantsvscunts',
-                   'mugurporn', 'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'gotfilled', 'alexlegend', 'aglaeaproductions']
+                   'mugurporn', 'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'gotfilled', 'alexlegend', 'aglaeaproductions', 'mrlucky', 'mrluckypov', 'povmasters', 'dripdrop', 'dripdropprod', 'artemixxx', 'theartemixxx']
         if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
             yield self.check_item(item, self.days)

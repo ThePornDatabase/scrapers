@@ -21,6 +21,7 @@ class MovieAdultDVDEmpireSpider(BaseSceneScraper):
         'https://www.adultdvdempire.com'
     ]
 
+    cookies = [{"name":"ageConfirmed","value":"true"},{"name":"defaults","value":"{}"}]
     custom_settings = {'AUTOTHROTTLE_ENABLED': 'True', 'AUTOTHROTTLE_DEBUG': 'False'}
 
     selector_map = {

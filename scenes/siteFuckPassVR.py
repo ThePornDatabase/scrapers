@@ -14,11 +14,11 @@ class SiteFuckpassVRSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[contains(@class, "video__top")]/h2[@class="video__title"]/text()',
+        'title': '//h1/text()',
         'description': '//div[contains(@class, "readMoreWrapper2")]/p//text()',
         'date': '//span[contains(text(), "Released")]/following-sibling::text()',
         'date_formats': ['%b %d %Y'],
-        'image': '//web-vr-video-player/@coverimage',
+        'image': '//meta[@property="og:image"]/@content',
         'performers': '//span[contains(text(), "Starring")]/following-sibling::a/span/text()',
         'tags': '//span[contains(text(), "Tags")]/following-sibling::a/text()',
         'duration': '',
@@ -47,7 +47,7 @@ class SiteFuckpassVRSpider(BaseSceneScraper):
         return tags
 
     def get_image(self, response):
-        image = response.xpath('//web-vr-video-player/@coverimage')
+        image = response.xpath('//pornhall-player/@poster')
         if image:
             image = image.get()
             if "'" in image:

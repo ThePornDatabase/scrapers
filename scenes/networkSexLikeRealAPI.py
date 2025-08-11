@@ -1,4 +1,5 @@
 import re
+from requests import get
 import string
 import datetime
 import scrapy
@@ -24,9 +25,21 @@ class SexLikeRealSpider(BaseSceneScraper):
         'external_id': '(?:scenes|shemale|gay)\\/(.+)',
         'image': '//meta[@name="twitter:image1"]/@content or //meta[@name="twitter:image2"]/@content or //meta[@name="twitter:image3"]/@content or //meta[@name="twitter:image"]/@content',
         'trailer': '',
-        'pagination': '/scenes?type=premium&sort=most_recent&page=%s'
+        'pagination': '/scenes?type`=premium&sort=most_recent&page=%s'
         # ~ 'pagination': '/trans/studios/transexvr?page=%s'
     }
+
+    def start_requests(self):
+        ip = get('https://api.ipify.org').content.decode('utf8')
+        print('My public IP address is: {}'.format(ip))
+
+        meta = {}
+        if self.page == 1:
+            self.page = 5
+        meta['page'] = self.page
+
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta
@@ -64,7 +77,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         item['url'] = meta['url']
         item['date'] = datetime.datetime.utcfromtimestamp(json['date']).isoformat()
         item['site'] = json['paysite']['name']
-        item['network'] = self.network
+        item['network'] = item['site']
         item['parent'] = item['site']
 
         item['performers'] = []
@@ -88,10 +101,10 @@ class SexLikeRealSpider(BaseSceneScraper):
 
         shortsite = re.sub(r'[^a-z0-9]', '', item['site'].lower())
         item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
-        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr','badoink','realvr','kinkvr','babevr','vrcosplayx','18vr','wankzvr','vrhush','naughtyamerica']
+        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'blowvr', 'arporn', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr','badoink','realvr','kinkvr','babevr','vrcosplayx','18vr','wankzvr','vrhush','naughtyamerica']
         if not any(x in item['id'] for x in matches) and not any(x in shortsite for x in matches):
-            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers', 'porncorn', 'porncornvr']
+            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers', 'porncorn', 'porncornvr', 'vrlatina', 'povmasters']
             if not any(x in item['id'] for x in matches) and not any(x in shortsite for x in matches):
-                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink', 'slr-milfvr', 'milfvr', 'tranzvr']
+                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink', 'slr-milfvr', 'milfvr', 'tranzvr', 'girlsway', 'puretaboo', 'joibabes']
                 if not any(x in item['site'].lower() for x in matches) and not any(x in shortsite for x in matches):
                     yield self.check_item(item, self.days)

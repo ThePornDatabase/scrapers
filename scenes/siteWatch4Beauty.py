@@ -21,7 +21,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
     def start_requests(self):
 
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page),
+            yield scrapy.Request(url=self.get_next_page_url(self.page),
                                  callback=self.parse,
                                  meta={'page': self.page},
                                  headers=self.headers,
@@ -39,16 +39,19 @@ class Watch4BeautyScraper(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], response),
+                yield scrapy.Request(url=self.get_next_page_url(meta['page']),
                                      callback=self.parse,
                                      meta=meta,
                                      headers=self.headers,
                                      cookies=self.cookies)
 
     def get_scenes(self, response):
-        for scene in response.json():
-            if scene['issue_category'] == 6 or scene['issue_video_present'] == 1:
+        scenes = response.json()
+        for scene in scenes['latest']:
+            if ("issue_category" in scene and scene['issue_category'] == 6) or ("issue_video_present" in scene and scene['issue_video_present'] == 1):
                 yield scrapy.Request(url=self.format_link(response, '/api/issues/' + scene['issue_simple_title']), callback=self.parse_scene)
+            elif "magazine_category" in scene and scene['magazine_category'] == 3:
+                yield scrapy.Request(url=self.format_link(response, '/api/magazines/' + scene['magazine_simple_title']), callback=self.parse_magazine)
 
     def parse_scene(self, response):
         data = response.json()
@@ -72,6 +75,8 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['site'] = "Watch4Beauty"
             item['network'] = "Watch4Beauty"
             item['parent'] = "Watch4Beauty"
+            if "issue_size" in data and data['issue_size']:
+                item['duration'] = data['issue_size']
             item['url'] = "https://www.watch4beauty.com/updates/" + data['issue_simple_title']
             item['id'] = data['issue_id']
             item['trailer'] = ''
@@ -81,6 +86,39 @@ class Watch4BeautyScraper(BaseSceneScraper):
 
             modelurl = response.url + "/models"
             yield scrapy.Request(modelurl, callback=self.parse_models, meta={'item': item})
+
+    def parse_magazine(self, response):
+        data = response.json()
+        item = SceneItem()
+
+        if len(data):
+            data = data[0]
+            if ("backstage" in data and data['backstage']) or ("fhgbackstage" in data and data['fhgbackstage']):
+                item['title'] = data['magazine_title']
+                if len(item['title']) < 3:
+                    item['title'] = item['title'] + "."
+                if len(item['title']) < 3:
+                    item['title'] = item['title'] + "."
+                item['date'] = data['magazine_datetime']
+                if "Z" in item['date']:
+                    item['date'] = item['date'][:-1]
+                item['description'] = data['magazine_text']
+                item['tags'] = data['magazine_tags'].split(",")
+                item['tags'] = list(map(str.strip, item['tags']))
+                item['tags'] = list(map(str.capitalize, item['tags']))
+                item['tags'][:] = [x for x in item['tags'] if x]
+                item['site'] = "Watch4Beauty"
+                item['network'] = "Watch4Beauty"
+                item['parent'] = "Watch4Beauty"
+                item['url'] = f"https://www.watch4beauty.com/stories/{data['magazine_simple_title']}"
+                item['id'] = data['magazine_id']
+                item['trailer'] = ''
+                item['image'] = f"https://mh-c75c2d6726.watch4beauty.com/production/{datetime.fromisoformat(item['date']).strftime('%Y%m%d')}-magazine-cover-wide-2560.jpg"
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['performers'] = []
+
+                modelurl = response.url + "/models"
+                yield scrapy.Request(modelurl, callback=self.parse_models, meta={'item': item})
 
     def parse_models(self, response):
         item = response.meta['item']
@@ -96,15 +134,8 @@ class Watch4BeautyScraper(BaseSceneScraper):
 
         yield self.check_item(item, self.days)
 
-    def get_next_page_url(self, base, page, response=""):
-        if response:
-            oldestscene = datetime.now().isoformat()
-            for scene in response.json():
-                date = scene['issue_datetime']
-                if "Z" in date:
-                    date = date[:-1]
-                if date < oldestscene:
-                    oldestscene = date
-            date = (datetime.fromisoformat(date) - timedelta(days=1)).isoformat() + "Z"
-            return "https://www.watch4beauty.com/api/issues?before=" + date
-        return "https://www.watch4beauty.com/api/issues?before=" + datetime.now().isoformat()
+    def get_next_page_url(self, page):
+        if int(page) == 1:
+            return "https://www.watch4beauty.com/api/updates"
+        else:
+            return f"https://www.watch4beauty.com/api/updates?skip={str((int(page) - 1) * 50)}"

@@ -17,6 +17,18 @@ def match_site(argument):
         'spy26': "SPY26",
         'unrealporn': "Unreal Porn",
         'xvirtual': "XVirtual",
+        'redneckjohn': "RedNeckJohn",
+        'monstercockgang': "Monster Cock Gang",
+        'mikebigdick': "Mike Big Dick",
+        'unusualpeople': "Unusual People",
+        'powerfetish': "Power Fetish",
+        'annalovesshemale': "Anna Loves Shemale",
+        'therapyasmr': "Therapy ASMR",
+        'loveasmr': "Love ASMR",
+        'ghost-porn': "Ghost Porn",
+        'lifepornstories': "Lifeporn Stories",
+        'gayhorrorporn': "Gay Horror Porn",
+        'fuckmesensei': "Fuck Me Sensei",
     }
     return match.get(argument, argument)
 
@@ -36,6 +48,18 @@ class siteUnrealPornSpider(BaseSceneScraper):
         'https://spy26.com',
         'https://unrealporn.com',
         'https://xvirtual.com',
+        'https://fuckmesensei.com',
+        'https://gayhorrorporn.com',
+        'https://lifepornstories.com',
+        'https://monstercockgang.com',
+        'https://powerfetish.com',
+        'https://unusualpeople.com',
+        'https://mikebigdick.com',
+        'https://annalovesshemale.com',
+        'https://therapyasmr.com',
+        'https://loveasmr.com',
+        'https://ghost-porn.com',
+        'https://redneckjohn.com',
     ]
 
     selector_map = {

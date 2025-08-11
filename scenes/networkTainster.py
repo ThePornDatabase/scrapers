@@ -36,6 +36,19 @@ class SiteTainsterSpider(BaseSceneScraper):
         ['https://www.sinx.com/channel/Pornstars-At-Home/all', 'Pornstars At Home'],
         ["https://www.sinx.com/channel/Slime-Wave/all", 'Slimewave'],
         ["https://www.sinx.com/channel/Tyrannized/all", 'Tyrannized'],
+        ['https://www.sinx.com/channel/Upper-Class-Fuck-Fest/all', 'Upper-Class-Fuck-Fest'],
+        ['https://www.sinx.com/channel/Upper-Class-Fuck-Fest-Vol-2/all', 'Upper-Class-Fuck-Fest-Vol-2'],
+        ['https://www.sinx.com/channel/Lezboxx/all', 'Lezboxx'],
+        ['https://www.sinx.com/channel/Lezboxx-Vol-2/all', 'Lezboxx-Vol-2'],
+        ['https://www.sinx.com/Leather-Chronicle', 'Leather-Chronicle'],
+        ['https://www.sinx.com/X-Sorority', 'X Sorority'],
+        ['https://www.sinx.com/channel/Backstage-Bangers/all', 'Backstage Bangers'],
+        ['https://www.sinx.com/Big-Tits-On-Screen', 'Big Tits On Screen'],
+        ['https://www.sinx.com/channel/Bash-Bastards/all', 'Bash Bastards'],
+        ['https://www.sinx.com/Sex-In-Jeans', 'Sex In Jeans'],
+        ['https://www.sinx.com/Cutie-By-Nature', 'Cutie-By-Nature'],
+        ['https://www.sinx.com/channel/Pervy-Ones/all', 'Pervy Ones'],
+        ['https://www.sinx.com/Fisting-In-Action', 'Fisting In Action'],
     ]
 
 
@@ -51,9 +64,11 @@ class SiteTainsterSpider(BaseSceneScraper):
             meta['site'] = site[1]
             meta['parent'] = site[1]
             meta['network'] = "Tainster"
-            yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
-
-
+            if "/all" in link or "sexualOrientation" in link:
+                yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+            else:
+                meta['pagination'] = link + "?page=%s"
+                yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
         meta = response.meta

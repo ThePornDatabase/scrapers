@@ -19,7 +19,7 @@ class SiteCreamPiledSpider(BaseSceneScraper):
     cookies = {"name": "consent", "value": "true"}
 
     headers = {
-        'X-Nats-Cms-Area-Id': 2,
+        'X-Nats-Cms-Area-Id': '29c61dae-db14-419b-93a4-d016b928dee9',
         'X-Nats-Entity-Decode': 1,
     }
 

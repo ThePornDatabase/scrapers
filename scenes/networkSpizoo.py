@@ -83,7 +83,10 @@ class SpizooSpider(BaseSceneScraper):
             descriptionxpath = '//p[@class="description-scene"]/text()'
         else:
             descriptionxpath = '//p[@class="description"]/text()'
-        return response.xpath(descriptionxpath).get().strip()
+        description = response.xpath(descriptionxpath)
+        if description:
+            return description.get().strip()
+        return ""
 
     def get_site(self, response):
         return match_site(super().get_site(response))

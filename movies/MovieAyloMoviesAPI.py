@@ -15,12 +15,12 @@ class MovieAyloAPISpider(BaseSceneScraper):
     network = 'Mind Geek'
 
     start_urls = [
-        # ~ 'https://www.biempire.com',
-        # ~ 'https://www.digitalplayground.com',
-        # ~ 'https://www.iconmale.com',
-        # ~ 'https://www.milehighmedia.com',
-        # ~ 'https://www.milfed.com',
-        # ~ 'https://www.noirmale.com',
+        'https://www.biempire.com',
+        'https://www.digitalplayground.com',
+        'https://www.iconmale.com',
+        'https://www.milehighmedia.com',
+        'https://www.milfed.com',
+        'https://www.noirmale.com',
         'https://www.transsensual.com',
     ]
 
@@ -80,11 +80,11 @@ class MovieAyloAPISpider(BaseSceneScraper):
         meta = response.meta
         for scene in response.json()['result']:
             item = SceneItem()
-            print("Movie")
-            print("----------------------------------")
-            print(scene)
-            print()
-            print()
+            # ~ print("Movie")
+            # ~ print("----------------------------------")
+            # ~ print(scene)
+            # ~ print()
+            # ~ print()
             item['trailer'] = self.get_trailer(scene)
             item['id'] = str(scene['id'])
             item['title'] = string.capwords(scene['title'])
@@ -153,11 +153,11 @@ class MovieAyloAPISpider(BaseSceneScraper):
                     yield item
 
     def parse_scene(self, scene, movie):
-        print("Scene")
-        print("----------------------------------")
-        print(scene)
-        print()
-        print()
+        # ~ print("Scene")
+        # ~ print("----------------------------------")
+        # ~ print(scene)
+        # ~ print()
+        # ~ print()
         item = SceneItem()
 
         if len(scene['videos']):

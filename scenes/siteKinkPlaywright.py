@@ -16,7 +16,7 @@ class NetworkKinkSpider(BaseSceneScraper):
         # ~ '/search?type=shoots&sort=published&featuredIds=%s',
         # ~ '/search?type=shoots&sort=published&thirdParty=true&page=%s',
         # ~ '/shoots?channelIds=behindkink&thirdParty=false&sort=published&page=%s',
-        # ~ '/shoots?channelIds=brutalsessions&thirdParty=false&sort=published&page=%s',
+        # ~ '/shoots?channelIds=devicebondage&thirdParty=false&sort=published&page=%s',
     ]
 
     headers = {
@@ -40,7 +40,8 @@ class NetworkKinkSpider(BaseSceneScraper):
         'image': '//meta[@name="twitter:image"]/@content|//video/@poster|//a[contains(@class, "ratio-poster")]/img/@src',
         'duration': '//span[@class="clock"]/text()',
         'performers': '//p[@class="starring"]/span/a/text()|//span[contains(@class, "text-primary fs-5")]/a[contains(@href, "/model/")]/text()',
-        'tags': '//a[@class="tag"]/text()|//h4[contains(text(), "Categories")]/following-sibling::span[1]/a/text()',
+        # ~ 'tags': '//a[@class="tag"]/text()|//h4[contains(text(), "Categories")]/following-sibling::span[1]/a/text()',
+        'tags': '//div[contains(@class, "shoot-detail-description")]//a[contains(@href, "/tag/")]/text()',
         'external_id': r'/shoot/(\d+)',
         'trailer': '//meta[@name="twitter:player"]/@content|//div[contains(@class,"kvjs-container")]/@data-setup',
         're_trailer': r'trailer.*?quality.*?(http.*?)[\'\"]',

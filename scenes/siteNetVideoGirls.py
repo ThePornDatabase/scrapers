@@ -1,4 +1,5 @@
 import scrapy
+import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -34,25 +35,28 @@ class SiteNetVideoGirlsSpider(BaseSceneScraper):
         jsondata = response.json()
         jsondata = jsondata['result']['data']['allupdates']['nodes']
         for scene in jsondata:
-            item = SceneItem()
+            if scene['tour_stats']:
+                item = SceneItem()
 
-            item['network'] = 'NetVideoGirls'
-            item['parent'] = 'NetVideoGirls'
-            item['site'] = 'NetVideoGirls'
+                item['network'] = 'NetVideoGirls'
+                item['parent'] = 'NetVideoGirls'
+                item['site'] = 'NetVideoGirls'
 
-            item['date'] = scene['release_date']
-            if not item['date']:
-                item['date'] = None
-            item['title'] = scene['short_title']
-            item['id'] = scene['mysqlId']
-            item['url'] = 'https://netvideogirls.com/home'
+                item['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', scene['release_date'])
+                if item['date']:
+                    item['date'] = item['date'].group(1)
+                else:
+                    item['date'] = None
+                item['title'] = scene['short_title']
+                item['id'] = scene['mysqlId']
+                item['url'] = 'https://netvideogirls.com/home'
 
-            item['image'] = "https://netvideogirls.com/" + scene['tour_stats'][0]['tour_thumb']['localImage']['childImageSharp']['gatsbyImageData']['images']['fallback']['src']
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['image'] = "https://netvideogirls.com/" + scene['tour_stats'][0]['tour_thumb']['localImage']['childImageSharp']['gatsbyImageData']['images']['fallback']['src']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-            item['description'] = ''
-            item['performers'] = []
-            item['tags'] = ['Amateur', 'Audition']
-            item['trailer'] = ''
-            if item['date'] > "2021-01-01" or not item['date']:
-                yield self.check_item(item, self.days)
+                item['description'] = ''
+                item['performers'] = []
+                item['tags'] = ['Amateur', 'Audition']
+                item['trailer'] = ''
+                if item['date'] > "2021-01-01" or not item['date']:
+                    yield self.check_item(item, self.days)

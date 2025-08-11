@@ -62,5 +62,6 @@ class NetworkNookiesSpider(BaseSceneScraper):
                     image = image.group(1)
         else:
             image = image.get()
-        image = image.replace(" ", "%20")
+        if image:
+            image = image.replace(" ", "%20")
         return image

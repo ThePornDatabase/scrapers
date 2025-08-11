@@ -33,7 +33,7 @@ class SiteHeyzoPerformerSpider(BasePerformerScraper):
 
     def get_performers(self, response):
         meta = response.meta
-        performers = response.xpath('//h1[@class="long"]/following-sibling::ul/li/a[1]')
+        performers = response.xpath('//div[@class="actor_list"]//ul[not(@class)]//a[1]')
         for performer in performers:
             meta['name'] = performer.xpath('./img/@alt').get()
             meta['alt_image'] = performer.xpath('./img/@src').get()

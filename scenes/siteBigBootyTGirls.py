@@ -41,3 +41,8 @@ class SiteBigBootyTGirlsSpider(BaseSceneScraper):
 
     def get_parent(self, response):
         return "Big Booty Tgirls"
+
+    def get_id(self, response):
+        sceneid = super().get_id(response)
+        sceneid = sceneid.strip("-")
+        return sceneid

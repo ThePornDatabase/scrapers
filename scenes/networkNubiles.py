@@ -48,7 +48,7 @@ class NubilesSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//*[contains(@class, "content-pane-title")]/h2/text()',
-        'description': '.row .collapse::text',
+        'description': '//div[contains(@class, "content-pane-description")]/p/text()',
         'date': '//span[@class="date"]/text()',
         'image': '//video/@poster|//img[@class="fake-video-player-cover"]/@src',
         'performers': '//a[@class="content-pane-performer model"]/text()',

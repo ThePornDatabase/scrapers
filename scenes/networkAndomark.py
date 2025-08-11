@@ -114,7 +114,7 @@ class AndomarkSpider(BaseSceneScraper):
         'https://meanawolf.com',
         'https://meanawolfvintage.com',
         'https://www.minkaxxx.com',
-        'https://www.thejerkoffmembers.com',
+        # 'https://www.thejerkoffmembers.com', Moved to own scraper
         'https://xxxcellentadventures.com',
         'https://younggunsxxx.com',
         'https://yummybikinimodel.com',
@@ -161,8 +161,10 @@ class AndomarkSpider(BaseSceneScraper):
             selector = '/categories/movies_%s_d.html'
         elif 'thejerkoff' in base:
             selector = '/categories/movies_%s_d.html'
-        elif 'shiny' in base or '4k' in base or 'charlieforde' in base:
+        elif '4k' in base or 'charlieforde' in base:
             selector = '/updates/page_%s.html'
+        elif 'shinybound' in base:
+            selector = '/updates?page=%s'
         else:
             selector = '/categories/movies_%s_d.html'
 
@@ -184,7 +186,7 @@ class AndomarkSpider(BaseSceneScraper):
         elif '4k' in response.url:
             scenes = response.xpath('//h5/a/@href').getall()
         elif 'shiny' in response.url:
-            scenes = response.xpath('//div[contains(@class,"updatesAreaTop")]/div[@class="updateItem"]/a/@href').getall()
+            scenes = response.xpath('//div[@class="videoPic"]/a/@href').getall()
         else:
             scenes = response.xpath('//div[@class="updateItem"]/a/@href').getall()
 
@@ -235,12 +237,16 @@ class AndomarkSpider(BaseSceneScraper):
             if date:
                 date = date.strip()
                 date = re.search(r'(\d{2}\/\d{2}\/\d{4})', date).group(1)
+            if not date and "shinybound" in response.url:
+                date = response.xpath('//div[@class="contentD"]//i[contains(@class, "calendar")]/following-sibling::text()')
+                if date:
+                    date = date.get()
         if date:
             return self.parse_date(date).strftime('%Y-%m-%d')
         return ''
 
     def get_title(self, response):
-        if 'minkaxxx' in response.url or 'sexykaren' in response.url or 'houseofyre' in response.url:
+        if 'minkaxxx' in response.url or 'sexykaren' in response.url or 'houseofyre' in response.url or 'shinybound' in response.url:
             titlesearch = '//meta[@name="twitter:title"]/@content'
         elif 'meanawolf' in response.url:
             titlesearch = '//div[@class="trailerArea"]/h1/text()'
@@ -279,7 +285,7 @@ class AndomarkSpider(BaseSceneScraper):
             if image:
                 image = re.search(r'useimage\ =\ \"(.*?)\";', image).group(1)
         elif 'shinybound.com' in response.url:
-            imagesearch = '//img[@class="stdimage promo_thumb left thumbs"]/@src0_1x'
+            imagesearch = '//meta[@name="twitter:image"]/@content'
             image = response.xpath(imagesearch).get()
         elif 'sheseducedme' in response.url:
             imagesearch = '//div[@class="update_image"]/a[1]/img/@src0_1x'
@@ -300,6 +306,8 @@ class AndomarkSpider(BaseSceneScraper):
     def get_tags(self, response):
         if 'minkaxxx' in response.url or 'sexykaren' in response.url:
             tagsearch = '//div[@class="videodetails"]/p/a/text()'
+        elif 'shinybound' in response.url:
+            tagsearch = '//div[@class="tags"]/ul/li/a/text()'
         elif 'meanawolf' in response.url:
             tagsearch = '//span[contains(text(),"TAGS:")]/following-sibling::a[contains(@href,"/categories/")]/text()'
         else:
@@ -343,7 +351,10 @@ class AndomarkSpider(BaseSceneScraper):
         return parent
 
     def get_id(self, response):
-        idsearch = r'.*/(.*?)\.html'
+        if ".htm" in response.url:
+            idsearch = r'.*/(.*?)\.html'
+        else:
+            idsearch = r'.*/(.*?)$'
         search = re.search(idsearch, response.url, re.IGNORECASE)
         search = search.group(1)
         if "houseofyre" in response.url and "_vids" in search:
@@ -362,6 +373,8 @@ class AndomarkSpider(BaseSceneScraper):
             performersearch = '//div[contains(@class, "gallery_info")]/span[contains(@class, "update_models")]/a/text()'
         if 'sheseducedme' in response.url:
             performersearch = '//div[@class="update_block_info"]/span[@class="tour_update_models"]/a/text()'
+        if 'shinybound' in response.url:
+            performersearch = '//div[@class="models"]/ul/li/a/text()'
         if 'meanawolf' in response.url:
             performersearch = '//span[contains(text(),"FEATURING:")]/following-sibling::a[contains(@href,"/models/")]/text()'
 
@@ -371,6 +384,11 @@ class AndomarkSpider(BaseSceneScraper):
     def get_description(self, response):
         if 'meanawolf' in response.url:
             description = response.xpath('//div[@class="trailerContent"]/p/text()').getall()
+            if description:
+                description = " ".join(description)
+                return description
+        elif 'shinybound' in response.url:
+            description = response.xpath('//div[contains(@class,"videoDescription")]/p//text()').getall()
             if description:
                 description = " ".join(description)
                 return description
@@ -388,4 +406,12 @@ class AndomarkSpider(BaseSceneScraper):
         image = self.get_image(response)
         if image:
             return base64.b64encode(requests.get(image).content).decode('utf-8')
+        return None
+
+    def get_duration(self, response):
+        if "shinybound" in response.url:
+            duration = response.xpath('//div[@class="contentD"]//i[contains(@class, "fa-clock")]/following-sibling::text()')
+            if duration:
+                duration = duration.get().strip()
+                return self.duration_to_seconds(duration)
         return None

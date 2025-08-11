@@ -31,5 +31,5 @@ class SiteLilMissySpider(BaseSceneScraper):
         meta = response.meta
         scenes = response.xpath('//div[contains(@class, "videoPic")]/a/@href').getall()
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
+            if re.search(self.get_selector_map('external_id'), scene) and "photo-set" not in scene:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)

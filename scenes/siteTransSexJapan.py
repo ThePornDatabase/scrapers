@@ -5,24 +5,16 @@ from tpdb.items import SceneItem
 
 
 class SiteTransSexJapanSpider(BaseSceneScraper):
-    name = 'TransSexJapan'
-    network = 'TransSexJapan'
-    parent = 'TransSexJapan'
-    site = 'TransSexJapan'
+    name = 'TranSexJapan'
+    network = 'TranSexJapan'
+    parent = 'TranSexJapan'
+    site = 'TranSexJapan'
 
     start_urls = [
         'https://www.transexjapan.com',
     ]
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'duration': '',
-        'trailer': '',
         'external_id': r'',
         'pagination': '/models?page=%s',
         'type': 'Scene',
@@ -51,9 +43,9 @@ class SiteTransSexJapanSpider(BaseSceneScraper):
                 duration = duration.get()
                 duration = re.search(r'(\d+)', duration).group(1)
                 item['duration'] = str(int(duration) * 60)
-            item['site'] = "TransSexJapan"
-            item['network'] = "TransSexJapan"
-            item['parent'] = "TransSexJapan"
+            item['site'] = "TranSexJapan"
+            item['network'] = "TranSexJapan"
+            item['parent'] = "TranSexJapan"
             item['type'] = "Scene"
             item['tags'] = ['Trans', 'Asian']
             item['description'] = ''

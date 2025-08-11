@@ -50,10 +50,10 @@ class networkGlobeTwatters(BaseSceneScraper):
         description = super().get_description(response)
         description = re.sub('<[^<]+?>', '', description).strip()
         return description
-    
+
     def get_site(self, response):
         return response.meta['site']
-    
+
     def get_next_page_url(self, base, page):
         if "diary" in base:
             return self.format_url(base, self.get_selector_map('pagination')[0] % page)

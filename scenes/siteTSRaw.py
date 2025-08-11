@@ -1,81 +1,82 @@
 import re
-import string
-import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
 class SiteTSRawSpider(BaseSceneScraper):
     name = 'TSRaw'
-    site = 'TSRaw'
-    parent = 'TSRaw'
     network = 'TSRaw'
+    parent = 'TSRaw'
+    site = 'TSRaw'
 
     start_urls = [
         'https://www.tsraw.com',
     ]
 
+    headers = {'X-NATS-cms-area-id': 'cc6bd0ac-a417-47d1-9868-7855b25986e5'}
+
     selector_map = {
-        'title': './/span[contains(@class, "video-title")]/text()',
-        'description': './/p[contains(@class, "setTRT")]/text()',
-        'date': './/span[contains(@class, "videoDate")]/text()',
+        'title': '',
+        'description': '',
+        'date': '',
         'image': '',
         'performers': '',
-        'tags': './/span[contains(@class, "tags-style")]/following-sibling::a/text()',
-        'duration': '',
+        'tags': '',
         'trailer': '',
         'external_id': r'',
-        'pagination': '',
-        'type': 'Scene',
+        'pagination': '/index.php?section=1681&start=%s'
     }
 
-    def start_requests(self):
-        link = 'https://www.tsraw.com/index.php?section=1647'
-        yield scrapy.Request(link, callback=self.get_scenes, headers=self.headers, cookies=self.cookies)
+    def get_next_page_url(self, base, page):
+        index = str((int(page) - 1) * 48)
+        url = f"https://nats.islanddollars.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=48&start={index}&cms_area_id=cc6bd0ac-a417-47d1-9868-7855b25986e5&cms_block_id=102013&orderby=published_desc&content_type=video&status=enabled&text_search=&data_type_search=%7B%22100001%22:%22164%22%7D"
+        return url
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="videoThumb"]/..')
+        meta = response.meta
+        jsondata = response.json()
+        scenes = jsondata['sets']
         for scene in scenes:
             item = SceneItem()
-            item['title'] = self.get_title(scene)
-            item['description'] = self.get_description(scene)
-            item['date'] = self.get_date(scene)
-            image = self.format_link(response, scene.xpath('.//img/@src').get())
-            if "&width" in image:
-                image = re.search(r'(.*?)\&width', image).group(1)
-            if image:
-                item['image'] = image
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            else:
-                item['image'] = ''
-                item['image_blob'] = ''
+
+            item['title'] = self.cleanup_title(scene['name'])
+            item['description'] = scene['description']
+            item['date'] = scene['added_nice']
 
             item['performers'] = []
-            performers = scene.xpath('.//span[contains(@class, "ts-video-desc")]/text()')
-            if performers:
-                performers = performers.get()
-                performers = performers.split(",")
-                if performers:
-                    item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
+            if "data_types" in scene and scene['data_types']:
+                for entry in scene['data_types']:
+                    if entry['data_type'] == "Models":
+                        if "data_values" in entry and entry['data_values']:
+                            for model in entry['data_values']:
+                                item['performers'].append(model['name'])
 
-            item['tags'] = self.get_tags(scene)
-            item['id'] = re.search(r'gal=(\d+)', item['image']).group(1)
+            item['tags'] = []
+            if "data_types" in scene and scene['data_types']:
+                if "data_values" in scene['data_types'][0] and scene['data_types'][0]['data_values']:
+                    for tag in scene['data_types'][0]['data_values']:
+                        item['tags'].append(tag['name'])
 
+            if "preview_formatted" in scene and scene['preview_formatted']:
+                if "thumb" in scene['preview_formatted'] and scene['preview_formatted']['thumb']:
+                    resolution = 0
+                    for thumb in scene['preview_formatted']['thumb']:
+                        height = re.search(r'-(\d)', thumb)
+                        if height:
+                            height = int(height.group(1))
+                            if height > resolution:
+                                resolution = height
+                                imageinfo = scene['preview_formatted']['thumb'][thumb][0]
+                                item['image'] = f"https://c762d323d1.mjedge.net{imageinfo['fileuri']}?{imageinfo['signature']}"
+            if item['image']:
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
+            item['id'] = "tsraw-" + scene['slug']
             item['trailer'] = ""
-            item['duration'] = ''
-            duration = scene.xpath('.//span[contains(@class, "videoTRT")]/text()')
-            if duration:
-                duration = duration.getall()
-                duration = "".join(duration)
-                duration = re.sub('[^a-zA-Z0-9]', '', duration.lower())
-                duration = re.search(r'(\d+)min', duration)
-                if duration:
-                    item['duration'] = str(int(duration.group(1)) * 60)
+            item['url'] = f"https://www.tsraw.com/index.php?section=1681&start={str(int(meta['page']) * 48)}"
+            item['network'] = "TSRaw"
+            item['parent'] = "TSRaw"
+            item['site'] = "TSRaw"
 
-            item['url'] = f"https://www.tsraw.com/index.php?vid={item['id']}"
-            item['network'] = self.network
-            item['parent'] = self.parent
-            item['site'] = self.site
-            item['type'] = 'Scene'
-
-            yield self.check_item(item, self.days)
+            if item['date'] > "2024-10-22":
+                yield self.check_item(item, self.days)

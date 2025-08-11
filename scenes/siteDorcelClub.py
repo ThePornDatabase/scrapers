@@ -23,7 +23,7 @@ class DorcelClubSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1/text()',
         'description': '///span[@class="full"]/p/text()',
-        'image': 'picture img.thumbnail::attr(data-src)',
+        'image': '//picture//img[contains(@class, "thumbnail")]/@data-src',
         'performers': '//div[@class="actress"]/a/text()',
         'date': '//span[@class="publish_date"]/text()',
         'tags': '',
@@ -49,9 +49,3 @@ class DorcelClubSpider(BaseSceneScraper):
         scenes = response.css('div.scene a.thumb::attr(href)').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), cookies=self.cookies, callback=self.parse_scene)
-
-    def get_image(self, response):
-        image = super().get_image(response)
-        trash = '_' + image.split('_', 3)[-1].rsplit('.', 1)[0]
-        image = image.replace(trash, '', 1)
-        return image

@@ -1,5 +1,6 @@
 import re
 import scrapy
+import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -9,6 +10,7 @@ def match_site(argument):
         'aplphamales-2-0': 'Alpha Males 2.0',
         'men-of-the-world': 'Men of the World',
         'blue-blake': 'Blue Blake',
+        'hardbritladse': 'Hard Brit Lads',
         'hot-spunks-studios': 'Hot Spunk Studios'
     }
     return match.get(argument, argument)
@@ -23,21 +25,23 @@ class SiteAlphaMales(BaseSceneScraper):
     paginations = [
         # ~ '/en/videos/alphamales/?page=%s',
         '/en/videos/alphamales-toolbox/?page=%s',
-        '/en/videos/aplphamales-2-0/?page=%s',
+        '/en/videos/alphamales/?page=%s',
         '/en/videos/men-of-the-world/?page=%s',
         '/en/videos/blue-blake/?page=%s',
+        '/en/videos/hardbritlads/?page=%s',
+        '/en/videos/cazzo/?page=%s',
         '/en/videos/hot-spunks-studios/?page=%s'
     ]
 
     selector_map = {
-        'title': '//div[contains(@class, "col-12 text-center")]/h1/text()',
+        'title': '//div[contains(@class, "text-center")]/h1/text()',
         'description': '//div[contains(@class, "col-12")]/h2/text()',
-        'date': '',
-        'image': '//div[contains(@class, "d-block embed-responsive embed-responsive-16by9 mb-2 rounded ")]/img/@src',
-        'performers': '//i[contains(@class,"fa-star ")]/following-sibling::text()',
-        'tags': '//div[contains(@class, "col-12 text-center px-4 py-2")]/a/h3/text()',
+        'date': '//script[contains(text(), "datePublished")]/text()',
+        're_date': r'datePublished.*?(\d{4}-\d{2}-\d{2})',
+        'image': '//meta[@property="og:image"]/@content',
+        'performers': '//div[contains(@class, "models-list-img")]/a/div[contains(@class, "text")]/text()',
+        'tags': '//div[contains(@class, "text-center")]//h3[contains(@class, "h120")]/text()',
         'external_id': r'detail/(\d+)-',
-        'trailer': '//video[contains(@class, "embed-responsive-item obj-cover d-none")]/source/@src',
         'pagination': '/?page=%s'
     }
 
@@ -63,6 +67,10 @@ class SiteAlphaMales(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_next_page_url(self, url, page, pagination):
+        if int(page) == 1:
+            url = url + re.search(r'(.*)/', pagination).group(1)
+            print(url)
+            return url
         page = str(int(page) - 1)
         return self.format_url(url, pagination % page)
 
@@ -84,7 +92,7 @@ class SiteAlphaMales(BaseSceneScraper):
         return match_site(parent)
 
     def get_duration(self, response):
-        duration = response.xpath('//span[@class="mx-1" and contains(text(), "Time")]/text()')
+        duration = response.xpath('//i[contains(@class, "fa-clock")]/following-sibling::text()[1]')
         if duration:
             duration = duration.get()
             duration = "".join(duration).replace("\n", "").replace("\t", "").replace(" ", "").lower()
@@ -94,3 +102,17 @@ class SiteAlphaMales(BaseSceneScraper):
                 duration = str(int(duration) * 60)
                 return duration
         return None
+
+    def get_performers_data(self, response):
+        performers = super().get_performers(response)
+        performers_data = []
+        for performer in performers:
+            performer = string.capwords(performer.strip())
+            performer_extra = {}
+            performer_extra['name'] = performer
+            performer_extra['network'] = "AlphaMales"
+            performer_extra['site'] = "AlphaMales"
+            performer_extra['extra'] = {}
+            performer_extra['extra']['gender'] = "Male"
+            performers_data.append(performer_extra)
+        return performers_data

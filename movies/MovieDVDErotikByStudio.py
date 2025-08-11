@@ -58,6 +58,8 @@ class MovieErotikSpider(BaseSceneScraper):
                 if "name" in movie['studio'] and movie['studio']['name']:
                     meta['site'] = movie['studio']['name']
                     meta['studio'] = meta['site']
+                    meta['parent'] = meta['site']
+                    meta['network'] = meta['site']
             if movie['name']['en']:
                 meta['title'] = movie['name']['en']
             else:

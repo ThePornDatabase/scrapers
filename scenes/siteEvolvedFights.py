@@ -29,10 +29,13 @@ class EvolvedFightsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//h4/a/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="latestUpdateB"]')
         for scene in scenes:
+            meta['id'] = scene.xpath('./@data-setid').get()
+            scene = scene.xpath('./div[1]/a[1]/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_duration(self, response):
         duration = response.xpath('//div[@class="vidImgTitle"]/div[@class="latestUpdateBinfo gallery_info bg_light radius"]/ul[@class="videoInfo"]/li[@class="text_med"]/text()[contains(., "min")]')
@@ -44,3 +47,8 @@ class EvolvedFightsSpider(BaseSceneScraper):
                 duration = str(int(duration.group(1)) * 60)
                 return duration
         return None
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        image = image.replace("-2x", "-4x")
+        return image

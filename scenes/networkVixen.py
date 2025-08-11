@@ -1,4 +1,5 @@
 import json
+from requests import get
 import string
 from urllib.parse import urlparse
 import scrapy
@@ -20,6 +21,7 @@ class VixenScraper(BaseSceneScraper):
         'https://www.deeper.com',
         'https://www.milfy.com',
         'https://www.slayed.com',
+        'https://www.wifey.com',
     ]
 
     sites = {
@@ -31,6 +33,7 @@ class VixenScraper(BaseSceneScraper):
         'DEEPER': 'Deeper',
         'SLAYED': 'Slayed',
         'MILFY': 'Milfy',
+        'WIFEY': 'Wifey',
     }
 
     selector_map = {
@@ -41,6 +44,8 @@ class VixenScraper(BaseSceneScraper):
     per_page = 200
 
     def start_requests(self):
+        ip = get('https://api.ipify.org').content.decode('utf8')
+        print('My public IP address is: {}'.format(ip))
         for link in self.start_urls:
             yield scrapy.Request(
                 url=link + '/graphql',
@@ -133,12 +138,7 @@ class VixenScraper(BaseSceneScraper):
         largest = 0
         scene['image_blob'] = self.get_image_blob_from_link(scene['image'])
 
-        for trailer in data['previews']['poster']:
-            if trailer['width'] > largest:
-                scene['trailer'] = trailer['src']
-            largest = trailer['width']
-
-        scene['trailer'] = '' if 'trailer' not in scene or not scene['trailer'] else scene['trailer']
+        scene['trailer'] = ''
 
         yield self.check_item(scene, self.days)
 

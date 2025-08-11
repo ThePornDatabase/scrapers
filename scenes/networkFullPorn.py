@@ -65,9 +65,9 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'https://badbrotherpov.com',
         'https://baddaddypov.com',
         'https://badfamilypov.com',  # Sub sites no longer available
-        # 'https://badmommypov.com',
+        # ~ # 'https://badmommypov.com',
         'https://brokensluts.net',
-        # ~ # 'https://badsisterpov.com',
+        # 'https://badsisterpov.com',
         'http://www.cumdumpsterteens.com/',
         # 'https://daughterjoi.com',
         'https://downtofuckdating.com/',
@@ -109,10 +109,19 @@ class FullPornNetworkSpider(BaseSceneScraper):
         'date': '//label[contains(text(), "Date Added")]/following-sibling::p[1]/text()',
         'date_formats': ['%Y-%m-%d'],
         'tags': '//ul/li/a[contains(@href, "/categories/")]/text()',
-        'external_id': r'trailers/([A-Za-z0-9-_]+)\.htm?',
+        'external_id': r'trailers/([A-Za-z0-9-_]+)[\.htm?|/]',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html'
     }
+
+    def get_next_page_url(self, base, page):
+        # ~ if "badfamilypov" in base or "baddaddy" in base or "badbrother" in base or "badsister" in base or "pornforce" in base or "abbiemaley" in base:
+            # ~ pagination = "/porn-categories/movies/?page=%s&sort=most-recent"
+        # ~ else:
+            # ~ pagination = self.get_selector_map('pagination')
+        pagination = "/porn-categories/movies/?page=%s&sort=most-recent"
+        # ~ print(pagination, base)
+        return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
         # ~ scenes = response.xpath('//div[contains(@class,"video_preview")]/a/@href').getall()

@@ -71,13 +71,13 @@ class MovieJMEliteSpider(BaseSceneScraper):
         item['tags'] = []
         item['trailer'] = ''
         item['type'] = 'Movie'
-        item['network'] = 'Jacquie et Michel'
-        item['parent'] = 'Jacquie et Michel Elite'
         studio = response.xpath('//strong[contains(text(), "Studio:")]/following-sibling::a/text()')
         if studio:
             item['site'] = studio.get()
         else:
             item['site'] = 'Jacquie et Michel Elite'
+        item['network'] = item['site']
+        item['parent'] = item['site']
         item['store'] = 'Jacquie et Michel Elite'
         item['url'] = response.url
         item['id'] = re.search(r'elite/(\d+)/', response.url).group(1)

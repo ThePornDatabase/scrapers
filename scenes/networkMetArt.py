@@ -23,8 +23,8 @@ class MetArtNetworkSpider(BaseSceneScraper):
         "https://www.stunning18.com",
         "https://www.thelifeerotic.com",
         "https://www.vivthomas.com",
-        # 'https://www.hustlerunlimited.com',
-        # 'https://www.barelylegal.com/'
+        # ~ # 'https://www.hustlerunlimited.com',
+        # ~ # 'https://www.barelylegal.com/'
     ]
 
     selector_map = {

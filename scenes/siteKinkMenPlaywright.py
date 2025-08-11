@@ -1,4 +1,5 @@
 import re
+import string
 import scrapy
 from PIL import Image
 import base64
@@ -15,10 +16,10 @@ class NetworkKinkMenSpider(BaseSceneScraper):
     url = 'https://www.kinkmen.com'
 
     paginations = [
-        '/shoots/latest?page=%s',
+        '/shoots?sort=published&page=%s',
         # ~ '/shoots/featured?page=%s',
         # ~ '/shoots/partner?page=%s',
-        # ~ '/search?type=shoots&channelIds=poundhisass&sort=published&page=%s',
+        # ~ '/shoots?channelIds=takenrough&page=%s',
     ]
 
     # ~ headers = {
@@ -36,46 +37,55 @@ class NetworkKinkMenSpider(BaseSceneScraper):
     # ~ }
 
     selector_map = {
-        'title': '//title/text()',
-        'description': '//span[@class="description-text"]/p/text()',
-        'date': "//span[@class='shoot-date']/text()",
-        'image': '//meta[@name="twitter:image"]/@content',
-        'performers': '//p[@class="starring"]/span/a/text()',
-        'tags': "//a[@class='tag']/text()",
+        'title': '//h1/text()',
+        'description': '//span[contains(text(), "Description")]/following-sibling::span[1]/p/text()',
+        'date': '//script[contains(text(), "KinkyTracking.all")]/text()',
+        're_date': r'(\d{4}-\d{2}-\d{2})',
+        'image': '//div[contains(@class, "kvjs-container")]/@data-setup',
+        're_image': r'thumbnailUrl.*?(http.*?)[\'\"]',
+        'performers': '//h1/following-sibling::span[1]/a/text()',
+        'tags': '//p[contains(text(), "Categories")]/following-sibling::span[1]/a/text()',
+        'director': '//p[contains(text(), "Director")]/following-sibling::p[1]/span/a/text()',
+        'duration': '//span[contains(@class, "clock")]/text()',
         'external_id': r'/shoot/(\d+)',
-        'trailer': '//meta[@name="twitter:player"]/@content',
+        'trailer': '//div[contains(@class, "kvjs-container")]/@data-setup',
+        're_trailer': r'thumbnailUrl.*?[\'\"]url[\'\"].*?(http.*?)[\'\"]',
         'pagination': '/shoots/latest?page=%s'
     }
 
-    custom_scraper_settings = {
-        'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
-        'AUTOTHROTTLE_ENABLED': True,
-        'USE_PROXY': True,
-        'AUTOTHROTTLE_START_DELAY': 1,
-        'AUTOTHROTTLE_MAX_DELAY': 60,
-        'CONCURRENT_REQUESTS': 1,
-        'DOWNLOAD_DELAY': 2,
-        'DOWNLOADER_MIDDLEWARES': {
-            # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-            'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-        },
-        'DOWNLOAD_HANDLERS': {
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        }
-    }
+    # ~ custom_scraper_settings = {
+        # ~ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
+        # ~ 'AUTOTHROTTLE_ENABLED': True,
+        # ~ 'USE_PROXY': True,
+        # ~ 'AUTOTHROTTLE_START_DELAY': 1,
+        # ~ 'AUTOTHROTTLE_MAX_DELAY': 60,
+        # ~ 'CONCURRENT_REQUESTS': 1,
+        # ~ 'DOWNLOAD_DELAY': 2,
+        # ~ 'DOWNLOADER_MIDDLEWARES': {
+            # ~ # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+            # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
+            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+            # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
+            # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+        # ~ },
+        # ~ 'DOWNLOAD_HANDLERS': {
+            # ~ "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            # ~ "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        # ~ }
+    # ~ }
 
     def start_requests(self):
-        yield scrapy.Request("https://www.kinkmen.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
+        # ~ yield scrapy.Request("https://www.kinkmen.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies, meta={"playwright": True})
+        yield scrapy.Request("https://www.kinkmen.com", callback=self.start_requests2, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
+        meta={}
+        meta['page'] = self.page
         for pagination in self.paginations:
-            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta={'page': self.page, 'pagination': pagination, "playwright": True})
+            meta['pagination'] = pagination
+            yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta=meta)
 
     def parse(self, response, **kwargs):
         if response.status == 200:
@@ -94,13 +104,13 @@ class NetworkKinkMenSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath("//a[@class='shoot-link']/@href").getall()
+        scenes = response.xpath('//div[contains(@class, "shoot-thumbnail")]/div[1]/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        return response.xpath('//div[@class="shoot-page"]/@data-sitename').get().strip()
+        return response.xpath('//div[@id="shootPage"]/@data-channelname').get().strip()
 
     def get_performers(self, response):
         performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
@@ -159,6 +169,9 @@ class NetworkKinkMenSpider(BaseSceneScraper):
             item['performers'] = response.meta['performers']
         else:
             item['performers'] = self.get_performers(response)
+
+        if item['performers']:
+            item['performers_data'] = self.get_performers_data(response, item['site'])
 
         if 'tags' in response.meta:
             item['tags'] = response.meta['tags']
@@ -277,3 +290,17 @@ class NetworkKinkMenSpider(BaseSceneScraper):
                     print(f"Could not decode image for evaluation: '{image}'")
                 return base64.b64encode(data).decode('utf-8')
         return None
+
+    def get_performers_data(self, response, site):
+        performers = super().get_performers(response)
+        performers_data = []
+        for performer in performers:
+            performer = string.capwords(performer.strip())
+            performer_extra = {}
+            performer_extra['name'] = performer
+            performer_extra['network'] = "Kink"
+            performer_extra['site'] = site
+            performer_extra['extra'] = {}
+            performer_extra['extra']['gender'] = "Male"
+            performers_data.append(performer_extra)
+        return performers_data

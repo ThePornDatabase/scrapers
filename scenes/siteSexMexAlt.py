@@ -11,8 +11,8 @@ class SiteSexMexAltSpider(BaseSceneScraper):
 
     start_urls = [
         'https://exposedlatinas.com',
-        'https://sexmexamateurs.com',
-        'https://transqueens.com',
+        # ~ 'https://sexmexamateurs.com',
+        # ~ 'https://transqueens.com',
     ]
 
     selector_map = {

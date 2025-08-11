@@ -9,6 +9,7 @@ class NetworkPornhubSpider(BaseSceneScraper):
 
     performers = [
         ["/channels/pornhub-originals-vr?o=mr&page=%s", "", "Pornhub: Pornhub Originals VR"],
+        ["/model/sweetherry/videos?o=mr&page=%s", "SweetHerry", "Pornhub: SweetHerry"],
         ["/model/404hotfound/videos?o=mr&page=%s", "404HotFound", "Pornhub: 404HotFound"],
         ["/model/aeries-steele/videos/upload?o=mr&page=%s", "Aeries Steele", "Pornhub: Aeries Steele"],
         ["/model/aestra-azure/videos/upload?o=mr&page=%s", "Aestra Azure", "Pornhub: Aestra Azure"],
@@ -121,7 +122,23 @@ class NetworkPornhubSpider(BaseSceneScraper):
         ["/model/nofacegirl/videos/upload?o=mr&page=%s", "Nofacegirl", "Pornhub: Nofacegirl"],
         ["/model/lis-evans/videos/upload?o=mr&page=%s", "Lis Evans", "Pornhub: Lis Evans"],
         ["/model/fantasybabe/videos/upload?o=mr&page=%s", "Fantasy Babe", "Pornhub: Fantasy Babe"],
+        ["/model/mira-shark/videos/upload?o=mr&page=%s", "Mira Shark", "Pornhub: Mira Shark"],
+        ["/model/luna-vitaler/videos/upload?o=mr&page=%s", "Luna Vitaler", "Pornhub: Luna Vitaler"],
+        ["/pornstar/swife-katy/videos/upload?o=mr&page=%s", "SWife Katy", "Pornhub: SWife Katy"],
         ["/pornstar/tru-kait/videos/upload?o=mr&page=%s", "Tru Kait", "Pornhub: Tru Kait"],
+        ["/model/comatozze/videos/upload?o=mr&page=%s", "Cumatozze", "Pornhub: Cumatozze"],
+        ["/model/loly-nebel/videos/upload?o=mr&page=%s", "Loly Nebel", "Pornhub: Loly Nebel"],
+        ["/model/teddy-tarantino/videos/upload?o=mr&page=%s", "Teddy Tarantino", "Pornhub: Teddy Tarantino"],
+        ["/model/marycherry/videos/upload?o=mr&page=%s", "Mary Cherry", "Pornhub: MaryCherry"],
+        ["/model/marybarrie/videos/upload?o=mr&page=%s", "Mary Cherry", "Pornhub: MaryBarrie"],
+        ["/model/jean-summer/videos/upload?o=mr&page=%s", "Jean Summer", "Pornhub: Jean Summer"],
+        ["/model/john-and-sky/videos/upload?o=mr&page=%s", "", "Pornhub: John and Sky"],
+        ["/model/1twothreecum/videos/upload?o=mr&page=%s", "", "Pornhub: 1twothreecum"],
+        ["/model/emilia-shot/videos/upload?o=mr&page=%s", "Emilia Shot", "Pornhub: Emilia Shot"],
+        ["/model/lil-karina/videos/upload?o=mr&page=%s", "Lil Karina", "Pornhub: Lil Karina"],
+        ["/model/lacyluxxx/videos?o=mr&page=%s", "Lacy Luxxx", "Pornhub: Lacy Luxxx"],
+        ["/model/miss-ellie-moore/videos?o=mr&page=%s", "Miss Ellie Moore", "Pornhub: Miss Ellie Moore"],
+        ["/model/guesswhox2/videos?o=mr&page=%s", "GuessWhoX2", "Pornhub: GuessWhoX2"],
     ]
 
     selector_map = {

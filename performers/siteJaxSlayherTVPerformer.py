@@ -47,29 +47,35 @@ class SiteJaxSlayherTVPerformerSpider(BasePerformerScraper):
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, cookies=self.cookies, headers=self.headers)
 
     def get_weight(self, response):
-        weight = response.xpath('//div[@class="model_box"]//div[@class="description_main"]/ul/li/div[contains(text(), "Weight")]/following-sibling::div/text()').getall()
-        weight = re.search(r'(\d+)', "".join(weight)).group(1)
+        weight = response.xpath('//div[@class="model_box"]//div[@class="description_main"]/ul/li/div[contains(text(), "Weight")]/following-sibling::div/text()')
         if weight:
-            return str(int(int(weight) * 0.45359237)) + "kg"
+            weight = weight.getall()
+            weight = re.search(r'(\d+)', "".join(weight).strip())
+            if weight:
+                weight = weight.group(1)
+                if weight:
+                    return str(int(int(weight) * 0.45359237)) + "kg"
         return None
 
     def get_height(self, response):
-        height = response.xpath('//div[@class="model_box"]//div[@class="description_main"]/ul/li/div[contains(text(), "Height")]/following-sibling::div/text()').getall()
-        height = "".join(height).strip()
-        height = height.replace(" ", "")
-        if "'" in height:
-            height = re.sub(r'[^0-9\']', '', height)
-            feet = re.search(r'(\d+)\'', height)
-            if feet:
-                feet = feet.group(1)
-                feet = int(feet) * 12
-            else:
-                feet = 0
-            inches = re.search(r'\'(\d+)', height)
-            if inches:
-                inches = inches.group(1)
-                inches = int(inches)
-            else:
-                inches = 0
-            return str(int((feet + inches) * 2.54)) + "cm"
+        height = response.xpath('//div[@class="model_box"]//div[@class="description_main"]/ul/li/div[contains(text(), "Height")]/following-sibling::div/text()')
+        if height:
+            height = height.getall()
+            height = "".join(height).strip()
+            height = height.replace(" ", "")
+            if "'" in height:
+                height = re.sub(r'[^0-9\']', '', height)
+                feet = re.search(r'(\d+)\'', height)
+                if feet:
+                    feet = feet.group(1)
+                    feet = int(feet) * 12
+                else:
+                    feet = 0
+                inches = re.search(r'\'(\d+)', height)
+                if inches:
+                    inches = inches.group(1)
+                    inches = int(inches)
+                else:
+                    inches = 0
+                return str(int((feet + inches) * 2.54)) + "cm"
         return None

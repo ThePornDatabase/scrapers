@@ -107,6 +107,8 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         ['https://transtakenraw.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Trans Taken', ''],
         ['https://mma-xxx.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'MMA XXX', ''],
         ['https://jessydubairaw.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Jessy Dubai Raw', 'Jessy Dubai'],
+        ['https://pastelgoddess.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'Pastel Goddess', 'Pastel Goddess'],
+        ['https://suzyq.modelcentro.com', '&transitParameters[v1]=ykYa8ALmUD&transitParameters[v2]=ykYa8ALmUD', 'SuzyQ', 'SuzyQ'],
     ]
 
     selector_map = {

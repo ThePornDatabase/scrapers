@@ -3,7 +3,6 @@ import string
 import scrapy
 import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteClips4SaleSpider(BaseSceneScraper):
@@ -95,7 +94,7 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Fetish by Daisy Haze', 'Fetish by Daisy Haze', '71770', 'daisys-desires'],
         ['Clips4Sale', 'Jerk4PrincessUK', 'Jerk4PrincessUK', '36426', 'jerk4princessuk'],
         ['Clips4Sale', 'Naughty Midwest Girls (Clips4Sale)', 'Naughty Midwest Girls (Clips4Sale)', '3664', 'naughty-midwest-girls-videoclips'],
-        ['Clips4Sale', 'Lilus Handjobs', 'Lilus Handjobs', '7325', 'i-jerk-off-100--strangers-hommme-hj'],
+        # ['Clips4Sale', 'Lilus Handjobs', 'Lilus Handjobs', '7325', 'i-jerk-off-100--strangers-hommme-hj'],
         ['Clips4Sale', 'Miss Lilu', 'Miss Lilu', '3010', 'Miss-LiLu'],
         ['Clips4Sale', 'Fetish Liza Clips', 'Fetish Liza Clips', '88414', 'fetish-liza-clips'],
         ['Clips4Sale', 'Kinky Leather Clips', 'Kinky Leather Clips', '83433', 'kinky-leather-clips'],
@@ -206,6 +205,44 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Clips4Sale: SofiaStudios', 'Clips4Sale: SofiaStudios', '173843', 'sofiastudios'],
         ['Clips4Sale', 'Clips4Sale: Kendra James Fetish Experience', 'Clips4Sale: Kendra James Fetish Experience', '11330', 'kendra-james-fetish-exxxpierence'],
         ['Clips4Sale', 'Clips4Sale: Alicia Silvers 1111 Customs', 'Clips4Sale: Alicia Silvers 1111 Customs', '151073', 'alicia-silvers-1111-customs'],
+        ['Clips4Sale', 'Clips4Sale: Mistress Lilith Last Witch', 'Clips4Sale: Mistress Lilith Last Witch', '214733', 'mistress-lilith-last-witch'],
+        ['Clips4Sale', 'Clips4Sale: Mistress Nikita FemDom Videos', 'Clips4Sale: Mistress Nikita FemDom Videos', '57215', 'mistress-nikita-femdom-videos'],
+        ['Clips4Sale', 'Clips4Sale: Foot Tongue Mouth and Vore', 'Clips4Sale: Foot Tongue Mouth and Vore', '119032', 'foot-tongue-mouth-and-vore'],
+        ['Clips4Sale', 'Clips4Sale: BlowRayne', 'Clips4Sale: BlowRayne', '175947', 'blowrayne'],
+        ['Clips4Sale', 'Clips4Sale: Bratty Foot Girls', 'Clips4Sale: Bratty Foot Girls', '40537', 'bratty-foot-girls'],
+        ['Clips4Sale', 'Clips4Sale: Helena Price Cock Quest', 'Clips4Sale: Helena Price Cock Quest', '127111', 'helena-price-cock-quest'],
+        ['Clips4Sale', 'Clips4Sale: Darling Kiyomi', 'Clips4Sale: Darling Kiyomi', '189285', 'darling-kiyomi'],
+        ['Clips4Sale', 'Clips4Sale: Bella Bates', 'Clips4Sale: Bella Bates', '187465', 'bella-bates'],
+        ['Clips4Sale', 'Clips4Sale: Bettie Bondage', 'Clips4Sale: Bettie Bondage', '27897', 'bettie-bondage'],
+        ['Clips4Sale', 'Clips4Sale: Bitch World Femdom', 'Clips4Sale: Bitch World Femdom', '66613', 'bitch-world-femdom'],
+        ['Clips4Sale', 'Clips4Sale: Miss Melissa', 'Clips4Sale: Miss Melissa', '58397', 'spoiled-princess-mel'],
+        ['Clips4Sale', 'Clips4Sale: Goddess Alessa', 'Clips4Sale: Goddess Alessa', '178303', 'goddess-alessa'],
+        ['Clips4Sale', 'Clips4Sale: Young Goddess Kim', 'Clips4Sale: Young Goddess Kim', '107054', 'young-goddess-kim'],
+        ['Clips4Sale', 'Clips4Sale: Entrancement', 'Clips4Sale: Entrancement', '12956', 'entrancement'],
+        ['Clips4Sale', 'Clips4Sale: Chronicles of Mlle Fanchette', 'Clips4Sale: Chronicles of Mlle Fanchette', '56793', 'chronicles-of-mlle-fanchette-'],
+        ['Clips4Sale', 'Clips4Sale: Goddess Maisha', 'Clips4Sale: Goddess Maisha', '243771', 'goddess-maisha'],
+        ['Clips4Sale', 'Clips4Sale: Shoelovers', 'Clips4Sale: Shoelovers', '216831', 'shoelovers'],
+        ['Clips4Sale', 'Clips4Sale: Ty Bones Bone Zone', 'Clips4Sale: Ty Bones Bone Zone', '136091', 'ty-bones-bone-zone'],
+        ['Clips4Sale', 'Clips4Sale: FLEX-RX', 'Clips4Sale: FLEX-RX', '66443', 'flex-rx'],
+        ['Clips4Sale', 'Clips4Sale: TaylorMadeClips', 'Clips4Sale: TaylorMadeClips', '2119', 'taylormadeclips'],
+        ['Clips4Sale', 'Clips4Sale: Alluras Addictions', 'Clips4Sale: Alluras Addictions', '57829', 'allura-s-addictions'],
+        ['Clips4Sale', 'Clips4Sale: Chaos Clips', 'Clips4Sale: Chaos Clips', '53471', 'chaos-clips'],
+        ['Clips4Sale', 'Clips4Sale: TABOO CHAOS', 'Clips4Sale: TABOO CHAOS', '73105', 'taboo-chaos'],
+        ['Clips4Sale', 'Clips4Sale: Natashas Bedroom', 'Clips4Sale: Natashas Bedroom', '72779', 'natasha-s-palace'],
+        ['Clips4Sale', 'Clips4Sale: Daddys Dirty Girls', 'Clips4Sale: Daddys Dirty Girls', '54583', 'daddys-dirty-girls'],
+        ['Clips4Sale', 'Clips4Sale: XXX Multimedia', 'Clips4Sale: XXX Multimedia', '79949', 'xxx-multimedia'],
+        ['Clips4Sale', 'Clips4Sale: WCA Productions', 'Clips4Sale: WCA Productions', '88054', 'wca-productions'],
+        ['Clips4Sale', 'Clips4Sale: Shiny Cock Films', 'Clips4Sale: Shiny Cock Films', '128845', 'shiny-cock-films'],
+        ['Clips4Sale', 'Clips4Sale: Ama Rios Playground', 'Clips4Sale: Ama Rios Playground', '153417', 'ama-rios-playground'],
+        ['Clips4Sale', 'Clips4Sale: Lady Fyre Femdom', 'Clips4Sale: Lady Fyre Femdom', '60555', 'lady-fyre-femdom'],
+        ['Clips4Sale', 'Clips4Sale: LoveHerShoes', 'Clips4Sale: LoveHerShoes', '298841', 'lovehershoes'],
+        ['Clips4Sale', 'Clips4Sale: AnikaFall', 'Clips4Sale: AnikaFall', '123317', 'anikafall'],
+        ['Clips4Sale', 'Clips4Sale: Stella Liberty', 'Clips4Sale: Stella Liberty', '101957', 'stella-liberty'],
+        ['Clips4Sale', 'Clips4Sale: ScarlettBelles Fetish Clips', 'Clips4Sale: ScarlettBelles Fetish Clips', '70634', 'scarlettbelle-s-fetish-clips'],
+        ['Clips4Sale', 'Clips4Sale: Yes Ms Talia', 'Clips4Sale: Yes Ms Talia', '133263', 'yes-ms-talia'],
+        ['Clips4Sale', 'Clips4Sale: Lady Angelika', 'Clips4Sale: Lady Angelika', '56387', 'lady-angelika'],
+        ['Clips4Sale', 'Clips4Sale: Sylvie Labrae', 'Clips4Sale: Sylvie Labrae', '337583', 'sylvie-labrae'],
+        ['Clips4Sale', 'Clips4Sale: Shibari Kalahari', 'Clips4Sale: Shibari Kalahari', '221255', 'shibari-kalahari'],
         # ~ ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
         # ~ ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
     ]
@@ -255,43 +292,51 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         jsondata = response.json()
         jsondata = jsondata['clips']
         for scene in jsondata:
-            item = SceneItem()
-            item['title'] = self.cleanup_title(scene['title'])
-            item['id'] = scene['clipId']
-            if "description" in scene and scene['description']:
-                item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
-            else:
-                item['description'] = ''
-            item['image'] = self.format_link(response, scene['previewLink']).replace(" ", "%20")
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            if scene['cdn_preview_link']:
-                item['trailer'] = self.format_link(response, scene['cdn_preview_link']).replace(" ", "%20")
-            else:
-                item['trailer'] = ""
-            scene_date = self.parse_date(scene['dateDisplay'], date_formats=['%m/%d/%y %h:%m %p']).strftime('%Y-%m-%d')
-            item['date'] = ""
-            if scene_date:
-                item['date'] = scene_date
-            item['url'] = f"https://www.clips4sale.com{scene['link']}"
-            item['tags'] = []
-            if "related_category_links" in scene and scene['related_category_links']:
-                for tag in scene['related_category_links']:
-                    if "category" in tag:
-                        item['tags'].append(tag['category'])
-                    if "clean_name" in tag:
-                        item['tags'].append(string.capwords(tag['clean_name']))
-            if "keyword_links" in scene and scene['keyword_links']:
-                for tag in scene['keyword_links']:
-                    if "keyword" in tag:
-                        item['tags'].append(string.capwords(tag['keyword']))
-            if scene['duration']:
-                item['duration'] = str(int(scene['duration']) * 60)
-            item['site'] = self.get_site(response)
-            item['parent'] = self.get_parent(response)
-            item['network'] = self.get_network(response)
-            item['performers'] = self.get_performers(response)
+            # ~ print(scene)
+            # ~ print()
+            # ~ print()
+            item = self.init_scene()
+            if scene['title']:
+                item['title'] = self.cleanup_title(scene['title'])
+                item['id'] = scene['clipId']
+                if "description" in scene and scene['description']:
+                    item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
+                else:
+                    item['description'] = ''
+                item['image'] = self.format_link(response, scene['previewLink']).replace(" ", "%20")
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                if scene['cdn_preview_link']:
+                    item['trailer'] = self.format_link(response, scene['cdn_preview_link']).replace(" ", "%20")
+                else:
+                    item['trailer'] = ""
+                scene_date = self.parse_date(scene['dateDisplay'], date_formats=['%m/%d/%y %h:%m %p']).strftime('%Y-%m-%d')
+                item['date'] = ""
+                if scene_date:
+                    item['date'] = scene_date
+                item['url'] = f"https://www.clips4sale.com{scene['link']}"
+                item['tags'] = []
+                if "related_category_links" in scene and scene['related_category_links']:
+                    for tag in scene['related_category_links']:
+                        if "category" in tag:
+                            item['tags'].append(tag['category'])
+                        if "clean_name" in tag:
+                            item['tags'].append(string.capwords(tag['clean_name']))
+                if "keyword_links" in scene and scene['keyword_links']:
+                    for tag in scene['keyword_links']:
+                        if "keyword" in tag:
+                            item['tags'].append(string.capwords(tag['keyword']))
+                if scene['duration']:
+                    item['duration'] = str(int(scene['duration']) * 60)
+                item['site'] = self.get_site(response)
+                item['parent'] = self.get_parent(response)
+                item['network'] = self.get_network(response)
+                if "performers" in scene and scene['performers'] and len(scene['performers']):
+                    for performer in scene['performers']:
+                        item['performers'].append(string.capwords(performer['stage_name']))
+                else:
+                    item['performers'] = self.get_performers(response)
 
-            yield self.check_item(item, self.days)
+                yield self.check_item(item, self.days)
 
     def get_site(self, response):
         meta = response.meta
@@ -321,8 +366,20 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         return tldextract.extract(response.url).domain
 
     def get_performers(self, response):
+        if "lady-angelika" in response.url:
+            return ['Lady Angelika']
+        if "sylvie-labrae" in response.url:
+            return ['Sylvie Labrae']
+        if "yes-ms-talia" in response.url:
+            return ['Talia Tate']
+        if "scarlettbelle-s-fetish-clips" in response.url:
+            return ['Scarlette Belle']
+        if "stella-liberty" in response.url:
+            return ['Stella Liberty']
         if "alysa-nylon" in response.url:
             return ['Alysa Nylon']
+        if "anikafall" in response.url:
+            return ['Anika Fall']
         if "annabelle-rogers" in response.url:
             return ['Annabelle Rogers']
         if "astrodomina" in response.url:
@@ -331,20 +388,42 @@ class SiteClips4SaleSpider(BaseSceneScraper):
             return ['Andrea Rosu']
         if "crystal-knight" in response.url:
             return ['Crystal Knight']
+        if "bella-bates" in response.url:
+            return ['Bella Bates']
+        if "bettie-bondage" in response.url:
+            return ['Bettie Bondage']
+        if "chronicles-of-mlle-fanchette" in response.url:
+            return ['Mlle Fanchette']
+        if "ama-rios-playground" in response.url:
+            return ['Ama Rio']
         if "daisys-desires" in response.url:
             return ['Daisy Haze']
         if "mistress-jessica-starling" in response.url:
             return ['Jessica Starling']
         if "divine-goddess-amber" in response.url:
             return ['Divine Goddess Amber']
+        if "darling-kiyomi" in response.url:
+            return ['Darling Kiyomi']
+        if "goddess-maisha" in response.url:
+            return ['Goddess Maisha']
         if "addie-juniper" in response.url:
             return ['Addie Juniper']
+        if "lilith-last-witch" in response.url:
+            return ['Lilith Last Witch']
+        if "lovehershoes" in response.url:
+            return ['Lis Evans']
         if "superior-lana-blade" in response.url:
             return ['Lana Blade']
         if "mistress-euryale" in response.url:
             return ['Elis Euryale']
+        if "helena-price" in response.url:
+            return ['Helena Price']
         if "mandy-marx" in response.url:
             return ['Mandy Marx']
+        if "goddess-alessa" in response.url:
+            return ['Goddess Alessa']
+        if "young-goddess-kim" in response.url:
+            return ['Young Goddess Kim']
         if "marisol-price" in response.url:
             return ['Marisol Price']
         if "princess-sasha-foxxx" in response.url:
@@ -353,6 +432,8 @@ class SiteClips4SaleSpider(BaseSceneScraper):
             return ['Dahlia Fallon']
         if "mistress-courtneys-fetish-lair" in response.url:
             return ['Mistress Courtney']
+        if "mistress-nikita-femdom" in response.url:
+            return ['Mistress Nikita']
         if "evansfeet" in response.url:
             return ['Lis Evans']
         if "mean-wolf" in response.url:

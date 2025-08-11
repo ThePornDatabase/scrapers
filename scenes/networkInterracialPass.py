@@ -28,7 +28,7 @@ class InterracialPassSpider(BaseSceneScraper):
         'https://www.backroomcastingcouch.com',
         'https://bbcsurprise.com',
         'https://exploitedcollegegirls.com',
-        # 'https://www.ikissgirls.com'
+        # ~ # 'https://www.ikissgirls.com'
     ]
 
     custom_settings = {
@@ -47,11 +47,11 @@ class InterracialPassSpider(BaseSceneScraper):
                 ]
 
     selector_map = {
-        'title': '//div[@class="video-player"]/div[@class="title-block"]/h3[@class="section-title"]/text()|//div[@class="video-player"]/div[@class="title-block"]/h2[@class="section-title"]/text()',
-        'description': '//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()',
-        'date': '//div[@class="update-info-row"]/text()',
+        'title': '//div[@class="video-player"]/div[@class="title-block"]/h3[@class="section-title"]/text()|//div[@class="video-player"]/div[@class="title-block"]/h2[@class="section-title"]/text()|//h1[@class="h3"]/text()',
+        'description': '//div[@class="update-info-block"]/h3[contains(text(),"Description")]/following-sibling::text()|//p[contains(@class, "descriptionFull")]//text()',
+        'date': '//div[@class="update-info-row"]/text()|//strong[contains(text(), "Released:")]/following-sibling::text()[contains(., ",")]',
         'image': '//div[@class="player-thumb"]//img/@src0_1x | //img[contains(@class,"main-preview")]/@src',
-        'performers': '//div[contains(@class, "models-list-thumbs")]//li//span/text()',
+        'performers': '//div[contains(@class, "models-list-thumbs")]//li//span/text()|//section[@id="model-bio"]//h3/text()',
         'duration': '//strong[contains(text(), "Runtime:")]/following-sibling::text()',
         're_duration': r'(\d{1,2}\:?\d{1,2}\:\d{1,2})',
         'tags': '//ul[@class="tags"]//li//a/text()',
@@ -86,11 +86,6 @@ class InterracialPassSpider(BaseSceneScraper):
             selector = '/categories/movies_%s_d.html'
 
         return self.format_url(base, selector % page)
-
-    def get_date(self, response):
-        date = self.process_xpath(
-            response, self.get_selector_map('date')).extract()
-        return self.parse_date(date[1].strip()).isoformat()
 
     def get_image(self, response):
         meta = response.meta
@@ -139,9 +134,55 @@ class InterracialPassSpider(BaseSceneScraper):
 
     def get_image_from_link(self, image):
         if image and self.cookies:
-            cookies = {cookie['name']:cookie['value'] for cookie in self.cookies}
+            cookies = {cookie['name']: cookie['value'] for cookie in self.cookies}
             req = requests.get(image, cookies=cookies, verify=False)
 
             if req and req.ok:
                 return req.content
+        return None
+
+    def get_performers_data(self, response):
+        performers = response.xpath('//section[@id="model-bio"]//div[@class="card"]')
+        performers_data = []
+        if len(performers):
+            for performer in performers:
+                perf = {}
+                perf['name'] = performer.xpath('.//h3/text()').get()
+                perf['extra'] = {}
+                perf['extra']['gender'] = "Female"
+                perf['network'] = "ExploitedX"
+                perf['site'] = "ExploitedX"
+                image = performer.xpath('.//img/@src0_3x')
+                if image:
+                    image = image.get()
+                    if "content" in image:
+                        perf['image'] = image
+                        perf['image_blob'] = self.get_image_blob_from_link(image)
+
+                height = performer.xpath('.//strong[contains(text(), "Height:")]/following-sibling::text()')
+                if height:
+                    height = height.get()
+                    height = re.sub(r'[^0-9\'\"]', '', height)
+                    if re.search(r'(\d+)\'', height):
+                        perf['extra']['height'] = self.convert_height(height)
+
+                measurements = performer.xpath('.//strong[contains(text(), "Measurements:")]/following-sibling::text()')
+                if measurements:
+                    perf['extra']['measurements'] = self.convert_measurements(measurements.get())
+
+                performers_data.append(perf)
+        return performers_data
+
+    def convert_measurements(self, measurements):
+        measurements = re.search(r'(\d+\w+).*?(\d+).*?(\d+)', measurements)
+        if measurements:
+            measurements = f"{measurements.group(1)}-{measurements.group(2)}-{measurements.group(3)}"
+            return measurements.upper()
+        return None
+
+    def convert_height(self, height):
+        feet, inches = map(int, height.replace(" ", "").strip().replace('"', '').split("'"))
+        cm = (feet * 30.48) + (inches * 2.54)
+        if cm:
+            return str(int(cm)) + "cm"
         return None

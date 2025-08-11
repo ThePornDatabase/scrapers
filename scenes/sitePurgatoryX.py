@@ -1,5 +1,6 @@
 import re
-import scrapy
+import string
+import json
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -14,35 +15,56 @@ class PurgatoryXSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h1[@class="title"]/text()',
-        'description': '//meta[@name="description"]/@content',
-        'date': "//span[@class='date']/text()",
-        'image': '//div[contains(@class,"player-wrap")]/*/@poster',
-        'performers': '//div[@class="model-wrap"]/ul/li/h5/text()',
-        'tags': '//meta[@name="keywords"]/@content',
-        'external_id': 'view\\/(\\d+)\\/',
-        'trailer': '//a[contains(@class,"download-trailer")]/@href',
-        'pagination': '/videos?page=%s'
+        'external_id': r'',
+        'pagination': '/episodes?page=%s&order_by=publish_date&sort_by=desc',
+        'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            '//div[@class="details-wrap"]/h3/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        jsoncode = response.xpath('//script[contains(@id, "NEXT_DATA")]/text()')
+        if jsoncode:
+            jsondata = json.loads(jsoncode.get())
+            jsondata = jsondata['props']['pageProps']['contents']['data']
+            for scene in jsondata:
+                item = self.init_scene()
 
-    def get_site(self, response):
-        site = response.xpath('//p[@class="series"]/span/text()').get().strip()
-        if not site:
-            site = "PurgatoryX"
-        return site
+                item['title'] = self.cleanup_title(scene['title'])
+                item['id'] = scene['id']
+                item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description'])).replace("\r", " ").replace("\n", " ").replace("\t", " ").strip()
+                item['image'] = scene['thumb']
+                if item['image'][:2] == '//':
+                    item['image'] = "https:" + item['image']
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['trailer'] = scene['trailer_url']
+                scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).strftime('%Y-%m-%d')
+                if scene_date:
+                    item['date'] = scene_date
+                else:
+                    item['date'] = self.parse_date('today').strftime('%Y-%m-%d')
+                item['url'] = f"https://tour.purgatoryx.com/episodes/{scene['slug']}?trilogy={scene['playlist']}"
+                item['tags'] = scene['tags']
+                item['tags'] = item['tags'] = list(map(lambda x: string.capwords(x.strip()), item['tags']))
+                if "Hell" in item['tags']:
+                    item['site'] = "Hell Series"
+                    item['tags'].remove("Hell")
+                elif "Heaven" in item['tags']:
+                    item['site'] = "Heaven Series"
+                    item['tags'].remove("Heaven")
+                else:
+                    item['site'] = "PurgatoryX"
+                item['tags'].remove("Purgatoryx")
 
-    def get_tags(self, response):
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(
-                response, self.get_selector_map('tags')).get()
-            if "," in tags:
-                tags = tags.split(",")
-            return list(map(lambda x: x.strip(), tags))
-        return []
+                try:
+                    duration = str(int(float(scene['seconds_duration'])))
+                    item['duration'] = duration
+                except:
+                    item['duration'] = ''
+
+                item['parent'] = 'PurgatoryX'
+                item['network'] = 'Radical Entertainment'
+                item['performers'] = []
+                item['type'] = "Scene"
+                for model in scene['models_slugs']:
+                    item['performers'].append(self.cleanup_title(model['name']))
+
+                yield self.check_item(item, self.days)

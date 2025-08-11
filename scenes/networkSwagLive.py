@@ -32,6 +32,11 @@ class NetworkSwagLiveSpider(BaseSceneScraper):
         ["5c7b62ed1817b7bd43cca413", "Linlin", "SwagLive: Linlinbebe"],
         ["5a28f2f7af9c462c61546a78", "Weng Yucheng", "SwagLive: Princessdolly"],
         ["65f51e4704f60b6519345ec5", "", "SwagLive: AsiaXXXTour"],
+        ["65a4f3960a4c5ddd39dc820e", "Su Chang", "SwagLive: woshisuchang"],
+        ["61d46f4d383b772167290dc2", "Mia", "SwagLive: miababe"],
+        ["5fb64491f1916c6904eac70b", "Elvababe", "SwagLive: elvababe"],
+        ["635688324a11ceb2c9fc3fa7", "", "SwagLive: daxiangtw"],
+        ["6176227bcffc3a85b9ef74dd", "", "SwagLive: peachmedia"],
     ]
 
     def start_requests(self):

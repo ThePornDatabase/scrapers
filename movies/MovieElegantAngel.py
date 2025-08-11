@@ -1,4 +1,5 @@
 import re
+import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -9,11 +10,14 @@ class MovieElegantAngelSpider(BaseSceneScraper):
     network = 'Elegant Angel'
     parent = 'Elegant Angel'
 
-    start_urls = [
-        'https://www.elegantangel.com'
-    ]
+    start_url = 'https://www.elegantangel.com'
 
     cookies = [{"name": "ageConfirmed", "value": True}]
+
+    paginations = [
+        '/streaming-elegant-angel-dvds-on-video.html?page=%s&hybridview=member',
+        '/elegant-angel-new-release-porn-movies.html?page=%s&media=2&studio=152',
+    ]
 
     custom_scraper_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
@@ -38,7 +42,22 @@ class MovieElegantAngelSpider(BaseSceneScraper):
         'external_id': 'scene/(\\d+)',
         'trailer': '',
         'pagination': '/streaming-elegant-angel-dvds-on-video.html?page=%s&hybridview=member'
+        # ~ 'pagination': '/elegant-angel-new-release-porn-movies.html?page=%s&media=2&studio=152'
     }
+
+    def get_next_page_url(self, base, page, pagination):
+        return self.format_url(base, pagination % page)
+
+    def start_requests(self):
+        ip = requests.get('https://api.ipify.org').content.decode('utf8')
+        print('My public IP address is: {}'.format(ip))
+
+        meta = {}
+        meta['page'] = self.page
+
+        for pagination in self.paginations:
+            meta['pagination'] = pagination
+            yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page, meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         meta = response.meta
@@ -55,7 +74,7 @@ class MovieElegantAngelSpider(BaseSceneScraper):
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
         meta = response.meta
@@ -67,11 +86,12 @@ class MovieElegantAngelSpider(BaseSceneScraper):
     def parse_movie(self, response):
         meta = response.meta
         scenes = response.xpath('//h2[contains(text(), "Scene List")]/../following-sibling::div[contains(@class, "item-grid-scene")]/div[@class="grid-item"]/article[1]/div[1]/a/@href').getall()
-        if len(scenes) > 1:
-            item = SceneItem()
+        if len(scenes) > 1 or not len(scenes):
+            item = self.init_scene()
             item['title'] = self.cleanup_title(response.xpath('//h1[@class="description"]/text()').get().strip())
-            scenedate = response.xpath('//span[contains(text(), "Released:")]/following-sibling::text()').get()
-            item['date'] = self.parse_date(scenedate, date_formats=['%b %d, %Y']).isoformat()
+            scenedate = response.xpath('//span[contains(text(), "Released:")]/following-sibling::text()')
+            if scenedate:
+                item['date'] = self.parse_date(scenedate.get(), date_formats=['%b %d, %Y']).strftime('%Y-%m-%d')
             description = response.xpath('//div[@class="synopsis"]/p//text()')
             if description:
                 item['description'] = " ".join(description.getall())
@@ -144,9 +164,11 @@ class MovieElegantAngelSpider(BaseSceneScraper):
                     item['scenes'].append({'site': item['site'], 'external_id': re.search(r'/(\d+)/.*?\.html', sceneurl).group(1)})
             meta['movie'] = item
 
-            yield self.check_item(item, self.days)
-            for sceneurl in sceneurls:
-                yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
+            check = self.check_item(item, self.days)
+            if check:
+                yield self.check_item(item, self.days)
+                for sceneurl in sceneurls:
+                    yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
         meta = response.meta

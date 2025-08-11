@@ -60,7 +60,15 @@ class NetworkCarnalPlusSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):
-        title = response.xpath('//h2[@class="video-detail-h2"]//text()').getall()
+        title = response.xpath('//h2[@class="video-detail-h2"]//text()')
+        if title:
+            title = title.getall()
+
+        if not title:
+            title = response.xpath('//h1[@class="video-detail-h2"]//text()')
+            if title:
+                title = title.getall()
+
         title = " - ".join(title)
         return string.capwords(title)
 

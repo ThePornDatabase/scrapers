@@ -16,7 +16,7 @@ class SiteRawFuckClubSpider(BaseSceneScraper):
     selector_map = {
         'title': '//div[@class="fluid-breadcrumbs"]/..//h2/text()',
         'description': '//p[@class="watch-description"]/text()',
-        'date': '//p[@class="watch-published-date"]/text()',
+        'date': '//p[@class="watch-published-date"]/text()[contains(., ",")]',
         're_date': r'(\w+ \d{1,2}, \d{4})',
         'date_formats': ['%B %d, %Y'],
         'image': '//meta[@property="og:image"]/@content|//meta[@name="twitter:image"]/@content',

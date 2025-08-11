@@ -60,7 +60,7 @@ class SiteHumiliationPOVSpider(BaseSceneScraper):
         meta = response.meta
         jsondata = json.loads(response.text)
         for scene in jsondata:
-            item = SceneItem()
+            item = self.init_scene()
 
             item['id'] = str(scene['id'])
             item['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', scene['date']).group(1)
@@ -68,14 +68,17 @@ class SiteHumiliationPOVSpider(BaseSceneScraper):
             image = re.search(r'img src.*?(http.*?uploads\/.*?\.\w{3})', scene['content']['rendered'])
             if image:
                 image_url = image.group(1)
-                item['image'] = image_url
-                im = Image.open(requests.get(image_url, stream=True).raw)
-                im.seek(1)
-                filename = f"screengrab-{str(random.randrange(100,999999999))}.png"
-                im.save(filename)
-                with open(filename, "rb") as image_file:
-                    item['image_blob'] = base64.b64encode(image_file.read()).decode('utf-8')
-                os.remove(filename)
+                try:
+                    item['image'] = image_url
+                    im = Image.open(requests.get(image_url, stream=True).raw)
+                    im.seek(1)
+                    filename = f"screengrab-{str(random.randrange(100,999999999))}.png"
+                    im.save(filename)
+                    with open(filename, "rb") as image_file:
+                        item['image_blob'] = base64.b64encode(image_file.read()).decode('utf-8')
+                    os.remove(filename)
+                except Exception as e:
+                    print(f"Encountered an error with images: {e}")
             else:
                 item['image'] = ""
                 item['image_blob'] = ""

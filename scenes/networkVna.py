@@ -45,6 +45,7 @@ class VnaNetworkSpider(BaseSceneScraper):
         'https://vnavickie.com',              #Rip
         'https://vickyathome.com',              #Rip
         'https://womenbyjuliaann.com',
+        'https://wydesyde.com',
 
         # Invalid VNA Sites, here for reference
         # Can't be scraped for various reasons...  Locked, no pagination, no video page, etc

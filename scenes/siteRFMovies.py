@@ -45,7 +45,7 @@ class SiteRFMoviesSpider(BaseSceneScraper):
         jsondata = response.json()
         jsondata = jsondata['video']
         if jsondata:
-            item = SceneItem()
+            item = self.init_scene()
             item['site'] = "RF Movies"
             item['parent'] = "RF Movies"
             item['network'] = "RF Movies"
@@ -59,10 +59,10 @@ class SiteRFMoviesSpider(BaseSceneScraper):
             item['id'] = jsondata['id']
             item['image'] = jsondata['artwork']['large']
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['tags'] = []
             if jsondata['genres']:
                 for genre in jsondata['genres']:
-                    item['tags'].append(genre['title']['en'])
+                    if genre['title']['en']:
+                        item['tags'].append(genre['title']['en'])
             if "trailer" in meta:
                 item['trailer'] = meta['trailer']
             else:
@@ -73,4 +73,5 @@ class SiteRFMoviesSpider(BaseSceneScraper):
                     item['duration'] = self.duration_to_seconds(jsondata['meta']['duration'])
             item['type'] = 'Scene'
 
+            # ~ print(item)
             yield self.check_item(item, self.days)

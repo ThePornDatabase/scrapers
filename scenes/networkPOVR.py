@@ -28,7 +28,7 @@ class NetworkPOVRSpider(BaseSceneScraper):
         'external_id': r'.*-(\d+)$',
         'trailer': '',
         # ~ 'pagination': '/?p=%s'
-        'pagination': '/studios/povr-originals?p=%s'
+        'pagination': '/studios/povr-originals?o=d&p=%s'
     }
 
     def start_requests(self):

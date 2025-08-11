@@ -4,14 +4,12 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SiteARPornSpider(BaseSceneScraper):
+class SiteVRPornSpider(BaseSceneScraper):
     name = 'ARPorn'
-    site = 'ARPorn'
-    parent = 'ARPorn'
-    network = 'ARPorn'
 
     start_urls = [
-        'https://vrporn.com/studio/arporn/'
+        ['https://vrporn.com/studio/arporn/', 'AR Porn'],
+        ['https://vrporn.com/studio/vrfanservice/', 'VR Fan Service'],
     ]
 
     selector_map = {
@@ -38,7 +36,11 @@ class SiteARPornSpider(BaseSceneScraper):
         meta = {}
         meta['page'] = self.page
 
-        for link in self.start_urls:
+        for site in self.start_urls:
+            link = site[0]
+            meta['site'] = site[1]
+            meta['parent'] = site[1]
+            meta['network'] = site[1]
             yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):

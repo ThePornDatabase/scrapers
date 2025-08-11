@@ -15,21 +15,21 @@ class SiteEnjoyxSpider(BaseSceneScraper):
         'https://enjoyx.com',
     ]
 
-    cookies = [{
-                    "domain": "enjoyx.com",
-                    "hostOnly": true,
-                    "httpOnly": false,
-                    "name": "cookieConsent",
-                    "path": "/",
-                    "sameSite": "unspecified",
-                    "secure": false,
-                    "session": false,
-                    "storeId": "0",
-                    "value": "{\"essential\":[\"all\"],\"nonessential\":[\"all\"]}"
-                }]
+    # ~ cookies = [{
+                    # ~ "domain": "enjoyx.com",
+                    # ~ "hostOnly": true,
+                    # ~ "httpOnly": false,
+                    # ~ "name": "cookieConsent",
+                    # ~ "path": "/",
+                    # ~ "sameSite": "unspecified",
+                    # ~ "secure": false,
+                    # ~ "session": false,
+                    # ~ "storeId": "0",
+                    # ~ "value": "{\"essential\":[\"all\"],\"nonessential\":[\"all\"]}"
+                # ~ }]
 
     selector_map = {
-        'title': '//div[contains(@class, "video-detail__title")]/text()',
+        'title': '//h1[contains(@class, "detail__title") and contains(@class, "max")]/text()',
         'description': '',
         'date': '//div[contains(@class, "hide-xxs-max")]//div[contains(@class, "video-info__time")]/text()',
         're_date': r'(\d{1,2} \w+, \d{4})',

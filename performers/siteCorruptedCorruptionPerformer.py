@@ -19,9 +19,9 @@ class SiteCorruptedCorruptionPerformerSpider(BasePerformerScraper):
         for performer in performers:
             item = PerformerItem()
 
-            perf_name
+            perf_name = performer.xpath('.//p/a[contains(@href, "/models/")]/text()').get()
             item['name'] = self.cleanup_title(perf_name.strip())
-            image = performer.xpath('')
+            image = performer.xpath('.//img/@src0_2x')
             if image:
                 item['image'] = self.format_link(response, image.get())
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
@@ -44,7 +44,7 @@ class SiteCorruptedCorruptionPerformerSpider(BasePerformerScraper):
             item['piercings'] = ''
             item['tattoos'] = ''
             item['weight'] = ''
-            item['network'] = ''
-            item['url'] = self.format_link(response, performer.xpath('').get())
+            item['network'] = 'collectivecorruption'
+            item['url'] = self.format_link(response, performer.xpath('.//p/a[contains(@href, "/models/")]/@href').get())
 
             yield item

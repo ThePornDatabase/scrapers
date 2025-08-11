@@ -14,9 +14,10 @@ class SiteKinkAcademySpider(BaseSceneScraper):
     start_url = 'https://www.kinkacademy.com'
 
     paginations = [
-        '/category/skill-level/basic-skill/page/%s/',
-        '/category/skill-level/intermediate-skill/page/%s/',
-        '/category/skill-level/advanced-skill/page/%s/',
+        # ~ '/category/skill-level/basic-skill/page/%s/',
+        # ~ '/category/skill-level/intermediate-skill/page/%s/',
+        # ~ '/category/skill-level/advanced-skill/page/%s/',
+        '/category/experts/page/%s/',
     ]
 
     selector_map = {
@@ -62,8 +63,13 @@ class SiteKinkAcademySpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//article[contains(@class, "format-video")]/header/figure/a/@href').getall()
+        scenes = response.xpath('//article[contains(@class, "format-video")]/header/figure')
         for scene in scenes:
+            meta['orig_image'] = scene.xpath('.//img/@src')
+            if meta['orig_image']:
+                meta['orig_image'] = meta['orig_image'].get()
+
+            scene = scene.xpath('./a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
@@ -75,3 +81,9 @@ class SiteKinkAcademySpider(BaseSceneScraper):
         for perf in performerlist:
             performers.append(string.capwords(html.unescape(perf)))
         return performers
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image or image in response.url:
+            image = response.meta['orig_image']
+        return image

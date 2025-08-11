@@ -38,6 +38,10 @@ class FiveKPornSpider(BaseSceneScraper):
             site = site.get()
             if "5kteen" in site.lower():
                 return "5K Teens"
+            if "8kteen" in site.lower():
+                return "8K Teens"
+            if "8kmilf" in site.lower():
+                return "8K Milfs"
         return "5K Porn"
 
     def get_parent(self, response):

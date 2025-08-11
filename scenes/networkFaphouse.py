@@ -10,6 +10,8 @@ class NetworkFaphouseSpider(BaseSceneScraper):
     performers = [
         ["/transgender/models/lucie-arztin?page=%s", "Lucie Arztin", "Faphouse: Lucie Arztin"],
         ["/models/wanilianna?page=%s", "Wanilianna", "Faphouse: Wanilianna"],
+        ["/models/karinalin?page=%s", "Karina Lin2", "Faphouse: Karina Lin"],
+        ["/studios/african-sex-trip?page=%s", "", "Faphouse: African Sex Trip"],
     ]
 
     selector_map = {

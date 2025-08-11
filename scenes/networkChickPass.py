@@ -35,13 +35,13 @@ class SiteChickPassSpider(BaseSceneScraper):
                 meta['site'] = site.get().strip()
             else:
                 meta['site'] = False
-            meta['date'] = self.parse_date('today').isoformat()
+            meta['date'] = self.parse_date('today').strftime('%Y-%m-%d')
             date = scene.xpath('.//div[@class="date"]/text()')
             if date:
                 date = " ".join(date.getall())
                 date = re.search(r'(\w+ \d{1,2}, \d{4})', date)
                 if date:
-                    meta['date'] = self.parse_date(date.group(1), date_formats=['%b %d, %Y']).isoformat()
+                    meta['date'] = self.parse_date(date.group(1), date_formats=['%b %d, %Y']).strftime('%Y-%m-%d')
 
             scene = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):

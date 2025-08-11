@@ -77,14 +77,14 @@ class LegalPornoSpider(BaseSceneScraper):
         item['duration'] = self.get_duration(response)
         item['trailer'] = self.get_trailer(response)
         item['url'] = self.get_url(response)
-        item['network'] = self.get_network(response)
-        item['parent'] = 'Legal Porno'
+        item['network'] = item['site']
+        item['parent'] = item['site']
 
         matches = ['bangbros', 'jeffsmodels', 'private', 'antoniosuleiman', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
-                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov',
+                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov', 'joibabes',
                    'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
                    'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue',
-                   'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'sexmex', 'alexlegend', 'aglaeaproductions']
+                   'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'sexmex', 'alexlegend', 'aglaeaproductions', 'dripdrop', 'dripdropprod', 'artemixxx', 'theartemixxx']
         if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
             yield self.check_item(item, self.days)

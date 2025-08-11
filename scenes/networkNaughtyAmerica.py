@@ -1,6 +1,6 @@
 import re
+from scrapy.utils.project import get_project_settings
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -49,31 +49,42 @@ class NaughtyAmericaSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
+        settings = get_project_settings()
         meta = {}
         meta['page'] = self.page
         meta['playwright'] = True
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+        meta['handle_httpstatus_list'] = [202]
+
+        singleurl = self.settings.get('url')
+        if singleurl:
+            yield scrapy.Request(singleurl, callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
+        else:
+            for link in self.start_urls:
+                yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath(
-            '//div[@class="scene-grid-item"]/a[contains(@href,"/scene/")]/@href').getall()
+        scenes = response.xpath('//div[@class="scene-grid-item"]/a[contains(@href,"/scene/")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_image(self, response):
-        image = response.xpath(
-            '//a[@class="play-trailer"]/picture[1]//source[contains(@data-srcset,"jpg")]/@data-srcset').get()
+        image = response.xpath('//a[@class="play-trailer"]/picture[1]//source[contains(@data-srcset,"jpg")]/@data-srcset')
         if not image:
-            image = response.xpath(
-                '//dl8-video/@poster[contains(.,"jpg")]').get()
+            image = response.xpath('//dl8-video/@poster[contains(.,"jpg")]')
+        if image:
+            image = image.get()
 
-        if image[0:2] == "//":
-            image = "https:" + image
-
-        return self.format_link(response, image)
+        # ~ if not image:
+            # ~ print(f"No image or missing image: {response.url}")
+            # ~ print(response.text)
+        # ~ else:
+        if image:
+            if image[0:2] == "//":
+                image = "https:" + image
+                return self.format_link(response, image)
+        return ""
 
     def get_site(self, response):
         site = response.xpath(

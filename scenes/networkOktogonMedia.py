@@ -41,10 +41,16 @@ class OktogonMediaSpider(BaseSceneScraper):
     }
 
     def start_requests(self):
-        for url in self.start_urls:
-            for pagination in self.paginations:
-                meta = {'page': self.page, 'pagination': pagination}
-                yield scrapy.Request(url=self.get_next_page_url(url, self.page, pagination), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+        meta = {}
+        singleurl = self.settings.get('url')
+        if singleurl:
+            meta['date'] = ""
+            yield scrapy.Request(singleurl, callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
+        else:
+            for url in self.start_urls:
+                for pagination in self.paginations:
+                    meta = {'page': self.page, 'pagination': pagination}
+                    yield scrapy.Request(url=self.get_next_page_url(url, self.page, pagination), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         if response.status == 200:

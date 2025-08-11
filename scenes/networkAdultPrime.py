@@ -71,7 +71,7 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
         # ~ 'description': '//p[contains(@class,"ap-limited-description-text")]/text()',  # Blocked due to public scenes having generic site descriptions
         'description': '',
         'date': '//div[contains(@class, "player-wrapper")]//span[@class="description-releasedate"]/text()',
-        'date_formats': ['%d.%m.%Y','%d-%m-%Y'],
+        'date_formats': ['%d.%m.%Y', '%d-%m-%Y'],
         'image': '//div[contains(@class,"update-video-wrapper")]/a/div/@style|//video/@poster',
         're_image': r'(http.*\.jpg)',
         'performers': '//p[contains(@class,"update-info-line")]/b[contains(text(), "Performer")]/following-sibling::a/text()',
@@ -82,13 +82,32 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="row portal-grid"]//div[@class="overlay-wrapper"]/div[1]/a/@href').getall()
+        meta = response.meta
+        meta['ignore_sites'] = 'playboyplus,metartnetwork,yanks,tonightsgirlfriend,myfriendshotmom'
+        scenes = response.xpath('//div[@class="row portal-grid"]//div[@class="overlay-wrapper"]')
         for scene in scenes:
-            sceneid = re.search(r'Id=(\d+)', scene)
+            duration = scene.xpath('./..//span[contains(@class, "duration")]/text()')
+            if duration:
+                duration = duration.get()
+                duration = re.search(r'((?:\d{1,2}\:)?\d{2}\:\d{2})', duration)
+                if duration:
+                    meta['duration'] = self.duration_to_seconds(duration.group(1))
+
+            scene = scene.xpath('./div[1]/a/@href').get()
+            sceneid = re.search(r'video/(\d+)', scene)
             if sceneid:
+                site = re.search(r'site=([a-zA-Z0-9\+]+)', scene)
+                if site:
+                    site = site.group(1)
+                    site = re.sub(r'[^a-z0-9]+', '', site.lower())
+                    if site == "ogjav":
+                        site = "Original JAV"
+                    meta['site'] = site
+                    meta['parent'] = site
                 sceneid = sceneid.group(1)
                 scene = "https://adultprime.com/studios/video/" + sceneid
-                yield scrapy.Request(scene, callback=self.parse_scene)
+                meta['id'] = sceneid
+                yield scrapy.Request(scene, callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
         site = response.xpath('//b[contains(text(), "Studio")]/a[1]/text()')

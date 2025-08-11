@@ -31,7 +31,7 @@ class PrivateSpider(BaseSceneScraper):
         'date': '//meta[@itemprop="uploadDate"]/@content',
         'image': '//meta[@itemprop="thumbnailUrl"]/@content',
         'performers': '//ul[contains(@class,"scene-models-list")]/li/a[@data-track="PORNSTAR_NAME"]/text()',
-        'tags': '//ul[@class="scene-models-list-tags-sites"]/li[@class="tag-tags"]/a/text()',
+        'tags': '//ul[contains(@class, "scene-models-list-tags-sites")]/li[@class="tag-tags"]/a/text()|//ul[@class="scene-tags"]/li/a/text()',
         'external_id': '\\/(\\d+)$',
         'trailer': '',
         'pagination': '/scenes/%s/'

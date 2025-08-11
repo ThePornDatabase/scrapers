@@ -4,7 +4,8 @@ import scrapy
 import re
 from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
-
+true = True
+false = False
 
 class BadoinkVrSpider(BaseSceneScraper):
     name = 'BadoinkVr'
@@ -20,19 +21,24 @@ class BadoinkVrSpider(BaseSceneScraper):
         'https://realvr.com',
     ]
 
+    cookies = [{"domain":"kinkvr.com","hostOnly":true,"httpOnly":false,"name":"agreedToDisclaimer","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"true"}]
+
     selector_map = {
-        'title': '//h1[@itemprop="name"]/@content | //h1[contains(@class, "video-title")]/text()',
-        'description': '//p[@itemprop="description"]/@content | //p[@class="video-description"]/text()',
+        'title': '//h1[@itemprop="name"]/@content | //h1[contains(@class, "video-title")]/text()|//h1[contains(@class, "page-title")]/text()',
+        'description': '//p[@itemprop="description"]/@content | //p[@class="video-description"]/text()|//div[contains(@class, "accordion-body")]',
         'date': '//p[@itemprop="uploadDate"]/@content | //p[@class="video-upload-date"]/text()',
-        'image': '//meta[@itemprop="thumbnailUrl"]/@content | //img[@class="video-image"]/@src',
-        'performers': '//a[contains(@class, "video-actor-link")]/text()',
-        'tags': "//p[@class='video-tags']//a/text()",
+        'image': '//meta[@itemprop="thumbnailUrl"]/@content|//img[@class="video-image"]/@src|//video/@poster|//dl8-video/@poster',
+        'performers': '//a[contains(@class, "video-actor-link")]/text()|//td[contains(text(), "Starring:")]/following-sibling::td/a[contains(@href, "girl")]/text()',
+        'tags': '//p[@class="video-tags"]//a/text()|//td[contains(text(), "Categories:")]/following-sibling::td/a[contains(@href, "category")]/text()',
         'external_id': '-(\\d+)\\/?$',
-        'trailer': ''
+        'trailer': '//meta[@property="og:video"]/@content'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath("//div[@class='tile-grid-item']//a[contains(@class, 'video-card-title')]/@href").getall()
+        if "kinkvr" in response.url:
+            scenes = response.xpath("//div[@class='video-grid-view']//a[1]/@href").getall()
+        else:
+            scenes = response.xpath("//div[@class='tile-grid-item']//a[contains(@class, 'video-card-title')]/@href").getall()
         for scene in scenes:
             scene = self.format_link(response, scene)
             yield scrapy.Request(scene, callback=self.parse_scene)
@@ -45,24 +51,31 @@ class BadoinkVrSpider(BaseSceneScraper):
         elif 'vrcosplay' in base:
             selector = '/cosplaypornvideos/%s?order=newest'
         elif 'kinkvr' in base:
-            selector = '/bdsm-vr-videos/%s?order=newest'
+            selector = '/videos/page%s/?sortby=NEWEST'
 
         return self.format_url(base, selector % page)
 
     def get_date(self, response):
-        date = self.process_xpath(
-            response, self.get_selector_map('date')).get()
-        if date:
-            return dateparser.parse(date.strip()).isoformat()
-        return datetime.now().isoformat()
+        if "kinkvr" in response.url:
+            date = response.xpath('//td[contains(text(), "Released:")]/following-sibling::td/text()')
+            if date:
+                date = self.parse_date(date.get().strip(), date_formats=['%B %d, %Y']).strftime('%Y-%m-%d')
+                return date
+        else:
+            date = self.process_xpath(response, self.get_selector_map('date'))
+            if date:
+                return dateparser.parse(date.get().strip()).strftime('%Y-%m-%d')
+        return ""
 
     def parse_scene(self, response):
         item = SceneItem()
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
         item['site'] = self.get_site(response)
-        item['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', self.get_date(response)).group(1)
+        item['date'] = self.get_date(response)
         item['image'] = self.get_image(response)
+        if "-small" in item['image']:
+            item['image'] = item['image'].replace("-small", "-medium")
         if item['image']:
             item['image_blob'] = self.get_image_blob(response)
         else:

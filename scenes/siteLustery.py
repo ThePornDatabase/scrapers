@@ -1,93 +1,66 @@
-import re
-import string
-import datetime as dt
-import json
+from datetime import datetime
 import scrapy
+import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteLusterySpider(BaseSceneScraper):
     name = 'Lustery'
-    network = 'Lustery'
 
-    start_url = 'https://lustery.com'
+    start_urls = ['https://lustery.com']
 
     selector_map = {
         'external_id': r'',
-        'pagination': '/api/feed-item/get-items?offset=%s&type=videos',
-        'type': 'Scene',
+        'pagination': 'https://lustery.com/api/videos?offset=%s&sort=latest',
     }
 
-    def start_requests(self):
-        meta = {}
-        meta['page'] = self.page
-        yield scrapy.Request('https://lustery.com/', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def start_requests_2(self, response):
-        meta = response.meta
-        responsetext = response.text
-        responsetext = responsetext.replace('\\', '').replace("\n", "").replace("\r", "").replace("\t", "")
-        # ~ buildId = re.search(r'\"buildId\".*?\"(.*?)\"', response.text)
-        buildId = re.search(r'\"buildId.*?(\w+?)\\?\"', response.text)
-        if buildId:
-            meta['buildId'] = buildId.group(1)
-            link = self.get_next_page_url(self.start_url, self.page)
-            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
-
     def get_next_page_url(self, base, page):
-        page = str((int(page) - 1) * 10)
+        page = str((int(page) - 1) * 18)
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        jsondata = json.loads(response.text)
         meta = response.meta
-        for scene in jsondata['feedItems']:
-            if scene['publishAt']:
-                meta['date'] = dt.datetime.utcfromtimestamp(scene['publishAt']).strftime('%Y-%m-%dT%H:%M:%S.%f%z')
-            else:
-                meta['date'] = None
-            if scene['videoPermalink']:
-                meta['id'] = scene['videoPermalink']
-                link = f"https://lustery.com/modules/LusteryNew/template/assets/out/_next/data/{meta['buildId']}/video-preview/{meta['id']}.json"
-                # ~ link = f"https://lustery.com/_next/data/{meta['buildId']}/video/{meta['id']}.json?permalink={meta['id']}"
-                yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
+        jsondata = response.json()
+        permalinks = jsondata['currentPagePermalinks']
+        for permalink in permalinks:
+            meta['id'] = permalink
+            link = f"https://lustery.com/api/videos/get-by-permalinks?permalinks%5B%5D={permalink}"
+            yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
         meta = response.meta
-        jsondata = json.loads(response.text)
-        jsondata = jsondata['pageProps']
-        item = SceneItem()
-        item['id'] = meta['id']
-        item['date'] = meta['date']
-        item['url'] = f"https://lustery.com/video-preview/{item['id']}"
+        jsondata = response.json()
+        if "videos" in jsondata and jsondata['videos']:
+            scene = jsondata['videos'][0]
+            resources = jsondata['resources']
+            item = self.init_scene()
 
-        # Items from 'video/video_id_node'
-        video = jsondata['fallback'][f"video/{item['id']}"]['video']
-        item['title'] = video['title']
-        item['duration'] = video['duration']
-        item['tags'] = video['tags']
-        item['tags'] = list(map(lambda x: string.capwords(x.replace("-", " ").strip()), item['tags']))
-        if "posterFullPath" in video and video['posterFullPath']:
-            item['image'] = f"https://lustery.com/{video['posterFullPath']}"
-        elif "poster" in video and video['poster']:
-            if "staticPath" in video['poster'] and video['poster']['staticPath']:
-                item['image'] = f"https://static.lustery.com/cdn-cgi/image/format=auto/{video['poster']['staticPath']}"
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        performers = video['coupleName']
-        if "&" in performers:
-            item['performers'] = performers.split("&")
-        else:
-            item['performers'] = [performers]
-        item['performers'] = list(map(lambda x: string.capwords(x.strip()), item['performers']))
+            item['title'] = self.cleanup_title(scene['title'])
 
-        # Items from 'video/video_id_node/info'
-        info = jsondata['fallback'][f"video/{item['id']}/info"]['videoInfo']
-        item['description'] = info['description']
+            if "poster" in scene and scene['poster']:
+                item['image'] = f"https://static.lustery.com/cdn-cgi/image/format=auto/{scene['poster']['staticPath']}"
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-        item['site'] = 'Lustery'
-        item['parent'] = 'Lustery'
-        item['network'] = 'Lustery'
-        item['trailer'] = ''
+            item['date'] = datetime.utcfromtimestamp(scene['publishAt']).strftime('%Y-%m-%d')
 
-        yield self.check_item(item, self.days)
+            item['id'] = meta['id']
+            item['url'] = f"https://lustery.com/preview/{meta['id']}"
+            item['site'] = 'Lustery'
+            item['tags'] = scene['tags']
+            item['duration'] = scene['duration']
+            item['parent'] = 'Lustery'
+            item['network'] = 'Lustery'
+
+            for resource in resources:
+                if "videoInfo" in resources[resource] and resources[resource]['videoInfo']:
+                    item['description'] = resources[resource]['videoInfo']['description']
+
+            if "coupleName" in scene and scene['coupleName']:
+                if "&" in scene['coupleName']:
+                    coupleName = scene['coupleName'].split("&")
+                else:
+                    coupleName = [scene['coupleName']]
+                for model in coupleName:
+                    item['performers'].append(string.capwords(model.strip()))
+
+            yield self.check_item(item, self.days)

@@ -14,7 +14,7 @@ class SiteJeffsModelsSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="section-title"]/h4/text()',
+        'title': '//div[@class="section-title"]/h4/text()|//div[@class="section-title"]/h1/text()',
         'description': '//div[@class="section-content"]//p[contains(@class, "read")]/text()',
         'date': '//div[@class="section-content"]//small[contains(@class,"updated")]/text()',
         'date_formats': ['%b %d, %Y'],

@@ -29,7 +29,7 @@ class SiteJackOffGirlsSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//div[contains(@class, "bnaVideoThumb")]/a/@href').getall()
+        scenes = response.xpath('//div[contains(@class, "item-thumb")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
