@@ -82,10 +82,7 @@ class SiteBlurredMediaSpider(BaseSceneScraper):
 
             item['date'] = scene['video']['dateRelease']
 
-            if item['date'] > '2023-12-18' and meta['sitedef']['sitenum'] == "2":
-                item['id'] = scene['video']['slug']
-            else:
-                item['id'] = scene['video']['id']
+            item['id'] = scene['video']['id']
 
             if "description" in scene['video'] and scene['video']['description']:
                 item['description'] = self.cleanup_description(scene['video']['description'])

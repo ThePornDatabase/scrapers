@@ -13,6 +13,8 @@ class SiteBlackMassiveCocksSpider(BaseSceneScraper):
         'https://blackmassivecocks.com',
     ]
 
+    cookies = [{"name": "ageConfirmed", "value": True}]
+
     selector_map = {
         'title': '//h1[@class="description"]/text()',
         'description': '',

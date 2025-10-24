@@ -1,22 +1,27 @@
 import re
 import string
-import html
-import json
-import unidecode
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteDorcelPagesSpider(BaseSceneScraper):
     name = 'DorcelPages'
 
-    start_urls = [
-        ['https://api.luxure.com/24api/v1/sites/103/freetour/videos?is_mobile=false&take=12&page=%s', 'Luxure', 'https://luxure.com', 'https://api.luxure.com/24api/v1/sites/103/freetour/videos/%s'],
-        ['https://api.russian-institute.com/24api/v1/sites/104/homepage/freetour?is_mobile=false&take=14&page=%s', 'Russian Insitute', 'https://russian-institute.com', 'https://api.russian-institute.com/24api/v1/sites/104/freetour/videos/%s'],
-        ['https://api.xxx-vintage.com/24api/v1/sites/105/homepage/freetour?is_mobile=false&take=14&page=%s', 'XXX Vintage', 'https://xxx-vintage.com', 'https://api.xxx-vintage.com/24api/v1/sites/105/freetour/videos/%s'],
-        ['https://api.africa-xxx.com/24api/v1/sites/106/homepage/freetour?is_mobile=false&take=14&page=%s', 'Africa XXX', 'https://africa-xxx.com', 'https://api.africa-xxx.com/24api/v1/sites/106/freetour/videos/%s']
+    start_url = "https://dorcelnetwork.com/"
+    sites = [
+        'africa-xxx',
+        'girls-at-work',
+        'contact',
+        'luxure',
+        'xxx-vintage',
+        'thr3e',
     ]
+
+    headers = {
+        'Accept-Language': 'en-US,en',
+        'x-requested-with': 'XMLHttpRequest',
+        'referer': 'https://dorcelnetwork.com/',
+    }
 
     custom_settings = {'CONCURRENT_REQUESTS': '1',
                        'AUTOTHROTTLE_ENABLED': 'True',
@@ -32,33 +37,30 @@ class SiteDorcelPagesSpider(BaseSceneScraper):
                        }
                        }
 
-    headers = {
-        'token': 'mysexmobile',
-        'siteId': '103',
-    }
-
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
+        'title': '//h1[contains(@class, "title")]/text()',
+        'date': '//div[contains(@class, "right")]/span[contains(@class, "publish_date")]/text()',
+        'image': '//div[contains(@class, "player_container")]//picture/img/@data-src',
+        'performers': '//div[@class="actress"]/a/text()',
         'tags': '',
         'trailer': '',
-        'external_id': r'',
+        'external_id': r'/videos/(\d+)/',
         'pagination': '/24api/v1/sites/103/freetour/videos?is_mobile=false&take=12&page=%s'
     }
 
-    def get_next_page_url(self, pagination, page):
-        return pagination % page
+    def get_next_page_url(self, site, page):
+        url = f"https://dorcelnetwork.com/collection/{site}/more?lang=en&page={str(page)}"
+        return url
 
     def start_requests(self):
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link[0], self.page),
-                                 callback=self.parse,
-                                 meta={'page': self.page, 'site': link[1], 'base': link[2], 'pagination': link[0], 'sceneurl': link[3]},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+        for site in self.sites:
+            meta = {}
+            meta['orig_site'] = site
+            meta['parent'] = "Dorcel"
+            meta['network'] = "Dorcel"
+            meta['page'] = self.page
+            url = self.get_next_page_url(meta['orig_site'], self.page)
+            yield scrapy.Request(url, method='POST', callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -72,80 +74,77 @@ class SiteDorcelPagesSpider(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(meta['pagination'], meta['page']),
-                                     callback=self.parse,
-                                     meta=meta,
-                                     headers=self.headers,
-                                     cookies=self.cookies)
+                url = self.get_next_page_url(meta['orig_site'], meta['page'])
+                yield scrapy.Request(url, method='POST', callback=self.parse, meta=meta, headers=self.headers)
 
     def get_scenes(self, response):
-        meta = response.meta
-        jsondata = json.loads(response.text)
-        jsondata = jsondata['payload']['scenes']
-        for scene in jsondata:
-            if isinstance(scene, dict):
-                meta['id'] = str(scene['id'])
+        scenes = response.xpath('//div[contains(@class, "scene thumbnail")]/a[1]/@href').getall()
+        for scene in scenes:
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=response.meta)
+
+    def get_site(self, response):
+        site = response.meta['orig_site']
+        if "contact" in site.lower() or "vintage" in site.lower() or "africa" in site.lower():
+            site = "Dorcel: " + site
+        return string.capwords(site)
+
+    def get_duration(self, response):
+        duration = response.xpath('//div[contains(@class, "right")]/span[contains(@class, "duration")]/text()')
+        if duration:
+            duration = duration.get()
+            hours = re.search(r'(\d+)h', duration)
+            if hours:
+                hours = int(hours.group(1)) * 3600
             else:
-                meta['id'] = str(jsondata[scene]['id'])
-            url = meta['sceneurl'] % meta['id']
-            yield scrapy.Request(url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
+                hours = 0
 
-    def parse_scene(self, response):
-        meta = response.meta
-        item = SceneItem()
-        sceneid = re.search(r'payload.*?scenes.*?(\d+)', response.text).group(1)
-        jsondata = json.loads(response.text)
-        scene = jsondata['payload']['scenes'][sceneid]
-        if "translations" in scene:
-            for lang in scene['translations']:
-                if lang['language_id'] == 1:
-                    item['id'] = str(lang['scene_id'])
-                    if lang['title']:
-                        item['title'] = unidecode.unidecode(string.capwords(lang['title']).strip())
-                    else:
-                        item['title'] = unidecode.unidecode(string.capwords(lang['scene']['title']).strip())
-                    if lang['story']:
-                        item['description'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', lang['story'])).strip())
-                    else:
-                        item['description'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', lang['scene']['story'])).strip())
-                    item['date'] = lang['scene']['original_publication_date']
-
-        if 'id' not in item or not item['id']:
-            item['id'] = str(scene['id'])
-            item['title'] = unidecode.unidecode(string.capwords(scene['title']).strip())
-            item['description'] = ''
-            item['date'] = self.parse_date('today').isoformat()
-
-        if 'original' in scene['video_cover']:
-            item['image'] = scene['video_cover']['original']
-        else:
-            item['image'] = scene['video_cover']['1']
-
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['trailer'] = None
-        item['site'] = meta['site']
-        item['parent'] = meta['site']
-        item['network'] = 'Dorcel Club'
-
-        item['performers'] = []
-        for performer in scene['models']:
-            item['performers'].append(unidecode.unidecode(scene['models'][performer]['stage_name']))
-
-        item['tags'] = []
-        for tag in scene['mainScenetags']:
-            if 'translations' in scene['mainScenetags'][tag]:
-                for lang in scene['mainScenetags'][tag]['translations']:
-                    if lang['language'] == 'en':
-                        item['tags'].append(string.capwords(lang['name']))
+            minutes = re.search(r'(\d+)m', duration)
+            if minutes:
+                minutes = int(minutes.group(1)) * 60
             else:
-                if '/en/' in scene['mainScenetags'][tag]['url']:
-                    item['tags'].append(string.capwords(scene['mainScenetags'][tag]['name']))
+                minutes = 0
 
-        if 'hreflang' in scene:
-            item['url'] = meta['base'] + scene['hreflang']['en']
-        elif 'routePaths' in scene:
-            for scenepath in scene['routePaths']:
-                if 'en' in scenepath:
-                    item['url'] = meta['base'] + scene['routePaths'][scenepath]['en']
+            seconds = re.search(r'm(\d+)', duration)
+            if seconds:
+                seconds = int(seconds.group(1))
+            else:
+                seconds = 0
 
-        yield self.check_item(item, self.days)
+            duration = hours + minutes + seconds
+            return str(duration)
+        return None
+
+    def get_description(self, response):
+        desc = response.xpath('//div[contains(@class, "description")]/div')
+        if desc:
+            if len(desc) > 1:
+                desc = desc.xpath('./span[contains(@class, "full")]/p//text()')
+            else:
+                desc = desc.xpath('./p//text()')
+            if desc:
+                return desc.get()
+        return ""
+
+    def get_image(self, response):
+        images = response.xpath('//div[contains(@class, "player_container")]//source/@data-srcset').getall()
+        if images:
+            image_list = []
+            for image in images:
+                match = re.search(r'.*(http.*?)\s2x.*', image)
+                if not match:
+                    match = re.search(r'.*(http.*?)\s1x.*', image)
+                if match:
+                    image_list.append(match.group(1))
+
+            def extract_area(url):
+                dim_match = re.search(r'_(\d{3,4})_(\d{3,4})_', url)
+                if dim_match:
+                    width, height = map(int, dim_match.groups())
+                    return width * height
+                return 0
+
+            if image_list:
+                largest_image = max(image_list, key=extract_area)
+                return largest_image
+

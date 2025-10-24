@@ -1,6 +1,8 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+true = True
+false = False
 
 
 class FrolicMeSpider(BaseSceneScraper):
@@ -14,6 +16,23 @@ class FrolicMeSpider(BaseSceneScraper):
     ]
 
     title_trash = ['- film', '- Film']
+
+    cookies =[
+        {
+            "domain": "www.frolicme.com",
+            "hostOnly": true,
+            "httpOnly": false,
+            "name": "fm_av_token",
+            "path": "/",
+            "sameSite": "unspecified",
+            "secure": true,
+            "session": true,
+            "storeId": "0",
+            "value": "1760971669.tier_2.2.yes.23924626553c7b06eb7af8ca29b07325d0a7e9d18cf6efd9fca7319cb1a51baa59d5e0cd0d.7b361cbfc6e82d7c12fb640be43fab23f069af202670416a7006f13c4fe8b4e9"
+        }
+    ]
+
+
 
     selector_map = {
         'title': '//div[@class="entry-title"]/text()',

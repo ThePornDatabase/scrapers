@@ -1,4 +1,5 @@
 import re
+import json
 import string
 import unicodedata
 import scrapy
@@ -30,93 +31,43 @@ class SitePegasProductionsSpider(BaseSceneScraper):
     selector_map = {
         'title': '//div[@class="span10"]/h4/text()',
         'description': '//div[@class="span10"]//h5/following-sibling::p[1]/text()',
-        'date': '//div[@id="date-duree"]/div[1]/p/text()',
-        'date_formats': ['%d/%m/%Y'],
         'image': '//script[contains(text(), "poster")]/text()',
         're_image': r'(http.*?\.jpg)',
-        'performers': '//p[contains(text(), "STARRING")]/following-sibling::div[@class="span5"]//h4/text()',
+        'performers': '//div[contains(@id,"synopsis-next-to-video")]//a[@itemprop="actor"]/text()',
         'tags': '//div[@class="span9"]/h4/strong[contains(text(), "Tags")]/following-sibling::text()',
         'external_id': r'\.com/(.*)\?',
         'trailer': '//script[contains(text(), "poster")]/text()',
         're_trailer': r'(http.*?\.mp4)',
-        'pagination': '/videos-porno-tour/page/%s?lang=en'
+        'pagination': '/wp-json/wp/v2/posts?per_page=24&page=%s'
     }
-
-    # ~ custom_scraper_settings = {
-        # ~ 'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        # ~ 'TWISTED_REACTOR': 'twisted.internet.asyncioreactor.AsyncioSelectorReactor',
-        # ~ 'AUTOTHROTTLE_ENABLED': True,
-        # ~ 'USE_PROXY': True,
-        # ~ 'AUTOTHROTTLE_START_DELAY': 1,
-        # ~ 'AUTOTHROTTLE_MAX_DELAY': 60,
-        # ~ 'CONCURRENT_REQUESTS': 1,
-        # ~ 'DOWNLOAD_DELAY': 2,
-        # ~ 'DOWNLOADER_MIDDLEWARES': {
-            # ~ # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
-            # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-            # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            # 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            # 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            # 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
-        # ~ },
-        # ~ 'DOWNLOAD_HANDLERS': {
-            # ~ "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            # ~ "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        # ~ }
-    # ~ }
-
-    def get_next_page_url(self, base, page):
-        if page == 1:
-            return "https://www.pegasproductions.com/videos-porno-tour?lang=en"
-        return self.format_url(base, self.get_selector_map('pagination') % page)
-
-    def start_requests(self):
-        yield scrapy.Request("https://www.pegasproductions.com/front-en.php", callback=self.start_requests2, headers=self.headers, cookies=self.cookies)
-
-    def start_requests2(self, response):
-        meta = response.meta
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta)
-
-    def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
-        count = 0
-        for scene in scenes:
-            count += 1
-            yield scene
-
-        if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
-                meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//span[contains(text(), "Latest") and not(contains(text(), "Girls"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href|//span[contains(text(), "Récentes") and not(contains(text(), "Filles"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href').getall()
-        # ~ scenes = response.xpath('//span[contains(text(), "Récentes") and not(contains(text(), "Filles"))]/following-sibling::div//div[@class="rollover_img_videotour"]/a/@href').getall()
-        for scene in scenes:
-            # ~ print(scene)
-            if "langue=" in scene:
-                scene = re.sub(r'langue=\w{2}', 'langue=en', scene)
-            # ~ scene = re.search(r'(.*)\?', scene).group(1)
-            # ~ print(scene)
-            # ~ scene = scene + "?langue=en"
-            meta['id'] = re.search(r'\.com/(.*)\?', scene).group(1)
-            # ~ time.sleep(5)
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        jsondata = json.loads(response.text)
+        for scene in jsondata:
+            blocklist = [8204, 1, 8108, 9742, 88, 8005, 11669, 11659, 9747, 8951]
+            if not any(val in scene['categories'] for val in blocklist):
+                meta['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', scene['date']).group(1)
+                meta['id'] = scene['slug']
+                meta['url'] = scene['link']
+                meta['orig_title'] = scene['title']['rendered']
+                yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta, cookies=self.cookies)
 
     def get_tags(self, response):
-        tags = response.xpath(self.get_selector_map('tags')).get()
-        tags = tags.split(",")
-        tags = list(map(lambda x: x.strip().title(), tags))
-        tags = [i for i in tags if i]
-        return tags
+        tags = response.xpath(self.get_selector_map('tags'))
+        if tags:
+            tags = tags.get()
+            tags = tags.split(",")
+            tags = list(map(lambda x: x.strip().title(), tags))
+            tags = [i for i in tags if i]
+            return tags
+        return []
 
     def get_title(self, response):
+        meta = response.meta
         title = super().get_title(response)
+        if not title:
+            title = meta['orig_title']
         return self.strip_accents(title)
 
     def get_performers(self, response):
@@ -141,3 +92,14 @@ class SitePegasProductionsSpider(BaseSceneScraper):
             image = response.xpath('//meta[@itemprop="thumbnailUrl"]/@content').get()
             image = image.replace("screenshots", "screenshots/")
         return image
+
+    def get_duration(self, response):
+        duration = response.xpath('//p[contains(text(), "duration:")]/text()')
+        if duration:
+            duration = duration.get()
+            duration = re.sub(r'[^a-z0-9:]+', '', duration.lower())
+            duration = re.search(r'(\d+)min', duration)
+            if duration:
+                duration = str(int(duration.group(1)) * 60)
+                return duration
+        return None

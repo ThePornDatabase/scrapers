@@ -29,7 +29,8 @@ class MovieDorcelClubSpider(BaseSceneScraper):
         'tags': '',
         'external_id': 'scene/(\\d+)',
         'trailer': '',
-        'pagination': '/en/porn-movie?p=%s'
+        # ~ 'pagination': '/en/porn-movie?p=%s'
+        'pagination': '/en/porn-movie-soon?p=%s'
     }
     custom_scraper_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',

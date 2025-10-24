@@ -1,4 +1,5 @@
 import re
+import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

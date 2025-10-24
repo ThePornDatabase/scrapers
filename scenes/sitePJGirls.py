@@ -18,13 +18,15 @@ class SitePJGirlsSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//h1/text()',
-        'description': '',
+        'description': '//div[contains(@class, "detailUvod")]/div/p//text()',
         'date': '//div[@class="info"]/h3[1]/text()',
         'date_formats': ['%B %d, %Y'],
         'image': '//div[@class="thumbs clear nomargin"]/div[@class="thumb mini"]/a/@href',
         'image_blob': True,
         'performers': '//div[@class="info"]/h3/a[contains(@href, "model")]/text()',
         'tags': '//div[contains(@class, "detailTagy")]/a/text()',
+        'duration': '//h3[contains(text(), "LENGTH:")]/text()',
+        're_duration': r'((?:\d{1,2}\:)?\d{2}\:\d{2})',
         'external_id': r'video/(\d+)',
         'trailer': '',
         'pagination': '/en/videos/?order=date&page=%s'
@@ -44,11 +46,7 @@ class SitePJGirlsSpider(BaseSceneScraper):
         page = curr_page - (self.page - 1)
 
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, page),
-                                 callback=self.parse,
-                                 meta={'page': page, 'start_page': curr_page},
-                                 headers=self.headers,
-                                 cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(link, page), callback=self.parse, meta={'page': page, 'start_page': curr_page}, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -62,11 +60,7 @@ class SitePJGirlsSpider(BaseSceneScraper):
                 meta = response.meta
                 meta['page'] = meta['page'] - 1
                 print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']),
-                                     callback=self.parse,
-                                     meta=meta,
-                                     headers=self.headers,
-                                     cookies=self.cookies)
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="thumb video"]/a[@class="img"]/@href').getall()

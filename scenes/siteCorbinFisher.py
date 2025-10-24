@@ -10,6 +10,8 @@ class SiteCorbinFisherSpider(BaseSceneScraper):
     parent = 'Corbin Fisher'
     site = 'Corbin Fisher'
 
+    cookies = [{"name": "warn", "value": "true"}]
+
     start_urls = [
         'https://www.corbinfisher.com',
     ]
@@ -31,6 +33,7 @@ class SiteCorbinFisherSpider(BaseSceneScraper):
         'external_id': r'.*/(.*?).html',
         'trailer': '',
         'pagination': '/tour/categories/guys/%s/latest/'
+        # ~ 'pagination': '/sfw/categories/guys/%s/latest/'
     }
 
     def get_scenes(self, response):

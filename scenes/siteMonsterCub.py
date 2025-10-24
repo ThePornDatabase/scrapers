@@ -1,6 +1,6 @@
 import re
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteMonsterCubSpider(BaseSceneScraper):
@@ -10,41 +10,63 @@ class SiteMonsterCubSpider(BaseSceneScraper):
         'https://www.monstercub.com',
     ]
 
+    cookies = [{
+                    "name": "showWarning",
+                    "value": "enter"
+                }, {
+                    "name": "SceneSort",
+                    "value": "published-newer"
+                }
+            ]
+
     selector_map = {
-        'title': './/div[@class="sceneTitle"]/text()',
-        'description': './/div[@class="sceneDescription"]/text()',
-        'date': '',
-        'image': './/div[@class="sceneImgBig"]/img/@src|.//span/@data-image',
-        'performers': './/a[@class="scenePerfLnk"]/text()',
-        'tags': './/a[@class="sceneTagsLnk"]/text()',
-        'duration': '',
-        'trailer': '//script[contains(text(), "jwplayer")]/text()',
-        're_trailer': r'(http.*?\.mp4)',
-        'external_id': r'',
-        'pagination': '/home?Page=%s',
+        'title': '//h2[contains(@class, "sectionMainTitle")]/text()',
+        'description': '//div[@class="p-5"]/p/text()',
+        'image': '//meta[@property="og:image"]/@content',
+        'performers': '//span[@class="perfImage"]/a/text()',
+        'tags': '//h5[contains(text(), "Categories")]/a/text()',
+        'external_id': r'scene/(\d+)-',
+        'pagination': '/scenes?page=%s',
         'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="eachScene"]')
+        meta = response.meta
+        scenes = response.xpath('//div[contains(@class, "scene_container")]/figure')
         for scene in scenes:
-            item = SceneItem()
+            scenedate = scene.xpath('./..//span[contains(@class, "dateLbl")]/text()')
+            if scenedate:
+                meta['date'] = self.parse_date(scenedate.get(), date_formats=['%b %d, %Y']).strftime('%Y-%m-%d')
 
-            item['title'] = self.get_title(scene)
-            item['date'] = self.get_date(scene)
-            item['description'] = self.get_description(scene)
-            item['image'] = self.get_image(scene, response.url)
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['performers'] = self.get_performers(scene)
-            item['tags'] = self.get_tags(scene)
-            if "Gay" not in item['tags']:
-                item['tags'].append("Homosexual")
-            item['trailer'] = self.get_trailer(scene, response.url)
-            item['type'] = 'Scene'
-            item['duration'] = None
-            item['url'] = response.url
-            item['id'] = re.search(r'(\d+)', scene.xpath('./@id').get()).group(1)
-            item['site'] = "Monster Cub"
-            item['parent'] = "Monster Cub"
-            item['network'] = "Monster Cub"
-            yield item
+            duration = scene.xpath('./..//i[contains(@class, "icon-clock")]/following-sibling::text()')
+            if duration:
+                duration = duration.get()
+                duration = re.sub(r'[^a-z0-9]+', '', duration.lower())
+                duration = re.search(r'(\d+)min', duration)
+                if duration:
+                    meta['duration'] = str(int(duration.group(1)) * 60)
+
+
+            scene = scene.xpath('./a[1]/@href').get()
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_performers_data(self, response):
+        performers = response.xpath('//span[@class="perfImage"]')
+        performers_data = []
+        if len(performers):
+            for performer in performers:
+                perf = {}
+                perf['name'] = performer.xpath('./a/text()').get()
+                perf['extra'] = {}
+                perf['extra']['gender'] = "Male"
+                perf['network'] = self.get_network(response)
+                perf['site'] = self.get_network(response)
+                image = performer.xpath('./a/img/@src')
+                if image:
+                    image = self.format_link(response, image.get())
+                    perf['image'] = image
+                    perf['image_blob'] = self.get_image_blob_from_link(image)
+
+                performers_data.append(perf)
+        return performers_data

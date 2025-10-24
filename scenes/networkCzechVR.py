@@ -10,7 +10,7 @@ class NetworkCzechVRSpider(BaseSceneScraper):
     cookies = {'name': 'iagree', 'value': 'ano'}
 
     start_urls = [
-        # ~ 'https://www.czechvr.com',
+        'https://www.czechvr.com',
         'https://www.czechvrcasting.com',
         'https://www.czechvrfetish.com',
         'https://www.vrintimacy.com',

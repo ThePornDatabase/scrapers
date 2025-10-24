@@ -32,3 +32,6 @@ class SiteOldjeSpider(BaseSceneScraper):
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_title(self, response):
+        return self.get_date(response)

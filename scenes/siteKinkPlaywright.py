@@ -16,7 +16,7 @@ class NetworkKinkSpider(BaseSceneScraper):
         # ~ '/search?type=shoots&sort=published&featuredIds=%s',
         # ~ '/search?type=shoots&sort=published&thirdParty=true&page=%s',
         # ~ '/shoots?channelIds=behindkink&thirdParty=false&sort=published&page=%s',
-        # ~ '/shoots?channelIds=devicebondage&thirdParty=false&sort=published&page=%s',
+        # ~ '/shoots?channelIds=boundgangbangs&thirdParty=false&sort=published&page=%s',
     ]
 
     headers = {

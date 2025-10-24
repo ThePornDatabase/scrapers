@@ -62,7 +62,6 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Sinn Sage Dreams', 'Sinn Sage Dreams', '96823', 'sinn-sage-dreams'],
         ['Clips4Sale', 'Aaliyah Taylors Fetish', 'Aaliyah Taylors Fetish', '70866', 'aaliyah-taylor-s-fetish'],
         ['Clips4Sale', 'Ashley Fires Fetish Clips', 'Ashley Fires Fetish Clips', '5177', 'ashley-fires-fetish-clips'],
-        ['All Her Luv', 'Missa X', 'Missa X', '51941', 'missa'],
         ['Clips4Sale', 'Cock Ninja Studios', 'Cock Ninja Studios', '79893', 'cock-ninja-studios'],
         ['Clips4Sale', 'Pampered Penny', 'Pampered Penny', '11315', 'pampered-penny'],
         ['Clips4Sale', 'Miss Penny Barber', 'Miss Penny Barber', '18369', 'miss-penny-barber'],
@@ -76,7 +75,7 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'XXXTREMECOMIXXX', 'XXXTREMECOMIXXX', '56081', 'xxxtremecomixxx'],
         ['Clips4Sale', 'Robomeats', 'Robomeats', '50885', 'robomeats'],
         ['Clips4Sale', 'The Tabooddhist', 'The Tabooddhist', '62135', 'dan-s-porn-and-taboo'],
-        ['Clips4Sale', 'Bondage Junkies', 'Bondage Junkies', '47664', 'bondagejunkies-clips'],
+        ['Clips4Sale', 'Clips4Sale: Bondage Junkies', 'Clips4Sale: Bondage Junkies', '47664', 'bondagejunkies-clips'],
         ['Clips4Sale', 'KICK ASS BONDAGE BY ROPEMARKED', 'KICK ASS BONDAGE BY ROPEMARKED', '39599', 'kick-ass-bondage-by-girls-in-a-bind'],
         ['Clips4Sale', 'Fetish Cartel', 'Fetish Cartel', '3044', 'fetish-cartel'],
         ['Clips4Sale', 'Philly Butt Sluts', 'Philly Butt Sluts', '40522', 'philly-butt-sluts'],
@@ -141,6 +140,7 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Bratty Foot Girls', 'Bratty Foot Girls', '40537', 'bratty-foot-girls'],
         ['Clips4Sale', 'Women on Top - of men', 'Women on Top - of men', '7740', 'women-on-top---of-men'],
         ['Clips4Sale', 'Jakes Blows Tugs n Toes', 'Jakes Blows Tugs n Toes', '77551', 'blows-and-toes'],
+        ['Clips4Sale', 'Clips4Sale: Missa X', 'Clips4Sale: Missa X', '51941', 'missa'],
         ['Clips4Sale', 'Clips4Sale: SSBBW Juicy Jackie', 'Clips4Sale: SSBBW Juicy Jackie', '135731', 'ssbbw-juicy-jackie'],
         ['Clips4Sale', 'Clips4Sale: BBW Feedee Bonnies clips', 'Clips4Sale: BBW Feedee Bonnies clips', '72633', 'bbw-feedee-bonnie-s-clips'],
         ['Clips4Sale', 'Clips4Sale: BBW CHLOE', 'Clips4Sale: BBW CHLOE', '134447', 'bbw-chloe'],
@@ -243,6 +243,35 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         ['Clips4Sale', 'Clips4Sale: Lady Angelika', 'Clips4Sale: Lady Angelika', '56387', 'lady-angelika'],
         ['Clips4Sale', 'Clips4Sale: Sylvie Labrae', 'Clips4Sale: Sylvie Labrae', '337583', 'sylvie-labrae'],
         ['Clips4Sale', 'Clips4Sale: Shibari Kalahari', 'Clips4Sale: Shibari Kalahari', '221255', 'shibari-kalahari'],
+        ['Clips4Sale', 'Clips4Sale: Asiana Starr Bondage', 'Clips4Sale: Asiana Starr Bondage', '52109', 'asiana-starr-bondage'],
+        ['Clips4Sale', 'Clips4Sale: Universal Spanking and Punishments', 'Clips4Sale: Universal Spanking and Punishments', '86173', 'universal-spanking-and-punishments'],
+        ['Clips4Sale', 'Clips4Sale: Bound To Be GAGGED', 'Clips4Sale: Bound To Be GAGGED', '170465', 'bound-to-be-gagged'],
+        ['Clips4Sale', 'Clips4Sale: Mistress Iside', 'Clips4Sale: Mistress Iside', '96981', 'mistress-iside---femdom'],
+        ['Clips4Sale', 'Clips4Sale: Bondage Land', 'Clips4Sale: Bondage Land', '221869', 'TeamJacky'],
+        ['Clips4Sale', 'Clips4Sale: God Slavena', 'Clips4Sale: God Slavena', '155741', 'god-slavena'],
+        ['Clips4Sale', 'Clips4Sale: Calisas Bondage Diaries', 'Clips4Sale: Calisas Bondage Diaries', '182907', 'calisas-bondage-diaries'],
+        ['Clips4Sale', 'Clips4Sale: LBC Fetish', 'Clips4Sale: LBC Fetish', '69727', 'lbc-fetish'],
+        ['Clips4Sale', 'Clips4Sale: BondageTea', 'Clips4Sale: BondageTea', '187753', '187753-bondagetea'],
+        ['Clips4Sale', 'Clips4Sale: Tatti Roana Bondage', 'Clips4Sale: Tatti Roana Bondage', '254031', 'tatti-roana-bondage'],
+        ['Clips4Sale', 'Clips4Sale: MilaAmoraBondage', 'Clips4Sale: MilaAmoraBondage', '220829', 'milaamorabondage'],
+        ['Clips4Sale', 'Clips4Sale: Latina Bondage', 'Clips4Sale: Latina Bondage', '194487', 'latina-bondage'],
+        ['Clips4Sale', 'Clips4Sale: Goddess LaVey', 'Clips4Sale: Goddess LaVey', '119180', 'goddess-lavey'],
+        ['Clips4Sale', 'Clips4Sale: Shiny leather heaven', 'Clips4Sale: Shiny leather heaven', '139143', 'shiny-leather-heaven'],
+        ['Clips4Sale', 'Clips4Sale: Taboo Diaries', 'Clips4Sale: Taboo Diaries', '56891', 'taboo-diaries'],
+        ['Clips4Sale', 'Clips4Sale: Hardcore Tickling', 'Clips4Sale: Hardcore Tickling', '22851', 'hardcore-tickling-'],
+        ['Clips4Sale', 'Clips4Sale: slave247story', 'Clips4Sale: slave247story', '223337', 'slave247story'],
+        ['Clips4Sale', 'Clips4Sale: Bound to Orgasm', 'Clips4Sale: Bound to Orgasm', '122831', 'bound-to-orgasm'],
+        ['Clips4Sale', 'Clips4Sale: Jenna Hoskins Bondage', 'Clips4Sale: Jenna Hoskins Bondage', '242941', 'jenna-hoskins-bondage'],
+        ['Clips4Sale', 'Clips4Sale: TILLYTOWN', 'Clips4Sale: TILLYTOWN', '121155', 'tillytown'],
+        ['Clips4Sale', 'Clips4Sale: Miss Ruby Greys Clips', 'Clips4Sale: Miss Ruby Greys Clips', '164277', 'miss-ruby-greys-clips'],
+        ['Clips4Sale', 'Clips4Sale: Ted Michaels Damsels', 'Clips4Sale: Ted Michaels Damsels', '38048', 'ted-michaels-damsels'],
+        ['Clips4Sale', 'Clips4Sale: Layla Bondage Addiction', 'Clips4Sale: Layla Bondage Addiction', '142109', 'layla-bondage-addiction'],
+        ['Clips4Sale', 'Clips4Sale: CapturedCurves', 'Clips4Sale: CapturedCurves', '226795', 'capturedcurves'],
+        ['Clips4Sale', 'Clips4Sale: WendyWarrior Market', 'Clips4Sale: WendyWarrior Market', '109544', 'wendywarrior-market'],
+        ['Clips4Sale', 'Clips4Sale: TIEDNCUFFED', 'Clips4Sale: TIEDNCUFFED', '40704', 'tiedncuffed'],
+        ['Clips4Sale', 'Clips4Sale: Russian girls in fetish', 'Clips4Sale: Russian girls in fetish', '98785', 'russian-girls-in-fetish'],
+        ['Clips4Sale', 'Clips4Sale: Yvette Xtreme', 'Clips4Sale: Yvette Xtreme', '112942', 'yvette-xtreme'],
+        ['Clips4Sale', 'Clips4Sale: Mastubation Encouragement Scenarios', 'Clips4Sale: Mastubation Encouragement Scenarios', '29481', 'mastubation-encouragement-scenarios'],
         # ~ ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
         # ~ ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
     ]
@@ -285,7 +314,8 @@ class SiteClips4SaleSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page, store, storename):
         # ~ url = f"https://www.clips4sale.com/studio/{store}/{storename}/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24/?onlyClips=true&_data=routes%2Fstudio.$id_.$studioSlug.$"
-        url = f"https://www.clips4sale.com/en/studio/{store}/{storename}/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24/?onlyClips=true&_data=routes%2F($lang).studio.$id_.$studioSlug.$"
+        # ~ url = f"https://www.clips4sale.com/en/studio/v/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24/?onlyClips=true&_data=routes%2F($lang).studio.$id_.$studioSlug.$"
+        url = f"https://www.clips4sale.com/en/studio/{store}/{storename}/Cat0-AllCategories/Page{str(page)}/C4SSort-added_at/Limit24?onlyClips=true&storeSimilarClips=false&_data=routes%2F%28%24lang%29.studio.%24id_.%24studioSlug.%24"
         return url
 
     def get_scenes(self, response):
@@ -299,6 +329,8 @@ class SiteClips4SaleSpider(BaseSceneScraper):
             if scene['title']:
                 item['title'] = self.cleanup_title(scene['title'])
                 item['id'] = scene['clipId']
+                if item['id'] == "17694316":
+                    item['title'] = "Buzzed"
                 if "description" in scene and scene['description']:
                     item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
                 else:
@@ -327,7 +359,7 @@ class SiteClips4SaleSpider(BaseSceneScraper):
                             item['tags'].append(string.capwords(tag['keyword']))
                 if scene['duration']:
                     item['duration'] = str(int(scene['duration']) * 60)
-                item['site'] = self.get_site(response)
+                item['site'] = self.get_site(response, scene)
                 item['parent'] = self.get_parent(response)
                 item['network'] = self.get_network(response)
                 if "performers" in scene and scene['performers'] and len(scene['performers']):
@@ -338,16 +370,16 @@ class SiteClips4SaleSpider(BaseSceneScraper):
 
                 yield self.check_item(item, self.days)
 
-    def get_site(self, response):
+    def get_site(self, response, scene):
         meta = response.meta
         if "Missa X" in meta['storedsite']:
-            title = self.process_xpath(response, self.get_selector_map('title')).get()
-            if "allherluv" in title.lower():
-                return "All Her Luv"
-            if "missax" in title.lower():
-                return "Missa X"
-            if "apovstory" in title.lower():
-                return "A POV Story"
+            title = re.sub(r'[^a-z0-9]+', '', scene['title'].lower())
+            if "allherluv" in title:
+                return "Clips4Sale: All Her Luv"
+            if "missax" in title:
+                return "Clips4Sale: Missa X"
+            if "apovstory" in title:
+                return "Clips4Sale: A POV Story"
 
         if meta['storedsite']:
             return meta['storedsite']
@@ -366,10 +398,26 @@ class SiteClips4SaleSpider(BaseSceneScraper):
         return tldextract.extract(response.url).domain
 
     def get_performers(self, response):
+        if "miss-ruby-greys-clips" in response.url:
+            return ['Miss Ruby Grey']
+        if "jenna-hoskins-bondage" in response.url:
+            return ['Jenna Hoskins']
+        if "slave247story" in response.url:
+            return ['SlaveQ']
+        if "yvette-xtreme" in response.url:
+            return ['Yvette Costeau']
+        if "goddess-lavey" in response.url:
+            return ['Harley LaVey']
+        if "milaamorabondage" in response.url:
+            return ['Mila Amora']
+        if "tatti-roana" in response.url:
+            return ['Tatti Roana']
         if "lady-angelika" in response.url:
             return ['Lady Angelika']
         if "sylvie-labrae" in response.url:
             return ['Sylvie Labrae']
+        if "asiana-starr-bondage" in response.url:
+            return ['Asiana Starr']
         if "yes-ms-talia" in response.url:
             return ['Talia Tate']
         if "scarlettbelle-s-fetish-clips" in response.url:

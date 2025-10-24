@@ -13,6 +13,8 @@ class SitePlantsVsCuntsSpider(BaseSceneScraper):
         'https://plantsvscunts.com',
     ]
 
+    cookies = {"name": "age_gate", "value": "18"}
+
     selector_map = {
         'title': '//h1/text()',
         'description': '//div[@id="fullstory"]/p/span/text()[not(contains(., "Read Less"))]',

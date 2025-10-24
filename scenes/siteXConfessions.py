@@ -11,7 +11,7 @@ class SiteXConfessionsSpider(BaseSceneScraper):
     parent = 'XConfessions'
 
     start_urls = [
-        'https://xconfessions.com/',
+        'https://xconfessions.com',
     ]
 
     selector_map = {
@@ -28,10 +28,16 @@ class SiteXConfessionsSpider(BaseSceneScraper):
         'director': '//p[contains(text(), "Director")]/a/text()',
         'external_id': r'.*\/(.*)',
         'trailer': '',
-        'pagination': '/?page=%s'
+        'pagination': '/film?order=default&page=%s'
     }
 
+    def get_next_page_url(self, base, page):
+        if int(page) == 1:
+            return "https://xconfessions.com/film?order=default"
+        return self.format_url(base, self.get_selector_map('pagination') % page)
+
     def get_scenes(self, response):
+        print(f"Response URL: {response.url}")
         meta = response.meta
         scenes = response.xpath('//div[contains(@data-cy,"hover-wrapper")]/a[contains(@href,"/film")]')
         for scene in scenes:

@@ -17,14 +17,7 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': "",
-        'description': "",
-        'date': "",
-        'performers': "",
-        'tags': "",
         'external_id': '',
-        'image': '',
-        'trailer': '',
         'pagination': '/scenes?type=new&page=%s'
     }
 

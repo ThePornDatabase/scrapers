@@ -49,6 +49,10 @@ class SiteTainsterSpider(BaseSceneScraper):
         ['https://www.sinx.com/Cutie-By-Nature', 'Cutie-By-Nature'],
         ['https://www.sinx.com/channel/Pervy-Ones/all', 'Pervy Ones'],
         ['https://www.sinx.com/Fisting-In-Action', 'Fisting In Action'],
+        ['https://www.sinx.com/Golden-Shower-Power', 'Golden Shower Power'],
+        ['https://www.sinx.com/Golden-Shower-Power-Vol-2', 'Golden Shower Power'],
+        ['https://www.sinx.com/Golden-Shower-Power-Vol-3', 'Golden Shower Power'],
+        ['https://www.sinx.com/Golden-Shower-Power-Vol-4', 'Golden Shower Power'],
     ]
 
 

@@ -6,13 +6,13 @@ import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
-class SiteSexyFightingZoneSpider(BaseSceneScraper):
-    name = 'SexyFightingZone'
-    site = 'Sexy Fighting Zone'
-    parent = 'Sexy Fighting Zone'
+class SiteDirtyWrestlingPitSpider(BaseSceneScraper):
+    name = 'DirtyWrestlingPit'
+    site = 'Dirty Wrestling Pit'
+    parent = 'Dirty Wrestling Pit'
     network = 'Sexy Fighting Zone'
 
-    start_url = "https://www.sexyfightingzone.com/all-videos.php"
+    start_url = "https://www.dirtywrestlingpit.com/all-videos.php"
 
     def get_next_page_url(self, base, page):
         return self.format_url(base, self.get_selector_map('pagination') % page)
@@ -61,7 +61,7 @@ class SiteSexyFightingZoneSpider(BaseSceneScraper):
             scenetext = f"videoID={sceneid}"
             scenetext = base64.b64encode(bytes(scenetext, 'utf-8'))
             scenetext = scenetext.decode('utf-8')
-            scene = f"https://www.sexyfightingzone.com/previewVideo.php?{scenetext}=_vid"
+            scene = f"https://www.dirtywrestlingpit.com/previewVideo.php?{scenetext}=_vid"
             if meta['id']:
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 

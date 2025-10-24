@@ -52,6 +52,12 @@ class NetworkFTMPlusSpider(BaseSceneScraper):
             title = response.xpath('//div[contains(@class,"titlePlayer")]/h2/text()')
             if title:
                 title = string.capwords(title.get())
+        if not title:
+            title = response.xpath('//h2[@class="video-detail-h2"]/text()')
+            if title:
+                title = string.capwords(title.get().strip())
+        if not title:
+            title = ""
         return title
 
     def get_duration(self, response):

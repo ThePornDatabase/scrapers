@@ -980,7 +980,7 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: tentenlatinas', False, '1006251848'],
         ['Manyvids: Keeks_3005', True, '1007240594'],
         ['Manyvids: Baddiesonlypov', False, '1005032015'],
-        ['Manyvids: Ayumikichi', True, '1006374960'],
+        ['Manyvids: Ayumikichi', True, '1006374960', 'Vertical'],
         ['Manyvids: Karneli_Bandi', True, '1002990973'],
         ['Manyvids: Annabelle Blue', True, '1008511883'],
         ['Manyvids: AvaZev', True, '1008074349'],
@@ -1016,6 +1016,22 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
         ['Manyvids: Rileyridesreece', True, '1004638956'],
         ['Manyvids: kiri_amari', True, '1007090765'],
         ['Manyvids: webtolove', True, '1004633725'],
+        ['Manyvids: TheRealMilaKoi', True, '1008585447'],
+        ['Manyvids: Island Boy Vids', False, '1007765381'],
+        ['Manyvids: Sasha Curves', True, '1006003083'],
+        ['Manyvids: Sarah Calanthe', True, '1001061960'],
+        ['Manyvids: SofiaSimens', True, '1004361605'],
+        ['Manyvids: Bianca Beauchamp', True, '8821'],
+        ['Manyvids: Princess Rae', True, '1005636504'],
+        ['Manyvids: Kakao Chan', True, '1005489816'],
+        ['Manyvids: ShadyProducer', False, '1003014243'],
+        ['Manyvids: Bondagio', False, '1005448400'],
+        ['Manyvids: Mrthroatmonster', False, '1002729613'],
+        ['Manyvids: itstommyking', True, '1001037206'],
+        ['Manyvids: RocketPowersXXX', False, '1006739926'],
+        ['Manyvids: Erika Chanel', True, '1004936475'],
+        ['Manyvids: California_girl', True, '1004612889'],
+        # ~ ['Manyvids: ', True, ''],
         # ~ ['Manyvids: ', True, ''],
         # ~ ['Manyvids: ', True, ''],
         # ~ ['Manyvids: ', True, ''],
@@ -1056,10 +1072,17 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
             meta['siteid'] = link[2]
             meta['site'] = link[0]
             meta['parse_performer'] = link[1]
-            yield scrapy.Request(url=self.get_next_page_url(self.page, meta), callback=self.parse, meta=meta, headers=self.headers)
+            meta['pagination'] = "landscape"
+            next_page = self.get_next_page_url(self.page, meta)
+            yield scrapy.Request(next_page, callback=self.parse, meta=meta, headers=self.headers)
+
+            if len(link) > 3:
+                meta['pagination'] = "vertical"
+                next_page = self.get_next_page_url(self.page, meta)
+                yield scrapy.Request(next_page, callback=self.parse, meta=meta, headers=self.headers)
+
 
     def parse(self, response):
-        # ~ print(response.text)
         meta = response.meta
         scenes = self.get_scenes(response)
         count = 0
@@ -1073,7 +1096,10 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta), callback=self.parse, meta=meta, headers=self.headers)
 
     def get_next_page_url(self, page, meta):
-        link = f"https://www.manyvids.com/bff/store/videos/{meta['siteid']}/?page={page}"
+        if meta['pagination'] == "vertical":
+            link = f"https://www.manyvids.com/bff/store/videos/{meta['siteid']}/?page={page}&vertical=1"
+        else:
+            link = f"https://www.manyvids.com/bff/store/videos/{meta['siteid']}/?page={page}"
         return link
 
     def get_scenes(self, response):
@@ -1107,6 +1133,8 @@ class NetworkManyVidsV2Spider(BaseSceneScraper):
                 return ['Freya Jade']
             if "420SexTime" in meta['site']:
                 return ['Asteria']
+            if "RocketPowersXXX" in meta['site']:
+                return ['Rocket Powers']
             if "Queen Zara Sutra" in meta['site']:
                 return ['Zara Sutra']
             if "MarySweetCherry" in meta['site']:

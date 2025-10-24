@@ -15,6 +15,11 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
         'X-Requested-With': 'XMLHttpRequest',
     }
 
+    cookies = [
+        {"name": "agree18", "value": "1"},
+        {"name": "version_website_id", "value": "j:[25,1013,1401,1402]"},
+    ]
+
     start_urls = [
         'https://pornbox.com/',
     ]
@@ -42,7 +47,14 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
         # ~ {'studio': 10714, 'site': 'WreccItRalph'},
         # ~ {'studio': 4344, 'site': 'filoufitt'},
         # ~ {'studio': 1547, 'site': 'novinhosdaimperium'},
-        {'studio': 2320, 'site': 'arinafox'},
+        # ~ {'studio': 2320, 'site': 'arinafox'},
+        # ~ {'studio': 111, 'site': 'yummyestudio'},
+        # ~ {'studio': 2611, 'site': 'fuckingpornstars'},
+        # ~ {'studio': 2976, 'site': 'martinspell'},
+        # ~ {'studio': 1547, 'site': 'Novinhosdaimperium'},
+        # ~ {'studio': 11257, 'site': 'Gaelbrandao'},
+        # ~ {'studio': 2826, 'site': 'Daisymelanin00'},
+        {'studio': 996, 'site': 'TedOficial'},
     ]
 
     content_json_url = 'https://pornbox.com/contents/%s'
@@ -158,8 +170,8 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
         item['duration'] = self.duration_to_seconds(jsondata['runtime'])
 
         item['url'] = self.content_url % jsondata['id']
-        item['network'] = self.network
-        item['parent'] = self.parent
+        item['network'] = item['site']
+        item['parent'] = item['site']
         item['type'] = 'Scene'
 
         for key in ['markers', 'trailer']:

@@ -11,11 +11,11 @@ class SiteNetworkTwoWebMediaSpider(BaseSceneScraper):
 
     paginations = [
         '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=wankitnow.com',
-        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=upskirtjerk.com',
-        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=downblousejerk.com',
-        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=realbikinigirls.com',
-        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=lingerietales.com',
-        '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=boppingbabes.com'
+        # ~ '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=upskirtjerk.com',
+        # ~ '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=downblousejerk.com',
+        # ~ '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=realbikinigirls.com',
+        # ~ '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=lingerietales.com',
+        # ~ '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&site=boppingbabes.com'
     ]
 
     selector_map = {

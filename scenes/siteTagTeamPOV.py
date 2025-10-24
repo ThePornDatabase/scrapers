@@ -21,7 +21,7 @@ class SiteTagTeamPOVSpider(BaseSceneScraper):
         'image': '//div[@id="block-content"]/img/@src',
         'performers': '//h2[contains(text(), "Pornstars")]/following-sibling::span[1]/a/@title',
         'tags': '//div[contains(@class, "categories-holder")]/a/@title',
-        'duration': '',
+        'duration': '//h4[contains(text(), "Length")]/following-sibling::p/text()|//h2[contains(text(), "Length")]/following-sibling::p/text()',
         'trailer': '',
         'external_id': r'.*/(.*?)\.htm',
         'pagination': '/categories/videos_%s_d.html',

@@ -120,7 +120,7 @@ class NubilesSpider(BaseSceneScraper):
                     description = description + descrow
 
         if not description or (description and not description.strip()):
-            description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()')
+            description = response.xpath('//div[@class="col-12 content-pane-column"]/div//text()[not(contains(., "Show More")) and not(contains(., "Show Less"))]')
             description = description.getall()
             if description:
                 description = " ".join(description)

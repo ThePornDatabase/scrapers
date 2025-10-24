@@ -19,10 +19,11 @@ link_to_info = {
     "su-reg": {"urlid": "sau-elastic-00gy5fg5ra", "site": "Say Uncle", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": False},
     "mylf-xsite": {"urlid": "mylf-elastic-hka5k7vyuw", "site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": True},
     "ts-xsite": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": True},
+    "familybundle": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": "Bundle"},
     "freeusebundle": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": "Bundle"},
     "swap_bundle": {"urlid": "ts-elastic-d5cat0jl5o", "site": "Team Skeet", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": "Bundle"},
+    "mylf_ppv": {"urlid": "ts-elastic-d5cat0jl5o", "site": "MYLF", "navText": v2_videos_content_text, "contentText": v2_videos_content_text, "v2": True, "xsite": "Bundle"},
 }
-
 
 def format_nav_url(link, start, limit, sitekey, v2=False, xsite=False):
     if xsite is True:
@@ -146,91 +147,93 @@ class TeamSkeetNetworkPlaywrightSpider(BaseSceneScraper):
                 data = data['hits']['hits'][0]['_source']
             item['title'] = data['title']
             item['description'] = data['description']
-            item['image'] = data['img']
-            if "med.jpg" in item['image']:
-                item['image'] = item['image'].replace("med.jpg", "hi.jpg")
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-            if 'tags' in data:
-                item['tags'] = data['tags']
-            else:
-                item['tags'] = []
-            # ~ print(item['tags'])
-            # ~ print()
-            item['id'] = data['id']
-
-            if 'videoTrailer' in data:
-                item['trailer'] = data['videoTrailer']
-            elif 'video' in data:
-                item['trailer'] = 'https://videodelivery.net/' + \
-                                  data['video'] + '/manifest/video.m3u8'
-            else:
-                item['trailer'] = ''
-
-            item['network'] = self.network
-            item['parent'] = response.meta['site']
 
             if 'publishedDate' in data:
                 item['date'] = self.parse_date(data['publishedDate']).strftime('%Y-%m-%d')
             else:
                 item['date'] = None
 
-            if 'site' in data:
-                if 'name' in data['site']:
-                    item['site'] = data['site']['name']
+            if self.check_item(item, self.days):
+                item['image'] = data['img']
+                if "med.jpg" in item['image']:
+                    item['image'] = item['image'].replace("med.jpg", "hi.jpg")
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
+                if 'tags' in data:
+                    item['tags'] = data['tags']
+                else:
+                    item['tags'] = []
+                # ~ print(item['tags'])
+                # ~ print()
+                item['id'] = data['id']
+
+                if 'videoTrailer' in data:
+                    item['trailer'] = data['videoTrailer']
+                elif 'video' in data:
+                    item['trailer'] = 'https://videodelivery.net/' + \
+                                      data['video'] + '/manifest/video.m3u8'
+                else:
+                    item['trailer'] = ''
+
+                item['network'] = self.network
+                item['parent'] = response.meta['site']
+
+                if 'site' in data:
+                    if 'name' in data['site']:
+                        item['site'] = data['site']['name']
+                    else:
+                        item['site'] = response.meta['site']
                 else:
                     item['site'] = response.meta['site']
-            else:
-                item['site'] = response.meta['site']
 
-            if is_v2:
-                if "Say Uncle" in response.meta['site']:
-                    item['url'] = "https://www.sayuncle.com/movies/" + urllib.parse.quote_plus(data['id'])
-                elif "MYLF" in response.meta['site']:
-                    item['url'] = "https://www.mylf.com/movies/" + urllib.parse.quote_plus(data['id'])
+                if is_v2:
+                    if "Say Uncle" in response.meta['site']:
+                        item['url'] = "https://www.sayuncle.com/movies/" + urllib.parse.quote_plus(data['id'])
+                    elif "MYLF" in response.meta['site']:
+                        item['url'] = "https://www.mylf.com/movies/" + urllib.parse.quote_plus(data['id'])
+                    else:
+                        item['url'] = "https://www.teamskeet.com/movies/" + urllib.parse.quote_plus(data['id'])
+
                 else:
-                    item['url'] = "https://www.teamskeet.com/movies/" + urllib.parse.quote_plus(data['id'])
+                    item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + urllib.parse.quote_plus(data['id'])
+                item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
+                item['url'] = item['url'].replace("-–", "-")
+                # ~ print(item['url'])
 
-            else:
-                item['url'] = "https://www." + response.meta['site'].replace(" ", "").lower() + ".com/movies/" + urllib.parse.quote_plus(data['id'])
-            item['url'] = item['url'].replace("hijabhookups", "hijabhookup")
-            item['url'] = item['url'].replace("-–", "-")
-            # ~ print(item['url'])
+                item['performers'] = []
+                if 'models' in data:
+                    item['performers_data'] = []
+                    for model in data['models']:
+                        if "modelName" in model:
+                            performer = model['modelName']
+                        elif "name" in model:
+                            performer = model['name']
+                        performer_extra = {}
+                        performer_extra['site'] = "Team Skeet"
+                        performer_extra['name'] = performer
+                        performer_extra['extra'] = {}
+                        if "gender" in model and model['gender']:
+                            performer_extra['extra']['gender'] = model['gender'].title()
+                        if "ethnicity" in model and model['ethnicity']:
+                            performer_extra['extra']['ethnicity'] = model['ethnicity']
+                        if "hairColor" in model and model['hairColor']:
+                            performer_extra['extra']['haircolor'] = model['hairColor']
+                        if "img" in model and model['img']:
+                            perf_image = model['img']
+                            if perf_image:
+                                perf_image = perf_image
+                                performer_extra['image'] = perf_image
+                                performer_extra['image_blob'] = self.get_image_blob_from_link(performer_extra['image'])
+                                if not performer_extra['image_blob']:
+                                    performer_extra['image_blob'] = ""
+                                    performer_extra['image'] = ""
+                        item['performers'].append(performer)
+                        if performer_extra['extra']:
+                            item['performers_data'].append(performer_extra)
+                if "performers_data" in item and not item['performers_data']:
+                    del item['performers_data']
 
-            item['performers'] = []
-            if 'models' in data:
-                item['performers_data'] = []
-                for model in data['models']:
-                    if "modelName" in model:
-                        performer = model['modelName']
-                    elif "name" in model:
-                        performer = model['name']
-                    performer_extra = {}
-                    performer_extra['site'] = "Team Skeet"
-                    performer_extra['name'] = performer
-                    performer_extra['extra'] = {}
-                    if "gender" in model and model['gender']:
-                        performer_extra['extra']['gender'] = model['gender'].title()
-                    if "ethnicity" in model and model['ethnicity']:
-                        performer_extra['extra']['ethnicity'] = model['ethnicity']
-                    if "hairColor" in model and model['hairColor']:
-                        performer_extra['extra']['haircolor'] = model['hairColor']
-                    if "img" in model and model['img']:
-                        perf_image = model['img']
-                        if perf_image:
-                            perf_image = perf_image
-                            performer_extra['image'] = perf_image
-                            performer_extra['image_blob'] = self.get_image_blob_from_link(performer_extra['image'])
-                            if not performer_extra['image_blob']:
-                                performer_extra['image_blob'] = ""
-                                performer_extra['image'] = ""
-                    item['performers'].append(performer)
-                    if performer_extra['extra']:
-                        item['performers_data'].append(performer_extra)
-            if "performers_data" in item and not item['performers_data']:
-                del item['performers_data']
-
-            yield self.check_item(item, self.days)
+                yield self.check_item(item, self.days)
 
     def get_scenes(self, response):
         meta = response.meta

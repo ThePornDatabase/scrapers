@@ -18,6 +18,8 @@ class SiteALSAngelsSpider(BaseSceneScraper):
         'http://www.alsangels.com/',
     ]
 
+    cookies = [{"name": "age_verified", "value": "true"}]
+
     selector_map = {
         'title': '',
         'description': '',

@@ -11,6 +11,7 @@ class NetworkFaphouseSpider(BaseSceneScraper):
         ["/transgender/models/lucie-arztin?page=%s", "Lucie Arztin", "Faphouse: Lucie Arztin"],
         ["/models/wanilianna?page=%s", "Wanilianna", "Faphouse: Wanilianna"],
         ["/models/karinalin?page=%s", "Karina Lin2", "Faphouse: Karina Lin"],
+        ["/models/lucie-arztin?page=%s", "", "Faphouse: Twistedrama"],
         ["/studios/african-sex-trip?page=%s", "", "Faphouse: African Sex Trip"],
     ]
 

@@ -1,47 +1,117 @@
 import re
 import json
 import scrapy
+import string
+from tpdb.helpers.http import Http
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteRickysRoomSpider(BaseSceneScraper):
     name = 'RickysRoom'
     network = 'Rickys Room'
 
-    start_urls = [
-        'https://rickysroom.com',
+    start_url = 'https://rickysroom.com'
+
+    paginations = [
+        '/_next/data/<buildID>/rickys-resort.json?page=%s&order_by=publish_date&sort_by=desc',
+        '/_next/data/<buildID>/videos.json?series=&order_by=publish_date&sort_by=desc&page=%s',
+        '/_next/data/<buildID>/bts.json?page=%s&order_by=publish_date&sort_by=desc'
     ]
 
     selector_map = {
-        'external_id': r'videos/.*',
-        'pagination': '/videos?page=%s&order_by=publish_date&sort_by=desc'
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/videos.json?series=&order_by=publish_date&sort_by=desc&page=%s',
     }
 
-    def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="video-info"]/a/@href').getall()
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://rickysroom.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = response.meta
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            for pagination in self.paginations:
+                meta['pagination'] = pagination
+                link = self.get_next_page_url(self.start_url, self.page, meta['buildID'], meta['pagination'])
+                yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID, pagination):
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
+
+    def get_scenes(self, response):
+        meta = response.meta
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
+        for scene in jsondata:
+            meta['id'] = scene['id']
+            if "bts" in meta['pagination']:
+                link = f"https://rickysroom.com/_next/data/{meta['buildID']}/bts/{scene['slug']}.json"
+            else:
+                link = f"https://rickysroom.com/_next/data/{meta['buildID']}/videos/{scene['slug']}.json"
+            yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        jsondata = response.xpath('//script[@id="__NEXT_DATA__"]/text()')
-        if jsondata:
-            jsondata = json.loads(jsondata.get())
-            jsondata = jsondata['props']['pageProps']
-            item = SceneItem()
+        meta = response.meta
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['content']
+        item = self.init_scene()
+        if "videos.json" in meta['pagination']:
             item['site'] = "Rickys Room"
-            item['parent'] = "Rickys Room"
-            item['network'] = "Rickys Room"
-            item['title'] = self.cleanup_title(jsondata['content']['title'])
-            item['description'] = self.cleanup_text(jsondata['content']['description'])
-            item['performers'] = jsondata['content']['models']
-            item['date'] = self.parse_date(jsondata['content']['publish_date']).isoformat()
-            item['id'] = jsondata['content']['id']
-            item['image'] = jsondata['content']['thumb'].replace(" ", "%20")
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['tags'] = jsondata['content']['tags']
-            item['trailer'] = jsondata['content']['trailer_url'].replace(" ", "%20")
-            item['url'] = f"https://rickysroom.com/videos/{jsondata['content']['slug']}"
+        if "rickys-resort" in meta['pagination']:
+            item['site'] = "Rickys Resort"
+        if "bts.json" in meta['pagination']:
+            item['site'] = "Rickys Room"
 
-            yield self.check_item(item, self.days)
+        item['parent'] = "Rickys Room"
+        item['network'] = "Rickys Room"
+        if "seconds_duration" in jsondata and jsondata['seconds_duration']:
+            item['duration'] = str(jsondata['seconds_duration'])
+        item['title'] = self.cleanup_title(string.capwords(jsondata['title']))
+        if 'description' in jsondata and jsondata['description']:
+            item['description'] = self.cleanup_text(jsondata['description'])
+        item['performers_data'] = []
+        for model in jsondata['models_thumbs']:
+            model_page = f"https://rickysroom.com/_next/data/{response.meta['buildID']}/models/{model['slug']}.json?slug={model['slug']}"
+            req = Http.get(model_page)
+            if req:
+                model_page = json.loads(req.content)
+                model_page = model_page['pageProps']['model']
+            perf = {}
+            perf['extra'] = {}
+            perf['extra']['gender'] = model_page['gender']
+            perf['name'] = string.capwords(model['name'])
+            perf['image'] = model['thumb'].replace(" ", "%20")
+            perf['image_blob'] = self.get_image_blob_from_link(model['thumb'])
+            perf['site'] = "Rickys Room"
+            perf['network'] = "Rickys Room"
+            item['performers_data'].append(perf)
+            item['performers'].append(string.capwords(model['name']))
+
+        item['date'] = self.parse_date(jsondata['publish_date'], date_formats=['%Y/%m/%d']).strftime('%Y-%m-%d')
+
+        item['id'] = jsondata['id']
+        item['image'] = jsondata['thumb'].replace(" ", "%20")
+        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        item['tags'] = jsondata['tags']
+        item['url'] = f"https://rickysroom.com/videos/{jsondata['slug']}"
+
+        yield self.check_item(item, self.days)
+

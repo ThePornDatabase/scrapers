@@ -1,9 +1,6 @@
 import re
-
-import dateparser
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from scrapy.http import HtmlResponse
 
 
 class PornFidelitySpider(BaseSceneScraper):
@@ -18,72 +15,82 @@ class PornFidelitySpider(BaseSceneScraper):
     cookies = {'nats': 'MC4wLjMuNTguMC4wLjAuMC4w'}
 
     selector_map = {
-        'title': '//h1[@class="level-item"]/span/following-sibling::text()',
-        'description': '//div[@class="column is-three-fifths"]/text()',
-        'date': "",
-        'image': '//script[contains(text(), ".jpg")]/text()',
-        're_image': r'poster.*?(http.*?)[\'\"]',
-        'performers': '//a[@class="is-underlined"]/text()',
+        'title': '//h1[contains(@class, "title")]/text()',
+        'description': '//div[contains(text(), "Episode Summary")]/following-sibling::p[1]/text()',
+        'date': '//p[contains(text(), "Published:")]//text()[contains(., "-")]',
+        'image': '//meta[@property="og:image"]/@content',
+        'performers': '//p[contains(text(), "Starring:")]/a/text()',
         'tags': "",
-        'duration': '//li//text()[contains(., "mins")]',
-        're_duration': r'(\d{1,2}\:\d{2}) mins',
+        'duration': '//p[contains(text(), "Episode:")]//text()[contains(., "mins")]',
+        're_duration': r'((?:\d{1,2}\:)?\d{2}\:\d{2})',
         'external_id': 'episodes\\/(\\d+)',
         'trailer': '',
         'pagination': "/episodes/search?page=%s"
     }
 
     def get_scenes(self, response):
-        rsp = HtmlResponse(url=response.url, body=response.json()['html'], encoding='utf-8')
-        scenes = rsp.css('.episode .card-link::attr(href)').extract()
+        meta = response.meta
+        scenes = response.xpath('//a[contains(@class, "video-card")]/ancestor::div[1]')
         for scene in scenes:
-            yield scrapy.Request(url=scene, callback=self.parse_scene, cookies=self.cookies)
+            episode = scene.xpath('.//span[contains(@class, "video-title")]/text()')
+            if episode:
+                episode = episode.get()
+                episode = re.sub(r'[^0-9]+', '', episode)
+                meta['episode'] = episode
+            title = scene.xpath('.//h3[contains(@class, "video-title")]/text()')
+            if title:
+                title = title.get()
+                title = self.cleanup_title(title.strip())
+                if episode:
+                    title = f"{title} E{episode}"
+                meta['title'] = title
 
-    # ~ def get_image(self, response):
-        # ~ res = re.search(self.get_selector_map('external_id'), response.url)
-        # ~ return 'https://tour-cdn.kellymadisonmedia.com/content/episode/poster_image/%s/poster.jpg' % res.group(1)
+            scenedate = scene.xpath('.//i[contains(@class, "calendar")]/following-sibling::span[1]/text()')
+            if scenedate:
+                scenedate = scenedate.get()
+                scenedate = self.parse_date(scenedate, date_formats=['%m/%d/%y']).strftime('%Y-%m-%d')
+                if scenedate:
+                    meta['date'] = scenedate
 
-    def get_date(self, response):
-        search = re.search('Published: (\\d+-\\d+-\\d+)', response.text)
-        if search:
-            return dateparser.parse(search.group(1)).strftime('%Y-%m-%d')
-        else:
-            return None
+            site = scene.xpath('.//span[contains(@class, "badge-brand")]/text()')
+            if site:
+                site = site.get()
+                site = site.lower().strip()
+                if site == "tf":
+                    meta['site'] = "TeenFidelity"
+                    meta['parent'] = "PornFidelity"
+                if site == "pf":
+                    meta['site'] = "PornFidelity"
+                if site == "km":
+                    meta['site'] = "KellyMadison"
+                    meta['parent'] = "PornFidelity"
+                if not site:
+                    meta['site'] = "PornFidelity"
 
-    def get_title_full(self, response):
-        return response.xpath(self.get_selector_map('title')).get().strip()
+            scene = scene.xpath('./a[1]/@href').get()
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):
-        # ~ print(response)
-        title = self.get_title_full(response)
-        search = re.search('(.+) - .+ \\#(\\d+)', title)
-        if not search:
-            return title
-        return search.group(1).strip() + ' E' + search.group(2).strip()
-
-    def get_site(self, response):
-        title = response.xpath(self.get_selector_map('title')).get().strip()
-        search = re.search('.+ - (.+) #(\\d+)', title)
-        if search:
-            return search.group(1).strip()
-
-        if 'Teenfidelity' in title:
-            return 'TeenFidelity'
-        elif 'Kelly Madison' in title:
-            return 'Kelly Madison'
+        meta = response.meta
+        title = super().get_title(response)
+        if "episode" in meta and meta['episode']:
+            return f"{title} E{meta['episode']}"
         else:
-            return 'PornFidelity'
+            return title
 
     def get_description(self, response):
         description = super().get_description(response)
         description = description.replace("Episode Summary", "").strip()
         return description
 
-    def get_duration(self, response):
-        duration = response.xpath('//li//text()[contains(., "mins") and contains(., "Episode")]')
-        if duration:
-            duration = duration.get()
-            duration = re.sub(r'[^a-z0-9:]+', '', duration.lower().strip())
-            duration = re.search(r'(\d{1,2}\:\d{2})mins', duration)
-            if duration:
-                return self.duration_to_seconds(duration.group(1))
-        return ""
+    def get_image(self, response):
+        image = super().get_image(response)
+        if not image or image in response.url:
+            image = response.xpath('//main/div[contains(@class,"maintop-first-section")]//img[contains(@class,"object-fit-cover")]/@src')
+            if image:
+                image = self.format_link(response, image.get())
+
+        if not image:
+            image = ""
+        return image

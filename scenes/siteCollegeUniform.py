@@ -22,14 +22,33 @@ class SiteCollegeUniformSpider(BaseSceneScraper):
         'tags': '//comment()[contains(., "Tags")]',
         'external_id': r'.*\/(.*?).html',
         'trailer': '',
-        'pagination': '/categories/updates_%s_p.html'
+        'pagination': '/categories/updates_%s_d.html'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="update_details" and .//div[@class="update_counts" and contains(text(), "video")]]/a[1]/@href').getall()
+        meta = response.meta
+        scenes = response.xpath('//div[@class="update_details" and .//div[@class="update_counts" and contains(text(), "video")]]')
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            sceneid = scene.xpath('./@data-setid')
+            if sceneid:
+                meta['id'] = sceneid.get()
+
+            scene = scene.xpath('./a[1]/@href').get()
+            if meta['id']:
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+            meta = response.meta
+            meta['page'] = meta['page'] + 1
+            print('NEXT PAGE: ' + str(meta['page']))
+            yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)
 
     def get_id(self, response):
         return super().get_id(response).lower().strip()

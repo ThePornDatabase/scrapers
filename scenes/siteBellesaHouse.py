@@ -4,8 +4,11 @@ import json
 import scrapy
 from datetime import datetime
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 from slugify import slugify
+from tpdb.helpers.http import Http
+import requests
+true = True
+false = False
 
 
 class SiteBellesaHouseSpider(BaseSceneScraper):
@@ -14,12 +17,12 @@ class SiteBellesaHouseSpider(BaseSceneScraper):
 
     start_urls = [
         'https://www.bellesa.co',
-        'https://www.bellesaplus.co',
+        'https://bellesaplus.co',
     ]
 
     selector_map = {
         'external_id': r'',
-        'pagination': '/videos?page=<PAGE>&providers=bellesa-films%2Cbellesa-house%2Cbellesa-blind-date%2Czero-to-hero%2Cbelle-says%2Cbellesa-house-party',
+        'pagination': '',
         'type': 'Scene',
     }
 
@@ -37,8 +40,6 @@ class SiteBellesaHouseSpider(BaseSceneScraper):
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
             'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
             'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -46,34 +47,35 @@ class SiteBellesaHouseSpider(BaseSceneScraper):
         }
     }
 
+    def get_next_page_url(self, base, page):
+        if "bellesa.co" in base:
+            pagination = "/api/rest/v1/videos?filter%5Bprovider%5D=or%3Abellesa-films%2Cbellesa-house%2Cbellesa-blind-date%2Czero-to-hero%2Cbelle-says%2Cbellesa-house-party&filter%5Bsource%5D=bellesa&limit=24&page=<PAGE>"
+        if "bellesaplus.co" in base:
+            pagination = "/api/rest/v1/videos?filter%5Bprovider%5D=or%3Abellesa-films%2Cbellesa-house%2Cbellesa-blind-date%2Czero-to-hero%2Cbelle-says%2Cbellesa-house-party&limit=24&page=<PAGE>&sources=plus"
+        link = self.format_url(base, pagination.replace("<PAGE>", str(page)))
+        return link
+
     def start_requests(self):
         meta = {}
         meta['page'] = self.page
         meta['playwright'] = True
-
-        link = "https://bellesaplus.co/studio-preview/bellesa-originals/"
-        yield scrapy.Request(link, callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def start_requests2(self, response):
-        meta = response.meta
         for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def get_next_page_url(self, base, page):
-        return self.format_url(base, self.get_selector_map('pagination').replace("<PAGE>", str(page)))
+            url=self.get_next_page_url(link, self.page)
+            yield scrapy.Request(url, callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
-        jsondata = response.xpath('//script[@id="data-script"]/text()').get()
-        jsondata = re.search(r'(\{.*\})', jsondata).group(1)
-        jsondata = json.loads(jsondata)
-        for scene in jsondata['videos']:
-            item = SceneItem()
+        if "<pre>" in response.text.lower():
+            raw_json = response.css("pre::text").get()
+        else:
+            raw_json = response.text
+        jsondata = json.loads(raw_json)
+        for scene in jsondata:
+            item = self.init_scene()
 
             if scene['title']:
                 item['title'] = self.cleanup_title(scene['title'].replace("&", "and"))
             else:
                 item['title'] = None
-
             if scene['description']:
                 item['description'] = self.cleanup_description(scene['description'])
             else:
@@ -81,29 +83,30 @@ class SiteBellesaHouseSpider(BaseSceneScraper):
             item['duration'] = scene['duration']
             datetime_obj = datetime.fromtimestamp(scene['posted_on'])
             item['date'] = datetime_obj.strftime('%Y-%m-%d')
-            item['id'] = scene['id']
-            item['performers'] = []
-            for performer in scene['performers']:
-                item['performers'].append(performer['name'])
-            item['tags'] = scene['tags'].split(",")
-            item['tags'] = list(map(lambda x: string.capwords(x.strip()), item['tags']))
-            item['tags'] = self.clean_tags(item['tags'], item['performers'])
-            item['tags'].append("Unscripted")
-            item['tags'].append("Ethical Porn")
-            item['image'] = self.format_link(response, scene['image'])
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['trailer'] = None
-            item['site'] = 'Bellessa House'
-            item['parent'] = 'Bellessa House'
-            item['network'] = 'Bellessa'
-            if scene['content_provider']:
-                if 'name' in scene['content_provider'][0] and scene['content_provider'][0]['name']:
-                    item['site'] = scene['content_provider'][0]['name']
-                    item['parent'] = scene['content_provider'][0]['name']
+            if self.check_item(item, self.days):
+                item['id'] = scene['id']
+                item['performers'] = []
+                for performer in scene['performers']:
+                    item['performers'].append(performer['name'])
+                item['tags'] = scene['tags'].split(",")
+                item['tags'] = list(map(lambda x: string.capwords(x.strip()), item['tags']))
+                item['tags'] = self.clean_tags(item['tags'], item['performers'])
+                item['tags'].append("Unscripted")
+                item['tags'].append("Ethical Porn")
+                item['image'] = self.format_link(response, scene['image'])
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item['trailer'] = None
+                item['site'] = 'Bellessa House'
+                item['parent'] = 'Bellessa House'
+                item['network'] = 'Bellessa'
+                if scene['content_provider']:
+                    if 'name' in scene['content_provider'][0] and scene['content_provider'][0]['name']:
+                        item['site'] = scene['content_provider'][0]['name']
+                        item['parent'] = scene['content_provider'][0]['name']
 
-            slug = slugify(re.sub('[^a-z0-9- ]', '', item['title'].lower().strip()))
-            item['url'] = f"https://www.bellesa.co/videos/{item['id']}/{slug}"
-            yield self.check_item(item, self.days)
+                slug = slugify(re.sub('[^a-z0-9- ]', '', item['title'].lower().strip()))
+                item['url'] = f"https://www.bellesa.co/videos/{item['id']}/{slug}"
+                yield self.check_item(item, self.days)
 
     def clean_tags(self, tags, performers):
         tags2 = []
@@ -118,3 +121,10 @@ class SiteBellesaHouseSpider(BaseSceneScraper):
                         else:
                             tags2.append(tag)
         return tags2
+
+    def get_image_from_link(self, image):
+        if image:
+            req = requests.get(image)
+            if req and req.status_code == 200:
+                return req.content
+        return None

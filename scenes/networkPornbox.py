@@ -1,6 +1,7 @@
 import string
 import scrapy
 import json
+import time
 import requests
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -34,10 +35,17 @@ class SitePornboxSpider(BaseSceneScraper):
         'duration': "//i[@class='fa fa-clock-o']/following-sibling::text()",
         'external_id': '\\/watch\\/(\\d+)',
         'trailer': '',
-        'pagination': '/store/new-scenes/%s'
+        # ~ 'pagination': '/store/new-scenes/%s'
+        'pagination': '/niche/234/?skip=%s&sort=recent&_=<timestamp>'
         # ~ 'pagination': '/niche/234/?skip=%s&sort=latest&_=1731108446109'
         # ~ 'pagination': '/studio/1275/?skip=%s&sort=recent&_=1688689939'
     }
+
+    def get_next_page_url(self, base, page):
+        timestamp = str(int(time.time() * 1000))
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<timestamp>", timestamp)
+        return self.format_url(base, pagination % page)
 
     def start_requests(self):
         meta = {}
@@ -119,7 +127,7 @@ class SitePornboxSpider(BaseSceneScraper):
         item['network'] = item['site']
         item['parent'] = item['site']
 
-        matches = ['bangbros', 'jeffsmodels', 'private', 'exposedlatinas', 'antoniosuleiman', 'bradmontana', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
+        matches = ['bangbros', 'jeffsmodels', 'private', 'exposedlatinas', 'antoniosuleiman', 'bradmontana', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms', 'anal4k', 'majorhotwife',
                    'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov', 'joibabes',
                    'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',

@@ -131,5 +131,8 @@ class NetworkPornProsAPISpider(BaseSceneScraper):
             if ("pornplus" in meta['site'] or "strippers4k" in meta['site']) and item['date'] < "2025-04-30":
                 submit = False
 
+            if "facials4k" in item['site'] and "pornplus" in item['url']:
+                submit = False
+
             if submit:
                 yield self.check_item(item, self.days)

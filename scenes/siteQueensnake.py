@@ -41,8 +41,7 @@ class SiteQueensnakeSpider(BaseSceneScraper):
             item = SceneItem()
             item['id'] = scene.xpath('./div[1]/@data-filmid').get()
 
-            url = scene.xpath('.//span[@class="contentFileDate"]/a/@href').get()
-            item['url'] = self.format_link(response, url)
+            item['url'] = response.url
             image = scene.xpath('.//div[@class="contentPreviewRightImageWrap"]/a[1]/div[1]/img/@src')
             if image:
                 item['image'] = self.format_link(response, image.get())
@@ -50,6 +49,8 @@ class SiteQueensnakeSpider(BaseSceneScraper):
             else:
                 item['image'] = ""
                 item['image_blob'] = ""
+            if "?" in item['image']:
+                item['image'] = re.search(r'(.*)\?', item['image']).group(1)
             item['title'] = self.get_title(scene)
             item['description'] = self.get_description(scene)
             item['date'] = self.get_date(scene)
@@ -87,10 +88,23 @@ class SiteQueensnakeSpider(BaseSceneScraper):
                 tags2.append(string.capwords(tag))
         return tags2
 
+    def get_date(self, scene):
+        scenedate = scene.xpath('.//span[@class="contentFileDate"]/text()')
+        if scenedate:
+            scenedate = scenedate.get()
+            scenedate = re.search(r'(\d{4} \w+ \d+)', scenedate)
+            if scenedate:
+                scenedate = scenedate.group(1)
+                scenedate = self.parse_date(scenedate, date_formats=['%Y %B %d']).strftime('%Y-%m-%d')
+                return scenedate
+        return None
+
     def get_duration(self, scene):
-        duration = scene.xpath('.//span[@class="contentFileDate"]/a/following-sibling::text()')
+        duration = scene.xpath('.//span[@class="contentFileDate"]/text()')
         if duration:
-            duration = re.search(r'(\d+)', duration.get())
+            duration = duration.get()
+            duration = duration.replace(" ", "")
+            duration = re.search(r'(\d+)min', duration.lower())
             if duration:
                 duration = duration.group(1)
                 duration = str(int(duration) * 60)

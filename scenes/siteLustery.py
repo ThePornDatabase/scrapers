@@ -38,13 +38,14 @@ class SiteLusterySpider(BaseSceneScraper):
             item['title'] = self.cleanup_title(scene['title'])
 
             if "poster" in scene and scene['poster']:
-                item['image'] = f"https://static.lustery.com/cdn-cgi/image/format=auto/{scene['poster']['staticPath']}"
+                # ~ item['image'] = f"https://static.lustery.com/cdn-cgi/image/format=auto/{scene['poster']['staticPath']}"
+                item['image'] = f"https://img.lustery.com/cache/image/resize/width=1600/{scene['poster']['staticPath']}"
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
             item['date'] = datetime.utcfromtimestamp(scene['publishAt']).strftime('%Y-%m-%d')
 
             item['id'] = meta['id']
-            item['url'] = f"https://lustery.com/preview/{meta['id']}"
+            item['url'] = f"https://lustery.com/video-preview/{meta['id']}"
             item['site'] = 'Lustery'
             item['tags'] = scene['tags']
             item['duration'] = scene['duration']

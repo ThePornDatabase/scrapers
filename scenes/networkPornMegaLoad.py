@@ -1,4 +1,5 @@
 import re
+import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -131,4 +132,29 @@ class NetworkPornMegaLoadPlaywrightSpider(BaseSceneScraper):
         item['parent'] = item['site']
         item['type'] = 'Scene'
 
-        yield self.check_item(item, self.days)
+        checksite = re.sub(r'[^a-z0-9]+', '', item['site'].lower())
+        if checksite.lower() not in ["naughtymag", "18eighteen", "bootyliciousmag"]:
+            yield self.check_item(item, self.days)
+
+    def get_image(self, response):
+        image = super().get_image(response)
+        if "base64" in image or "cdn" not in image:
+            image = response.xpath('//meta[@property="og:image"]/@content')
+            if image:
+                image = image.get()
+                image = self.format_link(response, image)
+        if "_lg" in image:
+            image_temp = image.replace("_lg", "_1280")
+            if self.check_image(image_temp):
+                return image_temp
+            image_temp = image.replace("_lg", "_800")
+            if self.check_image(image_temp):
+                return image_temp
+        return image
+
+    def check_image(self, image):
+        response = requests.head(image)
+        if response.status_code == 200:
+            return True
+        else:
+            return False

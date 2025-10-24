@@ -9,6 +9,8 @@ class SiteDigitalVideoVisionSpider(BaseSceneScraper):
     parent = 'Digital Video Vision'
     site = 'Digital Video Vision'
 
+    cookies = [{"name": "ageConfirmed", "value": "true"}]
+
     start_urls = [
         'https://www.digitalvideovision.com',
     ]

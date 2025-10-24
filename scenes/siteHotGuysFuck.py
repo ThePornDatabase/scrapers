@@ -12,10 +12,10 @@ class SiteHotGuysFuckSpider(BaseSceneScraper):
 
     sites = [
         # ~ {"site": "Gayhoopla", "sitenum": "1", "referer": "https://www.gayhoopla.com"},
-        {"site": "Hot Guys Fuck", "sitenum": "2", "referer": "https://www.hotguysfuck.com"},
-        {"site": "Sugar Daddy Porn", "sitenum": "4", "referer": "https://www.sugardaddyporn.com"},
-        {"site": "Bi Guys Fuck", "sitenum": "5", "referer": "https://www.biguysfuck.com"},
-        {"site": "Hot Guys House", "sitenum": "9", "referer": "https://www.hotguyshouse.com"}
+        # ~ {"site": "Hot Guys Fuck", "sitenum": "2", "referer": "https://www.hotguysfuck.com"},
+        # ~ {"site": "Sugar Daddy Porn", "sitenum": "4", "referer": "https://www.sugardaddyporn.com"},
+        # ~ {"site": "Bi Guys Fuck", "sitenum": "5", "referer": "https://www.biguysfuck.com"},
+        # ~ {"site": "Hot Guys House", "sitenum": "9", "referer": "https://www.hotguyshouse.com"}
     ]
 
     selector_map = {
@@ -31,15 +31,16 @@ class SiteHotGuysFuckSpider(BaseSceneScraper):
         meta = {}
         meta['page'] = self.page
 
-        for site in range(300, 500):
-            meta = {}
-            meta['siteheaders'] = {
-                "origin": "https://www.hotguysfuck.com",
-                "referer": "https://www.hotguysfuck.com/",
-                "site": str(site)
-            }
+        # ~ for site self.sites:
+            # ~ meta = {}
+            # ~ meta['siteheaders'] = {
+                # ~ "origin": "https://www.hotguysfuck.com",
+                # ~ "referer": "https://www.hotguysfuck.com/",
+                # ~ "site": site['sitenum']
+            # ~ }
+            # ~ meta['site'] = site['site']
 
-            yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page), callback=self.parse, meta=meta, headers=meta['siteheaders'], cookies=self.cookies, dont_filter=True)
+            # ~ yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page), callback=self.parse, meta=meta, headers=meta['siteheaders'], cookies=self.cookies, dont_filter=True)
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -47,6 +48,7 @@ class SiteHotGuysFuckSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
+        print(response.text)
         if "Unhandled match case" not in response.text:
             jsondata = response.json()
             jsondata = jsondata['videos']['data']

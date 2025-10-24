@@ -54,3 +54,13 @@ class SiteToaxxxSpider(BaseSceneScraper):
                 perf['site'] = self.get_network(response)
                 performers_data.append(perf)
         return performers_data
+
+    def get_id(self, response):
+        old_id = super().get_id(response)
+        sceneid = response.xpath('//div[@class="post-meta-trio"]/text()[1]')
+        if sceneid:
+            sceneid = sceneid.get()
+            sceneid = re.search(r'(tx\d+)', sceneid.lower())
+            if sceneid:
+                return sceneid.group(1).upper()
+        return old_id

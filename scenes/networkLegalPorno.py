@@ -27,6 +27,8 @@ class LegalPornoSpider(BaseSceneScraper):
         'external_id': r'/watch/(\d+)',
         'trailer': '',
         'pagination': '/new-videos/%s'
+        # ~ 'pagination': 'https://www.analvids.com/studios/latinhot_studio/%s'
+        # ~ 'pagination': 'https://www.analvids.com/filter/%s?studio=latinhot_studio'
     }
 
     def start_requests(self):
@@ -63,28 +65,29 @@ class LegalPornoSpider(BaseSceneScraper):
         item['description'] = self.get_description(response)
         item['site'] = self.get_site(response)
         item['date'] = self.get_date(response)
-        item['image'] = self.get_image(response)
-        if item['image']:
-            item['image_blob'] = self.get_image_blob(response)
-            item['image'] = re.search(r'(.*)\?', item['image']).group(1)
-        else:
-            item['image'] = ''
-            item['image_blob'] = ''
-        item['performers'] = self.get_performers(response)
-        item['tags'] = self.get_tags(response)
-        item['markers'] = self.get_markers(response)
-        item['id'] = self.get_id(response)
-        item['duration'] = self.get_duration(response)
-        item['trailer'] = self.get_trailer(response)
-        item['url'] = self.get_url(response)
-        item['network'] = item['site']
-        item['parent'] = item['site']
+        if self.check_item(item, self.days):
+            item['image'] = self.get_image(response)
+            if item['image']:
+                item['image_blob'] = self.get_image_blob(response)
+                item['image'] = re.search(r'(.*)\?', item['image']).group(1)
+            else:
+                item['image'] = ''
+                item['image_blob'] = ''
+            item['performers'] = self.get_performers(response)
+            item['tags'] = self.get_tags(response)
+            item['markers'] = self.get_markers(response)
+            item['id'] = self.get_id(response)
+            item['duration'] = self.get_duration(response)
+            item['trailer'] = self.get_trailer(response)
+            item['url'] = self.get_url(response)
+            item['network'] = item['site']
+            item['parent'] = item['site']
 
-        matches = ['bangbros', 'jeffsmodels', 'private', 'antoniosuleiman', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms',
-                   'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov', 'joibabes',
-                   'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
-                   'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
-                   'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue',
-                   'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'sexmex', 'alexlegend', 'aglaeaproductions', 'dripdrop', 'dripdropprod', 'artemixxx', 'theartemixxx']
-        if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
-            yield self.check_item(item, self.days)
+            matches = ['bangbros', 'jeffsmodels', 'private', 'antoniosuleiman', 'richardmannsworld', 'only3xnetwork', 'privateblack', 'pornforce', 'immorallive', 'girlfriendsfilms', 'majorhotwife', 'anal4k',
+                       'hentaied', 'vipissy', 'justanal', 'hussiepass', 'filthykings', 'puffynetwork', 'fit18', 'cuckhunter', 'bruceandmorgan', 'privateclassics', 'seehimfuck', 'filthyfamily', 'ukpornparty', 'jayspov', 'joibabes',
+                       'only3xgirls', 'parasited', 'hazeher', 'collegerules', 'abuseme', 'only3xvr', 'justpov', 'girlsgonewild', 'plumperpassstudio', 'only3xlost', 'onlygolddigger', 'wetandpuffy', 'mypervyfamily', 'mykebrazil', 'mylifeinmiami',
+                       'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
+                       'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue',
+                       'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'sexmex', 'alexlegend', 'aglaeaproductions', 'dripdrop', 'dripdropprod', 'artemixxx', 'theartemixxx']
+            if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
+                yield self.check_item(item, self.days)

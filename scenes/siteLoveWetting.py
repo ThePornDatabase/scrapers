@@ -1,4 +1,6 @@
 import re
+import scrapy
+import requests
 from datetime import date, timedelta
 import string
 
@@ -9,9 +11,9 @@ from tpdb.items import SceneItem
 class SiteLoveWettingSpider(BaseSceneScraper):
     name = 'LoveWetting'
 
-    start_urls = [
-        'https://www.lovewetting.com',
-    ]
+    cookies = [{"name": "cookie_mastercard", "value": "1"}]
+
+    start_url = 'https://www.lovewetting.com'
 
     selector_map = {
         'title': '',
@@ -24,6 +26,43 @@ class SiteLoveWettingSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/wetting-desperation-videos.html?order=date&page=%s'
     }
+
+    def get_next_page_url(self, base, page, max_pages):
+        page = max_pages - int(page)
+        return self.format_url(base, self.get_selector_map('pagination') % page)
+
+    def start_requests(self):
+        ip = requests.get('https://api.ipify.org').content.decode('utf8')
+        print('My public IP address is: {}'.format(ip))
+
+        meta = {}
+        meta['page'] = self.page
+        link = "https://www.lovewetting.com/wetting-desperation-videos.html"
+        yield scrapy.Request(link, callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests2(self, response):
+        meta = response.meta
+
+        page_limit = response.xpath('//div[contains(@class, "paging-top")]//select[@id="select_page2"]/option[@selected]/text()')
+        if page_limit:
+            page_limit = page_limit.get()
+            max_pages = re.search(r'(\d+)', page_limit).group(1)
+            meta['max_pages'] = int(max_pages) + 1
+            yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page, meta['max_pages']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['max_pages']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
         scenes = response.xpath('//div[@class="item"]')
@@ -52,10 +91,11 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             item['id'] = ''
             item['url'] = ''
             if image:
-                image = image.get().strip().replace("&amp;", "&")
+                image = image.get()
+                image = image.strip().replace("&amp;", "&")
                 item['image'] = self.format_link(response, image)
-                item['id'] = re.search(r'\d{4}\/(.*)\&', item['image']).group(1)
-                item['url'] = re.search(r'(.*\d{4}\/.*)\&', item['image']).group(1)
+                item['id'] = re.search(r'\d{4}\/(.*)\&', image).group(1)
+                item['url'] = self.format_link(response, re.search(r'(.*\d{4}\/.*)\&', image).group(1))
 
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
@@ -75,20 +115,4 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             item['trailer'] = ''
 
             if item['id'] and item['title']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
+                yield self.check_item(item, self.days)

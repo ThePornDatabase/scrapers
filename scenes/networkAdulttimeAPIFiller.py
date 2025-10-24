@@ -28,11 +28,13 @@ class AdultTimeAPISpider(BaseSceneScraper):
         'haileyroseshowcase-channel',
         'futaworld-at',
         'intimatelypov',
+        # 'milfmayhem',
         'toywithme',
         'upclosex',
         'polyfamilylife',
         'preggoworld',
         'raunch',
+        'theyeslist-channel',
     ]
 
     image_sizes = [
@@ -179,6 +181,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
                 item['site'] = "Futa World"
                 item['parent'] = "Futa World"
 
+            if "milfmayhem" in meta['parsesite']:
+                item['site'] = scene['sitename']
+                item['parent'] = scene['sitename']
+
             if "toywithme" in meta['parsesite']:
                 item['site'] = "Toy With Me"
                 item['parent'] = "Toy With Me"
@@ -194,6 +200,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
             if "raunch" in meta['parsesite']:
                 item['site'] = "Raunch"
                 item['parent'] = "Raunch"
+
+            if "theyeslist" in meta['parsesite']:
+                item['site'] = "TheYesList"
+                item['parent'] = "TheYesList"
 
             if "poly" in meta['parsesite'] and "family" in meta['parsesite']:
                 item['site'] = "PolyFamilyLife"
@@ -259,6 +269,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
         if "futaworld" in parsesite:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"query=&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&highlightPreTag=%3Cais-highlight-0000000000%3E&highlightPostTag=%3C%2Fais-highlight-0000000000%3E&facetingAfterDistinct=true&clickAnalytics=true&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')&facets=%5B%22hasSubtitle%22%2C%22categories.name%22%2C%22video_formats.format%22%2C%22length_range_15min%22%2C%22actors.name%22%2C%22subtitles.languages%22%2C%22availableOnSite%22%2C%22upcoming%22%2C%22network.lvl0%22%2C%22network.lvl1%22%5D&tagFilters=&facetFilters=%5B%5B%22upcoming%3A0%22%5D%2C%5B%22network.lvl1%3AAdult%20Time%20Originals%20%3E%20Futa%20World%22%5D%5D"}]}'
 
+        # Milf Mayhem Channel
+        if "milfmayhem" in parsesite:
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&clickAnalytics=true&facetFilters=%5B%22categories.name%3AMilf%22%5D&facetingAfterDistinct=true&facets=%5B%22actors.name%22%2C%22categories.name%22%2C%22hasSubtitle%22%2C%22length_range_15min%22%2C%22network.lvl0%22%2C%22subtitles.languages%22%2C%22video_formats.format%22%5D&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')%20AND%20(upcoming%3A\'0\')&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&query=&tagFilters="}]}'
+
         # PreggoWorld
         if "preggoworld" in parsesite:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&clickAnalytics=true&facetFilters=%5B%5B%22serie_name%3APreggo%20World%22%5D%5D&facetingAfterDistinct=true&facets=%5B%22actors.name%22%2C%22categories.name%22%2C%22hasSubtitle%22%2C%22length_range_15min%22%2C%22network.lvl0%22%2C%22serie_name%22%2C%22subtitles.languages%22%2C%22video_formats.format%22%5D&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')%20AND%20(upcoming%3A\'0\')&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&query=&tagFilters="}]}'
@@ -266,6 +280,10 @@ class AdultTimeAPISpider(BaseSceneScraper):
         # Raunch
         if "raunch" in parsesite:
             jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&clickAnalytics=true&facetFilters=%5B%5B%22serie_name%3ARaunch%22%5D%5D&facetingAfterDistinct=true&facets=%5B%22actors.name%22%2C%22categories.name%22%2C%22hasSubtitle%22%2C%22length_range_15min%22%2C%22network.lvl0%22%2C%22serie_name%22%2C%22subtitles.languages%22%2C%22video_formats.format%22%5D&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')%20AND%20(upcoming%3A\'0\')&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=60&maxValuesPerFacet=1000&page=' + str(page) + '&query=&tagFilters="}]}'
+
+        # TheYesList
+        if "theyeslist" in parsesite:
+            jbody = '{"requests":[{"indexName":"all_scenes_latest_desc","params":"analytics=true&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&clickAnalytics=true&facetFilters=%5B%5B%22network.lvl1%3AAdult%20Time%20Originals%20%3E%20The%20Yes%20List%22%5D%5D&facetingAfterDistinct=true&facets=%5B%22actors.name%22%2C%22categories.name%22%2C%22hasSubtitle%22%2C%22length_range_15min%22%2C%22network.lvl0%22%2C%22network.lvl1%22%2C%22subtitles.languages%22%2C%22video_formats.format%22%5D&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')%20AND%20(upcoming%3A\'0\')&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=60&maxValuesPerFacet=1000&page=0&query=&tagFilters="},{"indexName":"all_scenes_latest_desc","params":"analytics=false&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&clickAnalytics=false&facetFilters=%5B%5B%22network.lvl0%3AAdult%20Time%20Originals%22%5D%5D&facetingAfterDistinct=true&facets=%5B%22network.lvl0%22%2C%22network.lvl1%22%5D&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')%20AND%20(upcoming%3A\'0\')&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=0&maxValuesPerFacet=1000&page=0&query="},{"indexName":"all_scenes_latest_desc","params":"analytics=false&analyticsTags=%5B%22component%3Asearchlisting%22%2C%22section%3Amembers%22%2C%22site%3Aadulttime%22%2C%22context%3Avideos%22%2C%22device%3Adesktop%22%5D&clickAnalytics=false&facetingAfterDistinct=true&facets=%5B%22network.lvl0%22%5D&filters=(content_tags%3A\'trans\'%20OR%20content_tags%3A\'straight\'%20OR%20content_tags%3A\'lesbian\'%20OR%20content_tags%3A\'gay\'%20OR%20content_tags%3A\'bisex\'%20OR%20content_tags%3A\'futa\')%20AND%20(upcoming%3A\'0\')&highlightPostTag=__%2Fais-highlight__&highlightPreTag=__ais-highlight__&hitsPerPage=0&maxValuesPerFacet=1000&page=' + str(page) + '&query=&facetFilters=undefined"}]}'
 
         return scrapy.Request(
             url=algolia_url,

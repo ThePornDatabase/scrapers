@@ -28,7 +28,7 @@ class InterracialPassSpider(BaseSceneScraper):
         'https://www.backroomcastingcouch.com',
         'https://bbcsurprise.com',
         'https://exploitedcollegegirls.com',
-        # ~ # 'https://www.ikissgirls.com'
+        # 'https://www.ikissgirls.com'
     ]
 
     custom_settings = {
@@ -156,6 +156,7 @@ class InterracialPassSpider(BaseSceneScraper):
                 if image:
                     image = image.get()
                     if "content" in image:
+                        image = self.format_link(response, image)
                         perf['image'] = image
                         perf['image_blob'] = self.get_image_blob_from_link(image)
 

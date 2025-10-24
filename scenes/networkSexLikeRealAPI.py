@@ -13,8 +13,10 @@ class SexLikeRealSpider(BaseSceneScraper):
     network = 'SexLikeReal'
 
     start_urls = [
-        'https://www.sexlikereal.com'
+        'https://api.sexlikereal.com'
     ]
+
+    headers = {"client-type": "web"}
 
     selector_map = {
         'title': "//title/text()",
@@ -25,7 +27,8 @@ class SexLikeRealSpider(BaseSceneScraper):
         'external_id': '(?:scenes|shemale|gay)\\/(.+)',
         'image': '//meta[@name="twitter:image1"]/@content or //meta[@name="twitter:image2"]/@content or //meta[@name="twitter:image3"]/@content or //meta[@name="twitter:image"]/@content',
         'trailer': '',
-        'pagination': '/scenes?type`=premium&sort=most_recent&page=%s'
+        # ~ 'pagination': '/scenes?type`=premium&sort=most_recent&page=%s'
+        'pagination': '/v3/scenes?page=%s&perPage=24&sort=recent&type=new'
         # ~ 'pagination': '/trans/studios/transexvr?page=%s'
     }
 
@@ -34,77 +37,91 @@ class SexLikeRealSpider(BaseSceneScraper):
         print('My public IP address is: {}'.format(ip))
 
         meta = {}
-        if self.page == 1:
-            self.page = 5
         meta['page'] = self.page
+        if self.limit_pages == 1 and self.page == 1:
+            self.limit_pages = 25
 
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers)
+
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//article/div/div[contains(@class, "c-grid-ratio")]/a/@href').getall()
-        for scene in scenes:
-            meta['id'] = re.search(r'.*/(.*?)$', scene).group(1)
-            meta['url'] = self.format_link(response, scene)
-            try:
-                idnum = re.search(r'(\d+)$', scene).group(1)
-            except Exception:
-                print(f"Failed on scene: {scene}")
-            url = f"https://api.sexlikereal.com/virtualreality/video/id/{idnum}"
-            # ~ print(url)
-            if idnum:
-                yield scrapy.Request(url, callback=self.parse_scene, meta=meta)
+        json = response.json()
+        for scene in json['data']:
+            meta['id'] = scene['id']
+            url = f"https://api.sexlikereal.com/v3/scenes/{scene['label']}"
+            if meta['id']:
+                yield scrapy.Request(url, callback=self.parse_scene, meta=meta, headers=self.headers)
 
     def parse_scene(self, response):
         meta = response.meta
-        json = response.json()
-        item = SceneItem()
-        item['title'] = self.cleanup_title(json['title'])
-        item['description'] = self.cleanup_description(json['description'])
-        item['image'] = json['thumbnailUrl']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        # ~ item['image_blob'] = ''
-        item['id'] = meta['id']
+        scene = response.json()
+        scene = scene['data']
+        item = self.init_scene()
 
-        item['trailer'] = ''
-        if json['encodings']:
-            for encoding in json['encodings']:
-                if encoding['name'].lower() == 'h264':
-                    encoding = encoding['videoSources']
-                    item['trailer'] = encoding[0]['url']
+        item['title'] = self.cleanup_title(scene['title'])
+        item['date'] = datetime.datetime.utcfromtimestamp(scene['date']).strftime('%Y-%m-%d')
+        if self.check_item(item, self.days):
+            if "description" in scene and scene['description']:
+                item['description'] = self.cleanup_description(scene['description'])
 
-        item['url'] = meta['url']
-        item['date'] = datetime.datetime.utcfromtimestamp(json['date']).isoformat()
-        item['site'] = json['paysite']['name']
-        item['network'] = item['site']
-        item['parent'] = item['site']
+            item['image'] = scene['thumbnailUrl']
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            item['id'] = str(meta['id'])
 
-        item['performers'] = []
-        if 'actors' in json:
-            for model in json['actors']:
-                item['performers'].append(model['name'])
+            if "videoPreview" in scene and scene['videoPreview']:
+                item['trailer'] = scene['videoPreview']
 
-        item['tags'] = []
-        for tag in json['categories']:
-            item['tags'].append(string.capwords(tag['tag']['name']))
+            item['url'] = f"https://www.sexlikereal.com/scenes/{scene['label']}"
+            item['site'] = scene['studio']['name']
+            item['network'] = item['site']
+            item['parent'] = item['site']
 
-        item['markers'] = []
-        if 'timeStamps' in json:
-            if json['timeStamps']:
-                for timetag in json['timeStamps']:
-                    timestamp = {}
-                    timestamp['name'] = self.cleanup_title(timetag['name'])
-                    timestamp['start'] = str(timetag['ts'])
-                    item['markers'].append(timestamp)
-                    item['tags'].append(timestamp['name'])
+            item['performers'] = []
+            if 'actors' in scene:
+                for model in scene['actors']:
+                    item['performers'].append(model['name'])
 
-        shortsite = re.sub(r'[^a-z0-9]', '', item['site'].lower())
-        item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
-        matches = ['vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'blowvr', 'arporn', 'sinsvr', 'realjamvr', 'baberoticavr', 'fuckpassvr', 'czechvr', 'stripzvr','badoink','realvr','kinkvr','babevr','vrcosplayx','18vr','wankzvr','vrhush','naughtyamerica']
-        if not any(x in item['id'] for x in matches) and not any(x in shortsite for x in matches):
-            matches = ['virtualtaboo', 'virtualrealporn', 'virtualrealtrans', 'virtualrealpassion', 'virtualrealamateur', 'realjamvr', 'only3x', 'wankzvr', 'naughtyamerica', 'vrhush', 'realitylovers', 'porncorn', 'porncornvr', 'vrlatina', 'povmasters']
-            if not any(x in item['id'] for x in matches) and not any(x in shortsite for x in matches):
-                matches = ['swallowbay', 'wankitnowvr', 'baberoticavr', 'vr-bangers', 'vrconk', 'vrbtrans', 'vrbgay', 'sinsvr', 'realjamvr', 'baberoticavr', 'stripzvr','badoink', 'slr-milfvr', 'milfvr', 'tranzvr', 'girlsway', 'puretaboo', 'joibabes']
-                if not any(x in item['site'].lower() for x in matches) and not any(x in shortsite for x in matches):
-                    yield self.check_item(item, self.days)
+            item['tags'] = []
+            for tag in scene['categories']:
+                item['tags'].append(string.capwords(tag['name']))
+
+            item['markers'] = []
+            if 'timestamps' in scene:
+                if scene['timestamps']:
+                    for timetag in scene['timestamps']:
+                        timestamp = {}
+                        timestamp['name'] = self.cleanup_title(timetag['name'])
+                        timestamp['start'] = str(timetag['timestamp'])
+                        item['markers'].append(timestamp)
+                        item['tags'].append(timestamp['name'])
+            item['tags'].append("Virtual Reality")
+
+            item['tags'] = list(map(lambda x: string.capwords(x.strip()), list(set(item['tags']))))
+
+            shortsite = re.sub(r'[^a-z0-9]', '', item['site'].lower())
+            raw_matches = ['18vr', 'arporn', 'babevr', 'baberoticavr', 'badoink', 'blowvr', 'czechvr', 'fuckpassvr', 'girlsway',
+                        'joibabes', 'kinkvr', 'milfvr', 'naughtyamerica', 'only3x', 'passionsonly', 'peterskingdom', 'porncorn',
+                        'porncornvr', 'povmasters', 'puretaboo', 'realjamvr', 'realvr', 'realitylovers', 'sinsvr', 'slrmilfvr',
+                        'stripzvr', 'swallowbay', 'tranzvr', 'vrcosplayx', 'vrbangers', 'vrbgay', 'vrbtrans',
+                        'vrconk', 'vrhush', 'vrlatina', 'virtualrealamateur', 'virtualrealpassion', 'virtualrealporn',
+                        'virtualrealtrans', 'virtualtaboo', 'wankitnowvr', 'wankzvr']
+
+            matches = [re.sub(r'[^a-z0-9]', '', x) for x in raw_matches]
+
+            if not any(x in shortsite for x in matches):
+                yield self.check_item(item, self.days)

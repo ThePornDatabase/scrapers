@@ -2,6 +2,7 @@ from datetime import datetime
 import dateparser
 import scrapy
 import re
+from tpdb.helpers.http import Http
 from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
 true = True
@@ -68,20 +69,17 @@ class BadoinkVrSpider(BaseSceneScraper):
         return ""
 
     def parse_scene(self, response):
-        item = SceneItem()
+        item = self.init_scene()
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
         item['site'] = self.get_site(response)
         item['date'] = self.get_date(response)
-        item['image'] = self.get_image(response)
-        if "-small" in item['image']:
-            item['image'] = item['image'].replace("-small", "-medium")
-        if item['image']:
-            item['image_blob'] = self.get_image_blob(response)
-        else:
-            item['image_blob'] = ""
-
-        if item['image']:
+        image = self.get_image(response)
+        if "-small" in image:
+            image = image.replace("-small", "-medium")
+        if image:
+            item['image'] = image
+            item['image_blob'] = self.get_image_blob_from_link(image)
             if "?" in item['image'] and ("token" in item['image'].lower() or "expire" in item['image'].lower()):
                 item['image'] = re.search(r'(.*?)\?', item['image']).group(1)
 
@@ -96,3 +94,10 @@ class BadoinkVrSpider(BaseSceneScraper):
 
         item['type'] = 'Scene'
         yield self.check_item(item, self.days)
+
+    def get_image_from_link(self, image):
+        if image:
+            req = Http.get(image)
+            if req and req.is_success:
+                return req.content
+        return None

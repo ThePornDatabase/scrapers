@@ -51,6 +51,10 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
             "api": "beverlybluexxx.mymember.site",
             "name": "BeverlyBlueXxX",
         },
+        "bigmilkymommygf.com": {
+            "api": "big-milky-mommy-gf.mymember.site",
+            "name": "Big Milk Mommy GF",
+        },
         "bindastimesuk.com": {
             "api": "bindastimesuk.mymember.site",
             "name": "Bindastimesuk",
@@ -279,6 +283,10 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
             "api": "officialemyang.mymember.site",
             "name": "Official Em Yang",
         },
+        "rubber-passion.com": {
+            "api": "rubberpassion.mymember.site",
+            "name": "Rubber Passion",
+        },
         "mymember.site/rubbobjectdoll": {
             "api": "rubbobjectdoll.mymember.site",
             "name": "RubbobjectDoll",
@@ -342,6 +350,10 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
         "shemalevalentina.com": {
             "api": "shemalevalentina.mymember.site",
             "name": "Shemale Valentina",
+        },
+        "sinnerxxx.vip": {
+            "api": "sinnersworld.mymember.site",
+            "name": "Sinnersworld",
         },
         "slutwife.club": {
             "api": "slutwife-club.mymember.site",
@@ -462,7 +474,7 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
         if "casts" in scene and scene['casts']:
             item['performers'] = []
             for cast in scene['casts']:
-                item['performers'].append(cast['screen_name'])
+                item['performers'].append(string.capwords(cast['screen_name']))
 
             # ~ item['performers_data'] = self.get_performers_data(item['performers'], meta['site'])
 

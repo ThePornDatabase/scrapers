@@ -14,7 +14,7 @@ class SiteElegantAngelSpider(BaseSceneScraper):
     start_url = 'https://www.elegantangel.com'
 
     paginations = [
-        '/watch-newest-elegant-angel-clips-and-scenes.html?page=%s&hybridview=member',
+        # ~ '/watch-newest-elegant-angel-clips-and-scenes.html?page=%s&hybridview=member',
         '/watch-exclusive-elegant-angel-scenes.html?page=%s&hybridview=member',
     ]
 
@@ -26,7 +26,7 @@ class SiteElegantAngelSpider(BaseSceneScraper):
         'date': '//span[contains(text(), "Released:")]/following-sibling::text()',
         'date_formats': ['%b %d, %Y'],
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[@class="video-performer"]/a/span/span/text()',
+        'performers': '//div[@class="video-performer"]/a//text()',
         'tags': '//span[contains(text(), "Tags:")]/following-sibling::a/text()',
         'trailer': '',
         'external_id': r'/(\d{2,8})/',
@@ -93,14 +93,16 @@ class SiteElegantAngelSpider(BaseSceneScraper):
         title = super().get_title(response)
         if title:
             if "Scene" in title:
-                subtitle = response.xpath('//h1[@class="description"]/following-sibling::p/a/text()').get()
-                title = string.capwords(f"{subtitle.strip()} - {title}")
+                subtitle = response.xpath('//h1[@class="description"]/following-sibling::p/a/text()')
+                if subtitle:
+                    subtitle = subtitle.get()
+                    title = string.capwords(f"{subtitle.strip()} - {title}")
             return title
         return ""
 
     def get_image_from_link(self, image):
         if image:
             req = Http.get(image, verify=False)
-            if req and req.ok:
+            if req and req.status_code == 200:
                 return req.content
         return None

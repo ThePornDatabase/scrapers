@@ -66,7 +66,8 @@ class SiteAsianStreetMeatSpider(BaseSceneScraper):
     def get_image_from_link(self, image, headers):
         if image:
             req = Http.get(image, headers=headers, verify=False)
-            if req and req.ok:
+            # ~ print(req)
+            if req and req.status_code == 200:
                 return req.content
         return None
 

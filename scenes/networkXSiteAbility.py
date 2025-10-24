@@ -1,60 +1,59 @@
 import re
-from datetime import date, timedelta
 import string
 import scrapy
-
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class NetworkXSiteAbilitySpider(BaseSceneScraper):
     name = 'XSiteAbility'
     network = 'XSiteAbility'
 
+    cookies = [{"name": "ageVerified", "value": "true"}]
+
     start_urls = [
-        ['https://rachel-steele.com', '/x-new/new-preview-list.php?page=%s&user=rachel-steele', 'Rachel Steele'],
-        ['https://4tomiko.com', '/x-new/new-preview-list.php?page=%s&user=4tomiko.com', '4Tomiko'],
-        ['https://sandrasilvers.com', '/x-new/new-preview-list.php?page=%s&user=', 'Sandra Silvers'],
+        # ~ ['https://rachel-steele.com', '/x-new/new-preview-list.php?page=%s&user=rachel-steele', 'Rachel Steele'],
+        # ~ ['https://4tomiko.com', '/x-new/new-preview-list.php?page=%s&user=4tomiko.com', '4Tomiko'],
+        # ~ ['https://sandrasilvers.com', '/x-new/new-preview-list.php?page=%s&user=', 'Sandra Silvers'],
         ['https://officeperils.com', '/x-new/new-preview-list.php?page=%s&user=officeperils.com', 'Office Perils'],
-        ['https://gndbondage.com', '/x-new/new-preview-list.php?page=%s&user=gndbondage.com', 'Girls Next Door Bondage'],
-        ['https://sereneisley.com', '/x-new/new-preview-list.php?page=%s&user=sereneisley.com', 'Serene Isley'],
-        ['https://www.nyxonsbondagefiles.com', '/x-new/new-preview-list.php?page=%s&user=nyxonsbondagefiles', 'Nyxons Bondage Files'],
-        ['https://xsiteability.com', '/x-new/new-preview-list.php?page=%s&user=bedroombondage', 'Loreleis Bedroom Bondage'],
-        ['https://milfgigi.com', '/x-new/new-preview-list.php?page=%s&user=milfgigi.com', 'MILF Gigi'],
-        ['https://brendasbound.com', '/x-new/new-preview-list.php?page=%s&user=brendasbound.com', 'Brendas Bound'],
-        ['https://misswhitneymorgan.com', '/x-new/new-preview-list.php?page=%s&user=misswhitneymorgan.com', 'Miss Whitney Morgan'],
-        ['https://leagueofamazingwomen.com', '/x-new/new-preview-list.php?page=%s&user=leagueofamazingwomen.com', 'League of Amazing Women'],
-        ['https://maidensinmayhem.com', '/x-new/new-preview-list.php?page=%s&user=maidensinmayhem.com', 'Maidens in Mayhem'],
-        ['https://lewrubens.com', '/x-new/new-preview-list.php?page=%s&user=lewrubens.com', 'Lew Rubens'],
-        ['https://jimhunterslair.com', '/x-new/new-preview-list.php?page=%s&user=jimhunterslair.com', 'Jim Hunters Lair'],
-        ['https://laurenkiley.com', '/x-new/new-preview-list.php?page=%s&user=laurenkiley.com', 'Lauren Kiley'],
-        ['https://ivanboulder.com', '/x-new/new-preview-list.php?page=%s&user=ivanboulder.com', 'Ivan Boulder'],
-        ['https://cinchedandsecured.com', '/x-new/new-preview-list.php?page=%s&user=cinchedandsecured.com', 'Cinched and Secured'],
-        ['https://tiedinheels.com', '/x-new/new-preview-list.php?page=%s&user=tiedinheels.com', 'Tied in Heels'],
-        ['https://faythonfire.com', '/x-new/new-preview-list.php?page=%s&user=faythonfire.com', 'Fayth on Fire'],
-        ['https://sydneyscreams4u.com', '/x-new/new-preview-list.php?page=%s&user=sydneyscreams4u.com', 'Sydney Screams 4U'],
-        ['https://ogres-world.com', '/x-new/new-preview-list.php?page=%s&user=ogres-world.com', 'Vivienne Velvet'],
-        ['https://jackiebound.com', '/x-new/new-preview-list.php?page=%s&user=jackiebound.com', 'Jackie Bound'],
-        ['https://christinasapphire.com', '/x-new/new-preview-list.php?page=%s&user=christinasapphire.com', 'Christina Sapphire'],
-        ['https://captivechrissymarie.com', '/x-new/new-preview-list.php?page=%s&user=captivechrissymarie.com', 'Captive Chrissy Marie'],
-        ['https://xsiteability.com', '/x-new/new-preview-list.php?page=%s&user=kaeciejames', 'Kaecie James'],
-        ['https://desperatepleasures.com', '/x-new/new-preview-list.php?page=%s&user=desperatepleasures.com', 'Desperate Pleasures'],
-        ['https://ajmarion.com', '/x-new/new-preview-list.php?page=%s&user=ajmarion.com', 'AJ Marion'],
-        ['https://leggybondage.com', '/x-new/new-preview-list.php?page=%s&user=leggybondage.com', 'Leggy Bondage'],
-        ['https://bbwbound.com', '/x-new/new-preview-list.php?page=%s&user=bbwbound.com', 'BBW Bound'],
-        ['https://www.oldschoolbondage.com', '/x-new/new-preview-list.php?page=%s&user=www.oldschoolbondage.com', 'Old School Bondage'],
-        ['https://hosednhelpless.com', '/x-new/new-preview-list.php?page=%s&user=hosednhelpless.com', 'Hosed and Helpless'],
-        ['https://dpstonefetish.com', '/x-new/new-preview-list.php?page=%s&user=dpstonefetish.com', 'DP Stone Fetish'],
-        ['https://www.caroline-pierce.com', '/x-new/new-preview-list.php?page=%s&user=www.caroline-pierce.com', 'Caroline Pierce'],
-        ['https://collegecaptures.com', '/x-new/new-preview-list.php?page=%s&user=collegecaptures.com', 'College Captures'],
-        ['https://lynnwinters.com', '/x-new/new-preview-list.php?page=%s&user=lynnwinters.com', 'Lynn Winters'],
-        ['https://thelunadawn.com', '/x-new/new-preview-list.php?page=%s&user=thelunadawn.com', 'Luna Dawn'],
-        ['https://bondagedownsouth.com', '/x-new/new-preview-list.php?page=%s&user=bondagedownsouth.com', 'Bondage Down South'],
-        ['https://lisaharlotte.com', '/x-new/new-preview-list.php?page=%s&user=lisaharlotte.com', 'Lisa Harlotte'],
-        ['https://wrappedinbondage.com', '/x-new/new-preview-list.php?page=%s&user=wrappedinbondage.com', 'Wrapped in Bondage'],
-        ['https://ticklerotic.com', '/x-new/new-preview-list.php?page=%s&user=ticklerotic.com', 'Ticklerotic'],
-        ['https://bondagecrossdresser.com', '/x-new/new-preview-list.php?page=%s&user=bondagecrossdresser.com', 'Bondage Crossdresser'],
-        ['https://stellalibertyvideos.com', '/x-new/new-preview-list.php?page=%s&user=stellalibertyvideos.com', 'Stella Liberty'],
+        # ~ ['https://gndbondage.com', '/x-new/new-preview-list.php?page=%s&user=gndbondage.com', 'Girls Next Door Bondage'],
+        # ~ ['https://sereneisley.com', '/x-new/new-preview-list.php?page=%s&user=sereneisley.com', 'Serene Isley'],
+        # ~ ['https://www.nyxonsbondagefiles.com', '/x-new/new-preview-list.php?page=%s&user=nyxonsbondagefiles', 'Nyxons Bondage Files'],
+        # ~ ['https://xsiteability.com', '/x-new/new-preview-list.php?page=%s&user=bedroombondage', 'Loreleis Bedroom Bondage'],
+        # ~ ['https://milfgigi.com', '/x-new/new-preview-list.php?page=%s&user=milfgigi.com', 'MILF Gigi'],
+        # ~ ['https://brendasbound.com', '/x-new/new-preview-list.php?page=%s&user=brendasbound.com', 'Brendas Bound'],
+        # ~ ['https://misswhitneymorgan.com', '/x-new/new-preview-list.php?page=%s&user=misswhitneymorgan.com', 'Miss Whitney Morgan'],
+        # ~ ['https://leagueofamazingwomen.com', '/x-new/new-preview-list.php?page=%s&user=leagueofamazingwomen.com', 'League of Amazing Women'],
+        # ~ ['https://maidensinmayhem.com', '/x-new/new-preview-list.php?page=%s&user=maidensinmayhem.com', 'Maidens in Mayhem'],
+        # ~ ['https://lewrubens.com', '/x-new/new-preview-list.php?page=%s&user=lewrubens.com', 'Lew Rubens'],
+        # ~ ['https://jimhunterslair.com', '/x-new/new-preview-list.php?page=%s&user=jimhunterslair.com', 'Jim Hunters Lair'],
+        # ~ ['https://laurenkiley.com', '/x-new/new-preview-list.php?page=%s&user=laurenkiley.com', 'Lauren Kiley'],
+        # ~ ['https://ivanboulder.com', '/x-new/new-preview-list.php?page=%s&user=ivanboulder.com', 'Ivan Boulder'],
+        # ~ ['https://cinchedandsecured.com', '/x-new/new-preview-list.php?page=%s&user=cinchedandsecured.com', 'Cinched and Secured'],
+        # ~ ['https://tiedinheels.com', '/x-new/new-preview-list.php?page=%s&user=tiedinheels.com', 'Tied in Heels'],
+        # ~ ['https://faythonfire.com', '/x-new/new-preview-list.php?page=%s&user=faythonfire.com', 'Fayth on Fire'],
+        # ~ ['https://sydneyscreams4u.com', '/x-new/new-preview-list.php?page=%s&user=sydneyscreams4u.com', 'Sydney Screams 4U'],
+        # ~ ['https://ogres-world.com', '/x-new/new-preview-list.php?page=%s&user=ogres-world.com', 'Vivienne Velvet'],
+        # ~ ['https://jackiebound.com', '/x-new/new-preview-list.php?page=%s&user=jackiebound.com', 'Jackie Bound'],
+        # ~ ['https://christinasapphire.com', '/x-new/new-preview-list.php?page=%s&user=christinasapphire.com', 'Christina Sapphire'],
+        # ~ ['https://captivechrissymarie.com', '/x-new/new-preview-list.php?page=%s&user=captivechrissymarie.com', 'Captive Chrissy Marie'],
+        # ~ ['https://xsiteability.com', '/x-new/new-preview-list.php?page=%s&user=kaeciejames', 'Kaecie James'],
+        # ~ ['https://desperatepleasures.com', '/x-new/new-preview-list.php?page=%s&user=desperatepleasures.com', 'Desperate Pleasures'],
+        # ~ ['https://ajmarion.com', '/x-new/new-preview-list.php?page=%s&user=ajmarion.com', 'AJ Marion'],
+        # ~ ['https://leggybondage.com', '/x-new/new-preview-list.php?page=%s&user=leggybondage.com', 'Leggy Bondage'],
+        # ~ ['https://bbwbound.com', '/x-new/new-preview-list.php?page=%s&user=bbwbound.com', 'BBW Bound'],
+        # ~ ['https://www.oldschoolbondage.com', '/x-new/new-preview-list.php?page=%s&user=www.oldschoolbondage.com', 'Old School Bondage'],
+        # ~ ['https://hosednhelpless.com', '/x-new/new-preview-list.php?page=%s&user=hosednhelpless.com', 'Hosed and Helpless'],
+        # ~ ['https://dpstonefetish.com', '/x-new/new-preview-list.php?page=%s&user=dpstonefetish.com', 'DP Stone Fetish'],
+        # ~ ['https://www.caroline-pierce.com', '/x-new/new-preview-list.php?page=%s&user=www.caroline-pierce.com', 'Caroline Pierce'],
+        # ~ ['https://collegecaptures.com', '/x-new/new-preview-list.php?page=%s&user=collegecaptures.com', 'College Captures'],
+        # ~ ['https://lynnwinters.com', '/x-new/new-preview-list.php?page=%s&user=lynnwinters.com', 'Lynn Winters'],
+        # ~ ['https://thelunadawn.com', '/x-new/new-preview-list.php?page=%s&user=thelunadawn.com', 'Luna Dawn'],
+        # ~ ['https://bondagedownsouth.com', '/x-new/new-preview-list.php?page=%s&user=bondagedownsouth.com', 'Bondage Down South'],
+        # ~ ['https://lisaharlotte.com', '/x-new/new-preview-list.php?page=%s&user=lisaharlotte.com', 'Lisa Harlotte'],
+        # ~ ['https://wrappedinbondage.com', '/x-new/new-preview-list.php?page=%s&user=wrappedinbondage.com', 'Wrapped in Bondage'],
+        # ~ ['https://ticklerotic.com', '/x-new/new-preview-list.php?page=%s&user=ticklerotic.com', 'Ticklerotic'],
+        # ~ ['https://bondagecrossdresser.com', '/x-new/new-preview-list.php?page=%s&user=bondagecrossdresser.com', 'Bondage Crossdresser'],
+        # ~ ['https://stellalibertyvideos.com', '/x-new/new-preview-list.php?page=%s&user=stellalibertyvideos.com', 'Stella Liberty'],
     ]
 
     selector_map = {
@@ -104,9 +103,12 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         meta = response.meta
-        scenes = response.xpath('//li[contains(@class,"first")]')
+        if "officeperils" in response.url:
+            scenes = response.xpath('//*[self::h3 or self::h4]/following-sibling::p[contains(text(), "video")]/ancestor::li')
+        else:
+            scenes = response.xpath('//li[contains(@class,"first")]')
         for scene in scenes:
-            item = SceneItem()
+            item = self.init_scene()
 
             url = scene.xpath('./a/@href')
             if url:
@@ -115,7 +117,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             else:
                 item['url'] = ''
 
-            title = scene.xpath('.//h3/text()')
+            title = scene.xpath('.//h3/text()|.//h4/text()')
             if title:
                 title = title.get()
                 title = title.replace("*", "")
@@ -145,6 +147,12 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             if description:
                 description = description.getall()
                 item['description'] = " ".join(description).replace('\xa0', '').strip()
+
+                duration_desc = re.sub(r'[^a-z0-9:]+', '', item['description'].lower())
+                duration = re.search(r'((?:\d{1,2}\:)?\d{2}\:\d{2})video', duration_desc)
+                if duration:
+                    item['duration'] = self.duration_to_seconds(duration.group(1))
+
                 item['description'] = re.sub(r'\d{1,3} photos', '', item['description'], flags=re.IGNORECASE)
                 item['description'] = re.sub(r'\d{1,3}:\d{1,3} video', '', item['description'], flags=re.IGNORECASE)
                 item['description'] = re.sub('  ', ' ', item['description'])
@@ -152,14 +160,16 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             else:
                 item['description'] = ''
 
-            scenedate = re.search(r' (\w+ \d{1,2}, \d{4}) ', item['description'])
+            scenedate = re.search(r'(?:^|\s)(\w+ \d{1,2}, \d{4}) ', item['description'])
             if not scenedate:
                 scenedate = re.search(r'(\d{2}\.\d{2}\.\d{2})', item['description'])
 
             if scenedate:
-                item['date'] = self.parse_date(scenedate.group(1).strip()).isoformat()
-            else:
-                item['date'] = self.parse_date('today').isoformat()
+                scenedate = scenedate.group(1)
+                scenedate = self.parse_date(scenedate.strip())
+                if scenedate:
+                    item['date'] = scenedate.strftime('%Y-%m-%d')
+
             item['performers'] = self.site_performers(scene, meta)
             item['tags'] = self.site_tags(scene, meta)
             item['trailer'] = ''
@@ -168,23 +178,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
             item['network'] = 'XSiteAbility'
 
             if item['id']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
+                yield self.check_item(item, self.days)
 
     def site_performers(self, scene, meta):
         performers = []
