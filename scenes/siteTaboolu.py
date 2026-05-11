@@ -14,6 +14,10 @@ class SiteTabooluSpider(BaseSceneScraper):
         'https://taboolu.com',
     ]
 
+    custom_scraper_settings = {
+        'REDIRECT_ENABLED': False,
+    }
+
     cookies = [
         {"name": "ageConfirmed", "value": "true"},
         {"name": "use_lang", "value": "val=en"},
@@ -21,10 +25,10 @@ class SiteTabooluSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h1[@class="description"]/text()',
+        'title': '//h1[@class="description"]/text()|//div[contains(@class, "boxcover")]/img/@title',
         'description': '//div[@class="synopsis"]/p//text()',
         'date': '//div[@class="release-date"]/span[contains(text(), "Released")]/following-sibling::text()',
-        'image': '//meta[@property="og:image"]/@content',
+        # 'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="video-performer"]/a/div/text()',
         'tags': '//div[@class="tags"]/a/text()',
         'external_id': r'.*/(\d+)/',
@@ -37,6 +41,7 @@ class SiteTabooluSpider(BaseSceneScraper):
         scenes = response.xpath('//article/div[1]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
+                meta['orig_scene'] = scene
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_duration(self, response):
@@ -66,4 +71,3 @@ class SiteTabooluSpider(BaseSceneScraper):
             performers_data.append(performer_extra)
 
         return performers_data
-        
