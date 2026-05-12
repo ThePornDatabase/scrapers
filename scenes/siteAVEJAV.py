@@ -74,7 +74,6 @@ class SiteAVEJAVSpider(BaseSceneScraper):
         return f"{sceneid.upper()} - {title}"
 
     def get_performers_data(self, response):
-        meta = response.meta
         performers = self.get_performers(response)
         performers_data = []
         for performer in performers:

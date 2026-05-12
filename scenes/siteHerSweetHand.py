@@ -20,7 +20,6 @@ class SiteHerSweetHandSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[@class="video-card"]')
         for scene in scenes:
             item = self.init_scene()

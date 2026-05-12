@@ -52,7 +52,6 @@ class SiteLukeCooperXSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
         jsondata = response.json()
         jsondata = jsondata['pageProps']['contents']['data']
         for scene in jsondata:

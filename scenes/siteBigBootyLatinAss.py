@@ -33,7 +33,6 @@ class SiteBigBootyLatinAssSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[@align="center"]/preceding-sibling::p[@class="Estilo6"][1]')
         for scene in scenes:
             item = self.init_scene()

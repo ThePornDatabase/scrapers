@@ -24,7 +24,6 @@ class SiteZlatexaSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[@class="entry clearfix"][.//i[@class="icon-video"]]')
         for scene in scenes:
             item = self.init_scene()

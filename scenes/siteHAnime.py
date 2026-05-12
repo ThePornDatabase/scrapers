@@ -28,7 +28,6 @@ class siteHAnimeSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
         jsondata = response.json()
         for scene in jsondata:
             item = self.init_scene()

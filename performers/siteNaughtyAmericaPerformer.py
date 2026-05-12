@@ -21,7 +21,7 @@ class SiteNaughtyAmericaPerformerSpider(BasePerformerScraper):
         for performer in performers:
             item = PerformerItem()
             item['url'] = performer.xpath('.//a[contains(@class, "performer-name")]/@href').get()
-            slug = re.search(r'.*/(.*?)$', item['url']).group(1)
+            # ~ slug = re.search(r'.*/(.*?)$', item['url']).group(1)
             item['name'] = self.cleanup_title(performer.xpath('.//a[contains(@class, "performer-name")]/text()').get())
             image = performer.xpath('.//img/@data-srcset|.//source[contains(@srcset, ".jpg")]/@srcset')
             if image:

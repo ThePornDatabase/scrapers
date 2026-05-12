@@ -56,7 +56,6 @@ class SiteLadyboyPussySpider(BaseSceneScraper):
 
             if "preview_formatted" in scene and scene['preview_formatted']:
                 if "thumb" in scene['preview_formatted'] and scene['preview_formatted']['thumb']:
-                    image = ""
                     resolution = 0
                     for thumb in scene['preview_formatted']['thumb']:
                         height = re.search(r'-(\d)', thumb)

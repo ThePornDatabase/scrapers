@@ -19,7 +19,6 @@ class SiteTiedInPublicSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[@class="collection"]')
         for scene in scenes:
             item = self.init_scene()

@@ -42,12 +42,10 @@ class SiteHotGuysFuckSpider(BaseSceneScraper):
             # ~ yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page), callback=self.parse, meta=meta, headers=meta['siteheaders'], cookies=self.cookies, dont_filter=True)
 
     def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
-        count = 0
+        self.get_scenes(response)
 
     def get_scenes(self, response):
         meta = response.meta
-        print(response.text)
         if "Unhandled match case" not in response.text:
             jsondata = response.json()
             jsondata = jsondata['videos']['data']

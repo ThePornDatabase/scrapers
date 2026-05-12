@@ -19,7 +19,6 @@ class SiteCumPerfectionSinglePageSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[@class="update_details"]')
         for scene in scenes:
             item = self.init_scene()

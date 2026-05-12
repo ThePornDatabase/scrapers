@@ -51,7 +51,6 @@ class FittingRoomSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
         item = self.init_scene()
         scene_json = response.xpath('//script[contains(@type, "json")]/text()').get()
         scenedata = json.loads(scene_json)

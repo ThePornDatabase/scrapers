@@ -112,7 +112,7 @@ class SiteBralessForeverSpider(BaseSceneScraper):
         perf['extra']['gender'] = "Female"
         perf['network'] = "Braless Forever"
         perf['site'] = "Braless Forever"
-        user = contentUser.get('user') or {}
+        # user = contentUser.get('user') or {}
         avatar = contentUser.get('avatar') or {}
         image_data = avatar.get('data') or {}
         blob = image_data.get('o')

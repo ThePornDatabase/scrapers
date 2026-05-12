@@ -118,13 +118,11 @@ class TeenCoreClubSpider(BaseSceneScraper):
         return url
 
     def get_scenes(self, response):
-        print("Hello!")
-        meta = response.meta
+        # meta = response.meta
         jsondata = response.json()
         jsondata = jsondata['videos']['data']
         # print(jsondata)
         for scene in jsondata:
-            print(scene)
         #     if ("id" in scene and scene['id']) and ("slug" in scene and scene['slug']):
         #         link = f"https://api.fundorado.com/api/videodetail/{scene['id']}"
         #         yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=self.headers)

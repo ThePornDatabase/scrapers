@@ -119,7 +119,7 @@ class ATKGirlfriendsSpider(BaseSceneScraper):
         item['performers'] = []
         item['performers_data'] = []
         performers = response.xpath('//div[contains(@class,"model-profile-wrap")]')
-        perfArray = []
+        # perfArray = []
         for perf in performers:
             temp_perf = {}
             temp_perf['name'] = perf.xpath('./text()[1]').get()

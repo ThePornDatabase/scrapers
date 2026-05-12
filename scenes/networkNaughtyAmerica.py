@@ -49,7 +49,6 @@ class NaughtyAmericaSpider(BaseSceneScraper):
     }
 
     async def start(self):
-        settings = get_project_settings()
         meta = {}
         meta['page'] = self.page
         meta['playwright'] = True

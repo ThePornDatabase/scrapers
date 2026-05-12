@@ -21,7 +21,6 @@ class SiteMenAtPlaySpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429, 403, 302],
     }
 

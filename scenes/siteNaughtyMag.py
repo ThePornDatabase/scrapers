@@ -33,7 +33,6 @@ class SiteNaughtyMagSpider(BaseSceneScraper):
     custom_scraper_settings = {
         'CONCURRENT_REQUESTS': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         # ~ 'DOWNLOAD_FAIL_ON_DATALOSS': True,
         'COMPRESSION_ENABLED': False,
         'RETRY_ENABLED': True,

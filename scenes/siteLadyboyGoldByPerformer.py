@@ -38,7 +38,6 @@ class SiteLadyboyGoldByPerformerSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.get_scenes, cookies=self.cookies, headers=self.headers)
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[contains(@class, "videoUpdate") and contains(@class, "col-xxxld")]')
         for scene in scenes:
             item = SceneItem()

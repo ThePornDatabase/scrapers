@@ -75,7 +75,7 @@ class SiteKailaniKaiSpider(BaseSceneScraper):
 
             cat = []
             categories = scene['categories']
-            for category in scene['categories']:
+            for category in categories:
                 for tag in meta['catdata']:
                     if tag['id'] == category:
                         cat.append(tag['name'])

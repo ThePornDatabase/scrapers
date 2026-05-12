@@ -44,7 +44,6 @@ class MovieErotikSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 4,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 4,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 4,
     }
 
     def get_scenes(self, response):

@@ -47,7 +47,6 @@ class MovieHelixStudiosSpider(BaseSceneScraper):
             yield scrapy.Request(movie_url, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
         sceneurls = response.xpath('//div[@class="main"]//h2[contains(text(), "Videos on")]/following-sibling::div/a/@href').getall()
         sceneurls = list(filter(lambda x: len(x) > 0, sceneurls))
         if len(sceneurls) > 1:

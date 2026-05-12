@@ -29,7 +29,6 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
         movie = response.json()
         item = self.init_scene()
 

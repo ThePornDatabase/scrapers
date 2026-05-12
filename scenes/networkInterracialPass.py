@@ -39,7 +39,6 @@ class InterracialPassSpider(BaseSceneScraper):
         'AUTOTHROTTLE_MAX_DELAY': 10,
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,        
     }
 

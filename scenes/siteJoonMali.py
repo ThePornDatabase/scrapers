@@ -59,7 +59,6 @@ class SiteJoonMaliSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
         jsondata = response.json()
         jsondata = jsondata['sets']
 

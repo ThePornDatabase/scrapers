@@ -21,7 +21,6 @@ class SitePornDudeCastingSpider(BaseSceneScraper):
 
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[contains(@class, "content-block__item")]')
         for scene in scenes:
             item = self.init_scene()

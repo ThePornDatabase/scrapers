@@ -52,7 +52,6 @@ class SiteKenMarcusExquisiteEroticaSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[@class="updateItem"]')
         for scene in scenes:
             item = self.init_scene()

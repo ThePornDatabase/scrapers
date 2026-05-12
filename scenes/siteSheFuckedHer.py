@@ -20,7 +20,6 @@ class SiteSheFuckedHerSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//table[@bgcolor="black"]')
         for scene in scenes:
             item = SceneItem()

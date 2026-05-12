@@ -27,12 +27,10 @@ class SiteFit18WorkSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
         jsondata = response.xpath('//script[contains(text(), "INITIAL__DATA")]/text()').get()
         jsondata = jsondata.replace('\\"', '"')
         jsondata = re.search(r'(\{.*\})', jsondata).group(1)
         jsondata = json.loads(jsondata)
-        jsondata_str = json.dumps(jsondata, indent=2)
         jsondata = jsondata['page']['current']['recent']
         for jsonrow in jsondata:
 

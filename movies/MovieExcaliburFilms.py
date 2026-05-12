@@ -32,7 +32,6 @@ class MovieExcaliburFilmsSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
     }
 
     def get_scenes(self, response):

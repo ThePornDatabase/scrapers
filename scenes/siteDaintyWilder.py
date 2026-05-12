@@ -28,7 +28,6 @@ class SiteDaintyWilderSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//div[contains(@class, "single-video")]/div[@class="video--info"]')
         for scene in scenes:
             item = self.init_scene()

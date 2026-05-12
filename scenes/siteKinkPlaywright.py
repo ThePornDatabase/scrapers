@@ -192,7 +192,6 @@ class NetworkKinkSpider(BaseSceneScraper):
         return url
 
     def parse_scene(self, response):
-
         local_run = self.settings.get('local')
         show_blob = self.settings.get('showblob')
         force_update = self.settings.get('force_update')
@@ -202,7 +201,6 @@ class NetworkKinkSpider(BaseSceneScraper):
         if force_fields:
             force_fields = force_fields.split(",")
 
-        meta = response.meta
         item = self.init_scene()
 
         item['title'] = self.get_title(response)

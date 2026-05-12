@@ -21,7 +21,6 @@ class SiteExposedNursesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//th/h1/..')
         for scene in scenes:
             item = SceneItem()

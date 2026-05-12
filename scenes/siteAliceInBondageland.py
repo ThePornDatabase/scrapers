@@ -24,7 +24,6 @@ class SiteAliceInBondagelandSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
     
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//p[span[contains(@class,"Verdana-VideoTitle-13pxBold")]]/ancestor::table[@width="100%"][1]')
         if len(scenes) < 2:
             print(f"Less than 2 scenes found, stopping pagination.  {response.url}")

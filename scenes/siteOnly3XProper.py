@@ -36,7 +36,6 @@ class Only3XProperSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
     }
 
     selector_map = {

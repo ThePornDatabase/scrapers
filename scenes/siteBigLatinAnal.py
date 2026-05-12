@@ -30,7 +30,6 @@ class SiteBigLatinAnalSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
         scenes = response.xpath('//section[@class="modelo"]')
         for scene in scenes:
             item = self.init_scene()
