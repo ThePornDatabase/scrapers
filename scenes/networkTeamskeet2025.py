@@ -89,7 +89,7 @@ class NetworkTeamskeet2025Spider(BaseSceneScraper):
                             item['image'] = test_image
                         else:
                             item['image'] = image
-                    except requests.RequestException as e:
+                    except requests.RequestException:
                         item['image'] = image
 
                     item['performers'], item['performers_data'] = self.parse_model(scene['_source']['models'])

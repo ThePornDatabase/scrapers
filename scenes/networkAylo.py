@@ -5,7 +5,6 @@ import datetime
 import scrapy
 import requests
 from slugify import slugify
-from tldextract import tldextract
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 

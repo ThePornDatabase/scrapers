@@ -1,8 +1,5 @@
 import re
-import scrapy
-from scrapy.utils.project import get_project_settings
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteBrothaLoversSpider(BaseSceneScraper):

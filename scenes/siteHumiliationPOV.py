@@ -8,7 +8,6 @@ import base64
 import random
 import os
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 from PIL import Image
 
 

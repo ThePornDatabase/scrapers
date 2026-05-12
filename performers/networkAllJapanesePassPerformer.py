@@ -1,7 +1,6 @@
 import scrapy
 import re
 from datetime import datetime
-import time
 import datetime
 import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper

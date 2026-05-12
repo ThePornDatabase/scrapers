@@ -1,11 +1,6 @@
 import re
-import html
-import json
-import requests
 import string
-import unidecode
 import scrapy
-from scrapy import Selector
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 

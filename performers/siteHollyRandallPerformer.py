@@ -1,11 +1,7 @@
 import scrapy
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
-from datetime import datetime
 import re
-import dateparser
-import html
-import string
 
 class SiteHollyRandallPerformerSpider(BasePerformerScraper):
     name = 'HollyRandallPerformer'

@@ -2,9 +2,7 @@ import re
 import json
 import html
 import string
-import os.path
 from datetime import date, datetime, timedelta
-from pathlib import Path
 import unidecode
 import dateparser
 import scrapy

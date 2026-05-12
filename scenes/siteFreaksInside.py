@@ -1,6 +1,5 @@
 import re
 import string
-from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem

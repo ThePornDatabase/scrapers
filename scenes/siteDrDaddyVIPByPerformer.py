@@ -1,6 +1,5 @@
 import re
 import string
-import requests
 import scrapy
 from slugify import slugify
 from tpdb.BaseSceneScraper import BaseSceneScraper

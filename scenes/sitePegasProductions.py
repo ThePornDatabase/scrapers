@@ -3,7 +3,6 @@ import json
 import string
 import unicodedata
 import scrapy
-import time
 from tpdb.BaseSceneScraper import BaseSceneScraper
 true = True
 false = False

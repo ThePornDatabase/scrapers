@@ -1,5 +1,4 @@
 import re
-from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.BaseOCR import BaseOCR
 

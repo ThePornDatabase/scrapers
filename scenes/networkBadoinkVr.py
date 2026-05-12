@@ -1,9 +1,7 @@
-from datetime import datetime
 import dateparser
 import scrapy
 import re
 from tpdb.helpers.http import Http
-from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
 true = True
 false = False

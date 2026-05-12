@@ -1,11 +1,9 @@
-from os import link
 import scrapy
 
 from scrapy.http import HtmlResponse
 
 from extruct.jsonld import JsonLdExtractor
 from tpdb.BasePerformerScraper import BasePerformerScraper
-from tpdb.items import PerformerItem
 
 
 class networkVRLifePerformerSpider(BasePerformerScraper):

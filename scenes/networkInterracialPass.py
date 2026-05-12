@@ -1,11 +1,9 @@
-from datetime import date, timedelta
 import tldextract
 import requests
 import scrapy
 import string
 import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 def match_site(argument):

@@ -40,7 +40,7 @@ class SiteWankitnowVRSpider(BaseSceneScraper):
         tags = list(map(lambda x: string.capwords(x.lower().replace("(toys)", "").replace("(action)", "").replace("(outfit)", "").replace("(body)", "").replace("(", "").replace(")", "").replace("nationality", "").replace("location", "")).strip(), tags))
         taglist = []
         for tag in tags:
-            if not "quality" in tag.lower() and " age" not in tag.lower():
+            if "quality" not in tag.lower() and " age" not in tag.lower():
                 taglist.append(tag)
         return taglist
 

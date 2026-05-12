@@ -6,7 +6,6 @@ import base64
 from io import BytesIO
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-from tpdb.helpers.http import Http
 
 
 class NetworkKinkMenSpider(BaseSceneScraper):

@@ -1,5 +1,4 @@
 import re
-import scrapy
 from slugify import slugify
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem

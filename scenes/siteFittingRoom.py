@@ -3,7 +3,6 @@ import re
 import scrapy
 import json
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from scrapy.utils.project import get_project_settings
 true = True
 false = False
 

@@ -1,9 +1,6 @@
 import scrapy
 import re
 import string
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class siteAuntJudysPerformerSpider(BasePerformerScraper):

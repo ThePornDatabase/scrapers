@@ -2,7 +2,6 @@ import re
 import scrapy
 import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteDripDropSpider(BaseSceneScraper):

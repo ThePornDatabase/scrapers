@@ -1,4 +1,3 @@
-import re
 from requests import get
 from cleantext import clean
 import scrapy

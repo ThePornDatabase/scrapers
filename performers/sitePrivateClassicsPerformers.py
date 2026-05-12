@@ -1,5 +1,4 @@
 import re
-import string
 import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 

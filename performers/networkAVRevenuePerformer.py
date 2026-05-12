@@ -1,5 +1,4 @@
 import re
-import xml.etree.ElementTree as ET
 import string
 import scrapy
 from scrapy.utils.project import get_project_settings

@@ -1,5 +1,4 @@
 import scrapy
-import re
 from urllib.parse import urlparse
 from tpdb.BasePerformerScraper import BasePerformerScraper
 

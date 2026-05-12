@@ -1,9 +1,5 @@
 import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
-from urllib.parse import urlparse
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 

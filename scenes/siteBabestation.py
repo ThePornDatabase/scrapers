@@ -1,5 +1,3 @@
-import re
-from datetime import date, timedelta
 import scrapy
 import html
 import json

@@ -4,7 +4,6 @@ import scrapy
 import unidecode
 import html
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class MovieHelixStudiosSpider(BaseSceneScraper):

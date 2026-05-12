@@ -3,7 +3,6 @@ import re
 from urllib.parse import urlparse
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import dateparser
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 

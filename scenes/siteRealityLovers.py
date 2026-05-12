@@ -40,7 +40,7 @@ class SiteRealityLoversSpider(BaseSceneScraper):
         meta = {}
         meta['page'] = self.page
         meta['reg_pagination'] = "https://realitylovers.com/videos/page%s"
-        meta['json_pagination'] = f"https://engine.realitylovers.com/content/videos?max=12&page=%s&pornstar=&category=&perspective=&sort=NEWEST"
+        meta['json_pagination'] = "https://engine.realitylovers.com/content/videos?max=12&page=%s&pornstar=&category=&perspective=&sort=NEWEST"
 
         link = "https://realitylovers.com/"
         yield scrapy.Request(link, callback=self.start_requests_primed, meta=meta)

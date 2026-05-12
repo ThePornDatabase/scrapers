@@ -1,5 +1,4 @@
 import re
-import json
 import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

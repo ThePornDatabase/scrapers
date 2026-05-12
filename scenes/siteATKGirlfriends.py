@@ -1,12 +1,6 @@
 import re
-from datetime import date, timedelta
-import json
-import base64
 import string
-import requests
 import scrapy
-from scrapy.http import HtmlResponse
-from slugify import slugify
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

@@ -4,7 +4,6 @@ import string
 import scrapy
 from scrapy_playwright.page import PageMethod
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 true = True
 false = False
 

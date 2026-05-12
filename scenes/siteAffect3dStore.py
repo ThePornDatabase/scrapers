@@ -1,5 +1,4 @@
 import re
-import json
 import scrapy
 # ~ from helpers.scrapy_flare.request import FlareRequest
 from tpdb.BaseSceneScraper import BaseSceneScraper

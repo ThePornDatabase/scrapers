@@ -4,9 +4,7 @@ import scrapy
 import string
 
 from scrapy_playwright.page import PageMethod
-from slugify import slugify
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class ATKGirlfriendsPlaywrightSpider(BaseSceneScraper):

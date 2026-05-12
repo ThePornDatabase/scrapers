@@ -1,7 +1,6 @@
 # Historical scraper only.  No new scenes, pulling from Archive.org
 import re
 import csv
-import json
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 import scrapy

@@ -1,7 +1,4 @@
 import re
-import base64
-import html
-from tpdb.helpers.http import Http
 
 import string
 import scrapy

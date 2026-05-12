@@ -1,7 +1,6 @@
 import scrapy
 import re
 from tpdb.BasePerformerScraper import BasePerformerScraper
-from tpdb.items import PerformerItem
 
 
 class NetworkKinkPerformerPerformerSpider(BasePerformerScraper):

@@ -1,7 +1,4 @@
 import re
-from PIL import Image
-import base64
-from io import BytesIO
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 

@@ -1,5 +1,4 @@
 import re
-from datetime import date, timedelta
 import codecs
 import json
 import scrapy

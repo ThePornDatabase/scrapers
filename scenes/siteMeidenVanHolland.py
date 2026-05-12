@@ -1,10 +1,7 @@
 import re
-from datetime import date, timedelta
-import codecs
 import string
 import json
 import scrapy
-from tpdb.items import SceneItem
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

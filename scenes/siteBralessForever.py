@@ -3,7 +3,6 @@ import string
 import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 class SiteBralessForeverSpider(BaseSceneScraper):
     name = 'BralessForever'

@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime
+from datetime import datetime
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper

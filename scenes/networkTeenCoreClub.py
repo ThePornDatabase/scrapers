@@ -1,7 +1,3 @@
-import re
-from datetime import date, timedelta
-import json
-from urllib.parse import urlparse
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper

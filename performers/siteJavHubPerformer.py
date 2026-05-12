@@ -1,4 +1,3 @@
-import html
 import json
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem

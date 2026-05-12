@@ -1,7 +1,6 @@
 import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteTransSexJapanSpider(BaseSceneScraper):

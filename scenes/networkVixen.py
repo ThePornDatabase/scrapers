@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class VixenScraper(BaseSceneScraper):

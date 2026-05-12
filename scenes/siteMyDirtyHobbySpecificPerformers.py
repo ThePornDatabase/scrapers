@@ -7,10 +7,8 @@ import requests
 import html
 from slugify import slugify
 import unidecode
-import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 true = True
 false = False
 
