@@ -203,7 +203,8 @@ class SiteBralessFlightResolver:
             if content.startswith(('I', 'HL', 'T')):
                 # Find where the JSON actually starts after the prefix
                 json_start = content.find('[')
-                if json_start == -1: json_start = content.find('{')
+                if json_start == -1:
+                    json_start = content.find('{')
 
                 if json_start != -1:
                     try:

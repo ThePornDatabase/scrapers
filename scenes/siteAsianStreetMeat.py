@@ -36,7 +36,7 @@ class SiteAsianStreetMeatSpider(BaseSceneScraper):
                 if not title:
                     title = scene.xpath(".//tr[@class='height145']/td[1]/div[1]/a[1]/text()")
 
-                if title and not type(title) == str:
+                if not isinstance(title, str):
                     title = title.get()
 
                 if title:

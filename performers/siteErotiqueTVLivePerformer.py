@@ -39,12 +39,6 @@ class siteErotiqueTVLivePerformerSpider(BasePerformerScraper):
                 callback=self.parse_performer
             )
 
-    def get_cupsize(self, response):
-        if 'cupsize' in self.selector_map:
-            cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get().strip().replace("-","")
-            return cupsize
-        return ''
-
     def get_height(self, response):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()

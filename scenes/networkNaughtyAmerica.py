@@ -1,5 +1,4 @@
 import re
-from scrapy.utils.project import get_project_settings
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

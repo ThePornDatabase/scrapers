@@ -1,6 +1,4 @@
 import scrapy
-true = True
-false = False
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
