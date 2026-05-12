@@ -61,6 +61,7 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
         ['Clips4Sale', 'Clips4Sale: Portia Everly', 'Clips4Sale: Portia Everly', '235967', 'Portia-Everly'],
         ['Clips4Sale', 'Clips4Sale: KingDom Of Infinity', 'Clips4Sale: KingDom Of Infinity', '292343', 'kingdom-of-infinity'],
         ['Clips4Sale', 'Clips4Sale: FJ Squirts', 'Clips4Sale: FJ Squirts', '304649', 'fj-squirts'],
+        ['Clips4Sale', 'Fox Smoulder Fetish Clips', 'Fox Smoulder Fetish Clips', '82595', 'fox-smoulder-fetish-clips'],
         # ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
         # ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
     ]
