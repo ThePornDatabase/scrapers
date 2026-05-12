@@ -13,22 +13,22 @@ warnings.filterwarnings(
 
 class BaberoticaPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//a/h1/text()',
-        'image': '//div[@class="m5"]/img/@src',
-        'bio': '//div[contains(@class,"th-wrapper")]/div/p/text()',
-        'eyecolor': '//div[@id="model"]/div/strong[contains(text(),"Eye")]/../following-sibling::div[1]/text()',
-        'haircolor': '//div[@id="model"]/div/strong[contains(text(),"Hair")]/../following-sibling::div[1]/text()',
-        'height': '//div[@id="model"]/div/strong[contains(text(),"Height")]/../following-sibling::div[1]/text()',
-        'weight': '//div[@id="model"]/div/strong[contains(text(),"Weight")]/../following-sibling::div[1]/text()',
-        'birthday': '//div[@id="model"]/div/strong[contains(text(),"Birth")]/../following-sibling::div[1]/text()',
-        'ethnicity': '//div[@id="model"]/div/strong[contains(text(),"Ethnicity")]/../following-sibling::div[1]/text()',
-        'nationality': '//div[@id="model"]/div/strong[contains(text(),"Country")]/../following-sibling::div[1]/text()',
-        'country': '//div[@id="model"]/div/strong[contains(text(),"Country")]/../following-sibling::div[1]/text()',
-        'piercings': '//div[@id="model"]/div/strong[contains(text(),"Piercings")]/../following-sibling::div[1]/text()',
-        'tattoos': '//div[@id="model"]/div/strong[contains(text(),"Tattoos")]/../following-sibling::div[1]/text()',
-        'measurements': '//div[@id="model"]/div/strong[contains(text(),"Body")]/../following-sibling::div[1]/text()',
-        'cupsize': '//div[@id="model"]/div/strong[contains(text(),"Breasts")]/../following-sibling::div[1]/text()',
-        'aliases': '//div[@id="model"]/div/strong[contains(text(),"Aliases")]/../following-sibling::div[1]/text()',
+        'name': '//div[@class="model-photo"]/img/@alt',
+        'image': '//div[@class="model-photo"]/img/@src',
+        'bio': '//div[@class="header-model"]/div[@class="info"]/p//text()',
+        'eyecolor': '//div[@class="model-profile" and contains(./strong/text(), "Eye")]/text()',
+        'haircolor': '//div[@class="model-profile" and contains(./strong/text(), "Hair")]/text()',
+        'height': '//div[@class="model-profile" and contains(./strong/text(), "Height")]/text()',
+        'weight': '//div[@class="model-profile" and contains(./strong/text(), "Weight")]/text()',
+        'birthday': '//div[@class="model-profile" and contains(./strong/text(), "Birth")]/text()',
+        'ethnicity': '//div[@class="model-profile" and contains(./strong/text(), "Ethnicity")]/text()',
+        'nationality': '//div[@class="model-profile" and contains(./strong/text(), "Country")]/text()',
+        'country': '//div[@class="model-profile" and contains(./strong/text(), "Country")]/text()',
+        'piercings': '//div[@class="model-profile" and contains(./strong/text(), "Piercings")]/text()',
+        'tattoos': '//div[@class="model-profile" and contains(./strong/text(), "Tattoos")]/text()',
+        'measurements': '//div[@class="model-profile" and contains(./strong/text(), "Body")]/text()',
+        'cupsize': '//div[@class="model-profile" and contains(./strong/text(), "Breasts")]/text()',
+        'aliases': '//div[@class="model-profile" and contains(./strong/text(), "Alias")]/text()',
         'pagination': '/models/page/%s',
         'external_id': r'model\/(.*)/'
     }
@@ -93,23 +93,20 @@ class BaberoticaPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                if "cm" in height and re.match(r'(\d+\s?cm)', height):
-                    height = re.search(r'(\d+\s?cm)', height).group(1).strip()
-                    height = height.replace(" ", "")
-                if "0 ft" not in height:
-                    return height.strip()
+                height = re.sub(r'[^a-z0-9]+', '', height.lower())
+                if "cm" in height.lower():
+                    height = re.search(r'(\d+cm)', height.lower())
+                    if height:
+                        return height.group(1).strip()
         return ''
 
     def get_weight(self, response):
         if 'weight' in self.selector_map:
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
-                if "kg" in weight:
-                    weight = re.search(r'(\d+\s?kg)', weight).group(1).strip()
-                    weight = weight.replace(" ", "")
-                return weight.strip()
+                weight = re.sub(r'[^a-z0-9]+', '', weight.lower())
+                if "kg" in weight.lower():
+                    weight = re.search(r'(\d+kg)', weight.lower())
+                    if weight:
+                        return weight.group(1).strip()
         return ''
-
-    def get_birthday(self, response):
-        date = self.process_xpath(response, self.get_selector_map('birthday')).get()
-        return dateparser.parse(date.strip()).isoformat()

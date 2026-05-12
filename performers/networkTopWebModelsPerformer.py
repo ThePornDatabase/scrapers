@@ -99,5 +99,3 @@ class TopWebModelsSpider(BasePerformerScraper):
                 print(item)
             else:
                 yield item
-
-            item.clear()

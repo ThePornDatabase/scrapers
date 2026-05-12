@@ -14,7 +14,7 @@ class NetworkBrokeStraightBoysSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="inner"]/div[@class="dettl-bar"]/div[1]/text()|//div[@class="deTlt"]/h1/text()',
+        'title': '//div[@class="inner"]/div[@class="dettl-bar"]/div[1]/text()|//div[@class="dettl"]/h1/text()',
         'description': '//div[@class="desc"]//text()|//div[@class="dtlp"]/p//text()',
         'date': '',
         'image': '//img[contains(@src, "/thumbs") and contains(@src, "video")]/@src',

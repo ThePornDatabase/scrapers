@@ -36,14 +36,7 @@ class TopWebModelsSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': "",
-        'description': "",
-        'date': "",
-        'performers': "",
-        'tags': "",
         'external_id': '',
-        'image': '',
-        'trailer': '',
         'pagination': '/scenes?type=new&page=%s'
     }
 
@@ -100,22 +93,4 @@ class TopWebModelsSpider(BaseSceneScraper):
                 if "scott's picks" not in tags.lower():
                     item['tags'].append(string.capwords(tags))
 
-            days = int(self.days)
-            if days > 27375:
-                filterdate = "0000-00-00"
-            else:
-                filterdate = date.today() - timedelta(days)
-                filterdate = filterdate.strftime('%Y-%m-%d')
-
-            if self.debug:
-                if not item['date'] > filterdate:
-                    item['filtered'] = "Scene filtered due to date restraint"
-                print(item)
-            else:
-                if filterdate:
-                    if item['date'] > filterdate:
-                        yield item
-                else:
-                    yield item
-
-            item.clear()
+            yield self.check_item(item, self.days)

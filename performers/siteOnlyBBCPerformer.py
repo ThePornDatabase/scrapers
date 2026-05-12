@@ -5,7 +5,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 
 class SiteOnlyBBCPerformerSpider(BasePerformerScraper):
     selector_map = {
-        'name': '//h2/a/following-sibling::text()',
+        'name': '//div[@class="model_bio"]/h2[@class="title"]/text()',
         'image': '//img[contains(@class,"model_bio_thumb")]/@src0_1x',
 
         'height': '//span[@class="model_bio_heading"]/following-sibling::text()[contains(.,"Height")]',
@@ -46,6 +46,7 @@ class SiteOnlyBBCPerformerSpider(BasePerformerScraper):
 
     def get_height(self, response):
         height = super().get_height(response)
+        height = re.sub(r'[^0-9\'\"]+', '', height)
         if height:
             tot_inches = 0
             if re.search(r'(\d+)[\'\"]', height):

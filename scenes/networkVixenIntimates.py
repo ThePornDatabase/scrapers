@@ -13,9 +13,24 @@ class VixenIntimatesScraper(BaseSceneScraper):
     name = 'VixenIntimates'
     network = 'vixen'
 
+    custom_settings = {
+        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+        "DOWNLOAD_HANDLERS": {
+            "http": "scrapy_impersonate.ImpersonateDownloadHandler",
+            "https": "scrapy_impersonate.ImpersonateDownloadHandler",
+        },
+    }
+
     start_urls = [
         'https://www.vixen.com',
     ]
+
+    headers = {
+        "Accept-Encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "DNT": "1",
+    }
 
     selector_map = {
         'external_id': '',
@@ -28,12 +43,14 @@ class VixenIntimatesScraper(BaseSceneScraper):
         ip = get('https://api.ipify.org').content.decode('utf8')
         print('My public IP address is: {}'.format(ip))
         for link in self.start_urls:
+            headers = self.headers.copy()
+            headers['Referer'] = link
             yield scrapy.Request(
                 url=link + '/graphql',
                 callback=self.parse,
                 method='POST',
-                headers={'Content-Type': 'application/json'},
-                meta={'page': self.page},
+                headers=headers,
+                meta={'page': self.page, 'link': link, 'impersonate': 'chrome120'},
                 body=self.get_graphql_search_body(self.per_page, self.page, link),
             )
 
@@ -41,6 +58,8 @@ class VixenIntimatesScraper(BaseSceneScraper):
         meta = response.meta
         jsondata = response.json()['data']['findVideos']
         scenes = jsondata['edges']
+        headers = self.headers.copy()
+        headers['Referer'] = response.meta.get('link', response.url)
         for item in scenes:
             sceneid = item['node']['slug']
             meta['orig_site'] = "vixen" + re.sub(r'[^a-z]+', '', item['node']['channel']['name'].lower())
@@ -49,8 +68,9 @@ class VixenIntimatesScraper(BaseSceneScraper):
                     url=response.url,
                     callback=self.parse_scene,
                     method='POST',
-                    headers={'Content-Type': 'application/json'},
-                    body=self.get_graphql_body(sceneid, response.url), meta=meta
+                    headers=headers,
+                    meta={**meta, 'impersonate': 'chrome120'},
+                    body=self.get_graphql_body(sceneid, response.url),
                 )
 
         if 'page' in response.meta and response.meta['page'] < self.limit_pages and jsondata['pageInfo']['hasNextPage']:
@@ -62,8 +82,8 @@ class VixenIntimatesScraper(BaseSceneScraper):
                 url=response.url,
                 callback=self.parse,
                 method='POST',
-                headers={'Content-Type': 'application/json'},
-                meta={'page': meta['page']},
+                headers=headers,
+                meta={'page': meta['page'], 'link': meta.get('link', response.url), 'impersonate': 'chrome120'},
                 body=self.get_graphql_search_body(self.per_page, meta['page'], response.url),
             )
 
@@ -93,9 +113,12 @@ class VixenIntimatesScraper(BaseSceneScraper):
             scene['performers'].append(model['name'])
 
         scene['tags'] = []
-        if data['tags']:
+        if data.get('tags'):
             for tag in data['tags']:
                 scene['tags'].append(tag)
+
+        if data.get('runLength'):
+            scene['duration'] = self.duration_to_seconds(data['runLength'])
 
         scene['markers'] = []
         if 'chapters' in data:
@@ -198,7 +221,7 @@ query getVideo($videoSlug: String, $site: Site) {
     site
     description
     releaseDate
-    tags
+    runLength
     chapters {
       video {
         title

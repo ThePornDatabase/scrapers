@@ -30,44 +30,46 @@ class SiteTrueAmateurModelsSpider(BaseSceneScraper):
 
     def get_model_scenes(self, response):
         scenes = response.xpath('//text()[contains(., "of video")]/../../../../..')
-        for scene in scenes:
-            item = self.init_scene()
+        if scenes:
+            for scene in scenes:
+                item = self.init_scene()
 
-            item['title'] = self.get_title(scene)
-            item['description'] = self.get_description(scene)
-            item['date'] = self.get_date(scene)
-            item['tags'] = self.get_tags(scene)
-            performers = self.get_performers(scene)
-            item['performers'] = []
-            item['performers_data'] = []
-            for performer in performers:
-                performer = performer.replace("Model", "").strip()
-                performer_extra = {}
-                performer_extra['name'] = performer
-                performer_extra['extra'] = {}
-                performer_extra['extra']['gender'] = "Female"
-                perf_image = response.xpath('//div[contains(@class,"model_picture")]/img/@src0_3x|//div[contains(@class,"model_picture")]/img/@src0_2x|//div[contains(@class,"model_picture")]/img/@src0_1x')
-                if perf_image:
-                    perf_image = perf_image.get()
-                    performer_extra['image'] = "https://trueamateurmodels.com/" + perf_image
-                    performer_extra['image_blob'] = self.get_image_blob_from_link(performer_extra['image'])
-                item['performers_data'].append(performer_extra)
-                item['performers'].append(performer)
+                item['title'] = self.get_title(scene)
+                item['description'] = self.get_description(scene)
+                item['date'] = self.get_date(scene)
+                item['tags'] = self.get_tags(scene)
+                performers = self.get_performers(scene)
+                item['performers'] = []
+                item['performers_data'] = []
+                for performer in performers:
+                    performer = performer.replace("Model", "").strip()
+                    performer_extra = {}
+                    performer_extra['name'] = performer
+                    performer_extra['extra'] = {}
+                    performer_extra['extra']['gender'] = "Female"
+                    perf_image = response.xpath('//div[contains(@class,"model_picture")]/img/@src0_3x|//div[contains(@class,"model_picture")]/img/@src0_2x|//div[contains(@class,"model_picture")]/img/@src0_1x')
+                    if perf_image:
+                        perf_image = perf_image.get()
+                        performer_extra['image'] = "https://trueamateurmodels.com/" + perf_image
+                        performer_extra['image_blob'] = self.get_image_blob_from_link(performer_extra['image'])
+                    item['performers_data'].append(performer_extra)
+                    item['performers'].append(performer)
 
-            sceneimage = scene.xpath('.//div[@class="update_image"]/a/img/@src0_3x|.//div[@class="update_image"]/a/img/@src0_2x|.//div[@class="update_image"]/a/img/@src0_1x')
-            if sceneimage:
-                sceneimage = "https://trueamateurmodels.com/previewtour/" + sceneimage.get()
-                item['image'] = sceneimage
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            else:
-                item['image'] = ''
-                item['image_blob'] = ''
+                sceneimage = scene.xpath('.//div[@class="update_image"]/a/img/@src0_3x|.//div[@class="update_image"]/a/img/@src0_2x|.//div[@class="update_image"]/a/img/@src0_1x')
+                if sceneimage:
+                    sceneimage = "https://trueamateurmodels.com/previewtour/" + sceneimage.get()
+                    item['image'] = sceneimage
+                    # item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                else:
+                    item['image'] = ''
+                    item['image_blob'] = ''
 
-            item['id'] = re.search(r'content/(.*?)/', item['image']).group(1)
-            item['url'] = "https://trueamateurmodels.com/previewtour/" + item['id']
-            item['site'] = 'True Amateur Models'
-            item['parent'] = 'True Amateur Models'
-            item['network'] = 'True Amateur Models'
-            item['type'] = 'Scene'
+                if item['image']:
+                    item['id'] = re.search(r'content/(.*?)/', item['image']).group(1)
+                    item['url'] = "https://trueamateurmodels.com/previewtour/" + item['id']
+                    item['site'] = 'True Amateur Models'
+                    item['parent'] = 'True Amateur Models'
+                    item['network'] = 'True Amateur Models'
+                    item['type'] = 'Scene'
 
-            yield self.check_item(item, self.days)
+                    yield self.check_item(item, self.days)

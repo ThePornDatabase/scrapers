@@ -1,65 +1,99 @@
 import re
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
 
 class SiteFreakMobHardcoreSpider(BaseSceneScraper):
     name = 'FreakMobHardcore'
-    network = 'Freak Mob Media'
-    parent = 'Freak Mob Media'
-    site = 'Freak Mob Hardcore'
 
-    start_urls = [
-        'https://www.freakmobhardcore.com',
-    ]
+    start_url = 'https://freakmobhardcore.com'
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'trailer': '',
         'external_id': r'',
-        'pagination': '/models/models_%s_d.html'
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc',
     }
 
-    def get_scenes(self, response):
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request('https://freakmobhardcore.com/', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
         meta = response.meta
-        models = response.xpath('//div[@class="update_details"]/a[1]/@href').getall()
-        for model in models:
-            yield scrapy.Request(url=self.format_link(response, model), callback=self.parse_model, meta=meta)
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def parse_model(self, response):
-        scenes = response.xpath('//div[@class="update_block"]')
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
         for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = response.meta
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        url = f"{base}{pagination % page}"
+        return url
+
+    def get_scenes(self, response):
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
+        for scene in jsondata:
             item = SceneItem()
-
-            item['title'] = self.cleanup_title(scene.xpath('.//span[@class="update_title"]/text()').get())
-            description = scene.xpath('.//span[@class="latest_update_description"]/text()')
-            if description:
-                item['description'] = self.cleanup_text(description.get())
-            else:
-                item['description'] = ''
-            item['performers'] = scene.xpath('.//span[@class="tour_update_models"]/a/text()').getall()
-            item['date'] = self.parse_date('today').isoformat()
-            item['tags'] = []
-            trailer = scene.xpath('.//div[@class="update_image"]/a[1]/@onclick')
-            if trailer:
-                trailer = trailer.get()
-                if ".mp4" in trailer:
-                    trailer = self.format_link(response, re.search(r'\'(/.*\.mp4)', trailer).group(1)).replace(" ", "%20")
-            if not trailer:
-                trailer = None
-            item['trailer'] = trailer
-            item['image'] = self.format_link(response, scene.xpath('.//div[@class="update_image"]/a/img/@src0_2x').get()).replace(" ", "%20")
+            item['title'] = self.cleanup_title(scene['title'])
+            item['id'] = scene['id']
+            item['description'] = self.cleanup_description(re.sub('<[^<]+?>', '', scene['description']))
+            if "trailer_screencap" in scene and scene['trailer_screencap']:
+                item['image'] = self.format_link(response, scene['trailer_screencap']).replace(" ", "%20")
+            elif "thumb" in scene and scene['thumb']:
+                item['image'] = self.format_link(response, scene['thumb']).replace(" ", "%20")
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            item['site'] = "Freak Mob Hardcore"
-            item['parent'] = "Freak Mob Media"
-            item['network'] = "Freak Mob Media"
-            item['url'] = response.url
-            item['id'] = re.search(r'content/(.*?)/', item['image']).group(1)
+            item['image'] = re.sub(r'[^A-Za-z0-9:/\.\-\%\$]+', "", item['image'])
+            if scene['trailer_url']:
+                item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
+            else:
+                item['trailer'] = ""
+            item['trailer'] = self.format_link(response, scene['trailer_url']).replace(" ", "%20")
+            scene_date = self.parse_date(scene['publish_date'], date_formats=['%Y/%m/%d %h:%m:%s']).isoformat()
+            item['date'] = ""
+            if scene_date:
+                item['date'] = scene_date
+            item['url'] = f"https://freakmobhardcore.com/videos/{scene['slug']}"
+            if "tags" in scene:
+                item['tags'] = scene['tags']
+            item['duration'] = scene['seconds_duration']
+            item['site'] = 'Freak Mob Hardcore'
+            item['parent'] = 'Freak Mob Media'
+            item['network'] = 'Freak Mob Media'
+      
+            item['performers'], item['performers_data'] = self.get_performers_data(scene['models_thumbs'])
 
-            yield item
+            if item['date'] and item['date'] > '2025-12-19':
+                yield self.check_item(item, self.days)
+    
+    def get_performers_data(self, models):
+        performers = []
+        performers_data = []
+        for model in models:
+            performers.append(model['name'])
+            performers_data.append({
+                "name": model['name'],
+                "image": model['thumb'],
+                "image_blob": self.get_image_blob_from_link(model['thumb']),
+                "site": "Freak Mob Hardcore",
+                "network": "Freak Mob Media"
+            })
+        return performers, performers_data
