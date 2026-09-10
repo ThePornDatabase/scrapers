@@ -11,7 +11,7 @@ class CumPerfectionPerformerSpider(BasePerformerScraper):
         'ethnicity': '//strong[contains(text(),"ethnicity") or contains(text(),"Ethnicity")]/following-sibling::text()',
         'bio': '//comment()[contains(.,"Bio Extra") and not(contains(.,"Fields"))]/following-sibling::text()',
         'pagination': '/models/%s/latest/',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'CumPerfectionPerformer'

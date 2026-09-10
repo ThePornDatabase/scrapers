@@ -23,7 +23,7 @@ class SiteFreezeSpider(BaseSceneScraper):
         'performers': '//div[contains(@class,"tagsmodels")]/div[contains(@class, "taglist")]/a/text()',
         'tags': '//ul[@class="post-categories"]/li/a/text()',
         'director': '//div[contains(@class,"director")]/span/a/text()',
-        'external_id': '.*\/(.*?)\/$',
+        'external_id': r'.*/(.*?)/$',
         'trailer': '//video/@src',
         'pagination': '/all-videos/page/%s/'
     }

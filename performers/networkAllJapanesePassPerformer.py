@@ -14,7 +14,7 @@ class networkAllJapanesePassPerformerSpider(BasePerformerScraper):
         'height': '//span[contains(text(),"Height")]/following-sibling::strong/text()',
         'birthday': '//span[contains(text(),"Birthday")]/following-sibling::strong/text()',
         'pagination': '/models/newest/all/%s',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'AllJapanesePassPerformer'
@@ -41,7 +41,7 @@ class networkAllJapanesePassPerformerSpider(BasePerformerScraper):
         if 'image' in self.selector_map:
             image = self.process_xpath(response, self.get_selector_map('image')).get()
             if image:
-                image = re.search('url\(\'(.*.jpg)\'', image).group(1)
+                image = re.search(r"url\('(.*.jpg)'", image).group(1)
                 if image:
                     return image.strip()
         return ''        
@@ -50,7 +50,7 @@ class networkAllJapanesePassPerformerSpider(BasePerformerScraper):
     def get_birthday(self, response):
         date = self.process_xpath(response, self.get_selector_map('birthday')).get()
         if date:
-            if re.search('\d{4}-\d{2}-\d{2}', date):
+            if re.search(r'\d{4}-\d{2}-\d{2}', date):
                 date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
                 return dateparser.parse(date.strip()).isoformat()
         return ''

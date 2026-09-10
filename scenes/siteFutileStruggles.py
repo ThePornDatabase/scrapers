@@ -21,7 +21,7 @@ class siteFutileStrugglesSpider(BaseSceneScraper):
         'title': '//div[@class="title_bar"]/span/text()',
         'description': '//span[@class="update_description"]/text()',
         'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': 'id=(\d+)',
+        'external_id': r'id=(\d+)',
         'trailer': '',
         'pagination': '/trial/index.php?page=%s'
     }

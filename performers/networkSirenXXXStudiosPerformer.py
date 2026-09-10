@@ -10,7 +10,7 @@ class networkSirenXXXStudiosPerformerSpider(BasePerformerScraper):
         'height': '//span[contains(text(),"Height")]/following-sibling::text()',
         'bio': '//div[@class="about"]/p/text()',
         'pagination': '/modelbios.html',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'SirenXXXStudiosPerformer'

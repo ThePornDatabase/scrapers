@@ -12,7 +12,7 @@ class siteALSAngelsPerformerSpider(BasePerformerScraper):
         'weight': '//div[@id="modelbiodetails"]/span[contains(text(),"Weight")]/text()',
         'bio': '//div[@id="modelbio"]/p/text()',
         'pagination': '/modelbios.html',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'ALSAngelsPerformer'
@@ -48,13 +48,13 @@ class siteALSAngelsPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                if re.search('(\(.*cm\))', measurements):
-                    measurements = re.sub('(\(.*cm\))','',measurements)
+                if re.search(r'(\(.*cm\))', measurements):
+                    measurements = re.sub(r'(\(.*cm\))','',measurements)
                 measurements = measurements.replace("Measurements","").strip()
                 measurements = measurements.replace(":","").strip()
                 measurements = measurements.replace(" ","").strip()
-                if re.search('(.*-\d{2}-\d{2})', measurements):               
-                    measurements = re.search('(.*-\d{2}-\d{2})', measurements).group(1)
+                if re.search(r'(.*-\d{2}-\d{2})', measurements):               
+                    measurements = re.search(r'(.*-\d{2}-\d{2})', measurements).group(1)
                     if measurements:
                         cupsize = re.search('(.*?)-.*', measurements).group(1)
                         if cupsize:
@@ -64,9 +64,9 @@ class siteALSAngelsPerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.search('\d{2}(?:[a-zA-Z]+)?-\d{2}-\d{2}', measurements):
-                if re.search('(\(.*cm\))', measurements):
-                    measurements = re.sub('(\(.*cm\))','',measurements)            
+            if measurements and re.search(r'\d{2}(?:[a-zA-Z]+)?-\d{2}-\d{2}', measurements):
+                if re.search(r'(\(.*cm\))', measurements):
+                    measurements = re.sub(r'(\(.*cm\))','',measurements)            
                 measurements = measurements.replace("Measurements","").strip()
                 measurements = measurements.replace(":","").strip()
                 measurements = measurements.replace(" ","").strip()
@@ -78,7 +78,7 @@ class siteALSAngelsPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height.lower():
-                    height = re.search('(\d+)\s?cm',height.lower()).group(1)
+                    height = re.search(r'(\d+)\s?cm',height.lower()).group(1)
                     if height:
                         height = height+"cm"
                         return height.strip()
@@ -92,7 +92,7 @@ class siteALSAngelsPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight.lower():
-                    weight = re.search('(\d+)\s?kg',weight.lower()).group(1)
+                    weight = re.search(r'(\d+)\s?kg',weight.lower()).group(1)
                     if weight:
                         weight = weight+"kg"
                         return weight.strip()

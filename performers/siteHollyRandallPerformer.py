@@ -48,7 +48,7 @@ class SiteHollyRandallPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                height = re.search('(\d+\s?cm)', height)
+                height = re.search(r'(\d+\s?cm)', height)
                 if height:
                     height = height.group(1)
                     return height.strip()
@@ -58,7 +58,7 @@ class SiteHollyRandallPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
+                measurements = re.search(r'(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
                 if measurements:
                     measurements = measurements.group(1)
                     cupsize = re.search('(.*?)-.*', measurements)
@@ -72,7 +72,7 @@ class SiteHollyRandallPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
+                measurements = re.search(r'(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
                 if measurements:
                     measurements = measurements.group(1)
                     return measurements.upper().strip()

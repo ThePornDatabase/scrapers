@@ -28,7 +28,7 @@ class FittingRoomPerformersSpider(BasePerformerScraper):
         'astrology': '//div[contains(@class, "model-profile-desc")]//p[4]/text()',
         'measurements': '//div[contains(@class, "model-profile-desc")]//p[5]/text()',
         'pagination': '/models/%s',
-        'external_id': '\/models\/(.*)\/'
+        'external_id': r'/models/(.*)/'
     }
 
     start_urls = [

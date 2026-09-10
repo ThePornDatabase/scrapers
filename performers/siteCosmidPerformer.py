@@ -53,7 +53,7 @@ class CosmidPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                str_height = re.findall('(\d{1,2})', height)
+                str_height = re.findall(r'(\d{1,2})', height)
                 if len(str_height):
                     feet = int(str_height[0])
                     if len(str_height) > 1:

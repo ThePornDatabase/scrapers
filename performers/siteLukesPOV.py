@@ -11,7 +11,7 @@ class siteLukesPOVPerformerSpider(BasePerformerScraper):
         'ethnicity': '//strong[contains(text(),"Ethnicity")]/following-sibling::text()',
         'fakeboobs': '//strong[contains(text(),"Tits Type")]/following-sibling::text()',
         'pagination': '/pornstars/page/%s/',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'LukesPOVPerformer'

@@ -25,7 +25,7 @@ class siteHeavyOnHottiesSpider(BaseSceneScraper):
         'image': '//video/@poster',
         'performers': '//span[@class="feature title"]/strong/a[contains(@href,"/models/")]/text()',
         'tags': '',
-        'external_id': '.*\/(.*?)$',
+        'external_id': r'.*/(.*?)$',
         'trailer': '//video/source/@src',
         'pagination': '/movies/page-%s/?tag=&q=&model=&sort=recent'
     }

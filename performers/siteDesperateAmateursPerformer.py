@@ -11,7 +11,7 @@ class siteDesperateAmateursPerformerSpider(BasePerformerScraper):
         'height': '//span[@class="model_info"]/text()[contains(.,"Height")]',
         'astrology': '//span[@class="model_info"]/text()[contains(.,"Astrological")]',
         'pagination': '/fintour/category.php?id=6&page=%s&s=d&',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'DesperateAmateursPerformer'
@@ -33,7 +33,7 @@ class siteDesperateAmateursPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                height = re.search('Height:\s?(.*)', height).group(1)
+                height = re.search(r'Height:\s?(.*)', height).group(1)
                 if height:
                     return height.strip()
         return ''
@@ -42,7 +42,7 @@ class siteDesperateAmateursPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('Measurements:\s?(.*)', measurements).group(1)
+                measurements = re.search(r'Measurements:\s?(.*)', measurements).group(1)
                 if measurements:
                     return measurements.strip()
         return ''
@@ -51,7 +51,7 @@ class siteDesperateAmateursPerformerSpider(BasePerformerScraper):
         if 'astrology' in self.selector_map:
             astrology = self.process_xpath(response, self.get_selector_map('astrology')).get()
             if astrology:
-                astrology = re.search('Sign:\s?(.*)', astrology).group(1)
+                astrology = re.search(r'Sign:\s?(.*)', astrology).group(1)
                 if astrology:
                     return astrology.strip()
         return ''

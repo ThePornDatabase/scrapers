@@ -10,7 +10,7 @@ class networkPureCFNMPerformerSpider(BasePerformerScraper):
         'haircolor': '//strong[contains(text(),"Hair")]/following-sibling::text()[1]',
         'ethnicity': '//strong[contains(text(),"Ethnicity")]/following-sibling::text()[1]',
         'pagination': '/models/%s/latest/',
-        'external_id': 'models\/(.*)\/'
+        'external_id': r'models/(.*)/'
     }
 
     name = 'PureCFNMPerformer'

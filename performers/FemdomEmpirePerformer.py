@@ -9,7 +9,7 @@ class FemdomEmpirePerformerSpider(BasePerformerScraper):
         'image': '//img[contains(@class,"model_bio_thumb") and contains(@id,"set-target")][1]/@src0_1x',
         'bio': '//div[@class="profile-about"]/p/text()',
         'pagination': '/tour/models/%s/name/?g=',
-        'external_id': 'models\/(.+).html$'
+        'external_id': r'models/(.+).html$'
     }
 
     name = 'FemdomEmpirePerformer'

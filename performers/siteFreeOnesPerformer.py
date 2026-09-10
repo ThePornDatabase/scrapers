@@ -25,7 +25,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
         'bio': '//div[@data-test="biography"]/text()',
         'aliases': '//p[@data-test="p_aliases"]/text()',
         'pagination': '/babes?s=latest&o=desc&p=%s&l=96&f[professions]=porn_stars&f[careerStatus]=active',
-        'external_id': '\.ru\/(.*)\/'
+        'external_id': r'\.ru\/(.*)\/'
     }
 
     name = 'FreeOnesPerformer'
@@ -52,7 +52,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height:
-                    height = re.search('(.*cm)\ ', height).group(1)
+                    height = re.search(r'(.*cm)\ ', height).group(1)
                 return height.strip()
         return ''
 
@@ -61,7 +61,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight:
-                    weight = re.search('(.*kg)\ ', weight).group(1)
+                    weight = re.search(r'(.*kg)\ ', weight).group(1)
                 return weight.strip()
         return ''
 
@@ -70,7 +70,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
         if 'birthday' in self.selector_map:
             birthday = self.process_xpath(response, self.get_selector_map('birthday')).get()
             if birthday:
-                birthday = re.search('(\d{4}-\d{2}-\d{2})', birthday).group(1)
+                birthday = re.search(r'(\d{4}-\d{2}-\d{2})', birthday).group(1)
                 if birthday:
                     return birthday.strip()
         return ''
@@ -92,7 +92,7 @@ class siteFreeOnesPerformerSpider(BasePerformerScraper):
             image = self.process_xpath(response, self.get_selector_map('image')).get()
             if image:
                 if "?c" in image:
-                    image = re.search('(.*)\?c',image).group(1)
+                    image = re.search(r'(.*)\?c',image).group(1)
                 if image:
                     return image.strip()
         return ''

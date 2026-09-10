@@ -23,7 +23,7 @@ class siteJapanHDVPerformerSpider(BasePerformerScraper):
         'cupsize': '//div[@id="model"]/div/strong[contains(text(),"Breasts")]/../following-sibling::div[1]/text()',
         'aliases': '//div[@id="model"]/div/strong[contains(text(),"Aliases")]/../following-sibling::div[1]/text()',
         'pagination': '/models/page/%s',
-        'external_id': 'model\/(.*)/'
+        'external_id': r'model/(.*)/'
     }
 
     name = 'JapanHDVPerformer'
@@ -68,14 +68,14 @@ class siteJapanHDVPerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.match('B\d{2,3}-W\d{2,3}-H\d{2,3}', measurements):
-                bust = re.search('B(\d{2,3})', measurements).group(1)
+            if measurements and re.match(r'B\d{2,3}-W\d{2,3}-H\d{2,3}', measurements):
+                bust = re.search(r'B(\d{2,3})', measurements).group(1)
                 if bust:
                     bust = round(int(bust)/2.54)
-                waist = re.search('W(\d{2,3})', measurements).group(1)
+                waist = re.search(r'W(\d{2,3})', measurements).group(1)
                 if waist:
                     waist = round(int(waist)/2.54)
-                hips = re.search('H(\d{2,3})', measurements).group(1)
+                hips = re.search(r'H(\d{2,3})', measurements).group(1)
                 if hips:
                     hips = round(int(hips)/2.54)
                 
@@ -97,8 +97,8 @@ class siteJapanHDVPerformerSpider(BasePerformerScraper):
     def get_cupsize(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.match('B\d{2,3}-W\d{2,3}-H\d{2,3}', measurements):
-                bust = re.search('B(\d{2,3})', measurements).group(1)
+            if measurements and re.match(r'B\d{2,3}-W\d{2,3}-H\d{2,3}', measurements):
+                bust = re.search(r'B(\d{2,3})', measurements).group(1)
                 if bust:
                     bust = round(int(bust)/2.54)
 
@@ -127,8 +127,8 @@ class siteJapanHDVPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                if "cm" in height and re.match('(\d+\s?cm)', height):
-                    height = re.search('(\d+\s?cm)', height).group(1).strip()
+                if "cm" in height and re.match(r'(\d+\s?cm)', height):
+                    height = re.search(r'(\d+\s?cm)', height).group(1).strip()
                     height = height.replace(" ","")
                 if "0 ft" not in height:
                     return height.strip()
@@ -139,7 +139,7 @@ class siteJapanHDVPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight:
-                    weight = re.search('(\d+\s?kg)', weight).group(1).strip()
+                    weight = re.search(r'(\d+\s?kg)', weight).group(1).strip()
                     weight = weight.replace(" ","")
                 return weight.strip()
         return ''

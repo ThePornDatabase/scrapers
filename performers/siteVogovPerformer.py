@@ -19,7 +19,7 @@ class VogovPerformerSpider(BasePerformerScraper):
         'weight': '//li/span[contains(text(),"Weight:")]/following-sibling::text()',
         'birthday': '//li/span[contains(text(),"Age:")]/following-sibling::text()',
         'pagination': '/models/%s/',
-        'external_id': 'models\/(.*)\/'
+        'external_id': r'models/(.*)/'
     }
 
     name = 'VogovPerformer'
@@ -54,7 +54,7 @@ class VogovPerformerSpider(BasePerformerScraper):
         #Birthdate is calculated on Age field.  They're assigned a birthdate of date of import - "Age:" years
         if 'birthday' in self.selector_map:
             age = self.process_xpath(response, self.get_selector_map('birthday')).get()
-            age = re.search('(\d{2})\ ', age).group(1)
+            age = re.search(r'(\d{2})\ ', age).group(1)
             if age:
                 age = int(age.strip())
                 if age >= 18 and age <= 99:
@@ -68,7 +68,7 @@ class VogovPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height:
-                    height = re.search('(\d+\s?cm)', height).group(1).strip()
+                    height = re.search(r'(\d+\s?cm)', height).group(1).strip()
                     height = height.replace(" ","")
                 return height.strip()
         return ''
@@ -78,7 +78,7 @@ class VogovPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight:
-                    weight = re.search('(\d+\s?kg)', weight).group(1).strip()
+                    weight = re.search(r'(\d+\s?kg)', weight).group(1).strip()
                     weight = weight.replace(" ","")
                 return weight.strip()
         return ''

@@ -65,7 +65,7 @@ class PinkLabelSpider(BaseSceneScraper):
         return description
 
     def get_trailer(self, response):
-        trailer = re.search("http.*\.mp4", response.text)
+        trailer = re.search(r"http.*\.mp4", response.text)
         if trailer:
             return trailer.group(0)
         return ''

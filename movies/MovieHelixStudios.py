@@ -21,7 +21,7 @@ class MovieHelixStudiosSpider(BaseSceneScraper):
         'performers': '//div[@class="actress"]/a/text()',
         'date': '//span[@class="publish_date"]/text()',
         'tags': '',
-        'external_id': '/(\d+)/',
+        'external_id': r'/(\d+)/',
         'trailer': '',
         'pagination': '/movies/page/%s'
     }

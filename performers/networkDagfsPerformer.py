@@ -12,7 +12,7 @@ class networkDagfsPerformerSpider(BasePerformerScraper):
         'height': '//div[@class="model-thumb-description"]//p[contains(text(),"Height")]/text()',
         'measurements': '//div[@class="model-thumb-description"]//p[contains(text(),"Measurements")]/text()',
         'pagination': '/models/models_%s.html?g=f',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'DagfsPerformer'
@@ -47,7 +47,7 @@ class networkDagfsPerformerSpider(BasePerformerScraper):
             birthday = self.process_xpath(response, self.get_selector_map('birthday')).get()
             if birthday:
                 birthday = birthday.replace("&nbsp;","").replace("\n","").replace("\d","")
-                birthday = re.search('Birth:.*?([a-zA-Z].*\d{4})',birthday)
+                birthday = re.search(r'Birth:.*?([a-zA-Z].*\d{4})',birthday)
                 if birthday:
                     birthday = birthday.group(1)
                     if birthday:
@@ -60,7 +60,7 @@ class networkDagfsPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                height = re.search('(\d+\s?cm)', height)
+                height = re.search(r'(\d+\s?cm)', height)
                 if height:
                     height = height.group(1)
                     return height.strip()
@@ -70,10 +70,10 @@ class networkDagfsPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
+                measurements = re.search(r'(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
                 if measurements:
                     measurements = measurements.group(1)
-                    cupsize = re.search('(.*?)-.*', measurements)
+                    cupsize = re.search(r'(.*?)-.*', measurements)
                     if cupsize:
                         cupsize = cupsize.group(1)
                         return cupsize.upper().strip()
@@ -84,7 +84,7 @@ class networkDagfsPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
+                measurements = re.search(r'(\d{2,3}[a-zA-Z]+-\d{2}-\d{2})', measurements)
                 if measurements:
                     measurements = measurements.group(1)
                     return measurements.upper().strip()

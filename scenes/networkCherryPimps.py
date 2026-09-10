@@ -22,7 +22,7 @@ class CherryPimpsSpider(BaseSceneScraper):
         'tags': '//ul[@class="tags"]/li/a/text() | //p[@class="text" and contains(text(),"Categories")]/a/text()',
         'duration': '//div[@class="update-info-row"]/text()[contains(., ":")]',
         're_duration': r'((?:\d{1,2}\:)?\d{2}\:\d{2})',
-        'external_id': 'trailers/(.+)\.html',
+        'external_id': r'trailers/(.+)\.html',
         'trailer': '',
         'pagination': '/categories/movies_%s.html'
     }

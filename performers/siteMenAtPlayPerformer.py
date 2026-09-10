@@ -9,7 +9,7 @@ class SiteMenAtPlaySpider(BasePerformerScraper):
         'image': '//div[@class="model_picture"]/img/@src0_1x|//div[@class="model_picture"]/img/@src',
         'bio': '//div[@class="heroTitle"]/following-sibling::p/text()',
         'pagination': '/models/models_%s_d.html',
-        'external_id': 'models\/(.*)\/'
+        'external_id': r'models/(.*)/'
     }
 
     name = 'MenAtPlayPerformer'

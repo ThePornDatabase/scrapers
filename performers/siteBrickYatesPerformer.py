@@ -12,7 +12,7 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
         'astrology': '//strong[contains(text(),"Sign")]/following-sibling::text()',
         'eyecolor': '//strong[contains(text(),"Eye")]/following-sibling::text()',
         'birthplace': '//strong[contains(text(),"From")]/following-sibling::text()',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     url = 'http://www.brickyates.com/'
@@ -83,10 +83,10 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
             measurements = self.process_xpath(response, self.get_selector_map('cupsize')).get()
             if measurements:
                 measurements = measurements.replace(" ","").replace(".","").lower()
-                if re.search('(\d+lbs)', measurements):
-                    strip = re.search('(\d+lbs)', measurements).group(1)
+                if re.search(r'(\d+lbs)', measurements):
+                    strip = re.search(r'(\d+lbs)', measurements).group(1)
                     cupsize = measurements.replace(strip,"")
-                    if cupsize and re.search('(\d+[a-z])', cupsize):
+                    if cupsize and re.search(r'(\d+[a-z])', cupsize):
                         return cupsize.upper().strip()
         return ''
 
@@ -96,8 +96,8 @@ class siteBrickYatesPerformerSpider(BasePerformerScraper):
             measurements = self.process_xpath(response, self.get_selector_map('cupsize')).get()
             if measurements:
                 measurements = measurements.replace(" ","").replace(".","").lower()
-                if re.search('(\d+lbs)', measurements):
-                    weight = re.search('(\d+lbs)', measurements).group(1)
+                if re.search(r'(\d+lbs)', measurements):
+                    weight = re.search(r'(\d+lbs)', measurements).group(1)
                     if weight:
                         return weight.strip()
         return ''

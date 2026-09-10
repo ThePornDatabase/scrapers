@@ -21,7 +21,7 @@ class siteFisterTwisterSpider(BaseSceneScraper):
         'image': '//div[@class="player"]//video/@poster',
         'performers': '//ul/li[contains(text(),"Featuring")]/strong/a/text()',
         'tags': '//div[contains(@class,"video-info")]/p/a[contains(@href,"tag")]/text()',
-        'external_id': '.*\/(.*?)\/$',
+        'external_id': r'.*/(.*?)/$',
         'trailer': '//div[@class="player"]//video/source/@src',
         'pagination': '/videos/page-%s/?tag=&site=&model=all&sort=recent&pussy=all'
     }

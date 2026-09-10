@@ -12,7 +12,7 @@ class siteVIPissyPerformerSpider(BasePerformerScraper):
         'weight': '//dl[@class="row"]/dt[contains(text(),"Weight")]/following-sibling::dd[1]/text()',
         'nationality': '//dl[@class="row"]/dt[contains(text(),"Nationality")]/following-sibling::dd[1]/text()',
         'pagination': '/girls/page-%s/?tag=&sort=recent',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'VIPissyPerformer'
@@ -43,7 +43,7 @@ class siteVIPissyPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height.lower():
-                    height = re.search('(\d*)\s?cm',height.lower()).group(1)
+                    height = re.search(r'(\d*)\s?cm',height.lower()).group(1)
                     if height:
                         height = height + "cm"
 
@@ -56,7 +56,7 @@ class siteVIPissyPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight.lower():
-                    weight = re.search('(\d*)\s?kg',weight.lower()).group(1)
+                    weight = re.search(r'(\d*)\s?kg',weight.lower()).group(1)
                     if weight:
                         weight = weight + "kg"
 

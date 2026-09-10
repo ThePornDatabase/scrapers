@@ -20,7 +20,7 @@ class siteHollyRandallSpider(BaseSceneScraper):
         'image': '//img[contains(@class,"update_thumb")]/@src0_1x',
         'performers': '//p/a[contains(@href,"/models")]/text()',
         'tags': '//ul[@class="tags"]/li/a/text()',
-        'external_id': '.*\/(.*).html',
+        'external_id': r'.*/(.*).html',
         'trailer': '',
         'pagination': '/categories/movies_%s_d.html#'
     }

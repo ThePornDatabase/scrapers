@@ -11,7 +11,7 @@ class siteBiGuysFuckPerformerSpider(BasePerformerScraper):
         'weight': '//div[@class="value-holder"]/div[@class="details"]/span[contains(text(),"weight")]/../../div[@class="characteristics"]/span/text()',
         'bio': '//div[@class="content"]/p/text()',
         'pagination': '/models?page=%s',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'BiGuysFuckPerformer'

@@ -25,7 +25,7 @@ class networkManojobSpider(BaseSceneScraper):
         'image': '//div[@class="video"]//video/@poster|//div[contains(@class,"video")]//video/@poster',
         'performers': '//h2[contains(text(), "Starring")]/a/text()',
         'tags': '//p[contains(text(),"Categories")]/a/text()',
-        'external_id': '.*\/(.*)',
+        'external_id': r'.*/(.*)',
         'trailer': '//div[@class="video"]//video/source/@src',
         'pagination': '/updates/%s'
     }

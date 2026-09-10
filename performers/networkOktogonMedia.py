@@ -32,7 +32,7 @@ class OktogonMediaPerformerSpider(BasePerformerScraper):
         'fakeboobs': '//span[contains(text(),"Tits Type")]/../text()',
         'tattoos': '//span[contains(text(),"Body Art")]/../text()',
         'pagination': '/tour/models/%s/popular/?gender=female',
-        'external_id': 'models\/(.*).html/'
+        'external_id': r'models/(.*).html/'
     }
 
     def get_gender(self, response):
@@ -115,7 +115,7 @@ class OktogonMediaPerformerSpider(BasePerformerScraper):
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).getall()
             if measurements:
                 measurements = html.unescape(measurements[-1].strip())
-                measurements = re.findall("(\d{2}[\w]?)", measurements, re.M)
+                measurements = re.findall(r"(\d{2}[\w]?)", measurements, re.M)
                 if len(measurements)==3:
                     return '-'.join(map(str,measurements))
         return ''
@@ -125,7 +125,7 @@ class OktogonMediaPerformerSpider(BasePerformerScraper):
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).getall()
             if measurements:
                 measurements = html.unescape(measurements[-1].strip())
-                cupsize = re.search( '^(\d+\w)', measurements )
+                cupsize = re.search( r'^(\d+\w)', measurements )
                 if cupsize:
                     return cupsize.group(1)
         return ''

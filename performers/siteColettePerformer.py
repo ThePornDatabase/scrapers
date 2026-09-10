@@ -20,7 +20,7 @@ class siteColetteSpider(BasePerformerScraper):
         'nationality': '//div[contains(@class,"info-wrapper")]//span[contains(text(),"Country:")]/following-sibling::text()',
         'bio': '//div[contains(@class,"info-wrapper")]//p/text()',
         'pagination': '/index.php?show=models&sort=recent&page=%s',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
                                  
     def get_performers(self, response):
@@ -33,7 +33,7 @@ class siteColetteSpider(BasePerformerScraper):
         if 'image' in self.selector_map:
             image = self.process_xpath(response, self.get_selector_map('image')).get()
             if image:
-                image = re.search('.*\[(http.*lrg.jpg)', image).group(1).replace(" ","%20")
+                image = re.search(r'.*\[(http.*lrg.jpg)', image).group(1).replace(" ","%20")
                 if image:
                     return image.strip()
         return ''

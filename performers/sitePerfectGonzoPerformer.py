@@ -13,7 +13,7 @@ class PerfectGonzoPerformerSpider(BasePerformerScraper):
         'tattoos': '//strong[contains(text(),"Addons")]/following-sibling::text()[1]',
         'piercings': '//strong[contains(text(),"Addons")]/following-sibling::text()[1]',
         'pagination': '/models/page-%s/?tag=&sort=alpha&pussy=all&',
-        'external_id': 'models\/(.+)?$'
+        'external_id': r'models/(.+)?$'
     }
 
     name = 'PerfectGonzoPerformer'
@@ -30,7 +30,7 @@ class PerfectGonzoPerformerSpider(BasePerformerScraper):
     def get_id(self, response):
         search = re.search(self.get_selector_map('external_id'), response.url, re.IGNORECASE).group(1)
         if "?nats" in search:
-            search = re.search('(.*)\?nats',search).group(1)
+            search = re.search(r'(.*)\?nats',search).group(1)
         return search
         
     def get_performers(self, response):

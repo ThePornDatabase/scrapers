@@ -12,7 +12,7 @@ class sitePeeOnHerPerformerSpider(BasePerformerScraper):
         'weight': '//div[@class="sub_con"]/text()',
         'nationality': '//div[@class="sub_con"]/text()',
         'pagination': '/girls/page-%s/?tag=all&sort=recent&pussy=&site=all',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'PeeOnHerPerformer'
@@ -44,7 +44,7 @@ class sitePeeOnHerPerformerSpider(BasePerformerScraper):
             if height:
                 height = "".join(height)
                 if "cm" in height.lower():
-                    height = re.search('(\d*)\s?cm',height.lower()).group(1)
+                    height = re.search(r'(\d*)\s?cm',height.lower()).group(1)
                     if height:
                         height = height + "cm"
                         return height
@@ -57,7 +57,7 @@ class sitePeeOnHerPerformerSpider(BasePerformerScraper):
             if weight:
                 weight = "".join(weight)
                 if "kg" in weight.lower():
-                    weight = re.search('(\d*)\s?kg',weight.lower()).group(1)
+                    weight = re.search(r'(\d*)\s?kg',weight.lower()).group(1)
                     if weight:
                         weight = weight + "kg"
                         return weight

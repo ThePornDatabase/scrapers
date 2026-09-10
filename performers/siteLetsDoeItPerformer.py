@@ -11,7 +11,7 @@ class siteLetsDoeItPerformerSpider(BasePerformerScraper):
         'birthplace': '//div[contains(@class,"list-item") and contains(text(),"Birth Place")]/span/text()',
         'fakeboobs': '//div[contains(@class,"list-item") and contains(text(),"Tits Type")]/span/text()',
         'bio': '//*[contains(@class,"read-even-more")]//text()',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     paginations = [

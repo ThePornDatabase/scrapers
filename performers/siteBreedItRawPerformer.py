@@ -12,7 +12,7 @@ class SiteBreedItRawPerformerPerformerSpider(BasePerformerScraper):
         'height': '//strong[contains(text(),"Height")]/following-sibling::text()',
         'weight': '//strong[contains(text(),"Weight")]/following-sibling::text()',
         'pagination': '/tour/models/%s/latest/?g=',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'BreedItRawPerformer'

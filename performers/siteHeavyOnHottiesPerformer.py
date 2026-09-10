@@ -39,7 +39,7 @@ class siteHeavyOnHottiesPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height.lower():
-                    height = re.search('(\d+)\s+?cm',height.lower()).group(1)
+                    height = re.search(r'(\d+)\s+?cm',height.lower()).group(1)
                     if height:
                         height = height+"cm"
                         return height.strip()
@@ -50,7 +50,7 @@ class siteHeavyOnHottiesPerformerSpider(BasePerformerScraper):
             weight = self.process_xpath(response, self.get_selector_map('weight')).get()
             if weight:
                 if "kg" in weight.lower():
-                    weight = re.search('(\d+)\s+?kg',weight.lower()).group(1)
+                    weight = re.search(r'(\d+)\s+?kg',weight.lower()).group(1)
                     if weight:
                         weight = weight+"kg"
                         return weight.strip()
@@ -69,8 +69,8 @@ class siteHeavyOnHottiesPerformerSpider(BasePerformerScraper):
             birthplace = self.process_xpath(response, self.get_selector_map('birthplace')).get()
             if birthplace:
                 birthplace = birthplace.replace('From:', '')
-                if re.search('(, \d+)', birthplace):
-                    birthplace = re.search('(.*), \d+', birthplace).group(1)
+                if re.search(r'(, \d+)', birthplace):
+                    birthplace = re.search(r'(.*), \d+', birthplace).group(1)
             if birthplace:
                 return birthplace.strip()
         return ''

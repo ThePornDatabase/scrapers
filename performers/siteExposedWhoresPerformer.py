@@ -48,8 +48,8 @@ class ExposedWhoresPerformerSpider(BasePerformerScraper):
                     height = height.replace("\r\n", " ").strip()
                     height = height.replace("\n", " ").strip()
                     height = height.replace("\t", " ").strip()
-                    height = re.sub("\s\s+", " ", height).strip()
-                    height = re.search('Height:\s+(\d+.*\")', height).group(1)
+                    height = re.sub(r"\s\s+", " ", height).strip()
+                    height = re.search(r'Height:\s+(\d+.*")', height).group(1)
                     height = height.replace("\\", "").strip()
                     if height:
                         height = height.replace(" ","")

@@ -58,7 +58,7 @@ class siteGirlsRimmingPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height.lower():
-                    height = re.search('(\d+)\s?cm',height.lower())
+                    height = re.search(r'(\d+)\s?cm',height.lower())
                     if height:
                         height = height.group(1)
                         height = height+"cm"
@@ -74,7 +74,7 @@ class siteGirlsRimmingPerformerSpider(BasePerformerScraper):
             eyecolor = self.process_xpath(response, self.get_selector_map('eyecolor')).get()
             if eyecolor:
                 eyecolor = eyecolor.replace("&nbsp;", "").replace("\n", "")
-                eyecolor = re.search('Eyes:\s+(.*?)\s{3}', eyecolor)
+                eyecolor = re.search(r'Eyes:\s+(.*?)\s{3}', eyecolor)
                 if eyecolor:
                     eyecolor = eyecolor.group(1)
                     return eyecolor.strip()
@@ -85,7 +85,7 @@ class siteGirlsRimmingPerformerSpider(BasePerformerScraper):
             haircolor = self.process_xpath(response, self.get_selector_map('haircolor')).get()
             if haircolor:
                 haircolor = haircolor.replace("&nbsp;", "").replace("\n", "")
-                haircolor = re.search('Hair:\s+(.*?)\s{3}', haircolor)
+                haircolor = re.search(r'Hair:\s+(.*?)\s{3}', haircolor)
                 if haircolor:
                     haircolor = haircolor.group(1)
                     return haircolor.strip()
@@ -96,7 +96,7 @@ class siteGirlsRimmingPerformerSpider(BasePerformerScraper):
             nationality = self.process_xpath(response, self.get_selector_map('nationality')).get()
             if nationality:
                 nationality = nationality.replace("&nbsp;", "").replace("\n", "")
-                nationality = re.search('Nationality:\s+(.*?)\s{3}', nationality)
+                nationality = re.search(r'Nationality:\s+(.*?)\s{3}', nationality)
                 if nationality:
                     nationality = nationality.group(1)
                     return nationality.strip()
@@ -107,7 +107,7 @@ class siteGirlsRimmingPerformerSpider(BasePerformerScraper):
             birthday = self.process_xpath(response, self.get_selector_map('birthday')).get()
             if birthday:
                 birthday = birthday.replace("&nbsp;", "").replace("\n", "")
-                birthday = re.search('Birthday:\s+(.*?)\s{3}', birthday)
+                birthday = re.search(r'Birthday:\s+(.*?)\s{3}', birthday)
                 if birthday:
                     birthday = birthday.group(1)
                     age = birthday.strip()

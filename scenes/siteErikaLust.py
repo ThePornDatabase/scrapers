@@ -67,13 +67,12 @@ class SiteErikaLustSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
-                meta['page'] = meta['page'] + 1
+                meta = self.copy_meta(response, page=response.meta['page'] + 1)
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, headers=meta['headers'], meta=meta)
 
     def get_films(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         filmsjson = response.json()
         filmsjson = filmsjson['data']
         for film in filmsjson:
@@ -89,7 +88,7 @@ class SiteErikaLustSpider(BaseSceneScraper):
             yield scrapy.Request(filmurl, callback=self.get_scenes, headers=meta['headers'], meta=meta)
            
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenejson = response.json()
         scene= scenejson['data']
 

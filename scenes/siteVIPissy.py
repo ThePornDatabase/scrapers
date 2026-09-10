@@ -22,7 +22,7 @@ class siteVIPissySpider(BaseSceneScraper):
         'image': '//div[contains(@class,"row-with-video")]//video/@poster|//div[@id="videoplayer"]/img/@src',
         'performers': '//dl/dd/a[contains(@href,"girls/")]/text()',
         'tags': '//section[@class="downloads"]//a[contains(@href,"tag")]/text()',
-        'external_id': '.*\/(.*?)\/$',
+        'external_id': r'.*/(.*?)/$',
         'trailer': '//div[contains(@class,"row-with-video")]//video/source/@src',
         'pagination': '/updates/page-%s/?&sort=recent'
     }

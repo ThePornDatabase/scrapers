@@ -13,7 +13,7 @@ class BrokenBabesPerformerSpider(BasePerformerScraper):
         'measurements': '//div[@class="model-thumb-info"]/h2/following-sibling::p[contains(text(),"Measurements")]/text()',
         'birthday': '//div[@class="model-thumb-info"]/h2/following-sibling::p[contains(text(),"Date Of Birth")]/text()',
         'pagination': '/models/models_%s.html?g=f',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'BrokenBabesPerformer'
@@ -41,10 +41,10 @@ class BrokenBabesPerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cm" in height:
-                    height = re.search('(\d+\s?cm)', height).group(1).strip()
+                    height = re.search(r'(\d+\s?cm)', height).group(1).strip()
                     height = height.replace(" ","")
                 else:
-                    height = re.search('Height:.*\s+(.*)\s+?',height).group(1).strip()
+                    height = re.search(r'Height:.*\s+(.*)\s+?',height).group(1).strip()
                 return height.strip()
         return ''
 
@@ -52,7 +52,7 @@ class BrokenBabesPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('Measurements:.*\s+(.*?)\s+', measurements).group(1)
+                measurements = re.search(r'Measurements:.*\s+(.*?)\s+', measurements).group(1)
                 if measurements and re.match('(.*-.*-.*)', measurements):
                     return measurements.strip()
         return ''
@@ -61,9 +61,9 @@ class BrokenBabesPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if measurements:
-                measurements = re.search('Measurements:.*\s+(.*?)\s+', measurements).group(1)
+                measurements = re.search(r'Measurements:.*\s+(.*?)\s+', measurements).group(1)
                 if measurements and re.match('(.*-.*-.*)', measurements):
-                    cupsize = re.search('(?:\s+)?(.*)-.*-',measurements).group(1)
+                    cupsize = re.search(r'(?:\s+)?(.*)-.*-',measurements).group(1)
                 else:
                     cupsize = measurements.strip()
                 if cupsize:
@@ -74,7 +74,7 @@ class BrokenBabesPerformerSpider(BasePerformerScraper):
         if 'birthday' in self.selector_map:
             birthday = self.process_xpath(response, self.get_selector_map('birthday')).get()
             if birthday and "N/A" not in birthday and "lbs" not in birthday and "Dember" not in birthday:
-                birthday = re.search('Date Of Birth:\s+.*?(.*\d{2,4})\s+\(?', birthday).group(1)
+                birthday = re.search(r'Date Of Birth:\s+.*?(.*\d{2,4})\s+\(?', birthday).group(1)
                 if birthday:
                     return dateparser.parse(birthday.strip()).isoformat()
         return ''

@@ -21,7 +21,7 @@ class DickDrainersPerformerSpider(BasePerformerScraper):
         'height': '//strong[contains(text(),"Height")]/following-sibling::text()',
         'birthday': '//strong[contains(text(),"Age")]/following-sibling::text()',
         'pagination': '/tour/models/%s/latest/?g=',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'DickDrainersPerformer'
@@ -50,9 +50,9 @@ class DickDrainersPerformerSpider(BasePerformerScraper):
     def get_cupsize(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.search('(.*-\d{2}-\d{2})', measurements):
+            if measurements and re.search(r'(.*-\d{2}-\d{2})', measurements):
                 measurements = measurements.replace(" ","").strip()
-                measurements = re.search('(.*-\d{2}-\d{2})', measurements).group(1)
+                measurements = re.search(r'(.*-\d{2}-\d{2})', measurements).group(1)
                 if measurements:
                     cupsize = re.search('(.*?)-.*', measurements).group(1)
                     if cupsize:
@@ -65,7 +65,7 @@ class DickDrainersPerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.search('\d{2}(?:[a-zA-Z]+)?-\d{2}-\d{2}', measurements):
+            if measurements and re.search(r'\d{2}(?:[a-zA-Z]+)?-\d{2}-\d{2}', measurements):
                 return measurements.strip()
         return ''
 

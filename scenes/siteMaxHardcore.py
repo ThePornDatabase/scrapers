@@ -16,7 +16,7 @@ class SiteMaxHardcoreSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1[contains(@class, "mhead")]/text()',
         'description': '//div[@class="description__inner"]/text()',
-        'date': '//span[@class="mstats-list__label" and re:test(text(), "\d{4}-\d{2}-\d{2}")]/text()',
+        'date': r'//span[@class="mstats-list__label" and re:test(text(), "\d{4}-\d{2}-\d{2}")]/text()',
         're_date': r'(\d{4}-\d{2}-\d{2})',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//h4[contains(text(), "odels")]/../../following-sibling::div/ul/li/a//text()',

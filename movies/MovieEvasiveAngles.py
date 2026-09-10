@@ -21,7 +21,7 @@ class MovieEvasiveAnglesSpider(BaseSceneScraper):
         'performers': '//div[@class="actress"]/a/text()',
         'date': '//span[@class="publish_date"]/text()',
         'tags': '',
-        'external_id': '/(\d+)/',
+        'external_id': r'/(\d+)/',
         'trailer': '',
         'pagination': '/evasive-angles-new-release-porn-videos.html?sort=added&page=%s&studio=22235'
         # ~ 'pagination': '/evasive-angles-new-release-porn-videos.html?sort=added&page=%s&studio=95400'

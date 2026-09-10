@@ -44,7 +44,7 @@ class siteErotiqueTVLivePerformerSpider(BasePerformerScraper):
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
                 if "cms" in height.lower():
-                    height = re.search('(\d+)\s+?cms',height.lower()).group(1)
+                    height = re.search(r'(\d+)\s+?cms',height.lower()).group(1)
                     if height:
                         height = height+"cm"
                         return height.strip()
@@ -53,8 +53,8 @@ class siteErotiqueTVLivePerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.search('(\d+\w+-\d+-\d+)', measurements):
-                    measurements = re.search('(\d+\w+-\d+-\d+)', measurements).group(1)
+            if measurements and re.search(r'(\d+\w+-\d+-\d+)', measurements):
+                    measurements = re.search(r'(\d+\w+-\d+-\d+)', measurements).group(1)
                     measurements = re.sub('[^a-zA-Z0-9-]', '', measurements)
                     return measurements.strip().upper()
         return ''
@@ -63,7 +63,7 @@ class siteErotiqueTVLivePerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             cupsize = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if cupsize:
-                cupsize = re.search('(\d+\w+)-\d+-\d+', cupsize)
+                cupsize = re.search(r'(\d+\w+)-\d+-\d+', cupsize)
                 if cupsize:
                     cupsize = cupsize.group(1).upper()
                     return cupsize.strip().upper()

@@ -24,7 +24,7 @@ class networkUKXXXPassPerformerSpider(BasePerformerScraper):
         'ethnicity': '//div[@class="modelbiofields"]//p[contains(text(),"Ethnicity")]/text()',
         'bio': '//comment()[contains(.,"Bio Extra") and not(contains(.,"Fields"))]/following-sibling::text()',
         'pagination': '/models/models_%s_d.html',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     def get_performers(self, response):
@@ -57,7 +57,7 @@ class networkUKXXXPassPerformerSpider(BasePerformerScraper):
             haircolor = self.process_xpath(response, self.get_selector_map('haircolor')).get()
             if haircolor:
                 haircolor = haircolor.replace("&nbsp;","").replace("\n","").replace("\d","")
-                haircolor = re.search('Colour:.*?([a-zA-Z].*)\s{2}',haircolor)
+                haircolor = re.search(r'Colour:.*?([a-zA-Z].*)\s{2}',haircolor)
                 if haircolor:
                     haircolor = haircolor.group(1)
                     return haircolor.strip()
@@ -89,10 +89,10 @@ class networkUKXXXPassPerformerSpider(BasePerformerScraper):
         if 'cupsize' in self.selector_map:
             cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get()
             if cupsize:
-                bust = re.search('(\d{2,3}\s?[a-z-A-Z]{1,5}?)',cupsize)
+                bust = re.search(r'(\d{2,3}\s?[a-z-A-Z]{1,5}?)',cupsize)
                 if not bust:
                     bust = cupsize.replace("&nbsp;","").replace("\n","").replace("\d","")
-                    bust = re.search('Bust:.*?([a-zA-Z].*)\s',bust)
+                    bust = re.search(r'Bust:.*?([a-zA-Z].*)\s',bust)
                 if bust:
                     bust = bust.group(1)
                     return bust.strip()

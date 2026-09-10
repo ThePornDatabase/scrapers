@@ -13,7 +13,7 @@ class siteSapphixPerformerSpider(BasePerformerScraper):
         'height': '//div[contains(@class,"modeldetail")]/strong[contains(text(),"Height")]/following-sibling::text()[1]',
         'weight': '//div[contains(@class,"modeldetail")]/strong[contains(text(),"Weight")]/following-sibling::text()[1]',
         'pagination': '/models/page-%s/?tag=&sort=recent&pussy=all&',
-        'external_id': 'models\/(.*).html'
+        'external_id': r'models/(.*).html'
     }
 
     name = 'SapphixPerformer'
@@ -36,7 +36,7 @@ class siteSapphixPerformerSpider(BasePerformerScraper):
         
 
     def get_url(self, response):
-        url = re.search('(.*)\?nats', response.url)
+        url = re.search(r'(.*)\?nats', response.url)
         if url:
             url = url.group(1)
             return url.strip()

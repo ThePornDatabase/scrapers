@@ -19,7 +19,7 @@ class siteVlogXXXPerformerSpider(BasePerformerScraper):
         'nationality': '//b[contains(text(),"Nationality")]/following-sibling::text()[1]',
         'bio': '//p[@class="descriptionText"]/text()',
         'pagination': '/models/models_%s_d.html',
-        'external_id': 'models\/(.*)\/'
+        'external_id': r'models/(.*)/'
     }
 
     name = 'VlogXXXPerformer'
@@ -44,7 +44,7 @@ class siteVlogXXXPerformerSpider(BasePerformerScraper):
         if 'height' in self.selector_map:
             height = self.process_xpath(response, self.get_selector_map('height')).get()
             if height:
-                height = re.search('(\d{3}\s?cm)', height).group(1)
+                height = re.search(r'(\d{3}\s?cm)', height).group(1)
                 if height:
                     height = height.replace(" ","")
                     return height.strip()
@@ -53,7 +53,7 @@ class siteVlogXXXPerformerSpider(BasePerformerScraper):
     def get_measurements(self, response):
         if 'measurements' in self.selector_map:
             measurements = self.process_xpath(response, self.get_selector_map('measurements')).get()
-            if measurements and re.search('(\d+\w+-\d+-\d+)', measurements):
+            if measurements and re.search(r'(\d+\w+-\d+-\d+)', measurements):
                     measurements = re.sub('[^a-zA-Z0-9-]', '', measurements)
                     return measurements.strip().upper()
         return ''
@@ -62,7 +62,7 @@ class siteVlogXXXPerformerSpider(BasePerformerScraper):
         if 'measurements' in self.selector_map:
             cupsize = self.process_xpath(response, self.get_selector_map('measurements')).get()
             if cupsize:
-                cupsize = re.search('(\d+\w+)-\d+-\d+', cupsize).group(1)
+                cupsize = re.search(r'(\d+\w+)-\d+-\d+', cupsize).group(1)
                 if cupsize:
                     return cupsize.strip().upper()
         return ''
