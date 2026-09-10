@@ -16,12 +16,6 @@ class SexMexSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': "",
         'external_id': r'',
         'trailer': '//video/source/@src',
         'pagination': '/tour/categories/movies_%s_d.html'
@@ -32,13 +26,13 @@ class SexMexSpider(BaseSceneScraper):
         for scene in scenes:
             item = SceneItem()
 
-            date = scene.xpath('.//p[@class="scene-date"]/text()')
+            date = scene.xpath('.//p[contains(@class,"scene-date")]/text()')
             if date:
                 date = date.get()
                 date = self.parse_date(date.strip()).strftime('%Y-%m-%d')
             else:
                 date = None
-            title = scene.xpath('.//h5/a/text()').get()
+            title = scene.xpath('.//h3[contains(@class,"scene-title")]/a/text()').get()
             title = title.title()
             if " . " in title:
                 title = re.search(r'^(.*) \. ', title).group(1).strip()
@@ -49,7 +43,9 @@ class SexMexSpider(BaseSceneScraper):
                 image = re.search(r'url=(.*)', image).group(1)
             performers = scene.xpath('.//a[contains(@class, "modelnamesut") and contains(@href, "/models/")]/text()').getall()
 
-            sceneid = scene.xpath('./../@data-setid').get()
+            # Scene id now lives on <div id="setimage_NNNN"> inside the thumbnail
+            sceneid_raw = scene.xpath('.//div[starts-with(@id,"setimage_")]/@id').get()
+            sceneid = re.search(r'setimage_(\d+)', sceneid_raw).group(1) if sceneid_raw else None
 
             scene = scene.xpath('./a[1]/@href').get()
 

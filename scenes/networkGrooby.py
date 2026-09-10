@@ -80,7 +80,7 @@ class NetworkGroobySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "grooby.club" in response.url:
             scenes = response.xpath('//div[@class="videoblock"]/ancestor::div[contains(@class,"sexyvideo")][1]')
         else:
@@ -124,7 +124,7 @@ class NetworkGroobySpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         tags = ['Trans']
         tagset = map(str.strip, response.xpath(self.get_selector_map('tags')).getall())

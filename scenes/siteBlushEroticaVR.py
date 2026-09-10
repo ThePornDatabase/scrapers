@@ -28,7 +28,7 @@ class SiteBlushEroticaVRSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="latestUpdateB"]')
         for scene in scenes:
             meta['id'] = scene.xpath('./@data-setid').get().strip()

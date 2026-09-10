@@ -96,7 +96,7 @@ class VixenScraper(BaseSceneScraper):
               )
 
         if 'page' in response.meta and response.meta['page'] < self.limit_pages and jsondata['pageInfo']['hasNextPage']:
-            meta = response.meta
+            meta = self.copy_meta(response)
             meta['page'] = meta['page'] + 1
 
             print('NEXT PAGE: ' + str(meta['page']))

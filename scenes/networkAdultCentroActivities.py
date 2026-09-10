@@ -38,7 +38,7 @@ class NetworkAdultCentroEventsSpider(BaseSceneScraper):
     def start_requests_2(self, response):
 
         appscript = response.xpath('//script[contains(text(),"fox.createApplication")]/text()').get()
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['link']:
             if appscript:
                 ah = re.search(r'"ah":"(.*?)"', appscript).group(1)
@@ -59,7 +59,7 @@ class NetworkAdultCentroEventsSpider(BaseSceneScraper):
             yield scrapy.Request(url, callback=self.parse, meta=meta)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         scenes = self.get_scenes(response)
         count = 0
@@ -83,7 +83,7 @@ class NetworkAdultCentroEventsSpider(BaseSceneScraper):
         return self.format_url(base, page_url.format(page))
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         jsondata = jsondata['response']['collection']
         for scene in jsondata:
@@ -96,7 +96,7 @@ class NetworkAdultCentroEventsSpider(BaseSceneScraper):
                 yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = SceneItem()
 
         jsondata = response.text
@@ -139,7 +139,7 @@ class NetworkAdultCentroEventsSpider(BaseSceneScraper):
                 yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
     def get_performers_json(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
 
         jsontext = response.text

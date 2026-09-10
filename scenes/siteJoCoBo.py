@@ -27,7 +27,7 @@ class SiteJoCoBoSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="card"]/a[1]/@href').getall()
         uuid_pattern = r'[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'
         for scene in scenes:

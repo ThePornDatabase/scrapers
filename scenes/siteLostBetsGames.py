@@ -26,7 +26,7 @@ class SiteLostBetsGamesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//figure')
         for scene in scenes:
             scenedate = scene.xpath('.//em[@class="added"]/time/@datetime')

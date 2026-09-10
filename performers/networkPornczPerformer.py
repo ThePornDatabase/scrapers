@@ -43,7 +43,7 @@ class PornCZPerformerSpider(BasePerformerScraper):
                 yield performer
         if count or not response.meta['page']:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 timetext = datetime.datetime.utcnow().strftime("%H%M%S%f")
                 yield scrapy.Request(url=self.get_next_page_url(response.url, timetext),

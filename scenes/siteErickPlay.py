@@ -23,7 +23,7 @@ class SiteErickPlaySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "col-md-4")]')
         for scene in scenes:
             duration = scene.xpath('.//span[contains(@class, "duration")]/text()')

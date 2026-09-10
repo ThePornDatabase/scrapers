@@ -27,7 +27,7 @@ class SiteDarkkoTVSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="latestUpdateB"]')
         for scene in scenes:
             scenedate = scene.xpath('.//span[contains(i/@class, "calendar")]/following-sibling::text()')

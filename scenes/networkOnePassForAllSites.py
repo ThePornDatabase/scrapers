@@ -58,7 +58,7 @@ class OnePassForAllSitesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath(
             "//ul[@class='thumbs tn-updates tn-allmovs']/li")
         for scene in scenes:
@@ -88,7 +88,7 @@ class OnePassForAllSitesSpider(BaseSceneScraper):
         return site
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = self.process_xpath(
             response, self.get_selector_map('image')).get()
         if not image:
@@ -138,7 +138,7 @@ class OnePassForAllSitesSpider(BaseSceneScraper):
         return title
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = []
         perf_list = response.xpath('//p[@class="sp-info-name"]/a')
         if perf_list:

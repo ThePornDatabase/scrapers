@@ -23,7 +23,7 @@ class SiteMaxFelicitasSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "video-item")]')
         for scene in scenes:
 
@@ -53,7 +53,7 @@ class SiteMaxFelicitasSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = ['Max Felicitas']
         # ~ performer = re.search(r' And (\w+ \w+)', meta['title'])
         # ~ if performer:

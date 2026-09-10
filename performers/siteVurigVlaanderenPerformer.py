@@ -36,7 +36,7 @@ class SiteVurigVlaanderenPerformerSpider(BasePerformerScraper):
         yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         link = self.get_next_page_url(self.base_url, meta['page'])
         yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers_json)
 
@@ -49,7 +49,7 @@ class SiteVurigVlaanderenPerformerSpider(BasePerformerScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.get_performers, meta=meta, headers=self.headers_json)

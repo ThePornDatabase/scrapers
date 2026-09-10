@@ -48,7 +48,7 @@ class SiteFreaksInsideSpider(BaseSceneScraper):
         yield scrapy.Request('https://www.freaksinside.com/newsarchive.php', callback=self.parse_archives, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_archives(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         archives = response.xpath('//td/font/a[contains(@href, "newsarchive")]/@href').getall()
         for archive in archives:
             archive = self.format_link(response, archive)
@@ -127,7 +127,8 @@ class SiteFreaksInsideSpider(BaseSceneScraper):
                 item['site'] = "Freaks Inside"
                 item['parent'] = "Freaks Inside"
                 item['network'] = "Freaks Inside"
-                item['description'] = None
+                # '' not None: the pipeline runs re.sub() over the description
+                item['description'] = ''
                 item['url'] = response.url
 
 

@@ -49,7 +49,7 @@ class NetworkAPClipsSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "video-col")]')
         for scene in scenes:
             sceneid = scene.xpath('.//a[contains(@class, "btn-block")]/@data-content-code')

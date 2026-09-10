@@ -49,19 +49,19 @@ class NetworkTransationalFantasiesPerformerSpider(BasePerformerScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@id, "item_")]/div/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.get_performers, meta=meta)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="video-performer"]')
         for performer in performers:
             image = performer.xpath('./a/img/@data-bgsrc')

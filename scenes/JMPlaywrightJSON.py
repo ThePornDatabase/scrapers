@@ -38,10 +38,8 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
     # ~ 'DOWNLOADER_MIDDLEWARES': {
     # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
     # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-    # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-    # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+    # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
     # ~ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 100,
     # ~ },
     # ~ 'DOWNLOAD_HANDLERS': {
@@ -82,7 +80,7 @@ class JMPlaywrightJSONSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)

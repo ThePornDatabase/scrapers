@@ -30,7 +30,7 @@ class NetworkYezzclipsSpider(BaseSceneScraper):
         yield scrapy.Request(url, callback=self.start_requests2, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         self.headers['referer'] = 'https://www.yezzclips.com'
 
         for link in self.start_urls:
@@ -43,7 +43,7 @@ class NetworkYezzclipsSpider(BaseSceneScraper):
 
     def parse(self, response):
         # ~ print(response.text)
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -56,7 +56,7 @@ class NetworkYezzclipsSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta), callback=self.parse, meta=meta, headers=self.headers)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="row storeview_clip"]')
         for scene in scenes:
             item = self.init_scene()

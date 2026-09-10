@@ -1,6 +1,9 @@
-import re
 import json
+import re
 import string
+
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -15,46 +18,90 @@ class SiteWaterAndPowerSpider(BaseSceneScraper):
         'https://water-and-power.com',
     ]
 
+    # The site is no longer a Gatsby build: every /page-data/**/page-data.json is a
+    # 404.  It now renders server-side, listing scenes at /scenes (page N at
+    # /scenes/N) and giving each scene a /scene/<slug> page.  A scene is a set of
+    # parts, and the page publishes them as a schema.org ItemList of VideoObjects
+    # carrying the title, synopsis, still, runtime, release date and preview for
+    # each part -- one TPDB scene per part, as before.
     selector_map = {
-        'external_id': r'',
-        'pagination': '/page-data/videos/%s/page-data.json',
+        'external_id': r'/videos/([^/?]+)',
+        'pagination': '/scenes/%s',
         'type': 'Scene',
     }
 
     def get_next_page_url(self, base, page):
-        if page == 1:
-            return "https://water-and-power.com/page-data/index/page-data.json"
+        if int(page) == 1:
+            return self.format_url(base, '/scenes')
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        jsondata = json.loads(response.text)
-        jsondata = jsondata['result']['data']
-        if response.meta['page'] == 1:
-            jsondata = jsondata['videos']['nodes']
-        else:
-            jsondata = jsondata['allMarkdownRemark']['nodes']
-        for scene in jsondata:
+        scenes = response.xpath('//a[contains(@class, "card")][contains(@href, "/scene/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
+                                 headers=self.headers, cookies=self.cookies)
+
+    def get_parts(self, response):
+        for block in response.xpath('//script[@type="application/ld+json"]/text()').getall():
+            try:
+                data = json.loads(block)
+            except ValueError:
+                continue
+            if not isinstance(data, dict) or 'ItemList' not in str(data.get('@type')):
+                continue
+            for entry in data.get('itemListElement') or []:
+                part = entry.get('item') if isinstance(entry, dict) else None
+                if isinstance(part, dict) and 'VideoObject' in str(part.get('@type')):
+                    yield part
+
+    def parse_scene(self, response):
+        # The cast is only published on the part cards, keyed by the same URL the
+        # VideoObject carries.
+        cast = {}
+        for card in response.xpath('//a[contains(@class, "card")][contains(@href, "/videos/")]'):
+            names = card.xpath('.//div[@class="card__girls"]/text()').get() or ''
+            cast[card.attrib.get('href', '').rstrip('/')] = [
+                string.capwords(x.strip()) for x in names.split(',') if x.strip()]
+
+        for part in self.get_parts(response):
+            url = (part.get('url') or '').strip()
+            if not url or not re.search(self.get_selector_map('external_id'), url):
+                continue
+
             item = SceneItem()
+            item['title'] = self.cleanup_title(part.get('name') or '')
+            item['description'] = self.cleanup_description(
+                re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', part.get('description') or '')))
+            item['url'] = url
+            item['id'] = re.search(self.get_selector_map('external_id'), url).group(1)
 
-            item['title'] = self.cleanup_title(scene['frontmatter']['title'])
-            item['description'] = re.sub(r'<[^<]+?>', '', self.cleanup_description(scene['summary']))
-            item['date'] = ''
-            item['performers'] = list(map(lambda x: string.capwords(x.strip()), scene['frontmatter']['girls']))
-            item['tags'] = list(map(lambda x: string.capwords(x.strip()), scene['frontmatter']['tags']))
-            item['url'] = f"https://water-and-power.com/videos{scene['fields']['slug']}"
-            item['id'] = scene['frontmatter']['streamId']
-            image = "https://images-wap.imgix.net" + scene['frontmatter']['hero']
-            if image:
-                item['image'] = image
-                item['image_blob'] = self.get_image_blob_from_link(image)
-            else:
-                item['image'] = ''
-                item['image_blob'] = ''
+            upload = re.search(r'(\d{4}-\d{2}-\d{2})', part.get('uploadDate') or '')
+            item['date'] = upload.group(1) if upload else None
 
+            image = (part.get('thumbnailUrl') or '').strip()
+            item['image'] = image
+            item['image_blob'] = self.get_image_blob_from_link(image) if image else None
+
+            item['trailer'] = (part.get('contentUrl') or '').strip()
+            item['duration'] = self.duration_to_seconds(part.get('duration') or '')
+
+            performers = cast.get(re.sub(r'^https?://[^/]+', '', url).rstrip('/'), [])
+            # a part occasionally repeats the same model twice
+            item['performers'] = list(dict.fromkeys(performers))
+            item['tags'] = []
+            item['site'] = self.site
+            item['parent'] = self.parent
+            item['network'] = self.network
             item['type'] = 'Scene'
-            item['trailer'] = ''
-            item['site'] = "Water And Power"
-            item['parent'] = "Water And Power"
-            item['network'] = "Water And Power"
 
-            yield item
+            item = self.check_item(item, self.days)
+            if item:
+                yield item
+
+    def duration_to_seconds(self, value):
+        """The ld+json publishes ISO-8601 durations (PT15M25S)."""
+        parsed = re.search(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', value or '')
+        if not parsed or not any(parsed.groups()):
+            return None
+        hours, minutes, seconds = (int(x) if x else 0 for x in parsed.groups())
+        return str(hours * 3600 + minutes * 60 + seconds)

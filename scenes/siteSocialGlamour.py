@@ -50,7 +50,7 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))
@@ -83,11 +83,19 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                 else:
                     item['performers'] = []
 
-                date_xpath = scene.xpath('..//i[contains(@class, "fa-calendar")]/following-sibling::text()')
-                item['date'] = ""
-                if date_xpath:
-                    date_xpath = date_xpath.get().strip()
-                    item['date'] = self.parse_date(date_xpath, date_formats=['%Y-%m-%d']).isoformat()
+                # The site stopped publishing dates: the cards lost their
+                # fa-calendar line and the trailer pages carry no date either.  It
+                # used to fall through to date "" and then be discarded by the
+                # hand-rolled filter below, which is why the scraper produced
+                # nothing.  Left empty so TPDB falls back to the import date.
+                item['date'] = None
+
+                duration = scene.xpath('.//div[@class="vtime"]/text()').get()
+                if duration:
+                    minutes = re.search(r'(\d+)\s*min', duration)
+                    seconds = re.search(r'(\d+)\s*sec', duration)
+                    item['duration'] = str((int(minutes.group(1)) * 60 if minutes else 0)
+                                           + (int(seconds.group(1)) if seconds else 0))
 
                 image = scene.xpath('./div/a/img/@src')
                 if image:
@@ -114,20 +122,6 @@ class SiteSocialGlamourSpider(BaseSceneScraper):
                 if extern_id:
                     item['id'] = extern_id.group(1).lower().strip()
 
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
+                item = self.check_item(item, self.days)
+                if item:
+                    yield item

@@ -45,13 +45,19 @@ class SiteBelamiSpider(BaseSceneScraper):
         for scene in scenes:
             item = self.init_scene()
 
-            item['title'] = self.cleanup_title(scene.xpath('.//span[@class="label"]/text()').get())
+            title = scene.xpath('.//span[@class="label"]/text()').get()
+            if not title:
+                continue
+            item['title'] = self.cleanup_title(title)
             if "solo" in response.url:
                 item['title'] = "Solo: " + item['title']
                 item['tags'] = ['Solo']
-            item['description'] = self.cleanup_title(scene.xpath('.//video/@alt').get())
-            item['description'] = re.sub(r'<[^<]+?>', '', item['description'])
-            item['date'] = self.parse_date(scene.xpath('.//div[@class="date"]/text()').get(), date_formats=['%m/%d/%Y']).strftime('%Y-%m-%d')
+            item['description'] = self.cleanup_title(scene.xpath('.//video/@alt').get() or '')
+            item['description'] = re.sub(r'<[^<]+?>', '', item['description'] or '')
+            scenedate = scene.xpath('.//div[@class="date"]/text()').get()
+            if scenedate:
+                scenedate = self.parse_date(scenedate, date_formats=['%m/%d/%Y'])
+                item['date'] = scenedate.strftime('%Y-%m-%d') if scenedate else None
 
             item['image'] = scene.xpath('.//video/@poster').get()
             item['image_blob'] = self.get_image_blob_from_link(item['image'])

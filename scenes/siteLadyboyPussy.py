@@ -1,8 +1,7 @@
 import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.spiders.scenes._natscms import resolve_block_id
 from tpdb.items import SceneItem
-true = True
-false = False
 
 
 class SiteLadyboyPussySpider(BaseSceneScraper):
@@ -16,28 +15,40 @@ class SiteLadyboyPussySpider(BaseSceneScraper):
     ]
 
     headers = {'X-NATS-cms-area-id': '3b74725d-ad01-45a1-8186-ac6be1bc1661'}
-    cookies = [{"domain":"www.ladyboypussy.com","expirationDate":1761935244,"hostOnly":true,"httpOnly":false,"name":"nats_unique","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"MC4wLjkuOS4wLjAuMC4wLjA"},{"domain":"www.ladyboypussy.com","expirationDate":1764440844,"hostOnly":true,"httpOnly":false,"name":"nats","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"MC4wLjkuOS4wLjAuMC4wLjA"},{"domain":"www.ladyboypussy.com","expirationDate":1764440845,"hostOnly":true,"httpOnly":false,"name":"consent","path":"/","sameSite":"lax","secure":false,"session":false,"storeId":"0","value":"true"},{"domain":".ladyboypussy.com","expirationDate":1770564759.912632,"hostOnly":false,"httpOnly":true,"name":"nats_sess","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"d4d200fc311ad84b3f74d611ca98a2e1"},{"domain":".ladyboypussy.com","expirationDate":1764513159.912368,"hostOnly":false,"httpOnly":true,"name":"nats","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"MC4wLjkuOS4wLjAuMC4wLjA"},{"domain":".ladyboypussy.com","expirationDate":1764513159.91249,"hostOnly":false,"httpOnly":true,"name":"nats_cookie","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"https%253A%252F%252Fwww.ladyboypussy.com%252F"},{"domain":".ladyboypussy.com","expirationDate":1762007559.912542,"hostOnly":false,"httpOnly":true,"name":"nats_unique","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"MC4wLjkuOS4wLjAuMC4wLjA"},{"domain":".ladyboypussy.com","expirationDate":1764513159.912587,"hostOnly":false,"httpOnly":true,"name":"nats_landing","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"No%2BLanding%2BPage%2BURL"}]
+    # Consent flag only; the NATS affiliate/session cookies were removed.
+    cookies = {"consent": "true"}
 
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'trailer': '',
         'external_id': r'',
         'pagination': '/index.php?section=1681&start=%s'
     }
 
+
+    # cms_block_id belongs to a block in the tour's layout, so it changes whenever
+    # the tour is re-laid-out -- and when it does the API answers
+    # {"error":"cms_block_id ... not found"} and the spider silently yields
+    # nothing. It is therefore looked up once per crawl; the literal below is only
+    # the fallback used if that lookup fails, so this can only ever help.
+    nats_site = 'https://www.ladyboypussy.com'
+    nats_block_fallback = '113044'
+
+    @property
+    def nats_block_id(self):
+        if getattr(self, '_nats_block_id', None) is None:
+            self._nats_block_id = resolve_block_id(self.nats_site, self.nats_block_fallback)
+            if self._nats_block_id != self.nats_block_fallback:
+                print('*** %s: cms_block_id %s -> %s' % (
+                    self.name, self.nats_block_fallback, self._nats_block_id))
+        return self._nats_block_id
+
     def get_next_page_url(self, base, page):
         index = str((int(page) -1) * 12)
-        url = f"https://nats.islanddollars.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=12&start={index}&cms_area_id=3b74725d-ad01-45a1-8186-ac6be1bc1661&cms_block_id=113044&orderby=published_desc&content_type=video&status=enabled&text_search=&data_type_search=%7B%22100001%22:%22183%22%7D"
+        url = f"https://nats.islanddollars.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=12&start={index}&cms_area_id=3b74725d-ad01-45a1-8186-ac6be1bc1661&cms_block_id={self.nats_block_id}&orderby=published_desc&content_type=video&status=enabled&text_search=&data_type_search=%7B%22100001%22:%22183%22%7D"
         print(url)
         return url
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         scenes = jsondata['sets']
         for scene in scenes:

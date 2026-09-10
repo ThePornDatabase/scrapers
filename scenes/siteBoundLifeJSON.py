@@ -19,7 +19,7 @@ class SiteBoundLifeJSONSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = SceneItem()

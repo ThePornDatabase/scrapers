@@ -31,7 +31,7 @@ class SiteLukeHardySpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         perf_list = meta['performerlist']['scenes']
         scenes = response.xpath('//div[@class="videoThumbBlock"]')
         for scene in scenes:

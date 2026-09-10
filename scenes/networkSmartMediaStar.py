@@ -23,16 +23,36 @@ class NetworkSmartMediaStarJSONSpider(BaseSceneScraper):
         page = str(int(page) - 1)
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
+    def _referer_for(self, url):
+        if 'tsvirtuallovers' in url:
+            return 'https://tsvirtuallovers.com/videos/'
+        if 'realitylovers' in url:
+            return 'https://realitylovers.com/videos/'
+        return None
+
+    async def start(self):
+        for url in self.start_urls:
+            page = self.page
+            headers = {'Referer': self._referer_for(url)} if self._referer_for(url) else {}
+            yield scrapy.Request(
+                url=self.get_next_page_url(url, page),
+                callback=self.parse,
+                meta={'page': page},
+                headers=headers,
+            )
+
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
+        referer = self._referer_for(response.url)
+        headers = {'Referer': referer} if referer else {}
         for scene in jsondata['contents']:
             sceneid = scene['id']
             if "tsvirtuallovers" in response.url:
                 link = f"https://engine.tsvirtuallovers.com/content/videoDetail?contentId={sceneid}"
             elif "realitylovers" in response.url:
                 link = f"https://engine.realitylovers.com/content/videoDetail?contentId={sceneid}"
-            yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
+            yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=headers)
 
     def parse_scene(self, response):
         scene = response.json()

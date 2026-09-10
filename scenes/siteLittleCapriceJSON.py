@@ -40,10 +40,8 @@ class SiteLittleCapriceJSONSpider(BaseSceneScraper):
             # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -59,7 +57,7 @@ class SiteLittleCapriceJSONSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         responsedata = re.sub(r'<[^<]+?>', '', response.text)
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(responsedata)
         for scene in jsondata:
             item = SceneItem()

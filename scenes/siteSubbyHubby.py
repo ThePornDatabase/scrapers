@@ -27,7 +27,7 @@ class SiteSubbyHubbySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//span[@class="item-thumb"]/a')
         for scene in scenes:
             image = scene.xpath('./img/@src0_2x')

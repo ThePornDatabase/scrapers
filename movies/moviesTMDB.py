@@ -13,7 +13,9 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 class MoviesTMDBSpider(BaseSceneScraper):
     name = 'TMDBMovies'
 
-    api_key = "f83c77e92929bd569b110e2ce4e86b7e"
+    # TMDB keys are issued per account, so this one is a personal credential and
+    # must not live in the repo.  Export TMDB_API_KEY before running.
+    api_key = os.environ.get('TMDB_API_KEY', '')
 
     start_urls = [
         'https://api.themoviedb.org',

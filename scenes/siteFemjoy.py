@@ -39,7 +39,7 @@ class SiteFemjoySpider(BaseSceneScraper):
         yield scrapy.Request(url, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 

@@ -31,7 +31,7 @@ class SiteMFVideoXXXSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article')
         for scene in scenes:
             scenedate = scene.xpath('.//time[contains(@class, "published")]/@datetime').get()

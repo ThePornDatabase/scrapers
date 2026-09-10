@@ -23,7 +23,7 @@ class SitePeterFeverSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "product-item")]')
         for scene in scenes:
             title = scene.xpath('.//h3/a/text()')

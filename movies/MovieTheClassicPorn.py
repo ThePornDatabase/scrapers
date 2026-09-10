@@ -33,7 +33,7 @@ class MovieTheClassicPornSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination').replace("<PAGE>", str(page)))
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:

@@ -59,7 +59,7 @@ class SitePornboxSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['contents']
         for scene in jsondata:
@@ -67,7 +67,7 @@ class SitePornboxSpider(BaseSceneScraper):
             yield scrapy.Request(url, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene = response.json()
         item = SceneItem()
         item['title'] = string.capwords(scene['scene_name'])
@@ -133,6 +133,6 @@ class SitePornboxSpider(BaseSceneScraper):
                    'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
                    'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouchx', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue', 'plantsvscunts',
                    'mugurporn', 'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'gotfilled', 'alexlegend', 'aglaeaproductions', 'mrlucky', 'mrluckypov', 'povmasters', 'dripdrop', 'dripdropprod', 'artemixxx', 'theartemixxx',
-                   'madbros', 'madbrosx', 'girlfriendsfilms', 'realkingcobra', 'brandnewamateurs']
+                   'madbros', 'madbrosx', 'girlfriendsfilms', 'realkingcobra', 'brandnewamateurs', 'dickhddaily']
         if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
             yield self.check_item(item, self.days)

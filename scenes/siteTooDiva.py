@@ -31,7 +31,7 @@ class SiteTooDivaSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//header/following-sibling::div[1]/div/div[@id="primary"]/div[1]/div[1]/ul[1]/li/article/div[1]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

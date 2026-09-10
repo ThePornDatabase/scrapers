@@ -41,7 +41,7 @@ class SiteRichardMannsWorldSpider(BaseSceneScraper):
         reqheaders = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'}
         jsondata = json.loads(response.text)
         for scene in jsondata:
-            meta = response.meta
+            meta = self.copy_meta(response)
             meta['id'] = scene['id']
             meta['url'] = scene['link']
             meta['date'] = scene['date']

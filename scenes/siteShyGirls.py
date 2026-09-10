@@ -29,7 +29,7 @@ class SiteShyGirlsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//li[contains(@class,"sales-flash-overlay")]/a[contains(@href, "product")]/@href').getall()
         for scene in scenes:
             if "?product-page" not in scene:

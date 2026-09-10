@@ -42,7 +42,7 @@ class NetworkPKJMediaSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = json.loads(response.text)
         for scene in scenes:
             item = self.init_scene()
@@ -66,7 +66,7 @@ class NetworkPKJMediaSpider(BaseSceneScraper):
             yield scrapy.Request(item['url'], callback=self.scene_parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def scene_parse(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
 
         trailer = response.xpath('//video/@src')

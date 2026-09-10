@@ -61,7 +61,7 @@ class SiteAlphaMales(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -75,19 +75,19 @@ class SiteAlphaMales(BaseSceneScraper):
         return self.format_url(url, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class,"video-gallery")]/a[contains(@href, "en/videos/detail")][1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         site = re.search(r'videos/(.*?)/', meta['pagination']).group(1)
         return match_site(site)
 
     def get_parent(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         parent = re.search(r'videos/(.*?)/', meta['pagination']).group(1)
         return match_site(parent)
 

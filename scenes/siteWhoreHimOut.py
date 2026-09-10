@@ -34,7 +34,7 @@ class SiteSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "scenes-grid")]//div[@class="item"]/div[1]/a')
         for scene in scenes:
             image = scene.xpath('./img/@data-async-load')

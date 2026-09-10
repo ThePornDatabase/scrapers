@@ -11,8 +11,11 @@ class SiteAVEJAVSpider(BaseSceneScraper):
 
     start_urls = 'https://www.aventertainments.com'
 
+    # /ppv/255/1/1/dept?countpage=N redirects to the query-string form now; the
+    # positional path segments became cat/lang/culture parameters.  Every
+    # scene-page selector below still matches.
     paginations = [
-        '/ppv/255/1/1/dept?countpage=%s',
+        '/ppv/dept?lang=1&culture=en-US&cat=255&v=1&page=%s',
     ]
 
     selector_map = {
@@ -25,7 +28,7 @@ class SiteAVEJAVSpider(BaseSceneScraper):
         'tags': '//div[@class="single-info"]/span[contains(text(), "Category")]/following-sibling::span/a/text()',
         'trailer': '//div[contains(@class, "button-set")]//span/a[contains(@href, "javascript")]/@onclick',
         're_trailer': r'(https.*?)[\'\"]',
-        'external_id': r'.*?/(\d+)/.*',
+        'external_id': r'[?&]pro=(\d+)',
         'pagination': '',
         'type': 'JAV',
     }
@@ -45,7 +48,7 @@ class SiteAVEJAVSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.start_urls, self.page, pagination), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -59,7 +62,7 @@ class SiteAVEJAVSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['ignore_sites'] = 'Caribbeancom,1Pondo,Heyzo'
         scenes = response.xpath('//div[contains(@class, "single-slider-product__image")]/a[1]/@href').getall()
         for scene in scenes:
@@ -115,7 +118,7 @@ class SiteAVEJAVSpider(BaseSceneScraper):
         return performers_data
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
 
         item['title'] = self.get_title(response)

@@ -29,7 +29,7 @@ class SiteBratPerversionsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article')
         for scene in scenes:
             meta['id'] = scene.xpath('./@id').get()

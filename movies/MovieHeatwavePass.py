@@ -36,7 +36,7 @@ class MovieHeatwaveSpider(BaseSceneScraper):
     }
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -52,14 +52,14 @@ class MovieHeatwaveSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//ul[contains(@class,"dvd-list")]/li/a[1]/@href').getall()
         for movie in movies:
             movie_url = self.format_link(response, movie)
             yield scrapy.Request(movie_url, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         sceneurls = response.xpath('//div[contains(@class,"dvd-item")]//a[contains(text(), "Play Scene")]/@href').getall()
         sceneurls = list(filter(lambda x: len(x) > 0, sceneurls))
         if len(sceneurls) > 1:
@@ -135,7 +135,7 @@ class MovieHeatwaveSpider(BaseSceneScraper):
                     yield item
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
         item['title'] = self.cleanup_title(response.xpath('//h1[@class="title"]/text()').get().strip())

@@ -79,10 +79,11 @@ class NetworkAdultPrimeSpider(BaseSceneScraper):
         'external_id': r'.*/(\d+)',
         'trailer': '',
         'pagination': '/studios/videos?q=&website=&niche=&year=&type=&sort=&page=%s#focused'
+        # 'pagination': '/studios/videos?website=Blastfromthepast18&page=%s'
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['ignore_sites'] = 'playboyplus,metartnetwork,yanks,tonightsgirlfriend,myfriendshotmom'
         scenes = response.xpath('//div[@class="row portal-grid"]//div[@class="overlay-wrapper"]')
         for scene in scenes:

@@ -29,7 +29,7 @@ class SiteSubbyHubbySecondarySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="update_details"]/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

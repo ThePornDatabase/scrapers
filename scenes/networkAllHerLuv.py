@@ -26,7 +26,7 @@ class AllHerLuvSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="photo-thumb_body"]')
         for scene in scenes:
             image = scene.xpath('./a/img/@src0_4x')

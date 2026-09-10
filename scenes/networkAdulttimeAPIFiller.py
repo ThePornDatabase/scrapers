@@ -88,7 +88,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
         return self.call_algolia(response.meta['page'], token, response.meta['sitelink'], response.meta['parsesite'])
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if response.status == 200:
             scenes = self.get_scenes(response)
             count = 0
@@ -103,7 +103,7 @@ class AdultTimeAPISpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         # ~ print(response.json()['results'])
-        meta = response.meta
+        meta = self.copy_meta(response)
         for scene in response.json()['results'][0]['hits']:
             item = SceneItem()
 

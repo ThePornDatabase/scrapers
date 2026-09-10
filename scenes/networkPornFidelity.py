@@ -29,7 +29,7 @@ class PornFidelitySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@class, "video-card")]/ancestor::div[1]')
         for scene in scenes:
             episode = scene.xpath('.//span[contains(@class, "video-title")]/text()')
@@ -72,7 +72,7 @@ class PornFidelitySpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         title = super().get_title(response)
         if "episode" in meta and meta['episode']:
             return f"{title} E{meta['episode']}"

@@ -28,11 +28,26 @@ class SiteHotCollegeFucksSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class, "videothumb")]')
-        for scene in scenes:
-            sceneid = scene.xpath('./@class').get()
-            meta['id'] = re.search(r'b(\d+)_', sceneid).group(1)
-            scene = scene.xpath('./a/@href').get()
-            if meta['id']:
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        # div.videothumb (and the b<id>_ class the id came from) is gone; cards are
+        # div.item-update now.  The still has to come off the card too -- the scene
+        # page's set-target images are the related-scene strip, whose first entry is
+        # a different scene.
+        for card in response.xpath('//div[contains(@class, "item-update")]'):
+            link = card.xpath('.//div[contains(@class, "item-thumb")]//a/@href').get()
+            if not link:
+                continue
+
+            meta = dict(response.meta)
+            sceneid = card.xpath('.//img/@id').get() or ''
+            sceneid = re.search(r'set-target-(\d+)', sceneid)
+            meta['id'] = sceneid.group(1) if sceneid else None
+
+            image = card.xpath('.//img/@src0_1x').get()
+            if image:
+                meta['image'] = self.format_link(response, image)
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_image(self, response):
+        return response.meta.get('image', '')

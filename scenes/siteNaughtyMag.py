@@ -31,6 +31,17 @@ class SiteNaughtyMagSpider(BaseSceneScraper):
     }
 
     custom_scraper_settings = {
+        # The Score network refuses this exit outright: TLS completes, the
+        # request goes out, then the server kills the stream. It is not a TLS
+        # fingerprint (Playwright fails identically) nor a challenge page
+        # (FlareSolverr reports "Challenge not detected") -- it is the source
+        # address. FlareSolverr runs on a different host and reaches the site
+        # normally, so requests are routed through it.
+        'DOWNLOAD_TIMEOUT': 180,
+        'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+        },
         'CONCURRENT_REQUESTS': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
@@ -52,7 +63,7 @@ class SiteNaughtyMagSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class,"li-item") and contains(@class, "video")]//div[contains(@class, "item-img")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene) and "join." not in scene:

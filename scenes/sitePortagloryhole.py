@@ -22,69 +22,65 @@ class SitePortagloryholeSpider(BaseSceneScraper):
         'tags': '//a[@class="tags" and contains(@href, "search")]/text()',
         'trailer': '',
         'external_id': r'.*/(.*?)$',
-        'pagination': '/videos?page=%s',
+        # /videos?page=N now serves an empty 12KB shell with no cards; the root is
+        # the only page that still lists anything
+        'pagination': '',
         'type': 'Scene',
     }
 
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.parse, meta=meta,
+                                 headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class, "post_item")]')
-        for scene in scenes:
-            duration = scene.xpath('.//i[contains(@class, "fa-video")]/following-sibling::text()')
-            if duration:
-                meta['duration'] = self.duration_to_seconds(duration.get())
+        """Build items from the listing cards.
 
-            scenedate = scene.xpath('.//span[contains(@class, "posted_on")]/text()')
+        Every card's links now point at /join -- the per-scene pages are gone, so
+        the crawl used to request /join a few times and finish with nothing.  The
+        card still carries the post id, title, still, release date and runtime,
+        which is everything reachable without a membership.  parse_scene below is
+        left in place but is no longer reached; note it also carried a
+        `date < 2018-12-31` backfill guard that would have dropped every current
+        scene anyway.
+        """
+        for card in response.xpath('//div[contains(@class, "post_item")]'):
+            item = self.init_scene()
+
+            item['id'] = card.attrib.get('data-post-id')
+            title = card.xpath('.//div[contains(@class, "post_video")]/a[1]/@title').get()
+            if not item['id'] or not title or not title.strip():
+                continue
+            item['title'] = self.cleanup_title(title)
+            item['url'] = response.url
+            item['description'] = ''
+
+            scenedate = card.xpath('.//span[contains(@class, "posted_on")]/text()').get()
             if scenedate:
-                meta['date'] = self.parse_date(scenedate.get(), date_formats=['%b %d, %Y']).strftime('%Y-%m-%d')
+                scenedate = self.parse_date(scenedate.strip(), date_formats=['%b %d, %Y'])
+                if scenedate:
+                    item['date'] = scenedate.strftime('%Y-%m-%d')
 
-            image = scene.xpath('.//div[contains(@class, "post_video")]//img[contains(@class, "cover")]/@src')
+            duration = card.xpath('.//i[contains(@class, "fa-video")]/following-sibling::text()').get()
+            if duration and ':' in duration:
+                item['duration'] = self.duration_to_seconds(duration.strip())
+
+            image = (card.xpath('.//img[contains(@class, "item_cover")]/@src').get()
+                     or card.xpath('.//a[@data-media-poster]/@data-media-poster').get())
             if image:
-                image = image.get()
-                meta['image'] = image
-                meta['image_blob'] = self.get_image_blob_from_link(image)
+                item['image'] = image.strip()
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-            title = scene.xpath('.//div[contains(@class, "post_video")]/a[1]/@title')
-            if title:
-                meta['title'] = self.cleanup_title(title.get())
+            item['performers'] = []
+            item['tags'] = []
+            item['trailer'] = ''
+            item['site'] = self.get_site(response)
+            item['parent'] = self.get_parent(response)
+            item['network'] = self.network
 
-            scene = scene.xpath('.//div[contains(@class, "post_video")]/a[1]/@href').get()
-
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
-
-    def parse_scene(self, response):
-        meta = response.meta
-        item = self.init_scene()
-        item['title'] = meta['title']
-        item['description'] = self.get_description(response)
-        item['site'] = self.get_site(response)
-        item['date'] = meta['date']
-        item['duration'] = meta['duration']
-
-        if 'image' in meta:
-            item['image'] = meta['image']
-        if 'image_blob' in meta:
-            item['image_blob'] = meta['image_blob']
-        if not item['image'] or not item['image_blob']:
-            item['image'] = ''
-            item['image_blob'] = ''
-        item['performers'] = self.get_performers(response)
-        item['tags'] = self.get_tags(response)
-        item['id'] = self.get_id(response)
-        item['url'] = self.get_url(response)
-
-        item['network'] = self.network
-        item['parent'] = self.get_parent(response)
-        item['type'] = 'Scene'
-
-        if item['date'] < "2018-12-31":
-            if "check_date" in response.meta:
-                check_date = response.meta['check_date']
-                if item['date'] > check_date:
-                    yield self.check_item(item, self.days)
-            else:
-                yield self.check_item(item, self.days)
+            yield self.check_item(item, self.days)
 
     def get_image_from_link(self, image):
         if image and self.cookies:

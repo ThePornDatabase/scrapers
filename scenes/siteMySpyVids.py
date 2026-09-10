@@ -24,7 +24,7 @@ class SiteMySpyVids(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="scr_block"]')
         for scene in scenes:
             duration = scene.xpath('.//div[@class="runtime"]/text()')

@@ -28,7 +28,7 @@ class SiteRFMoviesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['videos']['data']
         for scene in jsondata:
@@ -41,7 +41,7 @@ class SiteRFMoviesSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['video']
         if jsondata:

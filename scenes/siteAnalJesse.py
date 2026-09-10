@@ -1,76 +1,73 @@
-import scrapy
 import re
-import json
+
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteAnalJesseSpider(BaseSceneScraper):
     name = 'AnalJesse'
     network = 'Anal Jesse'
+    parent = 'Anal Jesse'
+    site = 'Anal Jesse'
 
-    start_url = 'https://analjesse.com'
+    start_urls = [
+        'https://analjesse.com',
+    ]
 
     selector_map = {
-        'external_id': r'',
-        'pagination': '/_next/data/<buildID>/tags/main.json?slug=main&page=%s&per_page=12'
+        'description': '//div[contains(@class, "vidImgContent")]/p//text()',
+        'performers': '',
+        'tags': '',
+        'external_id': r'/scenes/(.*?)_vids\.html',
+        'trailer': '',
+        'pagination': '/categories/movies%s.html',
+        'type': 'Scene',
     }
 
-    async def start(self):
-        meta = {}
-        meta['page'] = self.page
-        yield scrapy.Request('https://analjesse.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def start_requests_2(self, response):
-        meta = response.meta
-        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
-        if buildId:
-            meta['buildID'] = buildId.group(1)
-            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
-            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def parse(self, response, **kwargs):
-        scenes = self.get_scenes(response)
-        count = 0
-        for scene in scenes:
-            count += 1
-            yield scene
-
-        if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
-                meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def get_next_page_url(self, base, page, buildID):
-        pagination = self.get_selector_map('pagination')
-        pagination = pagination.replace("<buildID>", buildID)
-        return self.format_url(base, pagination % page)
+    def get_next_page_url(self, base, page):
+        # Page one is /categories/movies.html; later pages are movies_2.html, movies_3.html ...
+        suffix = '' if int(page) == 1 else '_%d' % int(page)
+        return self.format_url(self.start_urls[0], self.get_selector_map('pagination') % suffix)
 
     def get_scenes(self, response):
-        jsondata = json.loads(response.text)
-        if jsondata:
-            jsondata = jsondata['pageProps']['contents']
-            for scene in jsondata['data']:
-                item = SceneItem()
-                item['site'] = "Anal Jesse"
-                item['parent'] = "Anal Jesse"
-                item['network'] = "Anal Jesse"
-                item['title'] = self.cleanup_title(scene['title'])
-                item['description'] = self.cleanup_text(scene['description'])
-                item['performers'] = []
-                if "models_slugs" in scene:
-                    for performer in scene['models_slugs']:
-                        item['performers'].append(performer['name'])
-                item['date'] = self.parse_date(scene['publish_date']).isoformat()
-                item['id'] = scene['id']
-                if scene['videos_duration']:
-                    item['duration'] = self.duration_to_seconds(scene['videos_duration'])
-                item['image'] = scene['thumb'].replace(" ", "%20")
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-                item['tags'] = []
-                item['trailer'] = scene['poster_url'].replace(" ", "%20")
-                item['url'] = f"https://analjesse.com/trailers/{scene['slug']}"
+        # The listing carries title, date, duration, thumbnail and the set id, so those
+        # are passed through and only the description is read off the scene page.
+        for scene in response.xpath('//div[contains(@class, "latestUpdateB")][@data-setid]'):
+            link = scene.xpath('.//h4//a/@href').get()
+            if not link:
+                continue
 
-                yield self.check_item(item, self.days)
+            meta = {}
+            meta['id'] = scene.xpath('./@data-setid').get()
+
+            title = scene.xpath('.//h4//a/text()').get()
+            if title:
+                meta['title'] = self.cleanup_title(title)
+
+            info = [self.cleanup_text(x) for x in scene.xpath('.//ul[@class="videoInfo"]/li//text()').getall()]
+            info = [x for x in info if x]
+
+            scenedate = next((x for x in info if re.search(r'\d{4}', x)), None)
+            if scenedate:
+                scenedate = self.parse_date(scenedate, date_formats=['%b %d, %Y', '%B %d, %Y'])
+                if scenedate:
+                    meta['date'] = scenedate.strftime('%Y-%m-%d')
+
+            duration = next((x for x in info if re.search(r'\d+\s*min', x)), None)
+            if duration:
+                meta['duration'] = str(int(re.search(r'(\d+)', duration).group(1)) * 60)
+
+            # poster_4x is the largest still; the src on the <video> is a preview clip
+            image = scene.xpath('.//video/@poster_4x | .//video/@poster_3x | .//video/@poster_2x').get()
+            if image:
+                meta['image'] = self.format_link(response, image.replace('//content', '/content'))
+
+            trailer = scene.xpath('.//video/@src | .//video/source/@src').get()
+            if trailer:
+                meta['trailer'] = self.format_link(response, trailer.replace('//content', '/content'))
+
+            meta['performers'] = []
+            meta['performers'].append('Jesse Thai')
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)

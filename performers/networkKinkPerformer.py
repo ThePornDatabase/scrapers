@@ -48,10 +48,8 @@ class NetworkKinkPerformerPerformerSpider(BasePerformerScraper):
             # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -69,7 +67,7 @@ class NetworkKinkPerformerPerformerSpider(BasePerformerScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page, pagination), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = self.get_performers(response)
         count = 0
         for performer in performers:
@@ -100,7 +98,7 @@ class NetworkKinkPerformerPerformerSpider(BasePerformerScraper):
         return ""
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="col"]/div[contains(@class, "position-relative")]')
         for performer in performers:
             item = self.init_performer()

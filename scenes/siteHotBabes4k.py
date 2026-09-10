@@ -32,7 +32,7 @@ class SiteHotBabes4kSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']),
@@ -42,7 +42,7 @@ class SiteHotBabes4kSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def get_models(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         models = response.xpath('//div[@class="modelPic"]/a/@href').getall()
         for model in models:
             yield scrapy.Request(self.format_link(response, model), callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)

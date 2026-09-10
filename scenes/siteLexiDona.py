@@ -24,7 +24,7 @@ class SiteLexiDonaSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//ul[contains(@class, "media-list")]/li')
         for scene in scenes:
             keywords = scene.xpath('.//figcaption/following-sibling::em[1]/text()[1]')

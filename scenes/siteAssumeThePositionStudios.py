@@ -1,89 +1,95 @@
-import datetime
+import re
+
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteAssumeThePositionStudiosSpider(BaseSceneScraper):
     name = 'AssumeThePositionStudios'
     network = 'Spanking Online'
 
+    # The JSON API the spider was built on is gone: /api/site/<n>/updates/0 and
+    # /api/update/<id>/trailer/ both 308 to the bare domain and then 404.  Every
+    # site in the network now renders server-side -- /updates?page=N lists
+    # div.atp-video-card cards linking to /trailer/<id> -- so the producer list the
+    # API used to supply is enumerated from the network's own site switcher instead.
+    sites = {
+        'https://assumethepositionstudios.com': 'Assume The Position Studios',
+        'https://canedschoolgirls.com': 'Caned School Girls',
+        'https://disciplinaryarts.com': 'Disciplinary Arts',
+        'https://fetishflixx.com': 'Fetish Flixx',
+        'https://goodspanking.com': 'Good Spanking',
+        'https://goodspankingclassics.com': 'Good Spanking Classics',
+        'https://markedbutts.com': 'Marked Butts',
+        'https://otkspank.com': 'OTK Spank',
+        'https://spankedschoolgirl.com': 'Spanked School Girl',
+        'https://spankingdigital.com': 'Spanking Digital',
+        'https://spankingimages.com': 'Spanking Images',
+        'https://spankingonline.com': 'Spanking Online',
+        'https://spankmybottom.com': 'Spank My Bottom',
+        'https://spankpass.com': 'SpankPass',
+        'https://strictlyenglishonline.com': 'Strictly English Online',
+        'https://strictspanking.com': 'Strict Spanking',
+        'https://uspanking.com': 'Universal Spanking',
+        'https://worstbehaviorproductions.com': 'Worst Behavior Productions',
+    }
+
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
+        'title': '//h1//text()',
+        'description': '//div[contains(@class, "atp-video-details")]/preceding-sibling::div[1]/p//text()',
+        'date': '//span[contains(text(), "Release Date")]/following-sibling::span[1]/text()',
+        're_date': r'(\w+ \d{1,2}, \d{4})',
+        'date_formats': ['%b %d, %Y'],
         'image': '',
-        'performers': '',
+        'performers': '//span[contains(text(), "Models")]/following-sibling::div[1]//a[contains(@class, "atp-model-tag")]//text()',
         'tags': '',
         'duration': '',
         'trailer': '',
-        'external_id': r'',
-        'pagination': '',
+        'external_id': r'/trailer/(\d+)',
+        'pagination': '/updates?page=%s',
         'type': 'Scene',
     }
 
     async def start(self):
-        meta = {}
-        meta['page'] = self.page
-        meta['days'] = self.days
-        tod = datetime.datetime.now()
-        d = datetime.timedelta(days=int(meta['days']))
-        a = tod - d
-        meta['check_date'] = a.strftime('%Y-%m-%d')
-        # Spanking Online: 3, Spanking Online: 8, Strictly English Online: 9, Good Spanking: 11, Assume The Position Studios: 13, Spanking Online: 14, Spanking Online: 15, Universal Spanking: 22
-
-        for x in range(100):
-            link = f"https://www.assumethepositionstudios.com/api/site/{x}/updates/0"
-            yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
+        for site_url, site_name in self.sites.items():
+            meta = {'page': self.page, 'site': site_name, 'site_url': site_url}
+            yield scrapy.Request(url=self.get_next_page_url(site_url, self.page), callback=self.parse,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
-        jsondata = response.json()
-        jsondata = jsondata['data']
-        for scene in jsondata:
-            item = SceneItem()
-            item['id'] = scene['id']
-            item['date'] = scene['live_date']
-            item['site'] = scene['producer']['name']
-            item['parent'] = scene['producer']['name']
-            item['network'] = "Spanking Online"
-            if "Spanking Online" in item['site']:
-                item['url'] = f"{scene['producer']['url'].replace('http://', 'https://')}/trailer/{item['id']}"
-            else:
-                item['url'] = f"{scene['producer']['url'].replace('http://', 'https://')}/trailer?updateId={item['id']}"
+        for card in response.xpath('//div[contains(@class, "atp-video-card")]'):
+            link = card.xpath('.//a[contains(@href, "/trailer/")]/@href').get()
+            if not link:
+                link = card.xpath('./ancestor::a[contains(@href, "/trailer/")]/@href').get()
+            if not link or not re.search(self.get_selector_map('external_id'), link):
+                continue
 
-            meta['site_url'] = scene['producer']['url'].replace('http://', 'https://')
-            scene_link = f"{scene['producer']['url'].replace('http://', 'https://')}/api/update/{item['id']}/trailer/"
-            if item['date'] >= meta['check_date']:
-                meta['item'] = item.copy()
-                meta['scene'] = scene.copy()
-                yield scrapy.Request(scene_link, callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
+            meta = dict(response.meta)
+            meta['id'] = re.search(self.get_selector_map('external_id'), link).group(1)
 
-    def parse_scene(self, response):
-        meta = response.meta
-        item = meta['item']
-        jsondata = response.json()
-        jsondata = jsondata['data']
-        try:
-            item['title'] = jsondata['scene']['title']
-            item['description'] = jsondata['scene']['description']
-            item['tags'] = ['Spanking']
-            item['performers'] = []
-            for model in jsondata['models']:
-                item['performers'].append(model['name'].replace("\r", "").replace("\n", ""))
-            if "trailer" in jsondata and jsondata['trailer']:
-                item['trailer'] = meta['site_url'] + "/" + jsondata['trailer']['link']
-            else:
-                item['trailer'] = ''
-            item['trailer'] = item['trailer'].replace(" ", "%20")
-            if "image" in jsondata and jsondata['image']:
-                item['image'] = meta['site_url'] + "/" + jsondata['image']
-                item['image'] = item['image'].replace(" ", "%20")
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            else:
-                item['image'] = ""
-                item['image_blob'] = ""
-            if "Best of the Brits - Remastered - Vol 5" not in item['title']:
-                yield item
-        except:
-            print(f"API Not pulling for scene:  ID: {meta['scene']['id']}   Title: {meta['scene']['scene']['title']}   Site: {meta['scene']['producer']['name']}   Date: {meta['scene']['live_date']}")
+            # the still and the runtime are only on the card
+            image = card.xpath('.//img/@src').get()
+            if image:
+                meta['image'] = self.format_link(response, image)
+            runtime = card.xpath('.//span[contains(@class, "atp-video-duration")]/text()').get()
+            if runtime:
+                runtime = re.search(r'(?:(\d+):)?(\d{1,2}):(\d{2})', runtime)
+                if runtime:
+                    hours, minutes, seconds = (int(x) if x else 0 for x in runtime.groups())
+                    meta['duration'] = str(hours * 3600 + minutes * 60 + seconds)
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_image(self, response):
+        return response.meta.get('image', '')
+
+    def get_duration(self, response):
+        return response.meta.get('duration')
+
+    def get_tags(self, response):
+        return ['Spanking']
+
+    def get_parent(self, response):
+        return response.meta.get('site', 'Spanking Online')

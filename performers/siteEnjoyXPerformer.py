@@ -46,7 +46,7 @@ class PerformerSpider(BasePerformerScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta)
@@ -55,7 +55,7 @@ class PerformerSpider(BasePerformerScraper):
         return self.format_url(base, pagination % page)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[contains(@class, "pornstar-card")]/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, meta=meta)

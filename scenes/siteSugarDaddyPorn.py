@@ -32,7 +32,7 @@ class SiteSugarDaddyPornSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['videos']['data']
         for scene in jsondata:

@@ -56,7 +56,7 @@ class NetworkMiniskirtGirlzSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.page, meta['first_page'], meta['pagination'], meta['max_pages']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -69,7 +69,7 @@ class NetworkMiniskirtGirlzSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta['first_page'], meta['pagination'], meta['max_pages']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//video')
         for scene in scenes:
             item = self.init_scene()

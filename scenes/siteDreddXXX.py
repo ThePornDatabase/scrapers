@@ -46,7 +46,7 @@ class SiteDreddXXXSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h2[contains(text(), "New Releases")]/ancestor::div[contains(@class, "e-con-full")][1]/following-sibling::div[contains(@class, "e-con-boxed")][1]//article/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

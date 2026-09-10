@@ -1,5 +1,4 @@
 import re
-import sys
 import json
 import html
 import string
@@ -132,27 +131,30 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             yield scrapy.Request(link[0] + '/videos/', callback=self.start_requests_2, meta={'link': link[0], 'transit': link[1], 'site': link[2], 'performer': link[3]})
 
     def start_requests_2(self, response):
+        """Build the per-site API token out of the inline fox application config.
+
+        Several of the configured domains no longer serve their own tour -- they
+        redirect to another site, or in one case to google.com -- so the fox script
+        is absent and no token can be built.  That used to leave `token` unbound
+        (crashing the callback) or hit sys.exit(), which killed the whole crawl and
+        took every still-working site down with it.  Such a site is now skipped.
+        """
+        meta = self.copy_meta(response)
+        if not meta['link']:
+            return
 
         appscript = response.xpath('//script[contains(text(),"fox.createApplication")]/text()').get()
-        meta = response.meta
-        if meta['link']:
-            if appscript:
-                ah = re.search(r'"ah":"(.*?)"', appscript).group(1)
-                aet = re.search(r'"aet":([0-9]+?),', appscript).group(1)
-                if ah and aet:
-                    # ~ print(f'ah: {ah}')
-                    # ~ print(f'aet: {aet}')
-                    token = ah[::-1] + "/" + str(aet)
-                    # ~ print(f'Token: {token}')
+        ah = re.search(r'"ah":"(.*?)"', appscript) if appscript else None
+        aet = re.search(r'"aet":([0-9]+?),', appscript) if appscript else None
+        if not (ah and aet):
+            self.logger.warning('No fox application token on %s (redirected to %s) - skipping %s',
+                                meta['link'], response.url, meta['site'])
+            return
 
-            if not token:
-                sys.exit()
-            else:
-                meta['token'] = token
-
-            url = self.get_next_page_url(meta['link'], self.page, meta['token'], meta['transit'])
-            meta['page'] = self.page
-            yield scrapy.Request(url, callback=self.parse, meta=meta)
+        meta['token'] = ah.group(1)[::-1] + "/" + str(aet.group(1))
+        url = self.get_next_page_url(meta['link'], self.page, meta['token'], meta['transit'])
+        meta['page'] = self.page
+        yield scrapy.Request(url, callback=self.parse, meta=meta)
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -163,7 +165,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['token'], meta['transit']),
@@ -186,7 +188,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         return url
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         jsondata = jsondata['response']['collection']
 
@@ -199,7 +201,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             yield scrapy.Request(scene_url, callback=self.parse_scene, headers=self.headers, cookies=self.cookies, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = SceneItem()
 
         jsondata = response.text
@@ -224,13 +226,14 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
             if "jerkoff" in response.url or "dillionation" in response.url:
                 performers = data['tags']['collection']
                 for performer in performers:
-                    performername = performers[performer]['alias'].strip().title()
+                    # Some sites (mugursworld) hand back a numeric alias
+                    performername = str(performers[performer].get('alias') or '').strip().title()
                     if performername:
                         item['performers'].append(performername)
             elif "daddyscowgirl" not in response.url and "fallinlovia" not in response.url:
                 tags = data['tags']['collection']
                 for tag in tags:
-                    tagname = tags[tag]['alias'].strip().title()
+                    tagname = str(tags[tag].get('alias') or '').strip().title()
                     if tagname and "Model - " not in tagname:
                         item['tags'].append(tagname)
                 item['tags'] = self.clean_tags(item['tags'])
@@ -313,7 +316,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
                 yield scrapy.Request(modelurl, callback=self.get_performers_json, meta=meta)
 
     def get_performers_json(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
 
         jsontext = response.text
@@ -433,7 +436,7 @@ class NetworkAdultCentroSpider(BaseSceneScraper):
         newlist = []
         for word in tags:
             if word not in cleanlist:
-                if not re.search('(\d{4})', word):
+                if not re.search(r'(\d{4})', word):
                     matches = ['dani ', 'deni ', 'daniel', 'deniels', 'kaite']
                     if any(x in word.lower() for x in matches):
                         word = ''

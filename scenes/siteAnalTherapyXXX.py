@@ -28,7 +28,7 @@ class SiteAnalTherapyXXXSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article/div[contains(@class, "image_container")]')
         for scene in scenes:
             image = scene.xpath('./a/img/@src')

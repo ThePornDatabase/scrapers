@@ -30,7 +30,7 @@ class SiteRawFuckClubSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         # ~ scenes = response.xpath('//div[contains(@class,"slick-gallery-single")]/div[1]/div[1]/div[1]/div/a[contains(@class, "stateful-link")]/@href').getall()
         scenes = response.xpath('//a[@class="stateful-link"]/@href').getall()
         for scene in scenes:

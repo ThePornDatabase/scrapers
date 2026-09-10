@@ -27,7 +27,7 @@ class SitePissPlaySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@class, "video_thumb")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

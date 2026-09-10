@@ -31,7 +31,7 @@ class SiteMilitaryClassifiedSpider(BaseSceneScraper):
         return url
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="RecruitBox"]')
         for scene in scenes:
             title = scene.xpath('.//div[@class="RecruitBoxText"]/text()')

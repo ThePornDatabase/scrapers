@@ -20,9 +20,13 @@ class SiteCharlotteFetishSpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page):
-        page = str((int(page) - 1) * 21)
-        pagination = '/preview.php?view_mode=detail&id=%s'
-        return self.format_url(base, pagination % page)
+        # The listing steps 11 scenes at a time, not 21, and id=0 is not a valid
+        # offset -- it makes preview.php answer "A database error occurred"
+        # instead of the grid, so the first page is fetched without the parameter.
+        if int(page) == 1:
+            return self.format_url(base, '/preview.php')
+        offset = str((int(page) - 1) * 11)
+        return self.format_url(base, '/preview.php?view_mode=detail&id=%s' % offset)
 
     def get_scenes(self, response):
         scenes = response.xpath('//table[@width="710"]')

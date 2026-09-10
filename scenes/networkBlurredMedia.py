@@ -51,7 +51,7 @@ class SiteBlurredMediaSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page), callback=self.parse, meta=meta, headers=meta['siteheaders'], cookies=self.cookies, dont_filter=True)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -65,7 +65,7 @@ class SiteBlurredMediaSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(self.start_url, meta['page']), callback=self.parse, meta=meta, headers=meta['siteheaders'], dont_filter=True)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['videos']['data']
         for scene in jsondata:
@@ -74,7 +74,7 @@ class SiteBlurredMediaSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=meta['siteheaders'], dont_filter=True)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene = response.json()
         item = SceneItem()
         if "video" in scene and scene["video"]:

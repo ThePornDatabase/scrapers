@@ -27,7 +27,7 @@ class SiteMajorHotwifeSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h3/a[contains(@href, "videos")]/..')
         for scene in scenes:
             image = scene.xpath('./following-sibling::div[1]/div[contains(@class, "video_pic")][1]/a/img/@src')

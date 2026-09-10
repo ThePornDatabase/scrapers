@@ -81,7 +81,7 @@ class MovieSexVideoAllByStudioSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for studio in self.studios:
             meta['studio'] = studio['name']
             meta['studio_id'] = studio['id']
@@ -89,7 +89,7 @@ class MovieSexVideoAllByStudioSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.start_requests_3, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_3(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['categories'] = json.loads(response.text)
         meta['categories'] = meta['categories']['studiocate']
         meta['pagination'] = self.get_selector_map('pagination')
@@ -98,7 +98,7 @@ class MovieSexVideoAllByStudioSpider(BaseSceneScraper):
         yield scrapy.Request(meta['link'], callback=self.parse, method="POST", body=json.dumps(meta['payload']), meta=meta, headers=self.headers)
 
     def parse(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -114,7 +114,7 @@ class MovieSexVideoAllByStudioSpider(BaseSceneScraper):
             yield scrapy.Request(meta['link'], callback=self.parse, method="POST", body=json.dumps(meta['payload']), meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         moviejson = json.loads(response.text)
         moviejson = moviejson['results']['cresults']
         for movie in moviejson:
@@ -122,7 +122,7 @@ class MovieSexVideoAllByStudioSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_movie, method="POST", meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         moviedata = json.loads(response.text)
         movie = moviedata['cresults']
         item = SceneItem()

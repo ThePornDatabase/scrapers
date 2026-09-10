@@ -106,7 +106,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['group']),
@@ -130,7 +130,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         data = jsondata['items']
         for jsonentry in data:
@@ -158,7 +158,7 @@ class NetworkPubaNetworkSpider(BaseSceneScraper):
         return None
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = SceneItem()
 
         item['title'] = self.cleanup_title(meta['title'])

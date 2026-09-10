@@ -25,7 +25,7 @@ class FamilyTherapyXXXSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class,"salvattore_content")]//article[contains(@id,"post")]')
         for scene in scenes:
             image = scene.xpath('./div/a/img/@src')

@@ -12,11 +12,11 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
 
     start_urls = [
         ['https://tour.nebraskacoeds.com/', '/categories/Movies_%s_d.html', 'Nebraska Coeds'],
-        ['https://www.springbreaklife.com/', '/categories/Movies_%s_d.html', 'Spring Break Life'],
-        ['https://tour.southbeachcoeds.com/', '/categories/Movies_%s_d.html', 'South Beach Coeds'],
-        ['https://tour.afterhoursexposed.com/', '/categories/Movies_%s_d.html', 'After Hours Exposed'],
-        ['https://tour.eurocoeds.com/', '/categories/Movies_%s_d.html', 'Euro Coeds'],
-        ['https://tour.misspussycat.com/', '/categories/Movies_%s_d.html', 'Miss Pussycat'],
+        # ['https://www.springbreaklife.com/', '/categories/Movies_%s_d.html', 'Spring Break Life'],
+        # ['https://tour.southbeachcoeds.com/', '/categories/Movies_%s_d.html', 'South Beach Coeds'],
+        # ['https://tour.afterhoursexposed.com/', '/categories/Movies_%s_d.html', 'After Hours Exposed'],
+        # ['https://tour.eurocoeds.com/', '/categories/Movies_%s_d.html', 'Euro Coeds'],
+        # ['https://tour.misspussycat.com/', '/categories/Movies_%s_d.html', 'Miss Pussycat'],
     ]
 
     selector_map = {
@@ -41,7 +41,7 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     url = meta['url']
@@ -55,9 +55,9 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
-        scenes = response.xpath('//div[@class="updateThumb"]/a[contains(@href,"/trailers/")]/../..|//div[@class="updateItem"]/a[contains(@href,"/trailers/")]/..|//div[@class="updateItem"]/a[contains(@href,"content/")]/..')
+        scenes = response.xpath('//div[@class="updateItem"][.//a[contains(@href,"/trailers/") or contains(@href,"content/")]]')
         for scene in scenes:
             item = SceneItem()
 
@@ -103,10 +103,20 @@ class NetworkNebraskaCoedsSpider(BaseSceneScraper):
                 item['trailer'] = ''
 
             url = scene.xpath('./div[@class="updateThumb"]/a/@href|./a/@href').get()
+            if url and '/trailers/' not in url:
+                # Updates that have no trailer video yet link the fancybox image instead of
+                # the scene page, so rebuild the scene url from the title the way the tour does
+                url = None
+            if not url and item['title']:
+                uri = urlparse(response.url)
+                url = uri.scheme + "://" + uri.netloc + "/trailers/" + re.sub(r'\s+', '-', item['title']) + ".html"
             if url:
                 item['url'] = url.strip()
-                item['id'] = re.search(r'.*/(.*).html', item['url']).group(1)
-                item['id'] = item['id'].lower().strip()
+                sceneid = re.search(r'.*/(.*)\.html', item['url'])
+                if sceneid:
+                    item['id'] = sceneid.group(1).lower().strip()
+                else:
+                    item['id'] = ''
             else:
                 item['url'] = ''
                 item['id'] = ''

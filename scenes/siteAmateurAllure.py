@@ -27,7 +27,7 @@ class AmateurAllureSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="update_thumbnail"]')
         for scene in scenes:
             images = scene.xpath('./a/img/@srcset')

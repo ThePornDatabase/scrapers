@@ -64,13 +64,13 @@ class SiteLustCinemaSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, headers=meta['headers'], meta=meta)
 
     def get_series(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         seriesjson = response.json()
         seriesjson = seriesjson['data']
         for series in seriesjson:
@@ -85,7 +85,7 @@ class SiteLustCinemaSpider(BaseSceneScraper):
             yield scrapy.Request(seriesurl, callback=self.get_scenes, headers=meta['headers'], meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenejson = response.json()
         scenejson = scenejson['data']
         for scene in scenejson['episodes']:

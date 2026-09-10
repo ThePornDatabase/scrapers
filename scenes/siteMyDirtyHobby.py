@@ -31,14 +31,14 @@ class SiteMyDirtyHobbySpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['link'] = "https://www.mydirtyhobby.com/content/api/videos"
         meta['page'] = self.page
         json_data = {"country": "no", "user_language": "en", "listing": "latest_video", "pageSize": 40, "page": meta['page']}
         yield scrapy.Request(meta['link'], method='POST', body=json.dumps(json_data), callback=self.parse, headers={'Content-Type': 'application/json'}, cookies=self.cookies, meta=meta)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:

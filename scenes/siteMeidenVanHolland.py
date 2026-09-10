@@ -100,7 +100,7 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers_json, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         yield scrapy.Request(url=self.get_next_page_url(self.base_url, self.page), callback=self.parse, meta=meta, headers=self.headers_json)
 
     def parse(self, response, **kwargs):
@@ -111,7 +111,7 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
             yield scene
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(
@@ -122,7 +122,7 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
                                      cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         data = jsondata['data']
         for jsonentry in data:
@@ -133,7 +133,7 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.parse_scene, meta=meta, headers=self.headers_json)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         scene = jsondata['data']
         item = self.init_scene()

@@ -60,26 +60,42 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
         #'https://wierdjapan.com',  #Requires Membership
     ]
 
+    # The tour was rebuilt on a tube-style theme: the b-breadcrumb / itemprop markup
+    # is gone and div.block-details renders empty (its contents are filled in by
+    # script), so the scene page only reliably yields og:title and og:image.  The
+    # listing card carries the runtime and preview, which get_scenes passes through.
     selector_map = {
-        'title': '//span[@class="b-breadcrumb-text"]/text()',
-        'description': '//p[@itemprop="description"]/text()',
-        'date': '//div[contains(text(),"Added")]/following-sibling::div[1]/text()',
-        'date_formats': ['%d %b %Y'],
-        'image': '//div[@class="b-player-body"]/div/img/@src',
+        'title': '//meta[@property="og:title"]/@content|//h1/text()',
+        'description': '',
+        'date': '',
+        'image': '//meta[@property="og:image"]/@content',
         'image_blob': True,
-        'performers': '//p[@itemprop="actor"]/a/span/text()',
-        'tags': '//p[@class="b-video-info__text"]/a[contains(@href,"/category/") or contains(@href,"/tag/")]/text()',
-        'external_id': r'.*\/(.*?)$',
+        'performers': '',
+        'tags': '',
+        'external_id': r'/video/(\d+)/',
         'trailer': '',
-        'pagination': '/videos/newest/%s'
+        'pagination': '/latest-updates/%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//a[contains(@class,"b-videos-item-link")]/@href').getall()
-        for scene in scenes:
-            print(scene)
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        # the b-videos-item-link class is gone; each card is a div.item whose anchor
+        # points straight at /video/<id>/<slug>
+        for card in response.xpath('//div[contains(@class, "item")][.//a[contains(@href, "/video/")]]'):
+            scene = card.xpath('.//a[contains(@href, "/video/")]/@href').get()
+            if not scene or not re.search(self.get_selector_map('external_id'), scene):
+                continue
+            meta = {}
+            runtime = card.xpath('.//div[@class="duration"]/text()').get()
+            if runtime and ':' in runtime:
+                meta['duration'] = self.duration_to_seconds(runtime.strip())
+            trailer = card.xpath('.//img/@data-preview').get()
+            if trailer:
+                meta['trailer'] = trailer.strip()
+            image = card.xpath('.//img/@data-original').get()
+            if image and image.strip():
+                meta['image'] = self.format_link(response, image.strip())
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):
         title = response.xpath(self.get_selector_map('title')).get()
@@ -107,6 +123,10 @@ class NetworkAllJapanesePassSpider(BaseSceneScraper):
         return []
 
     def get_performers(self, response):
+        # guard the empty selector the way get_tags above does: process_xpath falls
+        # through to css() for anything not starting with // and then raises on ''
+        if not self.get_selector_map('performers'):
+            return []
         performers = self.process_xpath(response, self.get_selector_map('performers')).getall()
         if performers:
             if "Japanese AV Model" in performers:

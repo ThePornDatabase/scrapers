@@ -11,8 +11,6 @@ import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-true = True
-false = False
 
 
 class SiteMyDirtyHobbySpecificPerformerSpider(BaseSceneScraper):
@@ -23,7 +21,9 @@ class SiteMyDirtyHobbySpecificPerformerSpider(BaseSceneScraper):
 
     start_url = 'https://www.mydirtyhobby.com'
 
-    cookies = [{"domain":"www.mydirtyhobby.com","hostOnly":true,"httpOnly":false,"name":"__s","path":"/profil","sameSite":"no_restriction","secure":true,"session":true,"storeId":"0","value":"66B8EFDC-42FE728201BBC3CF4-2325A4"},{"domain":"www.mydirtyhobby.com","expirationDate":1744306131.472444,"hostOnly":true,"httpOnly":false,"name":"__l","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"66167A96-42FE728201BB3790AC-1A918"},{"domain":"www.mydirtyhobby.com","hostOnly":true,"httpOnly":false,"name":"PHPSESSID","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"ts7n1n91lqo5udsm2vilfhj5an"},{"domain":"www.mydirtyhobby.com","hostOnly":true,"httpOnly":false,"name":"LBSERVERID","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"ded7256"},{"domain":".mydirtyhobby.com","expirationDate":1725988731,"hostOnly":false,"httpOnly":false,"name":"ats","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"eyJhIjo5NDk2LCJjIjo0NTgxMzMyNSwibiI6MjEsInMiOjI0MSwiZSI6ODUzLCJwIjozfQ=="},{"domain":".mydirtyhobby.com","expirationDate":1723482460,"hostOnly":false,"httpOnly":false,"name":"atsd","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"6e172895-532b-495a-afc4-f500661448e0"},{"domain":".mydirtyhobby.com","expirationDate":1723396960,"hostOnly":false,"httpOnly":false,"name":"atsm","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"6e172895-532b-495a-afc4-f500661448e0"},{"domain":".mydirtyhobby.com","hostOnly":false,"httpOnly":false,"name":"atss","path":"/","sameSite":"no_restriction","secure":true,"session":true,"storeId":"0","value":"6e172895-532b-495a-afc4-f500661448e0"},{"domain":"www.mydirtyhobby.com","hostOnly":true,"httpOnly":false,"name":"__s","path":"/","sameSite":"no_restriction","secure":true,"session":true,"storeId":"0","value":"66B8EFDC-42FE728201BBC3CF4-2325AC"},{"domain":".mydirtyhobby.com","hostOnly":false,"httpOnly":false,"name":"etaguid","path":"/","sameSite":"no_restriction","secure":true,"session":true,"storeId":"0","value":"ecd819e3-006d-491f-8ced-26b60144d651"},{"domain":".mydirtyhobby.com","expirationDate":1754932063.298792,"hostOnly":false,"httpOnly":false,"name":"AGEGATEPASSED","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"1"},{"domain":".mydirtyhobby.com","hostOnly":false,"httpOnly":true,"name":"MDHSID","path":"/","sameSite":"unspecified","secure":true,"session":true,"storeId":"0","value":"5n2fdlo5bp75u4v9hibe08da7a"},{"domain":".mydirtyhobby.com","expirationDate":1723418331.163237,"hostOnly":false,"httpOnly":true,"name":"MDH","path":"/","sameSite":"unspecified","secure":true,"session":false,"storeId":"0","value":"%21eyJvX2dlbmRlciI6IkEiLCJpc0xvZ2dlZCI6Im4iLCJscGFnZWlkIjo2LCJra0lEIjo0ODgzNiwibGFuZyI6InVzIiwibGFuZCI6ImRlIn0%3D%24018504784dd5589deece074beea2c5e47ff3a170"},{"domain":"www.mydirtyhobby.com","expirationDate":1754932644,"hostOnly":true,"httpOnly":false,"name":"COOKIE_CONSENT","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"000"},{"domain":".mydirtyhobby.com","expirationDate":1757956731.085989,"hostOnly":false,"httpOnly":false,"name":"atstrackPiece1","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"eyJhZmZVcmwiOiJjYXNoNG1lbWJlci5jb20iLCJhZmZDb2RlIjoiZXlKaElqbzVORGsyTENKaklqbzBOVGd4TXpNeU5Td2liaUk2TWpFc0luTWlPakkwTVN3aVpTSTZPRFV6TENKd0lqb3pmUT09IiwibmV0d29ya0NvZGUiOiJtZGgiLCJVSUQiOiI4NDA1NjU4My04ZjRmLTQ2MGItOTU3Ny1kOWY1OTY5MzliM2QiLCJTVUlEIjoiNmUxNzI4OTUtNTMyYi00OTVhLWFmYzQtZjUwMDY2MTQ0OGUwIiwiZGF0YSI6eyJ2YWx1ZSI6MSwiYWIiOjAsInVzZXJBZ2VudCI6Ik1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xMjcuMC4wLjAgU2FmYXJpLzUzNy4zNiBFZGcvMTI3LjAuMC4wIiwiYWRJZCI6MCwicmVmZXJyYWxEb21haW4iOiJodHRwOi8vb3JnYW5pYy8iLCJyZWZlcnJhbFBhdGgiOiJodHRwOi8vb3JnYW5pYy8iLCJ2b3J0ZXhHdWlkIjoiZWNkODE5ZTMtMDA2ZC00OTFmLThjZWQtMjZiNjAxNDRkNjUxIn0sImRtcCI6e30sImRlZmF1bHRDb2RlIjoiZXlKaElqbzVORGsyTENKaklqbzBORFEzTXpNMk5Dd2liaUk2TWpFc0luTWlPakkwTVN3aVpTSTZPRFV6TENKd0lqb3pmUT09Iiwic3BsaXRBdGxhc0RhdGEiOnRydWUsImRpc2FibGUiOmZhbHNlLCJzdGVwcyI6Inw7ZDt2O3Q7dTt8O2FjO3Y7dDt8O2FjO3Y7dDt8O2FjO3Y7dDt8Iiwidm9ydGV4ZGF0YSI6eyJfc3NjcmVlbiI6IjE5MjAgeCAxMDgwIiwiX3Nicm93"},{"domain":".mydirtyhobby.com","expirationDate":1757956731.086051,"hostOnly":false,"httpOnly":false,"name":"atstrackPiece2","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"c2VyIjoiQ2hyb21lIiwiX3Nicm93c2VyVmVyc2lvbiI6IjEyMy4wLjAuMCIsIl9ibW9iaWxlIjpmYWxzZSwiX3NvcyI6IldpbmRvd3MgTlQgNC4wIiwiX3Nvc1ZlcnNpb24iOiJOVCA0LjAiLCJfc2ZsYXNoVmVyc2lvbiI6Im5vIGNoZWNrIiwiX3NsYW5ndWFnZXMiOiJlbi1VUyxlbiIsImd1aWQiOiJlY2Q4MTllMy0wMDZkLTQ5MWYtOGNlZC0yNmI2MDE0NGQ2NTEiLCJod21vZGVsIjoiVW5rbm93biIsImh3ZmFtaWx5IjoiRW11bGF0b3IiLCJkZXZ0eXBlIjoiRGVza3RvcCJ9LCJ2aXNpdFN0YXJ0IjoxNzIzMzk2MDYwNDU0LCJjb2RlVHlwZSI6ImF0cyJ9"}]
+    # Age gate and consent only.  Session and analytics cookies (PHPSESSID, MDHSID,
+    # MDH, etaguid, ats*) were removed; they identified a specific browser.
+    cookies = {"AGEGATEPASSED": "1", "COOKIE_CONSENT": "000"}
 
     paginations = [
         {"site": "My Dirty Hobby: Lara Cumkitten", "profile": "5160121-Lara-CumKitten", "performer": "Lara Cumkitten", "date_format": "%d/%m/%y"},
@@ -35,6 +35,11 @@ class SiteMyDirtyHobbySpecificPerformerSpider(BaseSceneScraper):
         {"site": "My Dirty Hobby: Fickfreundinnen", "profile": "50381232-Fickfreundinnen", "performer": "Ramona", "date_format": "%d/%m/%y"},
         {"site": "My Dirty Hobby: Schnuggie91", "profile": "4544623-schnuggie91", "performer": "Sophie", "date_format": "%d/%m/%y"},
         {"site": "My Dirty Hobby: Leonie-pur", "profile": "4206129-Leonie-pur", "performer": "Leonie-pur", "date_format": "%d/%m/%y"},
+        {"site": "My Dirty Hobby: PiercingKitty", "profile": "2930773-PiercingKitty", "performer": "Piercing Kitty", "date_format": "%d/%m/%y"},
+        {"site": "My Dirty Hobby: AureliaVelvet", "profile": "54783872-AureliaVelvet", "performer": "Aurelia Velvet", "date_format": "%d/%m/%y"},
+        {"site": "My Dirty Hobby: SelinaMorgan", "profile": "54858942-SelinaMorgan", "performer": "Selina Morgan", "date_format": "%d/%m/%y"},
+        {"site": "My Dirty Hobby: MaryHaze", "profile": "437580-MaryHaze", "performer": "Mary Haze", "date_format": "%d/%m/%y"},
+        {"site": "My Dirty Hobby: Sadistra", "profile": "13931281-Sadistra", "performer": "Sadistra", "date_format": "%d/%m/%y"},
     ]
 
     selector_map = {
@@ -55,7 +60,7 @@ class SiteMyDirtyHobbySpecificPerformerSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for pagination in self.paginations:
             meta['site'] = pagination['site']
             meta['profile'] = pagination['profile']
@@ -64,7 +69,7 @@ class SiteMyDirtyHobbySpecificPerformerSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.page, meta['profile']), method='POST', callback=self.parse, meta=meta, headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -79,7 +84,7 @@ class SiteMyDirtyHobbySpecificPerformerSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta['profile']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         if jsondata:
             jsondata = jsondata['items']

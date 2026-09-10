@@ -1,7 +1,7 @@
-import re
-from requests import get
-import string
+import json
+
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -11,64 +11,107 @@ class SiteBigLatinAnalSpider(BaseSceneScraper):
     parent = 'Big Latin Anal'
     site = 'Big Latin Anal'
 
+    # home/home.html renders nothing server-side -- section.modelo never appears
+    # in the served HTML, which is why the old selectors matched nothing and the
+    # page looked like a bare "coming soon" countdown. assets/js/pages/home.js
+    # fetches the catalogue from the site's own JSON API and draws it in, so the
+    # API is read directly.
+    #
+    # The front end appends a clientUuid for its like/view tracking; it is not
+    # required to read the listing, so none is sent. limit is capped high enough
+    # to take the whole catalogue in one request (43 videos at the time of
+    # writing), and pagination is still honoured if it ever outgrows that.
     start_urls = [
-        'https://www.biglatinanal.com/home/home.html',
+        'https://www.biglatinanal.com',
     ]
+
+    api_url = 'https://www.biglatinanal.com/api/videos?page=%s&limit=%d'
+    # Every image lives in the site's R2 bucket; see assets/js/utils/cdn.js.
+    image_base = 'https://cdn.biglatinanal.com/biglatinanal/gallery/'
+    tour_url = 'https://www.biglatinanal.com/home/home.html'
+    per_page = 50
 
     selector_map = {
         'external_id': r'',
         'pagination': '',
+        'type': 'Scene',
     }
 
     async def start(self):
-        meta = {}
+        yield scrapy.Request(self.api_url % (self.page, self.per_page),
+                             callback=self.parse, meta={'page': self.page},
+                             headers=self.headers, cookies=self.cookies)
 
-        ip = get('https://api.ipify.org').content.decode('utf8')
-        print('My public IP address is: {}'.format(ip))
+    def parse(self, response, **kwargs):
+        try:
+            payload = json.loads(response.text)
+        except ValueError:
+            print("*** BigLatinAnal: /api/videos did not return JSON")
+            return
 
-        for link in self.start_urls:
-            yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
+        count = 0
+        for video in payload.get('data') or []:
+            item = self.build_item(video)
+            if item:
+                count += 1
+                yield self.check_item(item, self.days)
 
-    def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//section[@class="modelo"]')
-        for scene in scenes:
-            item = self.init_scene()
+        pagination = payload.get('pagination') or {}
+        meta = self.copy_meta(response)
+        if count and pagination.get('hasNext') and meta['page'] < self.limit_pages:
+            meta = dict(meta)
+            meta['page'] = meta['page'] + 1
+            print('NEXT PAGE: ' + str(meta['page']))
+            yield scrapy.Request(self.api_url % (meta['page'], self.per_page),
+                                 callback=self.parse, meta=meta,
+                                 headers=self.headers, dont_filter=True)
 
-            performer = scene.xpath('./div[@class="global"]/span[1]/text()')
-            performer = re.sub(r'[^A-Za-z ]+', '', performer.get())
-            item['performers'] = [string.capwords(performer.strip())]
+    def build_item(self, video):
+        title = (video.get('title') or '').strip()
+        if not title or not video.get('id'):
+            return None
 
-            title = scene.xpath('./div[@class="global"]/h2/text()').get()
-            title = re.sub(r'[^A-Za-z -]+', '', title)
-            item['title'] = title
-            item['title'] = string.capwords(item['title'])
+        item = self.init_scene()
+        item['title'] = self.cleanup_title(title)
+        item['id'] = str(video['id'])
+        # The catalogue is one page with no per-scene route, so every scene
+        # points at the tour.
+        item['url'] = self.tour_url
+        item['date'] = self.get_date(video)
+        item['duration'] = self.get_duration(video)
 
-            image = scene.xpath('./div[contains(@class,"imagenes")]/div[2]/img/@src')
-            if image:
-                item['image'] = self.format_link(response, image.get())
-                item['image'] = item['image'].replace("../", "")
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-                item['id'] = re.search(r'(\d+)\.', item['image']).group(1).lstrip("0")
+        gallery = ((video.get('media') or {}).get('gallery')) or []
+        item['image'] = (self.image_base + gallery[0]) if gallery else ''
+        item['image_blob'] = self.get_image_blob_from_link(item['image']) if item['image'] else ''
 
-            item['url'] = response.url
-            item['site'] = 'Big Latin Anal'
-            item['parent'] = 'Big Latin Anal'
-            item['network'] = 'Big Latin Anal'
+        item['performers'] = [model.strip() for model in video.get('models') or [] if model and model.strip()]
+        # The API carries no synopsis or tags.
+        item['description'] = ''
+        item['tags'] = []
+        item['trailer'] = ''
+        item['site'] = self.site
+        item['parent'] = self.parent
+        item['network'] = self.network
+        item['type'] = 'Scene'
+        return item
 
-            item['performers_data'] = self.get_performers_data(item['performers'])
+    def get_date(self, video):
+        # Dates read dd/mm/yyyy: across the catalogue the first field reaches 29
+        # while the second never passes 12, so it is day-first, not month-first.
+        scenedate = video.get('date')
+        if scenedate:
+            parsed = self.parse_date(scenedate.strip(), date_formats=['%d/%m/%Y'])
+            if parsed:
+                return parsed.isoformat()
+        return ''
 
-            yield item
-
-    def get_performers_data(self, performers):
-        performers_data = []
-        if len(performers):
-            for performer in performers:
-                perf = {}
-                perf['name'] = performer
-                perf['extra'] = {}
-                perf['extra']['gender'] = "Female"
-                perf['network'] = "Big Latin Anal"
-                perf['site'] = "Big Latin Anal"
-                performers_data.append(perf)
-        return performers_data
+    @staticmethod
+    def get_duration(video):
+        # "14:07.00" is mm:ss with a fractional-seconds tail.
+        runtime = (video.get('time') or '').split('.')[0]
+        parts = [p for p in runtime.split(':') if p.isdigit()]
+        if len(parts) == 2:
+            return str(int(parts[0]) * 60 + int(parts[1]))
+        if len(parts) == 3:
+            return str(int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2]))
+        return None

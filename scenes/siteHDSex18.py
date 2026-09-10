@@ -28,7 +28,7 @@ class SiteHDSex18Spider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="thumb-video cf"]')
         for scene in scenes:
             scenedate = scene.xpath('.//span[contains(@class,"date-added")]//text()')

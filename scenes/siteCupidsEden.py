@@ -28,7 +28,7 @@ class SiteCupidsEdenSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//span[contains(@class, "title-info")]/..')
         for scene in scenes:
             image = scene.xpath('.//img/@src')

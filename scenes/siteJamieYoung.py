@@ -1,186 +1,122 @@
 import re
-import html
-import json
-import requests
-import unidecode
+from urllib.parse import urlsplit, urlunsplit, quote
+import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
+# Template for Next.js sites that serve their listing JSON from
+# /_next/data/<buildID>/....json.  The buildID changes with every site
+# deploy, so it is scraped from the homepage on each run and substituted
+# into the pagination string.  Based on siteDickHDDaily.py.
+#
+# Fill in: name/network/parent/site, start_url, pagination, and the scene
+# URL path in get_scenes.  Verify the JSON keys against a real response.
 class SiteJamieYoungSpider(BaseSceneScraper):
     name = 'JamieYoung'
-    network = "Jamie Young"
-    parent = "Jamie Young"
-    site = "Jamie Young"
+    network = 'Jamie Young'
+    parent = 'Jamie Young'
+    site = 'Jamie Young'
 
-    custom_settings = {'CONCURRENT_REQUESTS': '1',
-                       'AUTOTHROTTLE_ENABLED': 'True',
-                       'AUTOTHROTTLE_DEBUG': 'False',
-                       'DOWNLOAD_DELAY': '2',
-                       'CONCURRENT_REQUESTS_PER_DOMAIN': '1',
-                       }
-
-    start_urls = [
-        'https://jamie-young.com',
-    ]
-
-    headers = {
-        'age_gate': '18',
-        'wpml_browser_redirect_test': '0',
-    }
+    start_url = 'https://jamie-young.com'
 
     selector_map = {
-        'performers': '//span[@itemprop="actors"]/a/text()',
-        'trailer': '',
         'external_id': r'',
-        'pagination': '/index.php/wp-json/wp/v2/video_skrn?page=%s&per_page=10'
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc',
+        'type': 'Scene',
     }
 
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request(self.start_url, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = self.copy_meta(response)
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = self.copy_meta(response)
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
+
+    @staticmethod
+    def clean_url(url):
+        """Percent-encode unsafe characters (e.g. spaces) in the URL path."""
+        if not url:
+            return url
+        parts = urlsplit(url)
+        return urlunsplit(parts._replace(path=quote(parts.path, safe='/')))
+
     def get_scenes(self, response):
-
-        reqheaders = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'}
-        jsondata = json.loads(response.text)
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['videos']['data']
         for scene in jsondata:
-            item = SceneItem()
-            item['id'] = scene['id']
-            item['url'] = scene['link']
-            item['date'] = scene['date']
-            item['title'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).replace("\n", " ").strip())
-
-            item['image'] = ''
-            item['image_blob'] = ''
-            link = f"https://jamie-young.com/index.php/wp-json/wp/v2/media?parent={item['id']}"
-            req = requests.get(link, headers=reqheaders, timeout=10)
-            if req and len(req.text) > 5:
-                imagelist = json.loads(req.text)
-                images = re.findall(r'https.*?\.(?:png|jpg)', imagelist[0]['description']['rendered'])
-                imagelink = None
-                if len(images):
-                    if not imagelink:
-                        for image in images:
-                            if "2048x" in image:
-                                imagelink = image
-
-                    if not imagelink:
-                        for image in images:
-                            if "1536x" in image:
-                                imagelink = image
-
-                    if not imagelink:
-                        for image in images:
-                            if "1200x" in image:
-                                imagelink = image
-
-                    if not imagelink:
-                        for image in images:
-                            if "1024x" in image:
-                                imagelink = image
-
-                if not imagelink:
-                    item['image'] = imagelist[0]['guid']['rendered']
-                else:
-                    item['image'] = imagelink
+            item = self.init_scene()
+            item['title'] = self.cleanup_title(scene['title'])
+            item['description'] = self.cleanup_description(scene['description'])
+            item['date'] = self.parse_date(re.search(r'(\d{4}/\d{2}/\d{2})', scene['publish_date']).group(1), date_formats=['%Y/%m/%d']).strftime('%Y-%m-%d')
+            item['image'] = self.clean_url(scene['trailer_screencap'])
+            if ".mp4" not in item['image']:
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            else:
+                item['image'] = ""
+                item['image_blob'] = ""
+            item['performers'], item['performers_data'] = self.get_performers_data(scene['models_thumbs'])
+            item['tags'] = scene['tags']
+            if "seconds_duration" in scene:
+                item['duration'] = scene['seconds_duration']
+            else:
+                item['duration'] = None
+            item['id'] = scene['id']
+            item['url'] = f"{self.start_url}/videos/{scene['slug']}"
+            item['site'] = self.site
+            item['parent'] = self.parent
+            item['network'] = self.network
+            item['type'] = self.get_selector_map('type')
+            yield self.check_item(item, self.days)
 
-            item['performers'] = []
-            link = f"https://jamie-young.com/index.php/wp-json/wp/v2/video-cast?post={item['id']}"
-            req = requests.get(link, headers=reqheaders, timeout=10)
-            if req and len(req.text) > 5:
-                performerlist = json.loads(req.text)
-                for performer in performerlist:
-                    if performer['name'].lower() == "jamie":
-                        item['performers'].append("Jamie Young")
-                    else:
-                        item['performers'].append(self.cleanup_title(performer['name']))
-            if "Jamie Young" not in item['performers']:
-                item['performers'].append("Jamie Young")
+    # The listing JSON carries no gender, so it is set by name for the two
+    # performers this site features.  Anyone else is listed as a performer
+    # but gets no performers_data entry.
+    genders = {
+        'jamie': 'Female',
+        'nico': 'Male',
+    }
 
-            item['description'] = scene['content']['rendered']
-            if item['description']:
-                item['description'] = unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', item['description'])).replace("\n", " ").strip())
-                if 'vc_raw_html' in item['description']:
-                    item['description'] = ''
-                if ".arm_" in item['description']:
-                    item['description'] = re.sub(r'\.arm_.*\}', '', item['description'])
-                    item['description'] = item['description'].replace('\n', '').replace('\r', '').replace('\t', '').replace('  ', ' ').replace('  ', ' ').replace('  ', ' ')
-                    # ~ print(f"Title: {item['title']}    Desc: {item['description']}")
-                if "Timestamps" in item['description']:
-                    timestamps = re.search(r'Timestamps?:?(.*)', item['description']).group(1)
-                    item['description'] = re.search(r'(.*)Timestamp', item['description']).group(1)
-                    timestamps = re.sub(r'(\d)-(\d)', r'\1 - \2', timestamps)
-                    timestamps = re.sub(r' (\d{1,2}:\d{2}) ', r' 00:\1 ', timestamps)
-                    timestamps = re.sub(r' (\d{1,2}:\d{2}) ', r' 00:\1 ', timestamps)
-                    timestamps = re.sub(r' (\d:\d{2}:\d{2}) ', r' 0\1 ', timestamps)
-                    timestamps = re.findall(r'[a-zA-Z]+ ?[a-zA-Z]+?:\s+?\d{2}:\d{2}:\d{2} - \d{2}:\d{2}:\d{2}', timestamps)
-                    item['markers'] = []
-                    for timestamp in timestamps:
-                        marker = {}
-                        stamps = re.search(r'([a-zA-Z]+ ?[a-zA-Z]+?):\s+?(\d{2}:\d{2}:\d{2}) - (\d{2}:\d{2}:\d{2})', timestamp)
-                        marker['name'] = self.cleanup_title(stamps.group(1))
-                        marker['start'] = self.get_second(stamps.group(2))
-                        marker['end'] = self.get_second(stamps.group(3))
-                        item['markers'].append(marker)
-                    if len(item['markers']):
-                        item['markers'] = self.clean_markers(item['markers'])
-
-            tags = []
-            link = f"https://jamie-young.com/index.php/wp-json/wp/v2/video-genres?post={item['id']}"
-            req = requests.get(link, headers=reqheaders, timeout=10)
-            if req and len(req.text) > 5:
-                taglist = []
-                taglist = json.loads(req.text)
-                for tag in taglist:
-                    tags.append(tag['name'])
-            item['tags'] = tags
-
-            item['trailer'] = ""
-            item['site'] = "Jamie Young"
-            item['parent'] = "Jamie Young"
-            item['network'] = "Jamie Young"
-
-            if "Teaser" not in item['tags'] and "teaser" not in item['title'].lower():
-                yield self.check_item(item, self.days)
-
-    def get_second(self, marker):
-        marker = re.search(r'(\d{2}):(\d{2}):(\d{2})', marker)
-        hours = int(marker.group(1))
-        minutes = int(marker.group(2))
-        seconds = int(marker.group(3))
-
-        return str((hours * 3600) + (minutes * 60) + seconds)
-
-    def clean_markers(self, markers):
-        markers = sorted(markers, key=lambda k: (k['name'].lower(), int(k['start']), int(k['end'])))
-        marker_final = []
-        marker_work = markers.copy()
-        marker2_work = markers.copy()
-        for test_marker in marker_work:
-            if test_marker in markers:
-                for marker in marker2_work:
-                    if test_marker['name'].lower().strip() == marker['name'].lower().strip():
-                        test_start = int(test_marker['start'])
-                        mark_start = int(marker['start'])
-                        test_end = int(test_marker['end'])
-                        mark_end = int(marker['end'])
-                        if test_start < mark_start or test_start == mark_start:
-                            test1 = mark_start - test_end
-                            test2 = mark_start - test_start
-                            if 0 < test1 < 60 or 0 < test2 < 60 or test1 == 0 or test2 == 0:
-                                if mark_end > test_end:
-                                    test_marker['end'] = marker['end']
-                                    if marker in markers:
-                                        markers.remove(marker)
-                            if (test_end > mark_start) and (mark_end > test_end):
-                                test_marker['end'] = marker['end']
-                                if marker in markers:
-                                    markers.remove(marker)
-                            if test_start < mark_start and (mark_end < test_end or test_end == mark_end):
-                                if marker in markers:
-                                    markers.remove(marker)
-                marker2_work = markers.copy()
-
-                if test_marker in markers:
-                    marker_final.append(test_marker)
-                    markers.remove(test_marker)
-        marker_final = sorted(marker_final, key=lambda k: (int(k['start']), int(k['end'])))
-        return marker_final
+    def get_performers_data(self, models):
+        performers = []
+        performers_data = []
+        for model in models:
+            performers.append(model['name'])
+            gender = next((g for key, g in self.genders.items() if key in model['name'].lower()), None)
+            if gender:
+                thumb = self.clean_url(model['thumb'])
+                performers_data.append({
+                    "name": model['name'],
+                    "image": thumb,
+                    "image_blob": self.get_image_blob_from_link(thumb),
+                    "site": self.site,
+                    "network": self.network,
+                    "extra": {
+                        "gender": gender
+                    }
+                })
+        return performers, performers_data

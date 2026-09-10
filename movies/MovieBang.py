@@ -39,7 +39,7 @@ class MovieBangSpider(BaseSceneScraper):
         return pagination
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -56,14 +56,14 @@ class MovieBangSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//div[contains(@class,"movie-preview")]/a/@href').getall()
         for movie in movies:
             movieurl = self.format_link(response, movie)
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene_count = response.xpath('//div[@class="scene-section" and not(contains(./div/h2/text(), "Bonus"))]')
         if len(scene_count) > 1:
             item = SceneItem()
@@ -116,7 +116,7 @@ class MovieBangSpider(BaseSceneScraper):
                                 # ~ yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = SceneItem()
         jsondata = response.xpath('//script[contains(@type, "json") and contains(text(), "duration")]/text()')
         if jsondata:

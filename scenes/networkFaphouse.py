@@ -5,14 +5,27 @@ from tpdb.BaseSceneScraper import BaseSceneScraper
 
 class NetworkFaphouseSpider(BaseSceneScraper):
     name = 'Faphouse'
-    network = 'Faphouse'
 
+    # network is deliberately NOT a class attribute: BaseSceneScraper prefers
+    # self.network over response.meta, so a class-level value would override the
+    # per-row network below. start() puts it in meta instead, defaulting to
+    # "Faphouse" so the rows that do not name one behave exactly as before.
+    #
+    # Row format: [path, initial performer, site, parent (optional), network (optional)]
     performers = [
         ["/transgender/models/lucie-arztin?page=%s", "Lucie Arztin", "Faphouse: Lucie Arztin"],
         ["/models/wanilianna?page=%s", "Wanilianna", "Faphouse: Wanilianna"],
         ["/models/karinalin?page=%s", "Karina Lin2", "Faphouse: Karina Lin"],
         ["/models/lucie-arztin?page=%s", "", "Faphouse: Twistedrama"],
         ["/studios/african-sex-trip?page=%s", "", "Faphouse: African Sex Trip"],
+        ["/studios/boymeetsmilf?page=%s", "", "Faphouse: Boy Meets MILF"],
+        ["/pornstars/angel-youngs?page=%s", "", "Faphouse: Angel Youngs"],
+        ["/models/spiel-maschinerie?page=%s", "", "Faphouse: Spiel Maschinerie"],
+        # ErosArts tours geo/VPN-block this exit, but FapHouse carries two of them
+        # under their own source domains. Kept on the ErosArts names so the scenes
+        # land on the existing entries rather than new "Faphouse: ..." ones.
+        ["/studios/eros-joi?page=%s", "", "Jerk Off Instructions", "Jerk Off Instructions", "Eros Arts"],
+        ["/studios/taboo-handjobs?page=%s", "", "Taboo Handjobs", "Taboo Handjobs", "Eros Arts"],
     ]
 
     selector_map = {
@@ -61,7 +74,8 @@ class NetworkFaphouseSpider(BaseSceneScraper):
             meta['pagination'] = performer[0]
             meta['initial_performers'] = [performer[1]]
             meta['site'] = performer[2]
-            meta['parent'] = "Faphouse"
+            meta['parent'] = performer[3] if len(performer) > 3 else "Faphouse"
+            meta['network'] = performer[4] if len(performer) > 4 else "Faphouse"
 
             link = self.get_next_page_url("https://faphouse.com", self.page, meta['pagination'])
             yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -75,13 +89,13 @@ class NetworkFaphouseSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "thumb tv")]')
         for scene in scenes:
             meta['id'] = scene.xpath('./@data-id').get()
@@ -91,9 +105,11 @@ class NetworkFaphouseSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = []
         new_perf = response.xpath('//div[contains(@class,"pornstarsWrapper")]/a/@data-mxptext|//div[contains(@class,"pornstarsWrapper")]/a/img/following-sibling::text()[1]')
+        if not new_perf:
+            new_perf = response.xpath('//div[contains(@class, "video-info-details__categories")]//a[contains(@href, "/pornstars") or contains(@href, "/models/")]/span[contains(@class, "title")]/text()')
         if new_perf:
             new_perf = new_perf.getall()
             performers = new_perf

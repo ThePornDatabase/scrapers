@@ -27,7 +27,7 @@ class SiteLesbianSexualitySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="updateItem"]')
         for scene in scenes:
             scenedate = scene.xpath('./div/p/span[contains(text(), "/20")]/text()').get()

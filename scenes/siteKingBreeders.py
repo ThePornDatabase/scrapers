@@ -14,12 +14,20 @@ class SiteKingBreedersSpider(BaseSceneScraper):
         'https://kingbreeders.net',
     ]
 
+    # The site was rebuilt on a new theme: the old #title-single / #header-inside
+    # blocks are gone and their contents now live in div.video-info, which is why
+    # the listing matched nothing and the scene pages left title/date/performers
+    # unset.  The homepage still shows only its newest 14 episodes and has no
+    # working pagination (/page/N and /episodes both re-serve page one), which is
+    # the same reach the previous scraper had.
     selector_map = {
-        'title': '//h2/text()',
-        'description': '//div[@id="header-inside"]//p[strong[contains(., "Description:")]]//text()[not(contains(., "Description:")) and not(contains(., "...")) and not(contains(., "Read more"))]',
-        'date': '//div[@id="title-single"]/span[1]/img/following-sibling::text()',
-        'image': '//video/@poster',
-        'performers': '//div[@id="title-single"]//strong[contains(text(), "Starring")]/following-sibling::a/text()',
+        'title': '//div[@class="video-info"]/h2/text()',
+        'description': '//div[@class="video-description"]//text()',
+        'date': '//div[@class="video-info"]//span[@class="time-full"]/text()',
+        're_date': r'(\w+ \d{1,2}, \d{4})',
+        'image': '//div[@class="entry"]//video/@poster',
+        'performers': '//div[@class="video-info"]//div[contains(@class, "video-cast")]//span[@class="cp-name"]/text()',
+        'trailer': '//div[@class="entry"]//video/source/@src',
         'external_id': r'',
         'pagination': '',
         'type': 'Scene',
@@ -39,15 +47,18 @@ class SiteKingBreedersSpider(BaseSceneScraper):
                 yield scrapy.Request('https://kingbreeders.net', callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@id, "post-")]')
         for scene in scenes:
             sceneid = scene.xpath('./@id').get()
-            meta['id'] = re.search(r'post-(\d+)', sceneid).group(1)
+            sceneid = re.search(r'post-(\d+)', sceneid) if sceneid else None
+            if not sceneid:
+                continue
+            meta['id'] = sceneid.group(1)
 
-            scene = scene.xpath('.//h2/a/@href').get()
+            scene = scene.xpath('.//a[contains(@class, "thumb-link")]/@href').get()
 
-            if re.search(self.get_selector_map('external_id'), scene):
+            if scene and re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):

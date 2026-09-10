@@ -30,7 +30,7 @@ class SiteMatureNLSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="grid-item"]')
         for scene in scenes:
             scenedate = scene.xpath('./div/div//div[contains(@class, "fs-small")]/div[@class="overflow"]/text()')

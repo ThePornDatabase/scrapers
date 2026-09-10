@@ -116,7 +116,7 @@ class NetworkWankzSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']),

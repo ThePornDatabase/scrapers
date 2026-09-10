@@ -1,7 +1,9 @@
 import re
 import string
+
 import scrapy
 from deep_translator import GoogleTranslator
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -9,24 +11,33 @@ from tpdb.items import SceneItem
 class JavKOVideoSpider(BaseSceneScraper):
     name = 'KOVideo'
     network = 'KO Video'
+    parent = 'KO Video'
 
     start_urls = [
         'https://ko-video.com',
     ]
 
+    # The shop was rebuilt.  None of the old p-workPage__ / works/list / actress
+    # selectors exist any more -- the listing is ul.item_list and each product page
+    # keeps its facts in a dl inside div.detail_product, with the synopsis in
+    # p.deitail_txt (the site's own spelling).  The モデル row lists body-type
+    # categories rather than performer names, and no cast is published anywhere on
+    # the rebuilt page, so performers are left empty rather than guessed at.
     selector_map = {
-        'title': '//h2[@class="p-workPage__title"]/text()',
-        'description': '//p[@class="p-workPage__text"]/text()',
-        'date': '//div[@class="item"]/a[contains(@href, "/works/list/date")]/@href',
-        're_date': r'(\d{4}-\d{2}-\d{2})',
+        # the only h1 is the logo; the product title is the first h2 in a title_bar
+        'title': '//div[contains(@class, "title_bar")]/h2/text()',
+        'description': '//p[contains(@class, "deitail_txt")]//text()',
+        'date': '//div[contains(@class, "detail_product")]//dt[contains(text(), "商品発売日")]/following-sibling::dd[1]/text()',
+        're_date': r'(\d{4}/\d{2}/\d{2})',
+        'date_formats': ['%Y/%m/%d'],
         'image': '',
-        'back': '//div[@class="swiper-wrapper"]/div[@class="swiper-slide"][1]/img/@data-src',
-        'performers': '//div[@class="item"]/a[contains(@href, "actress/detail")]/text()',
-        'tags': '//div[@class="item"]/a[contains(@href, "/works/list/genre")]/text()',
-        'duration': '',
+        'back': '',
+        'performers': '',
+        'tags': '//div[contains(@class, "detail_product")]//dt[contains(text(), "ジャンル") or contains(text(), "モデル")]/following-sibling::dd[1]/a/text()',
+        'duration': '//div[contains(@class, "detail_product")]//dt[contains(text(), "収録時間")]/following-sibling::dd[1]/text()',
         'trailer': '',
-        'external_id': r'.*/(.*?)$',
-        'pagination': '/products/list.php?mode=&type=&label=&maker=&series=&genre=&mgenre=&model=&name=&orderby=&disp_number=20&pageno=%s',
+        'external_id': r'product_code=([^&]+)',
+        'pagination': '/products/list.php?disp_number=20&pageno=%s',
         'type': 'Jav',
     }
 
@@ -37,7 +48,6 @@ class JavKOVideoSpider(BaseSceneScraper):
         'AUTOTHROTTLE_MAX_DELAY': 10,
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'DOWNLOADER_MIDDLEWARES': {},
         'DOWNLOAD_MAXSIZE': 0,
@@ -51,74 +61,90 @@ class JavKOVideoSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class,"swiper-slide")]/div[@class="item"]')
-        for scene in scenes:
-            image = scene.xpath('.//img/@data-src')
-            if image:
-                meta['image'] = image.get()
-                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
-            scene = scene.xpath('./div/a[1]/@href').get()
-            meta['id'] = re.search(r'.*/(.*?)$', scene).group(1)
+        for card in response.xpath('//ul[contains(@class, "item_list")]/li[.//a[contains(@href, "detail.php")]]'):
+            link = card.xpath('.//a[contains(@href, "detail.php")]/@href').get()
+            if not link or not re.search(self.get_selector_map('external_id'), link):
+                continue
 
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+            meta = dict(response.meta)
+            meta['id'] = re.search(self.get_selector_map('external_id'), link).group(1)
+            image = card.xpath('.//img/@src').get()
+            if image:
+                meta['image'] = self.format_link(response, image)
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
+
+    @staticmethod
+    def translate(text):
+        """A translation failure should cost the field, not the whole item."""
+        try:
+            return GoogleTranslator(source='ja', target='en').translate(text) or ''
+        except Exception:
+            return ''
 
     def get_title(self, response):
-        meta = response.meta
-        title = super().get_title(response)
-        title = GoogleTranslator(source='ja', target='en').translate(title.lower())
-        title = string.capwords(title)
-        title = title + " - " + meta['id']
-        return title
+        # a second title_bar h2 heads the "ranking" strip, so only the first is taken
+        title = response.xpath(self.get_selector_map('title')).get()
+        title = title.strip() if title else ''
+        if not title:
+            return ''
+        translated = self.translate(title.lower())
+        title = string.capwords(translated) if translated else title
+        return title + " - " + response.meta['id']
 
     def get_description(self, response):
-        description = super().get_description(response)
-        description = GoogleTranslator(source='ja', target='en').translate(description)
-        return description
+        description = ' '.join(response.xpath(self.get_selector_map('description')).getall())
+        description = self.cleanup_description(re.sub(r'\s+', ' ', description))
+        if not description:
+            return ''
+        return self.translate(description) or description
 
     def get_tags(self, response):
-        tags = super().get_tags(response)
-        tags2 = []
-        for tag in tags:
-            tag = GoogleTranslator(source='ja', target='en').translate(tag.lower())
-            tags2.append(string.capwords(tag))
-        if "Asian" not in tags2:
-            tags2.append("Asian")
-        if "JAV" not in tags2:
-            tags2.append("JAV")
-
-        return tags2
+        tags = []
+        for tag in response.xpath(self.get_selector_map('tags')).getall():
+            tag = tag.strip()
+            if not tag:
+                continue
+            translated = self.translate(tag.lower())
+            tags.append(string.capwords(translated) if translated else tag)
+        for extra in ('Asian', 'JAV', 'Gay'):
+            if extra not in tags:
+                tags.append(extra)
+        return tags
 
     def get_performers(self, response):
-        performers = super().get_performers(response)
-        performers2 = []
-        for performer in performers:
-            performer = GoogleTranslator(source='ja', target='en').translate(performer.lower())
-            performers2.append(string.capwords(performer))
-        return performers2
+        return []
 
     def get_duration(self, response):
-        duration = response.xpath('//div[contains(text(), "収録時間")]/following-sibling::div[1]/div[1]/p/span/following-sibling::text()')
+        duration = response.xpath(self.get_selector_map('duration')).get()
         if duration:
-            duration = re.search(r'(\d+)', duration.get())
+            duration = re.search(r'(\d+)\s*分', duration)
             if duration:
                 return str(int(duration.group(1)) * 60)
         return None
 
+    def get_back_image(self, response):
+        """The first gallery still stands in for the sleeve back."""
+        back = response.xpath('//a[contains(@data-slide-index, "0")]/img/@src').get()
+        if not back:
+            back = response.xpath('//img[contains(@src, "/gallery/")]/@src').get()
+        return self.format_link(response, back.strip()) if back else ''
+
     def parse_scene(self, response):
         item = SceneItem()
         item['title'] = self.get_title(response)
+        if not item['title']:
+            return
         item['description'] = self.get_description(response)
         item['site'] = self.get_site(response)
         item['date'] = self.get_date(response)
 
-        item['image'] = response.meta['image']
-        item['image_blob'] = response.meta['image_blob']
+        item['image'] = response.meta.get('image', '')
+        item['image_blob'] = self.get_image_blob_from_link(item['image']) if item['image'] else None
+
         item['back'] = self.get_back_image(response)
-        if item['back']:
-            item['back_blob'] = self.get_image_blob_from_link(item['back'])
-        else:
-            item['back_blob'] = ''
+        item['back_blob'] = self.get_image_blob_from_link(item['back']) if item['back'] else ''
 
         item['performers'] = self.get_performers(response)
         item['tags'] = self.get_tags(response)
@@ -130,4 +156,6 @@ class JavKOVideoSpider(BaseSceneScraper):
         item['parent'] = self.parent
         item['type'] = 'JAV'
 
-        yield self.check_item(item, self.days)
+        item = self.check_item(item, self.days)
+        if item:
+            yield item

@@ -57,7 +57,7 @@ class SitePJGirlsSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and (response.meta['start_page'] - response.meta['page']) < self.limit_pages and response.meta['page'] > 1:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] - 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)

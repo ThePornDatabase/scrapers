@@ -15,23 +15,25 @@ class SiteRawholeSpider(BaseSceneScraper):
 
     selector_map = {
         'title': '//div[contains(@class, "product-page")]/div[1]/h1/text()',
-        'description': '//div[@class="description"]/text()',
+        'description': '//meta[@name="description"]/@content',
         'date': '//li[contains(text(), "Added:")]/text()',
-        're_date': r'(\d{1,2} \w{3,4} \d{4})',
-        'date_formats': ['%d %b %Y'],
+        # Reads "  Added: Sept. 7, 2026" - dateparser copes with "Sept." but not the
+        # "Added:" prefix, so the prefix is stripped here rather than pinning a format.
+        're_date': r'Added:\s*(.+)',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="model-v"]//h1/text()',
-        'tags': '//i[contains(@class, "fa-tags")]/following-sibling::a/text()',
+        # The fa-tags block is gone; the keywords meta is site-wide, not per scene
+        'tags': '',
         'duration': '//li[contains(text(), "Length:")]/text()',
         're_duration': r'((?:\d{1,2}\:)?\d{2}\:\d{2})',
         'trailer': '',
-        'external_id': r'',
+        'external_id': r'/free-video/(.*?)\.html',
         'pagination': '/categories/scenes_%s_d.html',
         'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="product-item"]/div[1]/a[1]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
@@ -45,10 +47,6 @@ class SiteRawholeSpider(BaseSceneScraper):
         tags2.append("Gay")
         return tags2
 
-    def get_id(self, response):
-        image = self.get_image(response)
-        return re.search(r'.*/(\d+)-', image).group(1)
-
     def get_performers_data(self, response):
         performers = response.xpath('//div[@class="model-v"]')
         performers_data = []
@@ -60,11 +58,10 @@ class SiteRawholeSpider(BaseSceneScraper):
                 perf['extra']['gender'] = "Male"
                 perf['network'] = "Rawhole"
                 perf['site'] = "Rawhole"
-                image = performer.xpath('.//img/@src')
-                if image:
-                    image = image.get()
-                    if "content" in image:
-                        perf['image'] = image
-                        perf['image_blob'] = self.get_image_blob_from_link(image)
+                image = performer.xpath('.//img/@src').get()
+                if image and "content" in image:
+                    image = self.format_link(response, image)
+                    perf['image'] = image
+                    perf['image_blob'] = self.get_image_blob_from_link(image)
                 performers_data.append(perf)
         return performers_data

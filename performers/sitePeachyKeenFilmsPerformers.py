@@ -29,7 +29,7 @@ class PerformerSpider(BasePerformerScraper):
         return 'Female'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//article[contains(@class, "posts-entry")]')
         for performer in performers:
             image = performer.xpath('./a/@style')

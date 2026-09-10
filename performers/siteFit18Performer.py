@@ -35,7 +35,7 @@ class SiteFit18PerformerSpider(BasePerformerScraper):
     }
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()['data']['talent']['list']['result']['edges']
         for jsonrow in jsondata:
             item = PerformerItem()
@@ -81,7 +81,7 @@ class SiteFit18PerformerSpider(BasePerformerScraper):
             yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
 
     def get_images(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
         jsondata = response.json()['data']['asset']['batch']['result'][0]['serve']
         item['image'] = jsondata['uri']

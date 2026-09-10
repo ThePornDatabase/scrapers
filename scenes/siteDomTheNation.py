@@ -33,11 +33,23 @@ class DomTheNationSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_date(self, response):
-        date = response.xpath(
-            '//p[@class="update-info text-center feat-top-info"]/text()').get().strip()
+        """Return an ISO date, not the site's "July 8, 2026" wording.
+
+        check_item compares item['date'] to today as a *string*, so an unparsed
+        date like "July 8, 2026" sorts above "2026-09-08" and every scene was
+        silently dropped as future-dated -- a crawl fetched all its scene pages and
+        produced nothing, with no error.
+        """
+        date = response.xpath('//p[@class="update-info text-center feat-top-info"]/text()').get()
+        if not date:
+            return None
+        date = date.strip()
         if "|" in date:
-            date = re.search('^(.*\\d{4})\\ ', date).group(1).strip()
-        return date
+            found = re.search(r'^(.*\d{4})\s', date)
+            if found:
+                date = found.group(1).strip()
+        scenedate = self.parse_date(date, date_formats=['%B %d, %Y', '%b %d, %Y'])
+        return scenedate.strftime('%Y-%m-%d') if scenedate else None
 
     def get_title(self, response):
         title = response.xpath('//div[@class="row"]//h1/text()').get().strip()

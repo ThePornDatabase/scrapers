@@ -42,7 +42,7 @@ class MoviesErotikPerformerSpider(BasePerformerScraper):
         return 'Female'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for performer in jsondata['performers']:
             meta['name'] = performer['name']['en']

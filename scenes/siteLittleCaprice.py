@@ -39,7 +39,7 @@ class LittleCapriceSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.url, self.page, pagination), callback=self.parse, meta={'page': self.page, 'pagination': pagination}, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@class,"project-preview") and contains(@class, "project-type-video")]')
         for scene in scenes:
             sceneid = scene.xpath('./@class').get()

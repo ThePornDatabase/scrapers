@@ -33,21 +33,55 @@ class SiteHungarianHoneysSpider(BaseSceneScraper):
         'type': 'Scene',
     }
 
+    custom_scraper_settings = {
+        'RETRY_HTTP_CODES': [502, 503, 504, 522, 524, 408, 429],
+    }
+
     async def start(self):
+        # The listing serves a full page but answers with HTTP 500, which the
+        # HttpErrorMiddleware drops by default -- hence a crawl that made one
+        # request and stopped.  Accept it explicitly, and stop the retry middleware
+        # burning three attempts on every one of them.
         meta = {}
         meta['page'] = self.page
-        print(self.cookies)
+        meta['handle_httpstatus_list'] = [500]
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class, "videothumb")]')
-        for scene in scenes:
-            sceneid = scene.xpath('./@class')
+        # div.videothumb is gone; each card is a div.item-update carrying its link,
+        # title, still, runtime and release date.
+        for card in response.xpath('//div[contains(@class, "item-update")]'):
+            link = card.xpath('.//div[@class="content-div"]//a/@href').get() or card.xpath('.//a/@href').get()
+            if not link:
+                continue
+            # the scene pages answer 500 intermittently too, while still serving
+            # the full document, so carry the allowance through
+            meta = dict(response.meta)
+            meta['handle_httpstatus_list'] = [500]
+
+            sceneid = card.xpath('.//img[contains(@id, "set-target")]/@id').get()
+            sceneid = re.search(r'(\d+)', sceneid) if sceneid else None
             if sceneid:
-                sceneid = sceneid.get()
-                meta['id'] = re.search(r'(\w\d+)_', sceneid).group(1)
-            scene = scene.xpath('./a[1]/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+                meta['id'] = sceneid.group(1)
+
+            title = card.xpath('.//div[@class="content-div"]//h4/a/text()').get()
+            if title:
+                meta['title'] = self.cleanup_title(re.sub(r'\s+Video$', '', title.strip()))
+
+            info = ' '.join(x.strip() for x in card.xpath('.//div[contains(@class, "more-info-div")]//text()').getall() if x.strip())
+            scenedate = re.search(r'(\w{3,9} \d{1,2}, \d{4})', info)
+            if scenedate:
+                scenedate = self.parse_date(scenedate.group(1), date_formats=['%b %d, %Y', '%B %d, %Y'])
+                if scenedate:
+                    meta['date'] = scenedate.strftime('%Y-%m-%d')
+            runtime = re.search(r'((?:\d{1,2}:)?\d{1,2}:\d{2})', info)
+            if runtime:
+                meta['duration'] = self.duration_to_seconds(runtime.group(1))
+
+            image = card.xpath('.//img/@src0_1x').get() or card.xpath('.//img/@src').get()
+            if image and image.strip():
+                meta['image'] = self.format_link(response, image.strip())
+                meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)

@@ -80,7 +80,8 @@ class SiteKarupsPerformerPerformerSpider(BasePerformerScraper):
         "Burma": "Myanmar",
     }
 
-    cookies = [{"domain":".karups.com","expirationDate":1781415926.944098,"hostOnly":false,"httpOnly":true,"name":"nats_sess","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"dc480d11cb62227b068e67767c8218ed"},{"domain":".karups.com","hostOnly":false,"httpOnly":false,"name":"pcah","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"ZGM3Y21qT2Jkc24vdE0ycDJrY2crOVpxZWZDWHhNV1F4ckpadHZrVzFjZz0K"},{"domain":".karups.com","hostOnly":false,"httpOnly":false,"name":"pcar%5fS2FydXBzLmNvbSBNZW1iZXJzIEFyZWE%3d","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"ZlZ4Zm9YdDZTNVJ5ZnpUOTRvaVhzZG0xMVp6V05WUTJ4ZWhQNzg3YW1BdzV0Zk1QOEtuTmlScC9MbFFRTGtrNAo="},{"domain":".karups.com","expirationDate":1804630974.04235,"hostOnly":false,"httpOnly":false,"name":"xvid_auth","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"3RgRXgSuuupQoI50hPpBE0VQnvfR1_J4adhs_dqAxSNecBEQQveOc8hajp5IUdGISFIjDW8MTSKXTihV5_XMhtuKBKn7pDbUaOGHKwQTOLdQaaxRFghTq4dXkZgj6D8BsSFo41kComs-OP4tohy5-R9Sur"},{"domain":".karups.com","expirationDate":1804630974.042575,"hostOnly":false,"httpOnly":false,"name":"5e25dc46e4b06af9aa5c63ee","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"3RgRXgSuuupQoI50hPpBE0VQnvfR1_J4adhs_dqAxSNecBEQQveOc8hajp5IUdGISFIjDW8MTSKXTihV5_XMhtuKBKn7pDbUaOGHKwQTOLdQaaxRFghTq4dXkZgj6D8BsSFo41kComs-OP4tohy5-R9Sur"},{"domain":"www.karups.com","expirationDate":1773168014.886154,"hostOnly":true,"httpOnly":false,"name":"PHPSESSID","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"ea4l3foijbo04ebfavelqv7veq"},{"domain":"www.karups.com","hostOnly":true,"httpOnly":false,"name":"warningHidden","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"hide"},{"domain":".karups.com","expirationDate":1773109374.042706,"hostOnly":false,"httpOnly":false,"name":"bd22db99075a9f13","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"6cfebc38cf664770a18c0ebe192e1c4acf11cdf6_1773102179"},{"domain":".karups.com","expirationDate":1773138175.33846,"hostOnly":false,"httpOnly":false,"name":"x_session_id","path":"/","sameSite":"no_restriction","secure":true,"session":false,"storeId":"0","value":"ee9e1c493cfb81f1e4c9f7792018adeb9fc17e397268a4282b0193d9571428fb"},{"domain":".karups.com","hostOnly":false,"httpOnly":false,"name":"psso%5fS2FydXBzLmNvbSBNZW1iZXJzIEFyZWE%3d","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"aGRIRkZBTXBqWUNpSXpNR1d0bVhzVGJzdlM4MW9hSW9zMTZEdVVSeEg1ekJ6MnZ2ZE9YWTNIUHprR0UzMFQ0cgo="}]
+    # Age-gate only.  A logged-in members session was pasted here; never commit one.
+    cookies = {"warningHidden": "hide"}
 
     selector_map = {
         'birthplace': '//section[@class="model-section"]//span[contains(text(), "Place of Birth")]/following-sibling::span/text()',
@@ -103,7 +104,7 @@ class SiteKarupsPerformerPerformerSpider(BasePerformerScraper):
         return 'Female'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="item-inside"]')
         for performer in performers:
             perf_url = performer.xpath('./a/@href').get()

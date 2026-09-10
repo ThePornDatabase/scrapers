@@ -1,6 +1,8 @@
+import json
+import re
+
 import scrapy
 
-from extruct.jsonld import JsonLdExtractor
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -30,63 +32,99 @@ class VRLifeSpider(BaseSceneScraper):
         'DOWNLOAD_DELAY': 5,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
     }
 
+    # The sites were rebuilt on Livewire: div.videoItem with its data-id and
+    # a.w-portfolio-item-anchor is gone, and so is the Movie-typed JSON-LD the old
+    # parse_scene looked for.  Cards are div.card[wire:key] now, and each scene page
+    # publishes a schema.org VideoObject holding the title, synopsis, still,
+    # release date, runtime, cast and genres -- so everything comes from there.
     selector_map = {
-        'id': './@data-id',
-        'url': './/a[contains(@class, "w-portfolio-item-anchor")]/@href',
-        'title': './/img/@alt',
-        'tags': '//div[@class="metaSingleData"]//a/span/text()',
-        'external_id': r'-(\d+)/?$',
+        'external_id': r'/([^/]+)/?$',
         'pagination': '/?videoPage=%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath("//div[@data-id and contains(@class, 'videoItem')]")
+        for card in response.xpath('//div[contains(@class, "card")][.//a[contains(@class, "card-link")]]'):
+            url = card.xpath('.//a[contains(@class, "card-link")]/@href').get()
+            if not url:
+                continue
+            meta = {}
+            # the numeric id only exists on the card
+            sceneid = re.search(r'video-card-(\d+)', card.attrib.get('wire:key') or '')
+            if sceneid:
+                meta['id'] = sceneid.group(1)
+            yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
 
-        for scene in scenes:
-            scene_id = self.process_xpath(scene, self.get_selector_map('id')).get()
-            title = self.process_xpath(scene, self.get_selector_map('title')).get()
-            url = self.process_xpath(scene, self.get_selector_map('url')).get()
-            if url:
-                yield scrapy.Request(url=self.format_link(response, url), callback=self.parse_scene, meta={'id': scene_id, 'title': title})
+    def get_ld(self, response):
+        for block in response.xpath('//script[@type="application/ld+json"]/text()').getall():
+            try:
+                data = json.loads(block)
+            except ValueError:
+                continue
+            entries = data.get('@graph') if isinstance(data, dict) and '@graph' in data else data
+            for entry in (entries if isinstance(entries, list) else [entries]):
+                if isinstance(entry, dict) and 'VideoObject' in str(entry.get('@type')):
+                    return entry
+        return {}
 
     def parse_scene(self, response):
-        jslde = JsonLdExtractor()
-        json = jslde.extract(response.text)
-        data = {}
-        for obj in json:
-            if '@type' in obj and obj['@type'] == 'Movie':
-                data = obj
-                break
+        data = self.get_ld(response)
+        if not data:
+            return
 
         item = SceneItem()
-        item['title'] = self.clean_title(response.meta['title'])
-        item['description'] = self.cleanup_description(data['description'])
-        item['image'] = data['image']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['id'] = response.meta['id']
-        item['trailer'] = ""
-        item['duration'] = self.duration_to_seconds(data['duration'])
+        item['title'] = self.clean_title(self.cleanup_title(data.get('name') or ''))
+        if not item['title']:
+            return
+        item['description'] = self.cleanup_description(data.get('description') or '')
+
+        image = (data.get('thumbnailUrl') or '').strip()
+        item['image'] = image
+        item['image_blob'] = self.get_image_blob_from_link(image) if image else None
+
+        sceneid = response.meta.get('id')
+        if not sceneid:
+            sceneid = re.search(r'/videos/(\d+)/', image or '')
+            sceneid = sceneid.group(1) if sceneid else None
+        item['id'] = sceneid
+
+        item['trailer'] = (data.get('contentUrl') or '').strip()
+        item['duration'] = self.duration_to_seconds(data.get('duration') or '')
         item['url'] = response.url
-        item['date'] = self.parse_date(data['datePublished']).isoformat()
+
+        published = re.search(r'(\d{4}-\d{2}-\d{2})', data.get('uploadDate') or '')
+        item['date'] = published.group(1) if published else None
+
         item['network'] = self.network
-        item['site'] = self.get_site(response)
         item['parent'] = self.parent
+        item['site'] = self.get_site(response)
+        item['type'] = 'Scene'
 
-        item['performers'] = []
-        for model in data['actors']:
-            item['performers'].append(model['name'])
+        actors = data.get('actor') or []
+        if isinstance(actors, dict):
+            actors = [actors]
+        item['performers'] = [a['name'].strip() for a in actors
+                              if isinstance(a, dict) and (a.get('name') or '').strip()]
 
-        item['tags'] = self.get_tags(response)
-        yield self.check_item(item, self.days)
-
-    def get_tags(self, response):
-        tags = super().get_tags(response)
+        tags = [x.strip() for x in (data.get('genre') or []) if x and x.strip()]
         if "VR" not in tags:
             tags.append("VR")
-        return tags
+        item['tags'] = tags
+
+        item = self.check_item(item, self.days)
+        if item:
+            yield item
+
+    def duration_to_seconds(self, value):
+        """The VideoObject publishes ISO-8601 durations, usually as bare seconds
+        (PT2487S) but occasionally with hour and minute parts."""
+        parsed = re.search(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', value or '')
+        if not parsed or not any(parsed.groups()):
+            return None
+        hours, minutes, seconds = (int(x) if x else 0 for x in parsed.groups())
+        return str(hours * 3600 + minutes * 60 + seconds)
 
     @staticmethod
     def clean_title(title):

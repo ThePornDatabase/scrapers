@@ -29,7 +29,7 @@ class SiteXXXJobInterviewsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="gallery-item"]')
         for scene in scenes:
             duration = scene.xpath('.//div[@class="item"]/div[1]/span/text()')

@@ -22,7 +22,7 @@ class SiteGapeMyPussySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//table[@width="400"]')
         for scene in scenes:
             item = SceneItem()

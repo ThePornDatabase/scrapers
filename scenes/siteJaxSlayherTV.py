@@ -28,7 +28,7 @@ class SiteJaxSlayherTVSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="grid_item"]')
         for scene in scenes:
             image = scene.xpath('.//picture/source[1]/@srcset').get()

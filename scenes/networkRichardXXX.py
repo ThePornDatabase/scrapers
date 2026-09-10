@@ -23,7 +23,7 @@ class NetworkRichardXXXSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "col-12") and contains(@class, "scene")]')
         for scene in scenes:
 

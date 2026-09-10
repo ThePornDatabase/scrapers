@@ -25,7 +25,7 @@ class SiteIbicellaSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = json.loads(response.text)
         scenes = scenes['data']
         for scene in scenes:
@@ -43,7 +43,7 @@ class SiteIbicellaSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene = json.loads(response.text)
         item = SceneItem()
         item['title'] = meta['title']

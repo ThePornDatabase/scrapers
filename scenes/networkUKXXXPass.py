@@ -29,120 +29,58 @@ class NetworkUKXXXPassSpider(BaseSceneScraper):
         'https://splatbukkake.xxx',
     ]
 
+    # The Elevated X tour is gone: /models/models_N_d.html and div.model no longer
+    # exist, and the scene page is now a Livewire app with no og: tags, no JSON-LD
+    # and no addressable title.  The listing card carries the title, cast, release
+    # date and still, so the item is built there instead.
     selector_map = {
-        'title': '//div[@class="title clear"]/h2/text()',
-        'description': '//span[contains(@class,"description")]/text()',
-        'date': '//span[contains(@class,"update_date")]/text()',
-        'image': '//span[@class="model_update_thumb"]/img/@src',
-        'performers': '//span[@class="tour_update_models"]/a/text()',
-        'tags': '//span[@class="update_tags"]/a/text()',
-        'external_id': r'updates/(.*).html',
-        'trailer': '',
-        'pagination': '/models/models_%s_d.html'
+        'external_id': r'/movie/(\d+)/',
+        'pagination': '/movies?page=%s',
+        'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="model"]/div/a/@href').getall()
-        for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        for card in response.xpath('//div[contains(@class, "movieItem")]'):
+            link = card.xpath('.//div[contains(@class, "title")]//a/@href').get()
+            if not link:
+                continue
+            sceneid = re.search(self.get_selector_map('external_id'), link)
+            if not sceneid:
+                continue
 
-    def parse_scene(self, response):
-        scenes = response.xpath('//div[@class="update_block"]')
-        for scene in scenes:
             item = SceneItem()
+            item['id'] = sceneid.group(1)
+            item['url'] = self.format_link(response, link)
 
-            title = scene.xpath('.//span[contains(@class,"title")]/text()')
-            if title:
-                item['title'] = self.cleanup_title(title.get())
-            else:
-                item['title'] = ''
+            title = card.xpath('.//div[contains(@class, "title")]//a/text()').get()
+            if not title or not title.strip():
+                continue
+            item['title'] = self.cleanup_title(title)
+            item['description'] = ''
 
-            scenedate = scene.xpath('.//span[contains(@class,"update_date")]/text()').get()
-            if date:
-                item['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).isoformat()
-            else:
-                item['date'] = ''
+            # the card's date reads DD.MM.YYYY
+            item['date'] = None
+            for text in card.xpath('.//div[contains(@class, "text-xs")]//text()').getall():
+                scenedate = re.search(r'(\d{2}\.\d{2}\.\d{4})', text)
+                if scenedate:
+                    scenedate = self.parse_date(scenedate.group(1), date_formats=['%d.%m.%Y'])
+                    if scenedate:
+                        item['date'] = scenedate.isoformat()
+                    break
 
-            description = scene.xpath('.//span[contains(@class,"update_description")]/text()')
-            if description:
-                item['description'] = self.cleanup_description(description.get())
-            else:
-                item['description'] = ''
+            item['performers'] = [x.strip() for x in
+                                  card.xpath('.//div[contains(@class, "actors")]//a/text()').getall()
+                                  if x and x.strip()]
+            item['tags'] = []
+            item['trailer'] = ''
 
-            performers = scene.xpath('.//span[contains(@class,"update_models")]/a/text()').getall()
-            if performers:
-                item['performers'] = list(map(lambda x: string.capwords(x.strip()), performers))
-            else:
-                item['performers'] = []
+            image = card.xpath('.//img/@src').get()
+            item['image'] = self.format_link(response, image) if image else ''
+            item['image_blob'] = self.get_image_blob_from_link(item['image']) if item['image'] else None
 
-            tags = scene.xpath('.//span[contains(@class,"update_tags")]/a/text()').getall()
-            if tags:
-                item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags))
-            else:
-                item['tags'] = []
+            site = match_site(tldextract.extract(response.url).domain)
+            item['site'] = site
+            item['parent'] = site
+            item['network'] = 'UK XXX Pass'
 
-            image = scene.xpath('.//div[@class="update_image"]/a/img/@src0_4x').get()
-            if not image:
-                image = scene.xpath('.//div[@class="update_image"]/a/img/@src0_3x').get()
-            if not image:
-                image = scene.xpath('.//div[@class="update_image"]/a/img/@src0_2x').get()
-            if not image:
-                image = scene.xpath('.//div[@class="update_image"]/a/img/@src0_1x').get()
-            if image:
-                uri = urlparse(response.url)
-                base = uri.scheme + "://" + uri.netloc
-                item['image'] = base + image.strip().replace(" ", "").replace("\t", "")
-            else:
-                item['image'] = None
-
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-            trailer = scene.xpath('.//div[@class="update_image"]/a/@onclick').get()
-            if trailer:
-                trailer = re.search(r'tload\(\'(.*\.mp4|.*\.m4v)', trailer)
-                if trailer:
-                    trailer = trailer.group(1)
-                    if "http" not in trailer:
-                        uri = urlparse(response.url)
-                        base = uri.scheme + "://" + uri.netloc
-                    else:
-                        base = ''
-                    item['trailer'] = base + trailer.strip().replace(" ", "").replace("\t", "")
-            else:
-                item['trailer'] = ''
-
-            if item['title']:
-                externalid = re.sub(r'[^a-zA-Z0-9-]', '', item['title'])
-                item['id'] = externalid.lower().strip().replace(" ", "-")
-
-            item['url'] = response.url
-
-            item['site'] = match_site(tldextract.extract(response.url).domain)
-            item['parent'] = match_site(tldextract.extract(response.url).domain)
-            item['network'] = "UK XXX Pass"
-
-            if item['id'] and item['date']:
-                days = int(self.days)
-                if days > 27375:
-                    filterdate = "0000-00-00"
-                else:
-                    filterdate = date.today() - timedelta(days)
-                    filterdate = filterdate.strftime('%Y-%m-%d')
-
-                if self.debug:
-                    if not item['date'] > filterdate:
-                        item['filtered'] = "Scene filtered due to date restraint"
-                    print(item)
-                else:
-                    if filterdate:
-                        if item['date'] > filterdate:
-                            yield item
-                    else:
-                        yield item
-
-        next_page = response.xpath('//comment()[contains(.,"Next Page Link")]/following-sibling::a[1]/@href').get()
-        if next_page:
-            uri = urlparse(response.url)
-            base = uri.scheme + "://" + uri.netloc
-            next_page_url = base + "/" + next_page
-            yield scrapy.Request(next_page_url, callback=self.parse_scene)
+            yield self.check_item(item, self.days)

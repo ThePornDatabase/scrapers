@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import scrapy
 import json
 import string
@@ -29,10 +29,8 @@ class SiteLusterySpider(BaseSceneScraper):
             # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -60,20 +58,36 @@ class SiteLusterySpider(BaseSceneScraper):
         page = str((int(page) - 1) * 18)
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
+    def get_json(self, response):
+        """Read the API payload regardless of how the response was delivered.
+
+        Scrapy 2.18 hands back a JsonResponse for application/json, and calling
+        xpath() on one now raises instead of returning None; the //pre/text() form
+        only applies when Playwright renders the payload as a document.
+        """
+        try:
+            return json.loads(response.text)
+        except ValueError:
+            pass
+        # Playwright renders the payload into a <pre>, but the upstream
+        # application/json content type survives, so response.selector is a JSON
+        # selector over an HTML body and xpath() on it raises.  Build an HTML
+        # selector over the same text instead.
+        json_text = scrapy.Selector(text=response.text, type='html').xpath("//pre/text()").get()
+        return json.loads(json_text) if json_text else {}
+
     def get_scenes(self, response):
-        meta = response.meta
-        json_text = response.xpath("//pre/text()").get()
-        jsondata = json.loads(json_text)
-        permalinks = jsondata['currentPagePermalinks']
+        meta = self.copy_meta(response)
+        jsondata = self.get_json(response)
+        permalinks = jsondata.get('currentPagePermalinks') or []
         for permalink in permalinks:
             meta['id'] = permalink
             link = f"https://lustery.com/api/video/{permalink}"
             yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
-        json_text = response.xpath("//pre/text()").get()
-        jsondata = json.loads(json_text)
+        meta = self.copy_meta(response)
+        jsondata = self.get_json(response)
         if "video" in jsondata and jsondata['video']:
             scene = jsondata['video']
             # resources = jsondata['resources']
@@ -86,7 +100,7 @@ class SiteLusterySpider(BaseSceneScraper):
                 item['image'] = f"https://img.lustery.com/cache/image/resize/width=1600/{scene['poster']['staticPath']}"
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
 
-            item['date'] = datetime.utcfromtimestamp(scene['publishAt']).strftime('%Y-%m-%d')
+            item['date'] = datetime.fromtimestamp(scene['publishAt'], tz=timezone.utc).strftime('%Y-%m-%d')
 
             item['id'] = meta['id']
             if not scene['series']:
@@ -94,7 +108,9 @@ class SiteLusterySpider(BaseSceneScraper):
             else:
                 item['url'] = f"https://lustery.com/video/series/{meta['id']}"
             item['site'] = 'Lustery'
-            item['tags'] = scene['tags']
+            # The API returns tags as URL slugs, e.g. 'blonde-hair'
+            item['tags'] = [string.capwords(tag.replace('-', ' ').strip())
+                            for tag in (scene.get('tags') or []) if tag]
             item['duration'] = scene['duration']
             item['parent'] = 'Lustery'
             item['network'] = 'Lustery'

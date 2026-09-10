@@ -30,7 +30,7 @@ class SiteAlexLegendSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "item-col")]/div[1]')
         for scene in scenes:
             scenedate = scene.xpath('.//span[@class="item-date"]/span/text()')

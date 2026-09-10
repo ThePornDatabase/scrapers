@@ -29,7 +29,7 @@ class SiteHeatwaveSceneSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//ul[contains(@class,"scene-list")]/li/h3/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

@@ -1,6 +1,8 @@
-import re
 import json
+import re
+
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -11,84 +13,119 @@ class SiteOpenLifeSpider(BaseSceneScraper):
     parent = 'Open Life'
     site = 'Open Life'
 
+    # The tour moved to Gamma's React stack, so div.imageRotation is gone and the
+    # per-scene JSON-LD with it -- the catalogue is an Algolia index scoped to the
+    # openlife segment.  The API key is issued per page load and carries a
+    # validUntil, so it is scraped from the tour on every run, and it is refused
+    # without a matching Referer.  The index breaks the catalogue out into
+    # sub-sites (LaneSisters, Devonlee, Sunnyleone), but the scraper has always
+    # submitted everything as "Open Life", so that is kept.
     start_urls = [
-        'https://www.openlife.com',
+        'https://www.openlife.com/',
     ]
 
+    algolia_app_id = 'TSMKFA364Q'
+    algolia_url = 'https://tsmkfa364q-dsn.algolia.net/1/indexes/*/queries'
+    image_base = 'https://images01-fame.gammacdn.com/movies'
+    hits_per_page = 60
+
     selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'duration': '',
-        'trailer': '',
-        'external_id': r'.*/(\d+)',
-        'pagination': '/en/videos/All/views/0/%s',
+        'external_id': r'/(\d+)/?$',
+        'pagination': '',
         'type': 'Scene',
     }
 
+    async def start(self):
+        yield scrapy.Request(url=self.start_urls[0], callback=self.parse_api_key,
+                             meta={'page': self.page}, headers=self.headers, cookies=self.cookies)
+
+    def parse_api_key(self, response):
+        apikey = re.search(r'"apiKey"\s*:\s*"([^"]+)"', response.text)
+        if not apikey:
+            print("*** Could not find the Algolia API key on the %s tour" % self.name)
+            return
+        meta = self.copy_meta(response)
+        meta['apikey'] = apikey.group(1)
+        yield self.algolia_request(meta)
+
+    def algolia_request(self, meta):
+        body = json.dumps({"requests": [{
+            "indexName": "all_scenes_latest_desc",
+            "params": "query=&hitsPerPage=%d&page=%d&filters=upcoming%%3A0" % (
+                self.hits_per_page, int(meta['page']) - 1),
+        }]})
+        headers = {
+            'x-algolia-application-id': self.algolia_app_id,
+            'x-algolia-api-key': meta['apikey'],
+            'Content-Type': 'application/json',
+            'Referer': self.start_urls[0],
+        }
+        return scrapy.Request(url=self.algolia_url, method='POST', body=body,
+                              headers=headers, callback=self.parse, meta=meta,
+                              dont_filter=True)
+
+    def parse(self, response, **kwargs):
+        count = 0
+        for scene in self.get_scenes(response):
+            count += 1
+            yield scene
+
+        if count and response.meta['page'] < self.limit_pages:
+            meta = self.copy_meta(response)
+            meta['page'] = meta['page'] + 1
+            print('NEXT PAGE: ' + str(meta['page']))
+            yield self.algolia_request(meta)
+
+    def get_scene_url(self, hit, sceneid):
+        return "https://www.openlife.com/en/video/%s/%s/%s" % (
+            hit.get('sitename') or 'openlife', hit.get('url_title') or '', sceneid)
+
+    def get_scene_title(self, hit):
+        return self.cleanup_title(hit.get('title') or '')
+
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[contains(@class, "imageRotation")]/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        try:
+            results = json.loads(response.text)['results'][0]
+        except (ValueError, KeyError, IndexError):
+            return
 
-    def parse_scene(self, response):
-        jsondata = json.loads(response.xpath('//script[contains(@type, "ld+json")]/text()').get())
-        jsondata = jsondata[0]
-        item = SceneItem()
-        item['title'] = jsondata['name']
-        item['id'] = re.search(r'.*/(\d+)', response.url).group(1)
-        if 'description' in jsondata:
-            item['description'] = jsondata['description']
-        else:
-            item['description'] = ""
-        if "keywords" in jsondata:
-            item['tags'] = jsondata['keywords'].split(",")
-        else:
-            item['tags'] = []
-        item['image'] = response.xpath('//meta[@name="twitter:image"]/@content').get()
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        item['date'] = jsondata['dateCreated']
-        item['trailer'] = None
-        item['type'] = 'Scene'
-        item['network'] = "Open Life Network"
-        item['performers'] = []
-        if "actor" in jsondata:
-            for actor in jsondata['actor']:
-                item['performers'].append(actor['name'])
-        item['site'] = self.get_site(response)
-        item['parent'] = self.get_site(response)
-        item['url'] = response.url
-        if "duration" in jsondata:
-            item['duration'] = self.duration_to_seconds(jsondata['duration'].replace("PT", ""))
-        else:
-            item['duration'] = ""
-        yield self.check_item(item, self.days)
+        for hit in results.get('hits') or []:
+            item = SceneItem()
 
-    def get_site(self, response):
-        site = response.xpath('//div[contains(@id, "sceneInfo")]/div[contains(@class, "sceneInfoCol")]/div/@class')
-        if site:
-            site = site.get()
-            if site.strip().lower() == "sitelogo_40":
-                return "Abbey Brooks"
-            if site.strip().lower() == "sitelogo_37":
-                return "Ashley Fires"
-            if site.strip().lower() == "sitelogo_38":
-                return "Devon Lee"
-            if site.strip().lower() == "sitelogo_34":
-                return "Dylan Ryder"
-            if site.strip().lower() == "sitelogo_36":
-                return "Hanna Hilton"
-            if site.strip().lower() == "sitelogo_2":
-                return "Lane Sisters"
-            if site.strip().lower() == "sitelogo_1":
-                return "Open Life"
-            if site.strip().lower() == "sitelogo_64":
-                return "Sunny Leone"
-            if site.strip().lower() == "sitelogo_45":
-                return "Teal Conrad"
-        return "Open Life"
+            item['title'] = self.get_scene_title(hit)
+            if not item['title']:
+                continue
+
+            item['id'] = str(hit.get('clip_id') or hit.get('objectID') or '')
+            item['description'] = self.cleanup_description(hit.get('description') or '')
+            item['url'] = self.get_scene_url(hit, item['id'])
+
+            scenedate = re.search(r'(\d{4}-\d{2}-\d{2})', hit.get('release_date') or '')
+            item['date'] = scenedate.group(1) if scenedate else None
+
+            item['site'] = self.site
+            item['parent'] = self.parent
+            item['network'] = self.network
+
+            item['performers'] = [a['name'].strip() for a in (hit.get('actors') or [])
+                                  if isinstance(a, dict) and (a.get('name') or '').strip()]
+            item['tags'] = [c['name'].strip().title() for c in (hit.get('categories') or [])
+                            if isinstance(c, dict) and (c.get('name') or '').strip()]
+
+            pictures = hit.get('pictures') or {}
+            image = next((pictures[q] for q in ('1920x1080', '960x544', '638x360', 'resized')
+                          if isinstance(pictures.get(q), str)), '')
+            item['image'] = (self.image_base + image) if image else ''
+            item['image_blob'] = self.get_image_blob_from_link(item['image']) if item['image'] else None
+
+            trailers = hit.get('trailers') or {}
+            item['trailer'] = next((trailers[q] for q in ('1080p', '720p', '540p', '480p', '360p', '240p', '160p')
+                                    if trailers.get(q)), '')
+
+            length = hit.get('length')
+            item['duration'] = str(int(length)) if length else None
+            item['type'] = 'Scene'
+
+            item = self.check_item(item, self.days)
+            if item:
+                yield item

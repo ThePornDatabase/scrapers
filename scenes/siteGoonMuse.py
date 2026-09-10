@@ -16,8 +16,9 @@ class SiteGoonMuseSpider(BaseSceneScraper):
     cookies = [{"name": "warn", "value": "true"}]
 
     selector_map = {
-        'title': '//h4/text()',
+        'title': '//div[contains(@class, "vidImidWrap")]//h4/text()',
         'description': '//div[contains(@class,"vidImgContent")]/p/text()',
+        'date': '//div[@class="latestUpdateBinfo gallery_info bg_light radius"]/ul[@class="videoInfo"]/li[@class="text_med"]/text()',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[contains(@class,"latestUpdateBinfo gallery_info")]/p[@class="link_light"]/a/text()',
         'tags': '//div[@class="blogTags"]/ul/li/a/text()',
@@ -28,7 +29,7 @@ class SiteGoonMuseSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="videoPic"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

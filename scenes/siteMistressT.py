@@ -20,7 +20,11 @@ class SiteMistressTSpider(BaseSceneScraper):
         for scene in scenes:
             item = self.init_scene()
 
-            item['title'] = self.cleanup_title(scene.xpath('.//h2/text()').get())
+            # the title is now wrapped in an <a> inside the h2
+            title = scene.xpath('.//h2//text()').get()
+            if not title:
+                continue
+            item['title'] = self.cleanup_title(title)
 
             scenedate = scene.xpath('.//div[contains(text(), "date:")]/following-sibling::div[1]/div/text()')
             if scenedate:

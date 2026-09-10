@@ -32,7 +32,7 @@ class SiteSwallowSalonSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['check_date'] = "2021-04-09"
 
         scenes = response.xpath('//div[@class="update_details"]')

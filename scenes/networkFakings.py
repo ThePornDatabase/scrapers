@@ -1,3 +1,7 @@
+import re
+import json
+import html
+import string
 import urllib.parse
 import dateparser
 import scrapy
@@ -11,61 +15,23 @@ class FakingsSpider(BaseSceneScraper):
 
     url = 'https://www.fakings.com'
 
+    # Every /en/serie/<name>/N path in the old list now 404s -- the site dropped its
+    # per-series listings, which is where the 43 404s in a crawl came from.  The main
+    # search listing survives, but without the .htm extension or the ?all parameter.
     paginations = [
-        '/en/buscar/%s.htm?all',
-        '/en/serie/ainaras-diary/%s.htm?all',
-        '/en/serie/arnaldo-series/%s.htm?all',
-        '/en/serie/behind-fakings/%s.htm?all',
-        '/en/serie/big-rubber-cocks/%s.htm?all',
-        '/en/serie/blind-date/%s.htm?all',
-        '/en/serie/blowjob-lessons/%s.htm?all',
-        '/en/serie/busted/%s.htm?all',
-        '/en/serie/curvy-girls/%s.htm?all',
-        '/en/serie/exchange-student-girls/%s.htm?all',
-        '/en/serie/fakings-academy/%s.htm?all',
-        '/en/serie/fakings-castings/%s.htm?all',
-        '/en/serie/fakings-pornstars/%s.htm?all',
-        '/en/serie/fakings-slutwalk/%s.htm?all',
-        '/en/serie/fakingsvr/%s.htm?all',
-        '/en/serie/fakins-wild-party/%s.htm?all',
-        '/en/serie/first-fakings/%s.htm?all',
-        '/en/serie/free-couples/%s.htm?all',
-        '/en/serie/free-pussy-day/%s.htm?all',
-        '/en/serie/fuck-me-fool/%s.htm?all',
-        '/en/serie/fuck-them/%s.htm?all',
-        '/en/serie/horsedicks/%s.htm?all',
-        '/en/serie/i-sell-my-girlfriend/%s.htm?all',
-        '/en/serie/im-a-webcam-girl/%s.htm?all',
-        '/en/serie/innocent-18/%s.htm?all',
-        '/en/serie/ivan-amor/%s.htm?all',
-        '/en/serie/la-porno-house/%s.htm?all',
-        '/en/serie/loverfans/%s.htm?all',
-        '/en/serie/milf-club/%s.htm?all',
-        '/en/serie/my-first-anal/%s.htm?all',
-        '/en/serie/my-first-dp/%s.htm?all',
-        '/en/serie/nerd-buster/%s.htm?all',
-        '/en/serie/newbies-or-so-they-say-/%s.htm?all',
-        '/en/serie/next-door-girl/%s.htm?all',
-        '/en/serie/parejasnet/%s.htm?all',
-        '/en/serie/perverting-couples/%s.htm?all',
-        '/en/serie/quarantine-stories/%s.htm?all',
-        '/en/serie/sick-videos/%s.htm?all',
-        '/en/serie/swingers-life/%s.htm?all',
-        '/en/serie/talk-to-them/%s.htm?all',
-        '/en/serie/the-anatomical-sulphate/%s.htm?all',
-        '/en/serie/the-naughty-bet/%s.htm?all',
-        '/en/serie/trans-fakings/%s.htm?all',
-        '/en/serie/very-voyeur/%s.htm?all',
+        '/en/buscar/%s',
     ]
 
     selector_map = {
-        'title': '//h1//a/text()|//h1[@class="subtitle"]//text()',
-        'description': '//span[@class="grisoscuro"]/text()',
-        'performers': '//strong[contains(., "Actr")]//following-sibling::a/text()',
-        'tags': '//strong[contains(., "Categori")]//following-sibling::a/text()',
-        'external_id': 'video/(.+)\\.htm',
+        'title': '',
+        'description': '',
+        'date': '',
+        'image': '',
+        'performers': '//a[contains(@href, "/actrices-porno/")]/text()',
+        'tags': '',
+        'external_id': r'/en/video/(.+?)/?$',
         'trailer': '',
-        'pagination': '/en/buscar/%s.htm?all'
+        'pagination': '/en/buscar/%s'
     }
 
     async def start(self):
@@ -86,7 +52,7 @@ class FakingsSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']),
@@ -99,30 +65,70 @@ class FakingsSpider(BaseSceneScraper):
         return self.format_url(url, pagination % page)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="zona-listado2"]')
-        for scene in scenes:
+        # div.zona-listado2 is gone; the listing is a Tailwind rebuild whose cards
+        # link straight to /en/video/<slug>, repeated per card, hence the dedupe.
+        scenes = response.xpath('//a[contains(@href, "/en/video/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene),
+                                     callback=self.parse_scene,
+                                     headers=self.headers, cookies=self.cookies)
 
-            meta = {}
+    def get_ld(self, response):
+        """The scene page publishes a schema.org VideoObject holding the title,
+        synopsis, still, release date and trailer -- none of which the rebuilt
+        markup exposes as addressable elements any more."""
+        for block in response.xpath('//script[@type="application/ld+json"]/text()').getall():
+            try:
+                data = json.loads(block)
+            except ValueError:
+                continue
+            for entry in (data if isinstance(data, list) else [data]):
+                if isinstance(entry, dict) and 'VideoObject' in str(entry.get('@type')):
+                    return entry
+        return {}
 
-            date = scene.xpath('.//p[@class="txtmininfo calen sinlimite"]//text()').get().strip()
-            meta['date'] = dateparser.parse(
-                date, settings={'DATE_ORDER': 'DMY'}).isoformat()
-            meta['image'] = scene.xpath('./div[@class="zonaimagen"]/a/img/@src').get()
-            meta['image'] = urllib.parse.quote_plus(meta['image'])
-            meta['image'] = meta['image'].replace('%2F', '/').replace('%3A', ':')
-            meta['image_blob'] = self.get_image_blob_from_link(meta['image'])
+    def get_title(self, response):
+        title = self.get_ld(response).get('name') or ''
+        if not title:
+            title = response.xpath('//meta[@property="og:title"]/@content').get() or ''
+            title = re.sub(r'^FAKINGS\s*\|\s*', '', title)
+        return self.cleanup_title(title) if title else ''
 
-            yield scrapy.Request(url=self.format_link(response, scene.css('a::attr(href)').get()), callback=self.parse_scene, meta=meta)
+    def get_description(self, response):
+        text = self.get_ld(response).get('description') or ''
+        if not text:
+            return ''
+        text = re.sub(r'<[^>]+>', ' ', html.unescape(text))
+        return self.cleanup_description(re.sub(r'\s+', ' ', text))
+
+    def get_date(self, response):
+        upload = self.get_ld(response).get('uploadDate') or ''
+        upload = re.search(r'(\d{4}-\d{2}-\d{2})', upload)
+        return upload.group(1) if upload else None
+
+    def get_image(self, response):
+        image = (self.get_ld(response).get('thumbnailUrl')
+                 or response.xpath('//meta[@property="og:image"]/@content').get() or '')
+        image = image.strip()
+        return self.format_link(response, image) if image else ''
+
+    def get_trailer(self, response):
+        return (self.get_ld(response).get('contentUrl') or '').strip()
+
+    def get_performers(self, response):
+        """Only the cast links carry names; the nav link to the index is excluded."""
+        names = []
+        for a in response.xpath('//a[contains(@href, "/actrices-porno/")]'):
+            href = a.attrib.get('href') or ''
+            if href.rstrip('/').endswith('actrices-porno'):
+                continue
+            name = ' '.join(a.xpath('.//text()').getall()).strip()
+            if name and name not in names:
+                names.append(string.capwords(name))
+        return names
 
     def get_site(self, response):
         site = response.xpath('//strong[contains(., "Serie")]//following-sibling::a/text()')
-        if site:
-            site = site.get()
-        else:
-            site = "FaKings"
-        return site.strip()
+        return site.get().strip() if site else "FaKings"
 
-    def get_performers(self, response):
-        performers = super().get_performers(response)
-        performers = list(set(performers))
-        return performers

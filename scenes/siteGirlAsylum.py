@@ -27,7 +27,7 @@ class SiteGirlAsylumSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@href, ".zip") and contains(@href, "avi")]/ancestor::article[contains(@id, "post-")]')
         for scene in scenes:
             sceneid = scene.xpath('./@id')
@@ -47,7 +47,7 @@ class SiteGirlAsylumSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         title = super().get_title(response)
         if meta['origid']:
             title = f"{meta['origid']}: {title}"

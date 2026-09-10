@@ -1,4 +1,5 @@
 import json
+import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -21,7 +22,7 @@ class SiteBananaFeverSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = json.loads(response.text)
         for movie in scenes['videos']:
 
@@ -29,11 +30,15 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = response.json()
         item = self.init_scene()
 
-        item['id'] = movie['video_id']
+        scene_id = re.search(r'.*-(.*?)$', movie['slug'])
+        if scene_id:
+            item['id'] = scene_id.group(1)
+        else:
+            item['id'] = movie['slug']
         item['title'] = movie['title']
 
         item['performers'] = []
@@ -54,6 +59,10 @@ class SiteBananaFeverSpider(BaseSceneScraper):
             for category in movie['categories']:
                 tags.append(category['name'])
 
+        if "tags" in movie and movie['tags']:
+            for tag in movie['tags']:
+                tags.append(tag['name'])
+
         for tag in tags:
             if "banana" not in tag.lower():
                 item['tags'].append(tag)
@@ -64,5 +73,5 @@ class SiteBananaFeverSpider(BaseSceneScraper):
         item['network'] = "Banana Fever"
         item['parent'] = "Banana Fever"
 
-        if item['date'] > "2024-12-03":
+        if item['date'] > "2026-07-20":
             yield self.check_item(item, self.days)

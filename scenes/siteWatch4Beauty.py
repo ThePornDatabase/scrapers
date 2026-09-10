@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime
+from urllib.parse import urljoin
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -8,6 +8,7 @@ from tpdb.items import SceneItem
 class Watch4BeautyScraper(BaseSceneScraper):
     name = 'Watch4Beauty'
     network = 'Watch4Beauty'
+    image_base = 'https://www.watch4beauty.com'
 
     start_urls = [
         'https://watch4beauty.com',
@@ -35,7 +36,7 @@ class Watch4BeautyScraper(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(meta['page']),
@@ -74,12 +75,14 @@ class Watch4BeautyScraper(BaseSceneScraper):
             item['site'] = "Watch4Beauty"
             item['network'] = "Watch4Beauty"
             item['parent'] = "Watch4Beauty"
-            if "issue_size" in data and data['issue_size']:
+            # issue_size is the runtime in seconds for films (category 6), but the
+            # photo count for photo sets (category 5) - only the former is a duration.
+            if data.get('issue_category') == 6 and data.get('issue_size'):
                 item['duration'] = data['issue_size']
             item['url'] = "https://www.watch4beauty.com/updates/" + data['issue_simple_title']
             item['id'] = data['issue_id']
             item['trailer'] = ''
-            item['image'] = "https://mh-c75c2d6726.watch4beauty.com/production/%s-issue-cover-wide-2560.jpg" % (datetime.fromisoformat(item['date']).strftime('%Y%m%d'))
+            item['image'] = self.get_cover(data)
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['performers'] = []
 
@@ -112,12 +115,30 @@ class Watch4BeautyScraper(BaseSceneScraper):
                 item['url'] = f"https://www.watch4beauty.com/stories/{data['magazine_simple_title']}"
                 item['id'] = data['magazine_id']
                 item['trailer'] = ''
-                item['image'] = f"https://mh-c75c2d6726.watch4beauty.com/production/{datetime.fromisoformat(item['date']).strftime('%Y%m%d')}-magazine-cover-wide-2560.jpg"
+                item['image'] = self.get_cover(data)
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
                 item['performers'] = []
 
                 modelurl = response.url + "/models"
                 yield scrapy.Request(modelurl, callback=self.parse_models, meta={'item': item})
+
+    def get_cover(self, data):
+        # The API returns 'poster' as a dict of width -> path (it used to be a single
+        # URL containing a _WIDTH_ placeholder), and the paths are site-relative.
+        poster = (data.get('preparedVideos') or {}).get('poster')
+        if isinstance(poster, dict) and poster:
+            widths = [int(width) for width in poster.keys() if str(width).isdigit()]
+            if widths:
+                path = poster[str(max(widths))]
+                return urljoin(self.image_base, path)
+        if isinstance(poster, str) and poster:
+            return urljoin(self.image_base, poster.replace("_WIDTH_", "2560"))
+
+        cover_files = data.get('cover_files') or {}
+        cover = cover_files.get('wide-blank') or cover_files.get('player-blank')
+        if cover and data.get('prefix'):
+            return urljoin(self.image_base, f"/api/covers/{data['prefix']}/{cover}_2560.jpg")
+        return ''
 
     def parse_models(self, response):
         item = response.meta['item']

@@ -33,7 +33,7 @@ class CXWowSpiderAlt(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="iLatestScene"]')
         for scene in scenes:
             scenedate = scene.xpath('.//i[contains(@class, "calendar")]/following-sibling::text()')

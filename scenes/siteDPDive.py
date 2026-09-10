@@ -30,7 +30,7 @@ class SiteDPDivaSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="videoBlock"]')
         for scene in scenes:
             meta['date'] = self.parse_date(scene.xpath('.//div[@class="date"]/text()').get(), date_formats=['%m-%d-%Y']).isoformat()

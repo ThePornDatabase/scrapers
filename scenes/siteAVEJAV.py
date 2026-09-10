@@ -22,15 +22,20 @@ class SiteAVEJAVSpider(BaseSceneScraper):
         'tags': '//div[@class="single-info"]/span[contains(text(), "Category")]/following-sibling::span/a/text()',
         'trailer': '//div[contains(@class, "button-set")]//span/a[contains(@href, "javascript")]/@onclick',
         're_trailer': r'(https.*?)[\'\"]',
-        'external_id': r'.com/(\d+)/',
-        # ~ 'pagination': '/29/45/1/subdept_products?countpage=%s',
-        # ~ 'pagination': '/29/525/1/subdept_products?countpage=%s',
-        'pagination': '/29/736/1/subdept_products?countpage=%s',
+        # The positional /29/736/1/subdept_products path now redirects to the
+        # query-string form, which also changed the scene links from
+        # aventertainments.com/<digits>/ to /dvd/detail?pro=<digits>. The cards were
+        # still being found; every one of them failed this regex, so get_scenes
+        # yielded nothing and the crawl ended with no error to show for it.
+        'external_id': r'[?&]pro=(\d+)',
+        # ~ 'pagination': '/dvd/dept?lang=1&culture=en-US&cat=29&subcat=45&page=%s',
+        # ~ 'pagination': '/dvd/dept?lang=1&culture=en-US&cat=29&subcat=525&page=%s',
+        'pagination': '/dvd/dept?lang=1&culture=en-US&cat=29&subcat=736&page=%s',
         'type': 'JAV',
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "single-slider-product__image")]/a[1]')
         for scene in scenes:
             image = scene.xpath('./img/@src')
@@ -74,7 +79,7 @@ class SiteAVEJAVSpider(BaseSceneScraper):
         return f"{sceneid.upper()} - {title}"
 
     def get_performers_data(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = self.get_performers(response)
         performers_data = []
         for performer in performers:

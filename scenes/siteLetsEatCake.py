@@ -20,7 +20,7 @@ class SiteLetsEatCakeSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['data']
         for scene in jsondata:
@@ -32,7 +32,7 @@ class SiteLetsEatCakeSpider(BaseSceneScraper):
             yield scrapy.Request(scene_url, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
         scene = response.json()
 

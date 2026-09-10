@@ -52,7 +52,7 @@ class WoodmanCastingXScraper(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))
@@ -67,7 +67,7 @@ class WoodmanCastingXScraper(BaseSceneScraper):
             base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@class,"item scene")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

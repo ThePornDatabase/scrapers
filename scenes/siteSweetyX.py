@@ -1,107 +1,70 @@
-import scrapy
 import re
-import html
+
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
 class siteSweetyXSpider(BaseSceneScraper):
     name = 'SweetyX'
     network = 'SweetyX'
+    parent = 'SweetyX'
+    site = 'SweetyX'
 
+    # sweetyx.com now redirects onto the SexPacker tour, and every card there
+    # links to the join page rather than to a scene page -- there are no scene
+    # pages left to fetch, so the item is built entirely from the card.  That
+    # leaves no synopsis, cast or release date anywhere on the site; dates are
+    # left empty for TPDB to fall back on the import date.  The tour serves its
+    # whole catalogue on one page, so there is no pagination to walk.
     url = 'https://www.sweetyx.com/en/sweetyx-videos'
 
     selector_map = {
-        'title': '//h1/text()',
-        'description': '//div[@class="video_description"]/div/div/p/text()',
-        'date': '//div[@class="video_description"]//span[@class="info"]/span/span[contains(text(),"Date")]/../following-sibling::span/text()',
-        'date_formats': ['%d/%m/%Y'],
-        'image': '//meta[@property="og:image"]/@content',
-        'performers': '//div[@class="video_description"]//span[@class="info"]/span[contains(@class,"data-model")]/text()',
-        'tags': '//meta[@name="keywords"]/@content',
-        'external_id': '.*\/(.*?)$',
-        'trailer': '',
-        'pagination': ''
+        'external_id': r'',
+        'pagination': '',
+        'type': 'Scene',
     }
 
-
     async def start(self):
-        yield scrapy.Request(url=self.url,
-                             callback=self.get_scenes,
-                             headers=self.headers,
-                             cookies=self.cookies)
+        yield scrapy.Request(url=self.url, callback=self.get_scenes,
+                             meta={'page': self.page},
+                             headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//article/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        for card in response.xpath('//div[@class="videos__video"]'):
+            thumb = card.xpath('.//div[contains(@class, "videos__thumbnail")]')
+            sceneid = thumb.xpath('./@data-click-id').get()
+            title = card.xpath('.//a[contains(@class, "videos__videoTitle")]/text()').get()
+            if not sceneid or not title:
+                continue
 
-    def get_site(self, response):
-        return "SweetyX"
+            item = self.init_scene()
+            item['title'] = self.cleanup_title(title)
+            item['id'] = sceneid.strip()
+            item['url'] = response.url
+            item['date'] = ''
+            item['description'] = ''
+            item['performers'] = []
+            item['tags'] = []
+            item['trailer'] = ''
 
-    def get_parent(self, response):
-        return "SweetyX"
-        
+            image = thumb.xpath('.//img/@src').get()
+            item['image'] = image.strip() if image else ''
+            item['image_blob'] = self.get_image_blob_from_link(item['image']) if item['image'] else ''
 
-    def get_description(self, response):
-        description = self.process_xpath(response, self.get_selector_map('description'))
-        if description:
-            description = description.getall()
-            description = " ".join(description)
-            return html.unescape(description.strip())
+            item['duration'] = self.get_card_duration(thumb)
+            item['site'] = self.site
+            item['parent'] = self.parent
+            item['network'] = self.network
+            item['type'] = 'Scene'
 
-        return ''
+            yield self.check_item(item, self.days)
 
-    def get_tags(self, response):
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(response, self.get_selector_map('tags'))
-            if tags:
-                
-                tags = tags.get()
-                if "," in tags:
-                    tags = tags.split(",")
-                    tags = list(map(lambda x: x.strip().lower(), tags))
-
-                    performers = self.process_xpath(response, self.get_selector_map('performers')).get()
-                    if performers:
-                        if "," in performers:
-                            performers = performers.split(",")
-                        elif "&" in performers:
-                            performers = performers.split("&")
-                        else:
-                            performers = [performers]                        
-                        performers = list(map(lambda x: x.strip().lower(), performers))
-                        
-                        for performer in performers:
-                            if performer in tags:
-                                tags.remove(performer)        
-                
-                tags2 = tags.copy()
-                for tag in tags2:
-                    matches = ['uncle bob', 'brozerland', 'sweetyx']
-                    if any(x in tag.lower() for x in matches):
-                        tags.remove(tag)
-                
-                if '' in tags:
-                    tags.remove('')
-                
-                    
-            if tags:
-                return list(map(lambda x: x.strip().title(), tags))
-
-        return []
-
-
-
-    def get_performers(self, response):
-        performers = self.process_xpath(response, self.get_selector_map('performers')).get()
-        if performers:
-            if "," in performers:
-                performers = performers.split(",")
-            elif "&" in performers:
-                performers = performers.split("&")
-            else:
-                performers = [performers]                    
-            return list(map(lambda x: x.strip().title(), performers))
-
-        return []
+    def get_card_duration(self, thumb):
+        # The badge reads like "HD 27:14".
+        info = thumb.xpath('.//span[contains(@class, "videos__videoInfo")]/text()').get()
+        if info:
+            match = re.search(r'((?:\d{1,2}:)?\d{1,2}:\d{2})', info)
+            if match:
+                return self.duration_to_seconds(match.group(1))
+        return None

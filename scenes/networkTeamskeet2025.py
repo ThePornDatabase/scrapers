@@ -12,40 +12,79 @@ class NetworkTeamskeet2025Spider(BaseSceneScraper):
     parent = 'Teamskeet'
 
     start_url = 'https://tours-store.psmcdn.net'
+    page_size = 30
 
-    paginations = [
-        '/familybundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=<page>',
-        '/freeusebundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=<page>',
-        ## '/mylf_bundle/_search?q=(type:video%20AND%20isXSeries:false%20AND%20isUpcoming:false)&sort=publishedDate:desc&size=30&from=<page>',
-        ## '/mylf_bundle2/_search?q=(type:video%20AND%20isXSeries:false%20AND%20isUpcoming:false)&sort=publishedDate:desc&size=30&from=<page>',
-        '/network_mylf/_search?q=(type:video%20AND%20isXSeries:false%20AND%20isUpcoming:false)&sort=publishedDate:desc&size=30&from=<page>',
-        '/pervbundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=<page>',
-        '/reptyle_bundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=<page>',
-        '/sau_network/_search?sort=publishedDate:desc&q=(type:video%20AND%20isUpcoming:false)&size=30&from=<page>',
-        '/swap_bundle/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=<page>',
-        '/test_fos/_search?sort=publishedDate:desc&q=(type:video%20AND%20isXSeries:false%20)&size=30&from=<page>',
-        '/ts_network/_search?q=(type:video%20AND%20isUpcoming:false)&sort=publishedDate:desc&size=30&from=<page>',
+    # tours-store is an open Elasticsearch cluster - /_cat/aliases?format=json lists every
+    # index it serves.  Scene ids are tour specific, so an alias' ids only resolve on the
+    # domain that alias backs.  Between them these cover the whole catalogue.
+    #   [alias, tour base url, parent, sites to take from this alias (None = all of them)]
+    endpoints = [
+        ['ts_network', 'https://www.teamskeet.com', 'Teamskeet', None],
+        ['mylf_bundle', 'https://www.mylf.com', 'MyLF', None],
+        ['sau_network', 'https://www.sayuncle.com', 'Say Uncle', None],
+        # brand tours carrying series that none of the three network indexes hold
+        ['freeusebundle', 'https://www.freeuse.com', 'Teamskeet', ['FreeUse Milf', 'UsePOV', 'FreeUse Singles']],
+        ['mylf_ppv', 'https://www.pervprincipal.com', 'MyLF', None],
+        ['familybundle', 'https://www.familystrokes.com', 'Teamskeet', ['Ask Your Mother', 'Family Strokes Features']],
+        ['swap_bundle', 'https://www.swappz.com', 'Teamskeet', ['Swappz Features', 'Swappz Singles']],
+        # series that have no public page on any tour - the teamskeet.com urls built for these
+        # 404, they are here for the metadata
+        ['reptyle_bundle', 'https://www.teamskeet.com', 'Teamskeet', ['Reptyle Selects', 'Extras', 'TeamSkeet X Mr Lucky POV', 'TeamSkeet X Spizoo', 'TeamSkeet X Raw Attack']],
+        ['test_fos', 'https://www.teamskeet.com', 'Teamskeet', ['Reptyle Features']],
+        ['pervbundle', 'https://www.teamskeet.com', 'Teamskeet', ['Pervz Singles', 'Pervz Features', 'Charmed']],
+        ['network_mylf', 'https://www.teamskeet.com', 'MyLF', ['Milf Taxi']],
+        ['sau_dkl', 'https://www.teamskeet.com', 'Say Uncle', ['Dakota Lovell']],
     ]
+
+    # site names the api uses that we submit under a different name
+    site_names = {
+        'Extras': 'Reptyle Extras',
+    }
 
     selector_map = {
         'external_id': r'',
-        'pagination': '/ts_network/_search?q=(type:video)&sort=publishedDate:desc&size=30&from=<page>',
+        'pagination': '/ts_network/_search?q=(type:video AND isUpcoming:false)&sort=publishedDate:desc&size=30&from=<page>',
         'type': 'Scene',
     }
+
     async def start(self):
         ip = requests.get('https://api.ipify.org').content.decode('utf8')
         print('My public IP address is: {}'.format(ip))
 
-        meta = {}
-        meta['page'] = self.page
+        yield scrapy.Request(url=self.format_url(self.start_url, '/mylf_bundle/_search?q=(type:series)&size=100'),
+                             callback=self.parse_mylf_sites,
+                             headers=self.headers,
+                             cookies=self.cookies)
 
-        for pagination in self.paginations:
-            meta['pagination'] = pagination
-            link = self.start_url
-            yield scrapy.Request(url=self.get_next_page_url(link, pagination, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+    def parse_mylf_sites(self, response):
+        # mylf_bundle is the index behind mylf.com.  For every site it carries it holds that
+        # site's complete run, and ts_network carries the same scenes under the same ids, so
+        # those sites are excluded from the ts_network pass and taken with a mylf.com url
+        mylf_sites = sorted(hit['_source']['name'] for hit in response.json()['hits']['hits'])
+        print('MyLF tour sites: ' + str(len(mylf_sites)))
+
+        for alias, base, parent, sites in self.endpoints:
+            pagination = self.get_pagination(alias, sites, mylf_sites if alias == 'ts_network' else None)
+            meta = {'page': self.page, 'pagination': pagination, 'base': base, 'parent': parent}
+            yield scrapy.Request(url=self.get_next_page_url(self.start_url, pagination, self.page),
+                                 callback=self.parse,
+                                 meta=meta,
+                                 headers=self.headers,
+                                 cookies=self.cookies)
+
+    def get_pagination(self, alias, sites=None, exclude=None):
+        # the site filter goes in the query rather than being dropped while parsing, so that a
+        # page never comes back empty for any reason other than reaching the end of the index
+        query = 'type:video AND isUpcoming:false'
+        if sites:
+            query = query + ' AND site.name.keyword:(' + ' OR '.join(f'"{site}"' for site in sites) + ')'
+        if exclude:
+            query = query + ' AND NOT site.name.keyword:(' + ' OR '.join(f'"{site}"' for site in exclude) + ')'
+
+        return f"/{alias}/_search?q=({query})&sort=publishedDate:desc&size=<size>&from=<page>"
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -61,14 +100,17 @@ class NetworkTeamskeet2025Spider(BaseSceneScraper):
                 yield scrapy.Request(url, callback=self.parse, meta=meta)
 
     def get_next_page_url(self, base, pagination, page):
-        offset = (page - 1) * 30
-        returl = self.format_url(base, pagination.replace('<page>', str(offset)))
+        offset = (page - 1) * self.page_size
+        pagination = pagination.replace('<page>', str(offset)).replace('<size>', str(self.page_size))
+        returl = self.format_url(base, pagination)
         return returl
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         for scene in jsondata['hits']['hits']:
+            site = scene['_source']['site']['name']
+
             item = self.init_scene()
 
             item['id'] = scene['_source']['id']
@@ -82,8 +124,8 @@ class NetworkTeamskeet2025Spider(BaseSceneScraper):
                     image = self.format_link(response, scene['_source']['img']).replace(" ", "%20")
                     test_image = image.replace("shared/med.jpg", "shared/hi.jpg")
                     try:
-                        response = requests.head(test_image, allow_redirects=False, timeout=5)
-                        status = response.status_code
+                        head = requests.head(test_image, allow_redirects=False, timeout=5)
+                        status = head.status_code
 
                         if status == 200:
                             item['image'] = test_image
@@ -104,26 +146,10 @@ class NetworkTeamskeet2025Spider(BaseSceneScraper):
                     if "videoTrailer" in scene['_source'] and scene['_source']['videoTrailer']:
                         item['trailer'] = self.format_link(response, scene['_source']['videoTrailer']).replace(" ", "%20")
 
-                    if "mylf" in meta['pagination']:
-                        item['url'] = f"https://www.mylf.com/movies/{scene['_source']['id']}"
-                        item['parent'] = "MyLF"
-                    if "freeuse" in meta['pagination']:
-                        item['url'] = f"https://www.freeuse.com/movies/{scene['_source']['id']}"
-                        item['parent'] = "Teamskeet"
-                    if "familybundle" in meta['pagination']:
-                        item['url'] = f"https://www.familystrokes.com/movies/{scene['_source']['id']}"
-                        item['parent'] = "Teamskeet"
-                    if "sau_network" in meta['pagination']:
-                        item['url'] = f"https://www.sayuncle.com/movies/{scene['_source']['id']}"
-                        item['parent'] = "Say Uncle"                        
-                    if "swap_bundle" in meta['pagination']:
-                        item['url'] = f"https://www.swappz.com/movies/{scene['_source']['id']}"
-                        item['parent'] = "Teamskeet"    
-                    else:
-                        item['url'] = f"https://www.teamskeet.com/movies/{scene['_source']['id']}"
-                        item['parent'] = "Teamskeet"
+                    item['url'] = f"{meta['base']}/movies/{scene['_source']['id']}"
+                    item['parent'] = meta['parent']
 
-                    item['site'] = scene['_source']['site']['name']
+                    item['site'] = self.site_names.get(site, site)
                     item['network'] = "Teamskeet"
 
                     yield item
@@ -142,7 +168,9 @@ class NetworkTeamskeet2025Spider(BaseSceneScraper):
         performers_data = []
         for perf in models:
                 if " " not in perf['name']:
-                    perf_name = perf['name'] + str(perf['id'])
+                    # id used to be the numeric key but is a slug now, so appending it turned
+                    # single word names into "Broganbrogan" - itemId is the numeric one
+                    perf_name = perf['name'] + str(perf['itemId'])
                 else:
                     perf_name = perf['name']
 

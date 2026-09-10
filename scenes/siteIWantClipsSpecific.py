@@ -11,7 +11,7 @@ class SiteIWantClipsSpecificSpider(BaseSceneScraper):
     name = 'IWantClipsSpecific'
     network = 'I Want Clips'
 
-    url_fragment = "468/Goddess-Lindsey"
+    url_fragment = "116682/Domina-Kates-Palace-of-Sin"
 
     start_urls = [
         'https://iwantclips.com',
@@ -39,14 +39,14 @@ class SiteIWantClipsSpecificSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_token, meta=meta, cookies=self.cookies)
 
     def parse_token(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         token_script = response.xpath('//script[contains(text(), "let typesenseClient") and contains(text(), "apiKey")]/text()').get()
         meta['token'] = re.search(r"\'apiKey\'.*?\'(.*?)\'", token_script).group(1)
         meta['host'] = re.search(r'host: \'(.*?)\'', token_script).group(1)
         return self.call_algolia(response.meta['page'], meta)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if response.status == 200:
             scenes = self.get_scenes(response)
             count = 0

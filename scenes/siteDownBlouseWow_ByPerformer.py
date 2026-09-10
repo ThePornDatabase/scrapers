@@ -21,7 +21,7 @@ class SiteDownBlouseWow_ByPerformerSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="itemminfo"]/p/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.get_performer_scenes, meta=meta)

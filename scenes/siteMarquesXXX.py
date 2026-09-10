@@ -18,7 +18,7 @@ class SiteMarquesXXXSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "video-list-thumbs")]/div')
         for scene in scenes:
             item = self.init_scene()

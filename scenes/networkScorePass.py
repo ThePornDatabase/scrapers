@@ -92,7 +92,7 @@ def match_page_scenepath(argument):
         'naughtyfootjobs': "/foot-job-videos/?page=%s",
         'naughtytugs': "/hand-job-videos/?page=%s",
         'pickinguppussy': "/xxx-teen-videos/?page=%s",
-        'pornmegaload': "/hd-porn-scenes/?page=%s",
+        '': "/hd-porn-scenes/?page=%s",
         'scoreland2': "/big-boob-scenes/?page=%s",
         'titsandtugs': "/big-boob-videos/?page=%s",
         'tnatryouts': "/xxx-teen-videos/?page=%s",
@@ -194,6 +194,17 @@ class ScorePassSpider(BaseSceneScraper):
     ]
 
     custom_scraper_settings = {
+        # The Score network refuses this exit outright: TLS completes, the
+        # request goes out, then the server kills the stream. It is not a TLS
+        # fingerprint (Playwright fails identically) nor a challenge page
+        # (FlareSolverr reports "Challenge not detected") -- it is the source
+        # address. FlareSolverr runs on a different host and reaches the site
+        # normally, so requests are routed through it.
+        'DOWNLOAD_TIMEOUT': 180,
+        'DOWNLOADER_MIDDLEWARES': {
+            'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
+            'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
+        },
         'AUTOTHROTTLE_ENABLED': True,
         'AUTOTHROTTLE_START_DELAY': 1,
         'AUTOTHROTTLE_MAX_DELAY': 120,
@@ -219,7 +230,7 @@ class ScorePassSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['ignore_sites'] = ['scorepass']
         if "pornmegaload" in response.url:
             scenes = response.xpath('//div[contains(@class, "li-item video")]')

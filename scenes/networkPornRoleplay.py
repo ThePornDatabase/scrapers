@@ -65,7 +65,7 @@ class networkPornRoleplaySpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']),
@@ -79,7 +79,7 @@ class networkPornRoleplaySpider(BaseSceneScraper):
         return url
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h2[@class="title"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
@@ -103,7 +103,7 @@ class networkPornRoleplaySpider(BaseSceneScraper):
         return None
 
     def get_tags(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = self.process_xpath(response, self.get_selector_map('performers'))
         if performers:
             performers = list(map(lambda x: x.strip().lower(), performers.getall()))

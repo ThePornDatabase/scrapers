@@ -40,7 +40,7 @@ class MovieAyloAPISpider(BaseSceneScraper):
                 yield scrapy.Request(url=url, callback=self.parse, headers=self.headers, cookies=self.cookies, meta=meta, dont_filter=True)
 
     def parse(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         process_page = True
         if "firstpage" in meta and meta['firstpage']:
@@ -70,7 +70,7 @@ class MovieAyloAPISpider(BaseSceneScraper):
             yield scrapy.Request(url=link, callback=self.parse, headers={'instance': token}, meta=meta, dont_filter=True)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for scene in response.json()['result']:
             item = SceneItem()
             # ~ print("Movie")
@@ -174,7 +174,7 @@ class MovieAyloAPISpider(BaseSceneScraper):
         return item
 
     def get_next_page(self, response, pagination):
-        meta = response.meta
+        meta = self.copy_meta(response)
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
 
         if "movies" in pagination:

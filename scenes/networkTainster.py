@@ -75,7 +75,7 @@ class SiteTainsterSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         links = response.xpath('//a[@class="item--link"]/@href').getall()
         for link in links:
             meta['pagination'] = link + "?page=%s"
@@ -90,13 +90,13 @@ class SiteTainsterSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="video_item--player"]/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

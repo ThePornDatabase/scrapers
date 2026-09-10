@@ -29,7 +29,7 @@ class SiteWatch4BeautyPerformerSpider(BasePerformerScraper):
             yield scrapy.Request(start_url, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.json()
         # ~ print(performers)
         for performer in performers['models']:

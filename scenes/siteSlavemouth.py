@@ -22,12 +22,11 @@ class AssylumSpider(BaseSceneScraper):
         'tags': '//p[@class="tags"]/a/text()',
         'external_id': '.*/(.*?)$',
         'trailer': '',
-        'pagination': '/show.php?a=180_2&so=%s'
+        'pagination': '/show.php?a=183_%s'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath(
-            '//div[@class="item"]/a[@class="itemimg"]/@href').getall()
+        scenes = response.xpath('//div[@class="item"]/a[@class="itemimg"]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)

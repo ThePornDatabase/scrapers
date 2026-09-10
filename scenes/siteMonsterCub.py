@@ -31,7 +31,7 @@ class SiteMonsterCubSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "scene_container")]/figure')
         for scene in scenes:
             scenedate = scene.xpath('./..//span[contains(@class, "dateLbl")]/text()')

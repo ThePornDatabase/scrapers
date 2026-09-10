@@ -10,9 +10,30 @@ class SiteVRPornSpider(BaseSceneScraper):
     start_url = "https://vrporn.com"
 
     start_urls = [
-        ['/studio/arporn/page/%s/?sort=newest', 'AR Porn'],
-        ['/studio/vrfanservice/page/%s/?sort=newest', 'VR Fan Service'],
+        ['/studio/arporn/page/%s/?category=new', 'AR Porn'],
+        ['/studio/vrfanservice/page/%s/?category=new', 'VR Fan Service'],
     ]
+
+    # vrporn.com rate limits aggressively — the whole scene list was being fired
+    # off at once and coming back 429. One request at a time, spaced out, and
+    # retries backed off far enough that they don't just re-trip the limit.
+    custom_scraper_settings = {
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 3,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
+        'AUTOTHROTTLE_TARGET_CONCURRENCY': 1.0,
+        'CONCURRENT_REQUESTS': 1,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
+        'DOWNLOAD_DELAY': 3,
+        'RANDOMIZE_DOWNLOAD_DELAY': True,
+        'RETRY_ENABLED': True,
+        'RETRY_TIMES': 5,
+        'RETRY_HTTP_CODES': [429, 408, 500, 502, 503, 504, 522, 524],
+        # Send retries to the back of the queue instead of the front, so a
+        # retried 429 waits out the delay-spaced queue rather than hammering
+        # the same URL three times in four seconds.
+        'RETRY_PRIORITY_ADJUST': -1,
+    }
 
     selector_map = {
         'title': '//h1/text()',
@@ -29,6 +50,14 @@ class SiteVRPornSpider(BaseSceneScraper):
         'external_id': r'.*/(.*?)/',
         'pagination': '',
     }
+
+    # Meta keys this spider sets itself. Forwarding raw response.meta also
+    # forwards Scrapy internals (redirect_urls, download_latency, ...), which
+    # MetaCopyDetectionMiddleware warns about.
+    meta_keys = ('page', 'pagination', 'site', 'parent', 'network')
+
+    def clean_meta(self, response):
+        return {k: response.meta[k] for k in self.meta_keys if k in response.meta}
 
     def get_next_page_url(self, base, page, pagination):
         return self.format_url(base, pagination % page)
@@ -57,13 +86,13 @@ class SiteVRPornSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.clean_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, dont_filter=True)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.clean_meta(response)
         scenes = response.xpath('//article/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

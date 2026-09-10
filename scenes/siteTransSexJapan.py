@@ -21,7 +21,7 @@ class SiteTransSexJapanSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         models = response.xpath('//a[contains(@href, "/model/")]/@href').getall()
         for model in models:
             model_link = self.format_link(response, model)

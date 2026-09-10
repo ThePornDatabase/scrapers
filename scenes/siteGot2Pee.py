@@ -27,7 +27,7 @@ class SiteGot2PeeSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="video-frame"]')
         for scene in scenes:
             date = scene.xpath('.//span[@class="views left"]/text()')

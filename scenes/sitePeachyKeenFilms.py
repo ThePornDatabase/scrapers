@@ -80,12 +80,12 @@ class SitePeachyKeenFilmsSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         url = self.get_next_page_url(response.url, meta['page'])
         yield scrapy.Request(url, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//header[@class="entry-header"]//h1/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

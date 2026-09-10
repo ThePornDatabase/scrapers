@@ -29,7 +29,7 @@ class SiteLustForBoysSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//main/div[@class="row"]//div[contains(@class, "item")]')
         for scene in scenes:
 

@@ -55,7 +55,7 @@ class SitePlaytimeTVSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 page = str((int(meta['page']) - 1) * 12)
@@ -63,7 +63,7 @@ class SitePlaytimeTVSpider(BaseSceneScraper):
                 yield scrapy.FormRequest(self.url, method="POST", headers=self.headers, formdata=self.formdata, callback=self.parse)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         data = data = json.loads(response.text)
         media_list = [data[key] for key in data.keys() if key.isdigit()]
 

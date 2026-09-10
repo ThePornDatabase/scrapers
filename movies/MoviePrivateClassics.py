@@ -20,7 +20,7 @@ class MoviePrivateClassicsSpider(BaseSceneScraper):
     }
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -34,7 +34,7 @@ class MoviePrivateClassicsSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//article[contains(@class, "video")]')
         for movie in movies:
             imagealt = movie.xpath('./figure/a/img/@data-src')
@@ -45,7 +45,7 @@ class MoviePrivateClassicsSpider(BaseSceneScraper):
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//ul[contains(@class,"site-movies")]/li//article/figure/a/@href').get()
         if len(scenes) > 1:
             item = SceneItem()
@@ -122,7 +122,7 @@ class MoviePrivateClassicsSpider(BaseSceneScraper):
                 yield scrapy.Request(self.format_link(response, sceneurl['url']), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
         item['title'] = self.cleanup_title(response.xpath('//div[@class="container"]/div[@class="product"][1]/h1/text()').get().strip())

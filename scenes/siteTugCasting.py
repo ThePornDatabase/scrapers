@@ -28,7 +28,8 @@ class SiteTugCastingSpider(BaseSceneScraper):
         'pagination': '/page%s'
     }
 
-    cookies = {'SPSI': '0ca00a563fecd2d832cda91ab94f1fe9'}
+    # The SPSI session id that was here identified a specific browser session.
+    cookies = {}
 
     def get_scenes(self, response):
         scenes = response.xpath('//h3/a/@href|//div[@class="video-thumb"]/a/@href').getall()

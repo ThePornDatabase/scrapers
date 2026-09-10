@@ -36,7 +36,7 @@ class MovieBlueBirdFilmsSpider(BaseSceneScraper):
     }
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -51,14 +51,14 @@ class MovieBlueBirdFilmsSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//figure')
         for movie in movies:
             movieurl = self.format_link(response, movie.xpath('./a[1]/@href').get())
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = SceneItem()
         item['title'] = self.cleanup_title(response.xpath('//h2/text()').get().strip())
         item['description'] = ''
@@ -139,7 +139,7 @@ class MovieBlueBirdFilmsSpider(BaseSceneScraper):
             yield scrapy.Request(self.format_link(response, sceneurl['scene_url']), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         currscene = meta['currscene']
         item = SceneItem()
 

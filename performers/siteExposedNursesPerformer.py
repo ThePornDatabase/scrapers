@@ -25,7 +25,7 @@ class SiteExposedNursesPerformerSpider(BasePerformerScraper):
         yield scrapy.Request(link, callback=self.get_performers, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//a[@class="model_link_abc"]')
         for performer in performers:
             meta['name'] = performer.xpath('./text()[1]').get()
@@ -33,7 +33,7 @@ class SiteExposedNursesPerformerSpider(BasePerformerScraper):
             yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, meta=meta)
 
     def parse_performer(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = PerformerItem()
 
         item['name'] = self.cleanup_title(meta['name'])

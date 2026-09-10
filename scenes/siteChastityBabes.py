@@ -16,6 +16,12 @@ class ChastityBabesFullImportSpider(BaseSceneScraper):
         'https://www.chastitybabes.com/'
     ]
 
+    # Every URL on the site now answers with an age-verification form instead of
+    # the page, which is why the crawl saw 200s and parsed nothing.  Submitting the
+    # form sets this cookie, and sending it directly is enough -- the rest of the
+    # site, /babes included, is unchanged.
+    cookies = [{"name": "age_gate", "value": "18"}]
+
     selector_map = {
         'external_id': '',
         'pagination': '/scenes?type=new&page=%s'

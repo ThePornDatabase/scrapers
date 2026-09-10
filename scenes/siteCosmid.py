@@ -35,7 +35,7 @@ class CosmidFullImportSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def parse_model_page(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         models = response.xpath('//div[@class="item-portrait"]//h4')
         for model in models:
             modelurl = model.xpath('./a/@href').get()

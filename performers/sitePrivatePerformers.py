@@ -52,7 +52,7 @@ class SitePrivatePerformerSpider(BasePerformerScraper):
             yield performer
 
         if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-            meta = response.meta
+            meta = self.copy_meta(response)
             meta['page'] = meta['page'] + 1
             link = self.get_next_page_url(response.url, meta['page'], meta['pagination'])
             print(f'NEXT PAGE: {meta["page"]}  ({link})')
@@ -62,7 +62,7 @@ class SitePrivatePerformerSpider(BasePerformerScraper):
         return self.format_url(base, pagination % page)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="model"]')
         for performer in performers:
             image_list = performer.xpath('.//img/@srcset').get()
@@ -84,7 +84,7 @@ class SitePrivatePerformerSpider(BasePerformerScraper):
                 yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, meta=meta)
 
     def get_name(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         name = super().get_name(response)
         perfid = re.search(r'.*/(\d+)', response.url).group(1)
         if name and " " not in name:

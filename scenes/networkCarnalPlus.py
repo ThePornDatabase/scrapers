@@ -48,7 +48,7 @@ class NetworkCarnalPlusSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="grid-vid-item"]')
         for scene in scenes:
             site = scene.xpath('.//div[@class="update-sitename"]/text()').get()

@@ -1,8 +1,6 @@
-#  Requires Splash for Image download (https://github.com/scrapinghub/splash)
 #  Requires Flaresolverr for base page retrieval (https://github.com/FlareSolverr/FlareSolverr)
 #  Please enter fields into settings.py with full command such as:
 #  FLARE_ADDRESS = 'http://192.168.1.151:8191/v1'
-#  SPLASH_ADDRESS = 'http://192.168.1.151:8050/run'
 
 import re
 from datetime import date, timedelta
@@ -26,7 +24,6 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
 
     settings = get_project_settings()
     flare_address = settings.get('FLARE_ADDRESS')
-    splash_address = settings.get('SPLASH_ADDRESS')
 
     custom_settings = {
         'CONCURRENT_REQUESTS': 1
@@ -39,17 +36,22 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
     selector_map = {
         'title': '//h1/text()',
         'description': '//meta[@property="og:description"]/@content',
-        'date': '//span[@class="video-detail__date"]/text()',
-        're_date': r'(\d{2}/\d{2}/\d{4})',
-        'date_formats': ['%m/%d/%Y'],
+        'date': '',
         'image': '//meta[@property="og:image"]/@content',
-        'image_blob': '//meta[@property="og:image"]/@content',
         'performers': '',
-        'tags': '//span[@class="categories"]//a/text()',
-        'external_id': r'/(\d+)/',
+        'tags': '',
+        'external_id': r'/en/content/([0-9a-f]{16,})/',
         'trailer': '',
-        'pagination': '/en/videos/page%s.html'
+        'pagination': '/en/content/list?page=%s'
     }
+
+    # The tour was rebuilt.  /en/videos/pageN.html redirects to /en/content/list,
+    # div.video-list and a.video-item__thumb are gone, and scene ids are 24-character
+    # hex strings rather than digits.  Every card is a <content-card> element whose
+    # mpe attribute carries a base64 JSON payload holding the title, release date,
+    # runtime, cast and tags, so those come off the listing; the scene page is still
+    # visited for the full-size still and the synopsis.  Splash is no longer needed
+    # -- SPLASH_ADDRESS is commented out in settings and the stills fetch directly.
 
     async def start(self):
         if hasattr(self, 'start_page'):
@@ -57,10 +59,7 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
         else:
             page = self.page
         page = int(page)
-        if page > 1:
-            url = "https://www.jacquieetmicheltv.net/en/videos/page%s.html" % page
-        else:
-            url = "https://www.jacquieetmicheltv.net/en/"
+        url = "https://www.jacquieetmicheltv.net/en/content/list?page=%s" % page
 
         headers = self.headers
         headers['Content-Type'] = 'application/json'
@@ -106,11 +105,45 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
         response = indexdata['response']
         headers = self.headers
         headers['Content-Type'] = 'application/json'
-        scenes = response.xpath('//div[@class="video-list" and not(./a/h2)]//a[@class="video-item__thumb"]/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'session': 'jacquie', 'url': "https://www.jacquieetmicheltv.net" + scene}
-                yield scrapy.Request(self.flare_address, method='POST', callback=self.parse_scene, body=json.dumps(my_data), headers=headers, cookies=self.cookies)
+        for card in response.xpath('//content-card'):
+            link = card.xpath('.//a[contains(@href, "/en/content/")]/@href').get()
+            if not link or not re.search(self.get_selector_map('external_id'), link):
+                continue
+
+            meta = {'id': re.search(self.get_selector_map('external_id'), link).group(1)}
+            meta.update(self.decode_card(card))
+
+            my_data = {'cmd': 'request.get', 'maxTimeout': 60000, 'session': 'jacquie',
+                       'url': "https://www.jacquieetmicheltv.net" + link}
+            yield scrapy.Request(self.flare_address, method='POST', callback=self.parse_scene,
+                                 body=json.dumps(my_data), headers=headers, cookies=self.cookies, meta=meta)
+
+    @staticmethod
+    def decode_card(card):
+        """The card's mpe attribute holds a base64 JSON blob with the facts the
+        rebuilt markup no longer exposes as elements."""
+        mpe = card.xpath('.//a[contains(@href, "/en/content/")]/@mpe').get() or ''
+        payload = re.search(r"'([A-Za-z0-9+/=]{40,})'", mpe)
+        if not payload:
+            return {}
+        try:
+            data = json.loads(base64.b64decode(payload.group(1)))
+        except Exception:
+            return {}
+
+        out = {}
+        if data.get('contentTitle'):
+            out['title'] = data['contentTitle']
+        published = re.search(r'(\d{4}-\d{2}-\d{2})', data.get('contentPublicationDate') or '')
+        if published:
+            out['date'] = published.group(1)
+        if data.get('contentDuration'):
+            out['duration'] = str(int(data['contentDuration']))
+        actors = [x.strip() for x in (data.get('contentActorsNames') or '').split(',') if x.strip()]
+        out['performers'] = list(dict.fromkeys(actors))
+        tags = [x.strip().title() for x in (data.get('contentTagsNames') or '').split(',') if x.strip()]
+        out['tags'] = list(dict.fromkeys(tags))
+        return out
 
     def get_tags(self, response):
         if self.get_selector_map('tags'):
@@ -126,41 +159,40 @@ class SiteJacquieEtMichelTVSpider(BaseSceneScraper):
         return "Jacquie et Michel TV"
 
     def parse_scene(self, response):
+        meta = self.copy_meta(response)
         jsondata = response.json()
         htmlcode = jsondata['solution']['response']
-        response = HtmlResponse(url=response.url, body=htmlcode, encoding='utf-8')
+        page = HtmlResponse(url=jsondata['solution']['url'], body=htmlcode, encoding='utf-8')
+
         item = SceneItem()
-        item['performers'] = []
-        item['title'] = self.get_title(response)
-        item['title'] = item['title'].replace(" ...", "")
-        item['date'] = self.get_date(response)
-        item['description'] = self.get_description(response)
-        item['image'] = self.get_image(response)
-        item['image_blob'] = self.get_image_blob(response)
-        item['tags'] = self.get_tags(response)
-        if "" in item['tags']:
-            item['tags'].remove("")
-        item['id'] = re.search(r'\/(\d+)\/', jsondata['solution']['url']).group(1)
-        item['trailer'] = self.get_trailer(response)
+        item['title'] = (meta.get('title')
+                         or page.xpath('//h1/text()').get() or '').replace(" ...", "").strip()
+        if not item['title']:
+            return
+        item['title'] = self.cleanup_title(item['title'])
+
+        item['date'] = meta.get('date')
+        item['duration'] = meta.get('duration')
+        item['performers'] = meta.get('performers', [])
+        item['tags'] = meta.get('tags', [])
+
+        description = page.xpath('//meta[@property="og:description"]/@content').get() or ''
+        item['description'] = self.cleanup_description(re.sub(r'\s+', ' ', description))
+
+        item['image'] = (page.xpath(self.get_selector_map('image')).get() or '').strip()
+        item['image_blob'] = self.get_image_blob_from_link(item['image']) if item['image'] else None
+
+        item['id'] = meta.get('id')
+        item['trailer'] = ''
         item['url'] = jsondata['solution']['url']
         item['network'] = "Jacquie et Michel TV"
         item['parent'] = "Jacquie et Michel TV"
         item['site'] = "Jacquie et Michel TV"
+        item['type'] = 'Scene'
 
-        if ":8191" not in item['image']:
-            yield self.check_item(item, self.days)
-
-    def get_image_blob(self, response):
-        script = '''
-            splash:set_viewport_size(806, 453)
-            splash:go(args.url)
-            return splash:png()
-        '''
-        image = self.get_image(response)
-        if image:
-            rsp = requests.post(self.splash_address, json={'lua_source': script, 'url': image})
-            return base64.b64encode(rsp.content).decode('utf-8')
-        return None
+        item = self.check_item(item, self.days)
+        if item:
+            yield item
 
     def closed(self, response):
         headers = self.headers

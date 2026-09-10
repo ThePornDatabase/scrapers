@@ -29,7 +29,7 @@ class SiteEyeOnTheGuySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h4/a[contains(@href, "/t1/trailers")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

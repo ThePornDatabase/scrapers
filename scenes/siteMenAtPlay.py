@@ -42,7 +42,7 @@ class SiteMenAtPlaySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="updateDetails"]')
         for scene in scenes:
             sceneid = scene.xpath('.//a/img/@id')

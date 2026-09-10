@@ -37,7 +37,7 @@ class LegalPornoSpider(BaseSceneScraper):
         return "Legal Porno"
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="card-scene"]/div[1]/a[1]/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)

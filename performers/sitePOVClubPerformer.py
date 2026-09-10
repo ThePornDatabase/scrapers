@@ -32,7 +32,7 @@ class SitePOVClubPerformerSpider(BasePerformerScraper):
         return 'Female'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="item-portrait"]/a')
         for performer in performers:
             meta['name'] = performer.xpath('./@title').get().strip()

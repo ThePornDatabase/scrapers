@@ -71,7 +71,7 @@ class SiteDorcelPagesSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 url = self.get_next_page_url(meta['orig_site'], meta['page'])

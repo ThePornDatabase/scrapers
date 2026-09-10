@@ -37,7 +37,7 @@ class SiteSexyFightingZoneSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 formdata = {}
@@ -53,7 +53,7 @@ class SiteSexyFightingZoneSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//p/a/@onclick').getall()
         for scene in scenes:
             sceneid = re.search(r'\((\d+)\)', scene).group(1)

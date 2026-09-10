@@ -60,7 +60,7 @@ class OktogonMediaSpider(BaseSceneScraper):
                     yield scrapy.Request(url=self.get_next_page_url(url, self.page, pagination), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if response.status == 200:
             scenes = self.get_scenes(response)
             count = 0

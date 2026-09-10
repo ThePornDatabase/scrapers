@@ -28,7 +28,7 @@ class SiteDirtyTonySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h1/@id').getall()
         for scene in scenes:
             meta['id'] = re.search(r'-(\d+)$', scene).group(1)

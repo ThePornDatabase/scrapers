@@ -2,8 +2,6 @@ import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-true = True
-false = False
 
 
 class MovieNathanBlakeSpider(BaseSceneScraper):
@@ -15,7 +13,8 @@ class MovieNathanBlakeSpider(BaseSceneScraper):
         'https://nathansluts.com'
     ]
 
-    cookies = [{"domain":"nathansluts.com","expirationDate":1712439997,"hostOnly":true,"httpOnly":false,"name":"ns_disclaimer","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"1"},{"domain":"nathansluts.com","hostOnly":true,"httpOnly":true,"name":"_nathansluts_session2","path":"/","sameSite":"unspecified","secure":true,"session":true,"storeId":"0","value":"WXNUb01VMjJwS0hBd05pVk5pRmlWMDJCVXBha0VDeG4vSjVzQksyS0JuRXhxamZRbTZ5bHlwUVB0d3d0eTVGenJKNnN4T0p6MG1DUG1tWFd0K25lUmpDTEVrVmhqbDEzS0R0cUNwWWVOTDd4UTExOEl5VHdOaGE4aTJwOHFyZThXZUdtMGlnUkI4VXFyWkZHTmM1WVVkVzE0aVN4UjZleVdaQnZib2ROSFNvd1U2Yzl0QmlxTUNCbDFXb2xsZDFNVVRha01BNCtvb2dPTlN0Nzkzd2Uvd2pFbVRQUlZsd1hmK0JNeFpJT0JSVmdZSTNPdWpEYmR5WExMdlZSM0FBeVl6aHdkSUVzaHRGZXpUOFQxNHhTcVBjYXUyY1dFMkZidTNVQlZsSkgweDV3N1lTa3prSWh1WWNwK2loN1UwOUQtLVoxR3hIWmJtTDZBSjVWazRWcWc5c2c9PQ%3D%3D--538036a66b090009f9b4a7ee85872229b9c62e01"}]
+    # Disclaimer flag only; the _nathansluts_session2 session cookie was removed.
+    cookies = {"ns_disclaimer": "1"}
 
     custom_scraper_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
@@ -50,12 +49,12 @@ class MovieNathanBlakeSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies, dont_filter=True)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for link in self.start_urls:
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, cookies=self.cookies, meta=meta,dont_filter=True)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -72,14 +71,14 @@ class MovieNathanBlakeSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta,dont_filter=True)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//div/a[contains(@href, "/dvds/")]/@href').getall()
         for movie in movies:
             movieurl = self.format_link(response, movie)
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//comment()[contains(., "Scenes")]/following-sibling::div[1]//a[contains(@href, "/videos/")]/@href').getall()
         if len(scenes) > 1:
             item = SceneItem()
@@ -141,7 +140,7 @@ class MovieNathanBlakeSpider(BaseSceneScraper):
                     yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
 

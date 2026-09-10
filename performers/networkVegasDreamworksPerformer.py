@@ -71,7 +71,7 @@ class VegasDreamworksPerformerSpider(BasePerformerScraper):
 
         if count and response.meta['page'] < 10:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))

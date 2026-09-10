@@ -23,7 +23,7 @@ class SitePerfectDSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="video-card"]/div')
         for scene in scenes:
             image = scene.xpath('./a/img/@src')
@@ -46,7 +46,7 @@ class SitePerfectDSpider(BaseSceneScraper):
         return tags
 
     def get_image(self, response, path=None):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if ".jpg" not in image and ".png" not in image:
             image = meta['origimage']

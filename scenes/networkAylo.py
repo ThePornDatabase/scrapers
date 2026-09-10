@@ -132,6 +132,9 @@ class NetworkAyloSpider(BaseSceneScraper):
 
     def parse(self, response):
         token = self.get_token(response)
+        if not token:
+            print(f"*** No instance_token issued by {response.meta['url']}, skipping site")
+            return
 
         headers = {
             'instance': token,
@@ -148,7 +151,7 @@ class NetworkAyloSpider(BaseSceneScraper):
         return self.get_next_page(response)
 
     def get_next_page(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         query = {
@@ -257,7 +260,7 @@ class NetworkAyloSpider(BaseSceneScraper):
         return performer
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.json()['result']
         skipped_count = 0
         
@@ -415,8 +418,15 @@ class NetworkAyloSpider(BaseSceneScraper):
         return item
 
     def get_token(self, response):
-        token = re.search('instance_token=(.+?);', response.headers.getlist('Set-Cookie')[0].decode("utf-8"))
-        return token.group(1)
+        """Only the first Set-Cookie header used to be searched, but instance_token
+        is rarely the first one the sites send -- brazzers puts it second and
+        babes/realitykings/mofos/seancody third -- so the match returned None and
+        .group(1) aborted the whole site.  Every header is scanned now."""
+        for header in response.headers.getlist('Set-Cookie'):
+            token = re.search('instance_token=(.+?);', header.decode("utf-8"))
+            if token:
+                return token.group(1)
+        return None
 
     def get_trailer(self, scene):
         if 'videos' not in scene:

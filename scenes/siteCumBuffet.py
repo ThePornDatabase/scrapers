@@ -34,7 +34,7 @@ class SiteCumBuffetSpider(BaseSceneScraper):
                              cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="video"]')
         for scene in scenes:
             date = scene.xpath('.//div[@class="date"]/text()').get()

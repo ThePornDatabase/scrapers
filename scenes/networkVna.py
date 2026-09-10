@@ -72,7 +72,7 @@ class VnaNetworkSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         # ~ if "romemajor" in response.url:
         scenes = response.xpath('//div[contains(@class, "videoarea clear")]|//div[contains(@class, "updatedVideo")]|//div[contains(@class,"videoPics clear")]|//div[contains(@class, "vid-block")]|//div[contains(@class, "videos clear")]|//div[@class="video-thumb"]')
         for scene in scenes:
@@ -141,7 +141,7 @@ class VnaNetworkSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         image = image.replace("sd3.php?show=file&path=/", "")
         if not re.search(r'\.com/(.*)', image) or (".jpg" not in image.lower()):

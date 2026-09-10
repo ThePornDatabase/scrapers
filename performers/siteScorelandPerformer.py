@@ -55,7 +55,7 @@ class SiteScorelandPerformerPerformerSpider(BasePerformerScraper):
         return 'Female'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[contains(@class, "info")]/div[contains(@class, "trunc")]/a/@href').getall()
         for performer in performers:
             if "?nats" in performer:

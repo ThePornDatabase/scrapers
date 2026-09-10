@@ -29,7 +29,7 @@ class CherryPimpsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         """ Returns a list of scenes
         @url https://cherrypimps.com/categories/movies.html
         @returns requests 10 50
@@ -69,7 +69,7 @@ class CherryPimpsSpider(BaseSceneScraper):
         return site
 
     def get_parent(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "site" in meta and meta['site']:
             return meta['site']
         return super().get_parent(response)
@@ -88,7 +88,7 @@ class CherryPimpsSpider(BaseSceneScraper):
         return None
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if "content" not in image and "cdn" not in image:
             return meta['origimage']

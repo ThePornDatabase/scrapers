@@ -39,6 +39,28 @@ class SiteBrothaLoversSpider(BaseSceneScraper):
         'https://www.interracialsexx.com/interracialsexx/updates2018pt1.htm',
     ]
 
+    async def start(self):
+        """Clear the server-side age gate before requesting any update page.
+
+        interracialsexx.com now answers every URL with a splash page whose ENTER
+        button POSTs confirm_adult=1 back to /.  Without that the crawl only ever
+        saw the splash, which is why get_scenes matched nothing.  Scrapy carries the
+        resulting session cookie on the follow-up requests.
+        """
+        yield scrapy.FormRequest(
+            url='https://www.interracialsexx.com/',
+            formdata={'confirm_adult': '1', 'return': '/interracialsexx/previewpage.htm'},
+            callback=self.start_after_gate,
+            meta={'page': self.page},
+            headers=self.headers,
+            dont_filter=True)
+
+    def start_after_gate(self, response):
+        meta = self.copy_meta(response)
+        yield scrapy.Request(url=self.get_next_page_url(self.start_urls[0], self.page),
+                             callback=self.parse, meta=meta, headers=self.headers,
+                             dont_filter=True)
+
     def get_next_page_url(self, base, page):
         links = self.pages
         page = int(page) - 1

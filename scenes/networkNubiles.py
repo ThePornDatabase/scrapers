@@ -1,7 +1,9 @@
 import re
+import os
 import json
 import hashlib
 import requests
+from urllib.parse import urlparse
 from requests import get
 from datetime import date, timedelta, datetime
 import dateparser
@@ -68,6 +70,7 @@ class NubilesSpider(BaseSceneScraper):
         "https://anilos.com",
         "https://badteenspunished.com",
         "https://bountyhunterporn.com",
+        "https://brattymilf.com",
         "https://brattysis.com",
         "https://cheatingsis.com",
         "https://cumswappingsis.com",
@@ -112,26 +115,140 @@ class NubilesSpider(BaseSceneScraper):
     }
 
     async def start(self):
-        ip = get('https://api.ipify.org').content.decode('utf8')
-        print('My public IP address is: {}'.format(ip))
+        try:
+            ip = get('https://api.ipify.org', timeout=5).content.decode('utf8')
+            print('My public IP address is: {}'.format(ip))
+        except Exception as e:
+            print(f'Could not resolve public IP: {e}')
 
         for link in self.start_urls:
-            verified_cookies = self.get_verified_cookies(link)
-            if verified_cookies is None:
-                self.logger.error(f"Could not solve PoW captcha for {link}, skipping")
-                continue
-
-            cookies = {'18-plus-modal': 'hidden'}
-            cookies.update(verified_cookies)
-
-            meta = {'page': self.page}
+            # The server bounces /video/gallery -> /turnstile/challenge -> /video/gallery
+            # to issue session state. We follow redirects manually with dont_filter=True so
+            # the dupefilter doesn't block the second hop back to /video/gallery, and so we
+            # can intercept the Security Check page if it appears.
+            meta = {
+                'page': self.page,
+                'base_link': link.rstrip('/'),
+                'dont_redirect': True,
+                'handle_httpstatus_list': [301, 302, 303, 307, 308],
+            }
             yield scrapy.Request(
                 url=self.get_next_page_url(link, self.page),
-                callback=self.parse,
+                callback=self.captcha_or_parse,
                 meta=meta,
                 headers=self.headers,
-                cookies=cookies,
+                cookies={'18-plus-modal': 'hidden'},
             )
+
+    def captcha_or_parse(self, response):
+        """Follow redirects manually, intercept Security Check page if served,
+        otherwise defer to the normal parse() flow."""
+        if response.status in (301, 302, 303, 307, 308):
+            location = response.headers.get('Location', b'').decode('latin1')
+            if location.startswith('/'):
+                location = response.meta.get('base_link', '') + location
+            yield scrapy.Request(
+                url=location,
+                callback=self.captcha_or_parse,
+                meta=dict(response.meta),
+                headers=self.headers,
+                dont_filter=True,
+            )
+            return
+        # Detect the challenge either by URL (site's own /turnstile/challenge path)
+        # or by content markers. URL check is more resilient — the challenge HTML
+        # has been reworked before, and we don't want to silently fall through when
+        # markup changes.
+        is_challenge = (
+            '/turnstile/challenge' in response.url
+            or 'turnstileConfig' in response.text
+            or 'Security Check' in response.text
+        )
+        if is_challenge:
+            yield from self._solve_captcha(response)
+        else:
+            yield from self.parse(response)
+
+    def _solve_captcha(self, response):
+        m = re.search(r"var\s+turnstileConfig\s*=\s*(\{.*?\});", response.text)
+        if not m:
+            self.logger.error(
+                f"Captcha page detected at {response.url} but turnstileConfig not parseable. "
+                f"Response head (first 800 chars): {response.text[:800]!r}"
+            )
+            return
+        try:
+            config = json.loads(m.group(1))
+        except ValueError as e:
+            self.logger.error(f"turnstileConfig is not valid JSON: {e}")
+            return
+        try:
+            nonce = self._solve_pow(config['challenge'], config['difficulty'])
+        except Exception as e:
+            self.logger.error(f"PoW solve failed: {e}")
+            return
+
+        base = response.meta.get('base_link') or (
+            f"{response.url.split('/')[0]}//{response.url.split('/')[2]}"
+        )
+        verify_url = base + '/turnstile/verify'
+        payload = {
+            'nonce': str(nonce),
+            'timestamp': config['timestamp'],
+            'difficulty': config['difficulty'],
+            'environmentChecks': {
+                'screenWidth': 1920, 'screenHeight': 1080,
+                'hasCanvas': True, 'hasWebGL': True, 'colorDepth': 24,
+                'timezoneOffset': 300, 'languages': 'en-US,en',
+                'platform': 'Win32', 'cookieEnabled': True,
+            },
+            'returnTo': config['returnTo'],
+        }
+        verify_headers = dict(self.headers)
+        verify_headers.update({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Referer': response.url,
+            'Origin': base,
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Dest': 'empty',
+        })
+
+        self.logger.info(f"Solved PoW for {base} (nonce={nonce}); submitting verify")
+        yield scrapy.Request(
+            url=verify_url,
+            method='POST',
+            body=json.dumps(payload),
+            headers=verify_headers,
+            callback=self._after_verify,
+            meta=dict(response.meta),
+            dont_filter=True,
+        )
+
+    def _after_verify(self, response):
+        try:
+            result = response.json()
+        except ValueError:
+            self.logger.error(f"Non-JSON from /turnstile/verify: {response.text[:200]}")
+            return
+        if not result.get('success'):
+            self.logger.error(f"Verification rejected: {result}")
+            return
+
+        base = response.meta.get('base_link', '')
+        redirect_to = result.get('redirectTo') or '/video/gallery'
+        if not redirect_to.startswith('http'):
+            redirect_to = base + redirect_to
+
+        self.logger.info(f"Verified, re-requesting {redirect_to}")
+        yield scrapy.Request(
+            url=redirect_to,
+            callback=self.parse,
+            meta=response.meta,
+            headers=self.headers,
+            dont_filter=True,
+        )
 
     @staticmethod
     def _solve_pow(challenge, difficulty):
@@ -144,102 +261,7 @@ class NubilesSpider(BaseSceneScraper):
                 return nonce
             nonce += 1
 
-    def get_verified_cookies(self, base_url):
-        """Solve the homegrown PoW captcha and return a dict of verified session cookies.
-
-        Returns None on failure. Returns an empty dict if the site doesn't actually
-        present the captcha (already accessible).
-        """
-        base = base_url.rstrip('/')
-        gallery_url = base + '/video/gallery'
-
-        session = requests.Session()
-        session.headers.update({
-            'User-Agent': self.USER_AGENT,
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-            'Upgrade-Insecure-Requests': '1',
-        })
-
-        try:
-            r = session.get(gallery_url, timeout=15)
-        except requests.RequestException as e:
-            self.logger.warning(f"get_verified_cookies: GET {gallery_url} failed: {e}")
-            return None
-
-        if r.status_code == 429:
-            self.logger.warning(f"get_verified_cookies: rate-limited on {gallery_url}")
-            return None
-
-        m = re.search(r"var\s+turnstileConfig\s*=\s*(\{.*?\});", r.text)
-        if not m:
-            return dict(session.cookies)
-
-        try:
-            config = json.loads(m.group(1))
-            nonce = self._solve_pow(config['challenge'], config['difficulty'])
-        except Exception as e:
-            self.logger.warning(f"get_verified_cookies: PoW solve failed for {base}: {e}")
-            return None
-
-        verify_url = base + '/turnstile/verify'
-        payload = {
-            'nonce': str(nonce),
-            'timestamp': config['timestamp'],
-            'difficulty': config['difficulty'],
-            'environmentChecks': {
-                'screenWidth': 1920,
-                'screenHeight': 1080,
-                'hasCanvas': True,
-                'hasWebGL': True,
-                'colorDepth': 24,
-                'timezoneOffset': 300,
-                'languages': 'en-US,en',
-                'platform': 'Win32',
-                'cookieEnabled': True,
-            },
-            'returnTo': config['returnTo'],
-        }
-
-        try:
-            vr = session.post(
-                verify_url,
-                json=payload,
-                headers={
-                    'Content-Type': 'application/json',
-                    'Referer': gallery_url,
-                    'Origin': base,
-                },
-                timeout=15,
-            )
-        except requests.RequestException as e:
-            self.logger.warning(f"get_verified_cookies: POST {verify_url} failed: {e}")
-            return None
-
-        if vr.status_code != 200:
-            self.logger.warning(f"get_verified_cookies: verify POST returned {vr.status_code} for {base}")
-            return None
-
-        try:
-            result = vr.json()
-        except ValueError:
-            self.logger.warning(f"get_verified_cookies: non-JSON verify response for {base}")
-            return None
-
-        if not result.get('success'):
-            self.logger.warning(f"get_verified_cookies: verify failed for {base}: {result}")
-            return None
-
-        self.logger.info(f"get_verified_cookies: solved PoW for {base} (nonce={nonce})")
-        return dict(session.cookies)
-
     def get_scenes(self, response):
-        # print(response.text)
         scenes = response.xpath('//figcaption')
         for scene in scenes:
             link = scene.xpath('./div/span/a/@href').get()
@@ -286,13 +308,74 @@ class NubilesSpider(BaseSceneScraper):
                 if self.check_item(meta, self.days):
                     yield scrapy.Request(url,callback=self.parse_scene, meta=meta)
 
+    # Hosts known to reject /video/gallery/0 — page 1 must be plain /video/gallery.
+    # Short-circuit the HEAD probe for these so we don't burn requests (and don't
+    # risk triggering the WAF on the ones that answer HEAD with 429).
+    _PAGE1_PLAIN_HOSTS = (
+        'nubiles.net',
+        'doublepies.com',
+    )
+
+    # Cache of page-1 URL per host, persisted across runs so we probe each site
+    # at most once, ever.
+    _PAGE1_CACHE_FILE = os.path.expanduser('~/.tpdb_nubiles_page1_cache.json')
+    _page1_cache = None  # populated lazily on first access
+
+    def _load_page1_cache(self):
+        cls = type(self)
+        if cls._page1_cache is not None:
+            return cls._page1_cache
+        try:
+            with open(cls._PAGE1_CACHE_FILE, 'r') as f:
+                cls._page1_cache = json.load(f)
+        except (OSError, ValueError):
+            cls._page1_cache = {}
+        return cls._page1_cache
+
+    def _save_page1_cache(self):
+        cls = type(self)
+        if cls._page1_cache is None:
+            return
+        try:
+            with open(cls._PAGE1_CACHE_FILE, 'w') as f:
+                json.dump(cls._page1_cache, f, indent=2)
+        except OSError:
+            pass
+
     def get_next_page_url(self, base, page):
-        if "nubiles.net" in base and page == 1:
-            return "https://nubiles.net/video/gallery"
-        if "doublepies.com" in base and page == 1:
-            return "https://doublepies.com/video/gallery"
+        if page == 1:
+            probe_url = self.format_url(base, self.get_selector_map('pagination') % 0)
+            plain_url = self.format_url(base, '/video/gallery')
+            host = urlparse(base).netloc.lower()
+
+            # Fast-path 1: hardcoded known-plain hosts.
+            if any(bad in host for bad in self._PAGE1_PLAIN_HOSTS):
+                return plain_url
+
+            # Fast-path 2: persistent cache from a previous run.
+            cache = self._load_page1_cache()
+            if host in cache:
+                return cache[host]
+
+            # Cold path: probe once, then remember the answer forever.
+            chosen = plain_url
+            try:
+                r = requests.head(
+                    probe_url,
+                    headers={'User-Agent': self.USER_AGENT},
+                    allow_redirects=True,
+                    timeout=10,
+                )
+                if r.status_code == 200:
+                    chosen = probe_url
+            except requests.RequestException:
+                pass
+            cache[host] = chosen
+            self._save_page1_cache()
+            return chosen
         page = ((page - 1) * 12)
         return self.format_url(base, self.get_selector_map('pagination') % page)
+        
 
     def get_description(self, response):
         if 'description' not in self.get_selector_map():

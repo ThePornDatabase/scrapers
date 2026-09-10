@@ -28,7 +28,7 @@ class SiteRealJamVRSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="panel"]')
         for scene in scenes:
             trailer = scene.xpath('.//video/source/@src')

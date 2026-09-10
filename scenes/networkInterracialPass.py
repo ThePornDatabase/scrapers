@@ -69,7 +69,7 @@ class InterracialPassSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['handle_httpstatus_list'] = [500]
         scenes = response.xpath('//div[contains(@class, "item-video")]')
         for scene in scenes:
@@ -98,7 +98,7 @@ class InterracialPassSpider(BaseSceneScraper):
         return self.format_url(base, selector % page)
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = self.process_xpath(response, self.get_selector_map('image'))
         if image:
             image = self.get_from_regex(image.get(), 're_image')

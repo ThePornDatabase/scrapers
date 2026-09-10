@@ -8,6 +8,7 @@ from tpdb.BasePerformerScraper import BasePerformerScraper
 class siteDarkkoTVPerformerSpider(BasePerformerScraper):
     selector_map = {
         'name': '//h1/text()',
+        're_name': r'erformer (.*?)$',
         'image': '//meta[@property="og:image"]/@content',
         'image_blob': True,
         'bio': '//div[contains(@class, "modelBioInfo ")]//text()',
@@ -38,8 +39,8 @@ class siteDarkkoTVPerformerSpider(BasePerformerScraper):
     start_url = 'https://darkkotv.com'
 
     paginations = [
-        '/models/models_%s.html?g=m',
-        '/models/models_%s.html?g=f',
+        '/models/models_%s_d.html?g=m',
+        '/models/models_%s_d.html?g=f',
         # '/models/models_%s.html?g=tf',
         # '/models/models_%s.html?g=tm',
         # '/models/models_%s.html?g=nb',
@@ -62,7 +63,7 @@ class siteDarkkoTVPerformerSpider(BasePerformerScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['pagination']) % meta['page'])
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -71,7 +72,7 @@ class siteDarkkoTVPerformerSpider(BasePerformerScraper):
         return self.format_url(base, pagination % page)
     
     def get_gender(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         gender = 'Female'
         if "g=f" in meta['pagination']:
             gender = 'Female'
@@ -112,7 +113,7 @@ class siteDarkkoTVPerformerSpider(BasePerformerScraper):
         return None
     
     def get_fakeboobs(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         fakeboobs = 'no'
         if "g=f" in meta['pagination']:
             boob_text = response.xpath('//div[contains(@class, "vitalStats")]/ul/li/text()[contains(., "Natural Breasts")]')

@@ -24,15 +24,56 @@ class SiteBrokeModelSpider(BaseSceneScraper):
         'duration': '',
         'trailer': '',
         'external_id': r'',
-        'pagination': '/tour3/models/models_%s_d.html?g=f',
+        # The model pages this used to walk are broken server-side: the CMS emits
+        # "Uncaught Error: Undefined constant ZoneId" and renders no updates at all,
+        # so a crawl fetched 96 model pages and produced nothing.  The scenes listing
+        # at /tour3/categories/ carries them directly.
+        'pagination': '/tour3/categories/movies_%s_d.html',
         'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        models = response.xpath('//div[@class="modelPic"]/a/@href').getall()
-        for model in models:
-            yield scrapy.Request(url=self.format_link(response, model), callback=self.get_model_scenes, meta=meta)
+        for scene in response.xpath('//div[@class="updateItem"]'):
+            item = SceneItem()
+
+            title = scene.xpath('.//div[@class="updateDetails"]//h4/a/text()').get()
+            if not title or not title.strip():
+                continue
+            item['title'] = self.cleanup_title(title)
+            item['description'] = ""
+
+            # the still doubles as the identifier: content/<set>/<n>.jpg
+            image = scene.xpath('./a/img/@src0_4x').get() or scene.xpath('./a/img/@src').get()
+            if not image:
+                continue
+            item['image'] = self.format_link(response, image)
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
+            sceneid = re.search(r'content/([^/]+)/', image)
+            if not sceneid:
+                continue
+            item['id'] = sceneid.group(1)
+            item['url'] = self.format_link(response, scene.xpath('./a/@href').get() or image)
+
+            item['date'] = ''
+            for text in scene.xpath('.//div[@class="updateDetails"]//span/text()').getall():
+                scenedate = re.search(r'(\d{1,2}/\d{1,2}/\d{4})', text)
+                if scenedate:
+                    scenedate = self.parse_date(scenedate.group(1), date_formats=['%m/%d/%Y'])
+                    if scenedate:
+                        item['date'] = scenedate.isoformat()
+                    break
+
+            item['performers'] = [x.strip() for x in
+                                  scene.xpath('.//span[contains(@class, "tour_update_models")]/a/text()').getall()
+                                  if x and x.strip()]
+            item['tags'] = []
+            item['trailer'] = ""
+            item['site'] = "Broke Model"
+            item['parent'] = "Broke Model"
+            item['network'] = "Broke Model"
+
+            yield self.check_item(item, self.days)
 
     def get_model_scenes(self, response):
         scenes = response.xpath('//div[@class="update_block"]')

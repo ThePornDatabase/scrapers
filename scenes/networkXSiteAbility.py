@@ -82,7 +82,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def parse(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -103,7 +103,7 @@ class NetworkXSiteAbilitySpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "officeperils" in response.url or  "ericarossbound" in response.url:
             scenes = response.xpath('//*[self::h3 or self::h4]/following-sibling::p[contains(text(), "video")]/ancestor::li')
         else:

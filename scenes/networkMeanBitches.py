@@ -28,7 +28,7 @@ class NetworkMeanBitchesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@id, "packageinfo")]')
         for scene in scenes:
             sceneid = scene.xpath('./@id').get()

@@ -66,14 +66,14 @@ class NetworkPornProsAPISpider(BaseSceneScraper):
             yield scene
 
         if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-            meta = response.meta
+            meta = self.copy_meta(response)
             meta['page'] = meta['page'] + 1
             print('NEXT PAGE: ' + str(meta['page']))
             headers = {"x-site": f"{meta['site']}.com"}
             yield scrapy.Request(url=self.get_next_page_url(meta['site'], meta['page']), callback=self.parse, headers=headers, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.json()
         for scene in scenes['items']:
             item = self.init_scene()

@@ -1,7 +1,7 @@
+import re
+import string
+from urllib.parse import urlsplit, urlunsplit, quote
 import scrapy
-from slugify import slugify
-from scrapy.utils.project import get_project_settings
-from tpdb.items import SceneItem
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -11,72 +11,99 @@ class SiteThaineeSpider(BaseSceneScraper):
     parent = 'Thainee'
     site = 'Thainee'
 
-    start_urls = [
-        'https://thainee.com',
-    ]
+    start_url = 'https://thainee.com'
 
     selector_map = {
         'external_id': r'',
-        'pagination': '/index.php'
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc',
+        'type': 'Scene',
     }
 
+    # The feed mixes real tags in with site furniture
+    tag_trash = ['photos', 'sites', 'updates', 'thainee.com', 'tour updates', 'videos']
+
     async def start(self):
-        settings = get_project_settings()
-
-        if not hasattr(self, 'start_urls'):
-            raise AttributeError('start_urls missing')
-
-        if not self.start_urls:
-            raise AttributeError('start_urls selector missing')
-
         meta = {}
         meta['page'] = self.page
-        if 'USE_PROXY' in settings.attributes.keys():
-            use_proxy = settings.get('USE_PROXY')
-        else:
-            use_proxy = None
+        yield scrapy.Request(self.start_url, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
-        if use_proxy:
-            print(f"Using Settings Defined Proxy: True ({settings.get('PROXY_ADDRESS')})")
-        else:
-            try:
-                if self.proxy_address:
-                    meta['proxy'] = self.proxy_address
-                    print(f"Using Scraper Defined Proxy: True ({meta['proxy']})")
-            except Exception:
-                print("Using Proxy: False")
+    def start_requests_2(self, response):
+        meta = self.copy_meta(response)
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
-        link = "https://thainee.com/index.php"
-        yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
+        for scene in scenes:
+            count += 1
+            yield scene
+
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = self.copy_meta(response)
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
+
+    @staticmethod
+    def clean_url(url):
+        """Percent-encode unsafe characters (e.g. spaces) in the URL path."""
+        if not url:
+            return url
+        parts = urlsplit(url)
+        return urlunsplit(parts._replace(path=quote(parts.path, safe='/')))
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="showgirls"]')
-        for scene in scenes:
-            item = SceneItem()
-
-            item['title'] = self.cleanup_title(scene.xpath('.//span[@class="pink"]/following-sibling::text()').get())
-            item['description'] = scene.xpath('.//div[@class="agogodetails"]/p/text()').get().strip()
-            scenedate = scene.xpath('.//span[@class="green"]/following-sibling::text()')
-            if scenedate:
-                item['date'] = self.parse_date(scenedate.get(), date_formats=['%b %d, %Y']).isoformat()
-            else:
-                item['date'] = self.parse_date('today').isoformat()
-
-            item['performers'] = ['Thainee']
-            item['tags'] = ['Asian']
-            image = scene.xpath('.//div[@class="smallthumb clear"]/div[@class="thumb"][1]/div[@class="modelthumb"]//img/@src')
-            if image:
-                item['image'] = self.format_link(response, image.get())
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
+        for scene in jsondata:
+            item = self.init_scene()
+            item['title'] = self.cleanup_title(scene['title'])
+            item['description'] = self.cleanup_description(scene['description'])
+            item['date'] = self.parse_date(re.search(r'(\d{4}/\d{2}/\d{2})', scene['publish_date']).group(1), date_formats=['%Y/%m/%d']).strftime('%Y-%m-%d')
+            item['image'] = self.clean_url(scene['trailer_screencap'])
+            if ".mp4" not in item['image']:
                 item['image_blob'] = self.get_image_blob_from_link(item['image'])
             else:
                 item['image'] = ""
                 item['image_blob'] = ""
-            item['id'] = slugify(item['title'])
-            item['trailer'] = ""
-            item['url'] = response.url
-            item['network'] = "Thainee"
-            item['parent'] = "Thainee"
-            item['site'] = "Thainee"
+            item['performers'], item['performers_data'] = self.get_performers_data(scene['models_thumbs'])
+            item['tags'] = [tag for tag in scene['tags'] if tag.lower() not in self.tag_trash]
+            if "seconds_duration" in scene and scene['seconds_duration']:
+                item['duration'] = scene['seconds_duration']
+            else:
+                item['duration'] = None
+            item['id'] = scene['id']
+            item['url'] = f"{self.start_url}/videos/{scene['slug']}"
+            item['site'] = self.site
+            item['parent'] = self.parent
+            item['network'] = self.network
+            item['type'] = self.get_selector_map('type')
+            yield self.check_item(item, self.days)
 
-            if item['id'] and item['title']:
-                yield self.check_item(item, self.days)
+    def get_performers_data(self, models):
+        performers = []
+        performers_data = []
+        for model in models:
+            if not model.get('name'):
+                continue
+            name = string.capwords(model['name'])
+            thumb = self.clean_url(model['thumb'])
+            performers.append(name)
+            performers_data.append({
+                "name": name,
+                "image": thumb,
+                "image_blob": self.get_image_blob_from_link(thumb),
+                "site": self.site,
+                "network": self.network,
+            })
+        return performers, performers_data

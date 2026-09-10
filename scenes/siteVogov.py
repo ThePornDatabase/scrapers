@@ -1,4 +1,5 @@
 import re
+
 import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
@@ -14,35 +15,46 @@ class VogovSpider(BaseSceneScraper):
         'https://vogov.com'
     ]
 
+    # The tour was rebuilt: /latest-videos/N/ is a 404, the listing is
+    # /categories/movies_N_p.html, div.video-post cards became a.thumb-video and the
+    # scene pages moved from /videos/<slug> to /trailers/<Slug>.html.
     selector_map = {
-        'title': '//meta[@property="og:title"]/@content',
-        'description': '//div[contains(@class,"info-video-description")]/p/text()',
-        'performers': '//div[contains(@class,"info-video-models")]/a/text()',
-        'date': '//li[contains(text(),"Release")]/span/text()',
+        'title': '//h1[contains(@class, "video-title")]/text()',
+        'description': '//p[contains(@class, "video-description-text")]/text()',
+        'performers': '//a[contains(@class, "video-actor-link")]/text()',
+        'date': '//span[contains(@class, "video-info-date")]/text()',
+        're_date': r'(\w+ \d{1,2}, \d{4})',
+        'date_formats': ['%B %d, %Y'],
+        'duration': '//span[contains(@class, "video-info-time")]/text()',
         'image': '//meta[@property="og:image"]/@content',
-        'tags': '//div[contains(@class,"info-video-category")]/a/text()',
-        'external_id': r'videos\/(.*)\/?',
-        'trailer': '//script[contains(text(),"video_url")]/text()',
-        'pagination': '/latest-videos/%s/'
+        'tags': '//a[contains(@class, "video-tag-link")]/text()',
+        'external_id': r'/trailers/(.+?)\.html',
+        'trailer': '',
+        'pagination': '/categories/movies_%s_p.html'
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="video-post"]/div/a/@href').getall()
-        for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': 'Vogov'})
+        scenes = response.xpath('//a[contains(@class, "thumb-video")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
+                                     headers=self.headers, cookies=self.cookies)
+
+    def get_duration(self, response):
+        # the runtime sits after an inline svg, so the first text node is blank
+        duration = ' '.join(response.xpath('//span[contains(@class, "video-info-time")]//text()').getall())
+        if duration:
+            duration = re.search(r'(\d+)\s*min', duration)
+            if duration:
+                return str(int(duration.group(1)) * 60)
+        return None
 
     def get_trailer(self, response):
-        if 'trailer' in self.get_selector_map() and self.get_selector_map('trailer'):
-            trailer = self.process_xpath(
-                response, self.get_selector_map('trailer')).get()
-            trailer = re.search(r'video_url:\ .*?(https:\/\/.*?\.mp4)\/', trailer).group(1)
-            if trailer:
-                return trailer
-        return ''
+        """The old video_url script block is gone; the preview mp4 is served from
+        the teenmegaworld CDN and only appears as a plain source element."""
+        trailer = response.xpath('//video//source/@src|//video/@src').re_first(r'(https?://\S+?\.mp4)')
+        return trailer.strip() if trailer else ''
 
     def get_tags(self, response):
-        if self.get_selector_map('tags'):
-            tags = self.process_xpath(
-                response, self.get_selector_map('tags')).getall()
-            return list(map(lambda x: x.strip().title(), tags))
-        return []
+        return [x.strip().title() for x in
+                response.xpath(self.get_selector_map('tags')).getall() if x.strip()]

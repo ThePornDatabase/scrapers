@@ -13,6 +13,11 @@ class SiteAngelaWhiteScenesSpider(BaseSceneScraper):
         '',
     ]
 
+    # angelawhitestore.com runs on the AdultEmpire platform, which redirects every
+    # request to /AgeConfirmation until this cookie is set -- without it the studio
+    # page returned a 17KB age-gate shell and no movies were ever found.
+    cookies = [{"name": "ageConfirmed", "value": "true"}]
+
     selector_map = {
         'title': '//h1[@class="description"]/text()',
         'description': '//h1[@class="description"]/following-sibling::p[1]//text()',
@@ -55,11 +60,18 @@ class SiteAngelaWhiteScenesSpider(BaseSceneScraper):
     def get_movies(self, response):
         movies = response.xpath('//a[@class="boxcover"]/@href').getall()
         for movie in movies:
-            yield scrapy.Request(url=self.format_link(response, movie), callback=self.get_scenes)
+            yield scrapy.Request(url=self.format_link(response, movie), callback=self.get_scenes,
+                                 headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
-        meta['dvdtitle'] = self.cleanup_title(response.xpath('//h1[@class="description"]/text()').get().strip())
+        meta = self.copy_meta(response)
+        # HTTPERROR_ALLOWED_CODES lets 404s through, and a withdrawn movie redirects
+        # to /AgeConfirmation, so the movie page is not guaranteed to have a title --
+        # calling .strip() on the missing match used to abort the crawl.
+        dvdtitle = response.xpath('//h1[@class="description"]/text()').get()
+        if not dvdtitle:
+            return
+        meta['dvdtitle'] = self.cleanup_title(dvdtitle.strip())
         scenes = response.xpath('//div[contains(@class,"item-grid-scene")]/div[@class="grid-item"]/article')
         for scene in scenes:
             image = scene.xpath('.//a[@class="scene-img"]/img/@data-src')
@@ -71,7 +83,8 @@ class SiteAngelaWhiteScenesSpider(BaseSceneScraper):
                 meta['performers'] = performers.getall()
             scene = scene.xpath('./div/a/@href').get()
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
+                                     meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_duration(self, response):
         duration = response.xpath('//span[contains(text(), "ength:")]/following-sibling::text()')
@@ -82,8 +95,11 @@ class SiteAngelaWhiteScenesSpider(BaseSceneScraper):
                 return str(int(duration.group(1)) * 60)
 
     def get_title(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         title = super().get_title(response)
-        if "scene " in title.lower():
+        # a withdrawn scene 404s through to /AgeConfirmation, which has no title
+        if not title:
+            return ''
+        if "scene " in title.lower() and meta.get('dvdtitle'):
             title = meta['dvdtitle'] + " - " + title
         return title

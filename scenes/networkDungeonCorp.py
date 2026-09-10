@@ -43,7 +43,7 @@ class networkDungeonCorpSpider(BaseSceneScraper):
     
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@href, "/updates/")]/parent::div[contains(@class, "col-md-4")]')
         for scene in scenes:
             scenedate = scene.xpath('.//i[contains(@class, "fa-clock")]/following-sibling::text()[1]').get()
@@ -72,7 +72,7 @@ class networkDungeonCorpSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta)
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = self.process_xpath(response, self.get_selector_map('image'))
         if image:
             image = image.get()

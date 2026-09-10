@@ -57,7 +57,7 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
         # {'studio': 996, 'site': 'TedOficial'},
         # {'studio': 460, 'site': 'RichardMannsWorld'},
         # {'studio': 1184, 'site': 'Jayblak'},
-        {'studio': 2693, 'site': 'Sweetie Fox'},
+        {'studio': 34386, 'site': 'AkinAsmus'},
     ]
 
     content_json_url = 'https://pornbox.com/contents/%s'
@@ -88,7 +88,7 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -109,7 +109,7 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % (meta['studio'], page))
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         scenes = jsondata['contents']
         for scene in scenes:
@@ -120,7 +120,7 @@ class PornboxSingleSiteSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
 
         item = SceneItem()

@@ -124,7 +124,7 @@ class IFeelMyselfSpider(BaseSceneScraper):
         yield scene
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for item in super().parse_scene(response):
             # ~ keywords = item["title"].replace(" ", "+")
             keywords = item["title"]

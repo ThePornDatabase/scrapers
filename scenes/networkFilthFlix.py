@@ -58,7 +58,7 @@ class NetworkFilthFlixSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(meta['base'], meta['pagination'], meta['page']),
@@ -72,7 +72,7 @@ class NetworkFilthFlixSpider(BaseSceneScraper):
         return url
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@class, "video-grid__item")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

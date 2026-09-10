@@ -41,14 +41,26 @@ class SiteLoveWettingSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
-        meta = response.meta
+        """Find the last page number so the crawl can walk backwards from it.
 
-        page_limit = response.xpath('//div[contains(@class, "paging-top")]//select[@id="select_page2"]/option[@selected]/text()')
-        if page_limit:
-            page_limit = page_limit.get()
-            max_pages = re.search(r'(\d+)', page_limit).group(1)
-            meta['max_pages'] = int(max_pages) + 1
-            yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page, meta['max_pages']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+        The site walks oldest-first, so get_next_page_url subtracts the requested
+        page from the total.  That total used to come from a <select id="select_page2">
+        picker which no longer exists -- the pager is plain links now -- so a crawl
+        issued this one request and stopped.  The highest page= in those links is the
+        same number.
+        """
+        meta = self.copy_meta(response)
+
+        pages = [int(n) for n in response.xpath(
+            '//div[contains(@class, "paging")]//a/@href').re(r'[?&]page=(\d+)')]
+        if not pages:
+            pages = [int(n) for n in response.xpath('//a/@href').re(r'[?&]page=(\d+)')]
+        if not pages:
+            return
+
+        meta['max_pages'] = max(pages) + 1
+        yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page, meta['max_pages']),
+                             callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
         scenes = self.get_scenes(response)
@@ -59,7 +71,7 @@ class SiteLoveWettingSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['max_pages']), callback=self.parse, meta=meta)
@@ -75,10 +87,11 @@ class SiteLoveWettingSpider(BaseSceneScraper):
             if title:
                 item['title'] = self.cleanup_title(title.get())
 
-            description = scene.xpath('./div[@class="box-info"]/article/div[contains(@class, "description")]/text()')
+            # the synopsis wraps inline markup, so take every descendant text node
+            description = scene.xpath('.//div[contains(@class, "description")]//text()')
             item['description'] = ''
             if description:
-                item['description'] = self.cleanup_description(description.get())
+                item['description'] = self.cleanup_description(' '.join(description.getall()))
 
             scenedate = scene.xpath('./div[@class="box-info"]/p/span/i[contains(@class, "calendar")]/following-sibling::text()')
             item['date'] = self.parse_date('today').isoformat()

@@ -29,7 +29,7 @@ class SiteDesperateAmateursSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="update_details"]')
         for scene in scenes:
             meta['id'] = scene.xpath('./@data-setid').get()

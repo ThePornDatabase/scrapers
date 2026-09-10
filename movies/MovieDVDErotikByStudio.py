@@ -48,7 +48,7 @@ class MovieErotikSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for movie in jsondata['movies']:
             meta['id'] = movie['itemNumber']

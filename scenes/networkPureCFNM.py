@@ -52,7 +52,7 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     url = meta['url']
@@ -66,7 +66,7 @@ class NetworkPureCFNMSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         scenes = response.xpath('//div[@class="update_details"]')
         for scene in scenes:

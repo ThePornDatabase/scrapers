@@ -31,7 +31,7 @@ class SiteTheSensitiveSpotSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="videoPic"]')
         for scene in scenes:
             sceneid = scene.xpath('./a/img/@src').get()

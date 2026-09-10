@@ -28,7 +28,7 @@ class SiteAutumnFallsSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.json()
         scenes = scenes['result']['pageContext']['videosData']['allAirtableVideos']['nodes']
         for scene in scenes:

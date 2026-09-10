@@ -32,20 +32,33 @@ class SiteKimHollandSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-
         scenes = response.xpath('//div[@class="movie-item"]')
         for scene in scenes:
-            if int(meta['page']) == 1:
-                scenedate = scene.xpath('.//span[@class="movie-item-date"]/text()')
+            link = scene.xpath('./a[1]/@href').get()
+            if not link or not re.search(self.get_selector_map('external_id'), link):
+                continue
+
+            # A fresh meta per scene: the previous version mutated response.meta,
+            # which is one dict shared by every request off this page, so each
+            # card overwrote the last card's date and a card without one silently
+            # inherited its neighbour's. The same dict is handed to the next-page
+            # request, so a page-1 date also leaked onto the whole archive.
+            meta = dict(response.meta)
+            meta.pop('date', None)
+
+            scenedate = scene.xpath('.//span[@class="movie-item-date"]/text()').get()
+            if scenedate:
+                # Cards are written either 02-09-2026 (Dutch day-first) or
+                # 2026-08-04. The old formats were '%d-%m-%y', which wants a
+                # two-digit year, and '%Y-%m-%D', which is not a Python directive
+                # at all -- so neither ever matched and dateparser was left to
+                # guess, silently swapping day and month whenever both were <= 12
+                # (02-09-2026 was submitted as 9 February).
+                scenedate = self.parse_date(scenedate.strip(), date_formats=['%d-%m-%Y', '%Y-%m-%d'])
                 if scenedate:
-                    scenedate = scenedate.get()
-                    scenedate = self.parse_date(scenedate, date_formats=['%d-%m-%y', '%Y-%m-%D']).strftime('%Y-%m-%d')
-                    if scenedate:
-                        meta['date'] = scenedate
-            scene = scene.xpath('./a[1]/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+                    meta['date'] = scenedate.strftime('%Y-%m-%d')
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene, meta=meta)
 
     def get_next_page_url(self, base, page):
         if int(page) == 1:

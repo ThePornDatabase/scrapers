@@ -13,42 +13,57 @@ class SiteStaxusSpider(BaseSceneScraper):
         'https://staxus.com',
     ]
 
+    # The tour was rebuilt.  li.item is gone, and the scene page is now a 5.6MB
+    # document whose itemprop markup mixes the scene's own cast with every related
+    # scene's, so it is no longer a reliable source.  The listing card, by contrast,
+    # carries the title, cast, release date, set id, still and hover trailer, all
+    # correctly scoped -- so the item is built from the listing instead.
     selector_map = {
-        'title': '//div[contains(@class,"video-descr")]//h2/text()',
-        'description': '//div[contains(@class,"video-descr") and contains(@class,"content")]/p/text()',
-        'date': '//script[contains(text(), "context")]/text()',
-        're_date': r'uploadDate.*?(\d{4}-\d{2}-\d{2})',
-        'date_formats': ['%Y-%m-%d'],
-        'image': '//script[contains(text(), "context")]/text()',
-        're_image': r'thumbnailUrl.*?\"(http.*?)\"',
-        'trailer': '//script[contains(text(), "context")]/text()',
-        're_trailer': r'contentUrl.*?\"(http.*?)\"',
-        'performers': '//div[contains(@class,"video-descr__model-item")]//a/text()',
-        'tags': '//h4[contains(text(), "Tags")]/following-sibling::p/a/text()',
         'external_id': r'id=(\d+)',
         'pagination': '/trial/category.php?id=50&page=%s&s=d&',
         'type': 'Scene'
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//li[@class="item"]/div/a/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        for scene in response.xpath('//div[@class="update_details"]'):
+            item = self.init_scene()
 
-    def get_duration(self, response):
-        duration = response.xpath('//script[contains(text(), "context")]/text()')
-        if duration:
-            duration = re.search(r'duration.*?\"(\d{1,2})M(\d{1,2})S', duration.get())
-            if duration:
-                minutes = int(duration.group(1)) * 60
-                seconds = int(duration.group(2))
-                duration = str(minutes + seconds)
-                return duration
-        return ''
+            item['id'] = scene.xpath('./@data-setid').get()
+            link = scene.xpath('.//a[contains(@class, "title_bar_movie")]/@href').get()
+            if not link or not item['id']:
+                continue
+            item['url'] = self.format_link(response, link)
 
-    def get_image(self, response):
-        image = super().get_image(response)
-        image = image.replace(".com/contentthumbs", ".com/content/contentthumbs")
-        return image
+            title = scene.xpath('.//a[contains(@class, "title_bar_movie")]//span[@itemprop="name"]/text()').get()
+            if not title:
+                continue
+            item['title'] = self.cleanup_title(title)
+
+            item['performers'] = [x.strip().strip(',') for x in
+                                  scene.xpath('.//span[@class="update_models"]//span[@itemprop="name"]/text()').getall()
+                                  if x and x.strip().strip(',')]
+
+            for text in scene.xpath('.//div[contains(@class, "details")]/span/text()').getall():
+                scenedate = re.search(r'(\d{1,2} \w{3} \d{4})', text)
+                if scenedate:
+                    scenedate = self.parse_date(scenedate.group(1), date_formats=['%d %b %Y'])
+                    if scenedate:
+                        item['date'] = scenedate.strftime('%Y-%m-%d')
+                    break
+
+            # the still is a CSS background on the thumbnail anchor
+            style = scene.xpath('.//a[contains(@style, "background-image")]/@style').get() or ''
+            image = re.search(r'background-image:\s*url\(([^)]+)\)', style)
+            if image:
+                item['image'] = self.format_link(response, image.group(1).strip('\'"'))
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
+            trailer = scene.xpath('.//a[@data-video]/@data-video').get()
+            if trailer:
+                item['trailer'] = trailer.strip()
+
+            item['site'] = 'Staxus'
+            item['parent'] = 'Staxus'
+            item['network'] = 'Staxus'
+
+            yield self.check_item(item, self.days)

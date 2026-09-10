@@ -2,6 +2,7 @@ import re
 import string
 import html
 import tldextract
+import scrapy
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -16,60 +17,50 @@ class SiteGlaminoGirlsSpider(BaseSceneScraper):
         'https://lifepornstories.com',
     ]
 
+    # Same platform as the CzechAv network: /tour/page-N/ 404s, each site now serves
+    # its whole listing on the root, and div.episode__preview is gone.  The scene
+    # page still publishes a full schema.org VideoObject, so the item is built from
+    # that rather than scraped out of the listing card.
     selector_map = {
-        'title': "//h2[@class='nice-title']/text()",
-        'description': "//div[@class='desc-text']//p/text()",
+        'title': "//meta[@property='og:title']/@content",
+        'description': '//script[contains(@type, "json")]/text()',
+        're_description': r'description[\'\"]\s*:\s*[\'\"](.*?)[\'\"],',
+        'date': '//script[contains(@type, "json")]/text()',
+        're_date': r'uploadDate[\'\"].*?(\d{4}-\d{2}-\d{2})',
         'image': "//meta[@property='og:image']/@content",
         're_image': r'(.*)\?',
-        'tags': '//ul[@class="tags"]/li/a/text()',
-        'external_id': r'/tour/preview/(.+)/',
-        'trailer': '',
-        'pagination': '/tour/page-%s/'
+        'performers': '',
+        'tags': '',
+        'external_id': r'/video/(.+?)/',
+        'trailer': '//script[contains(@type, "json")]/text()',
+        're_trailer': r'contentUrl[\'\"]\s*:\s*[\'\"](https?://[^\'\"]+)',
+        'pagination': ''
     }
 
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.parse, meta=meta,
+                                 headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"episode__preview")]')
-        for scene in scenes:
-            item = SceneItem()
+        scenes = response.xpath('//a[contains(@href, "/video/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
-            title = scene.xpath('.//h2/text()')
-            if title:
-                item['title'] = self.cleanup_title(title.get())
-            else:
-                item['title'] = ''
+    def get_tags(self, response):
+        tags = response.xpath('//script[contains(@type, "json")]/text()').get() or ''
+        found = re.search(r'keywords[\'\"]\s*:\s*[\'\"](.*?)[\'\"]', tags)
+        if not found:
+            return []
+        return [string.capwords(x.strip()) for x in found.group(1).split(',') if x.strip()]
 
-            item['image'] = None
-            image = scene.xpath('.//div[@class="thumbnail_wrapper"]/img/@src').get()
-            if image:
-                image = re.search(r'(.*)\?', image)
-                if image:
-                    item['image'] = image.group(1).strip()
+    def get_site(self, response):
+        domain = tldextract.extract(response.url).domain
+        return {'glaminogirls': 'Glamino Girls',
+                'lifepornstories': 'Life Porn Stories'}.get(domain, string.capwords(domain))
 
-            item['image_blob'] = self.get_image_blob_from_link(item['image'])
-
-            item['performers'] = []
-            performers = scene.xpath('.//span[@class="episode__artist__name"]/text()').get()
-            if performers:
-                item['performers'] = [html.unescape(string.capwords(performers.strip()))]
-
-            item['url'] = ''
-            item['id'] = ''
-            url = scene.xpath('.//div[contains(@class,"description")]/a/@href').get()
-            if url:
-                item['url'] = "https://" + tldextract.extract(response.url).domain + ".com" + url.strip()
-                item['id'] = re.search(r'.*\/(.*?)\/', url).group(1)
-
-            item['date'] = self.parse_date('today').isoformat()
-            item['description'] = ''
-            item['tags'] = []
-            item['trailer'] = ''
-            item['network'] = 'Czech Casting'
-            if "glaminogirls" in response.url:
-                item['parent'] = "Glamino Girls"
-                item['site'] = "Glamino Girls"
-            if "lifepornstories" in response.url:
-                item['parent'] = "Life Porn Stories"
-                item['site'] = "Life Porn Stories"
-
-            if item['id'] and item['title']:
-                yield item
+    def get_parent(self, response):
+        return self.get_site(response)

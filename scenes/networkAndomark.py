@@ -204,7 +204,7 @@ class AndomarkSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         yield scrapy.Request(url=self.get_next_page_url(meta['link'], self.page), callback=self.parse, meta=meta)
 
     def get_trailer(self, response):

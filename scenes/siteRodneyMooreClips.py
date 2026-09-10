@@ -2,8 +2,6 @@ import re
 import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-true = True
-false = False
 
 
 class SiteRodneyMooreClipsSpider(BaseSceneScraper):
@@ -12,7 +10,10 @@ class SiteRodneyMooreClipsSpider(BaseSceneScraper):
     parent = 'Rodney Moore'
     site = 'Rodney Moore Clips'
 
-    cookies = [{"domain":"rodneymoorestore.com","expirationDate":1731270263.137922,"hostOnly":true,"httpOnly":false,"name":"etoken","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"a1=4c7d32ea10e344ad388c4639d696ea072f0a697fccde25af35c5043a38ec4cbd&a2=d1927f7ca7856ddb0b2b5c38de2c311a6fb3796186660563f4c0b3dbd7e76905&a3=99470726519224"},{"domain":"rodneymoorestore.com","hostOnly":true,"httpOnly":false,"name":"use_lang","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"val=en"},{"domain":"rodneymoorestore.com","hostOnly":true,"httpOnly":false,"name":"defaults","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"{'hybridView':''}"},{"domain":"rodneymoorestore.com","expirationDate":1761593063.949509,"hostOnly":true,"httpOnly":false,"name":"ageConfirmed","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"true"}]
+    # The previous Chrome-export cookie blob carried an etoken from Nov 2024; sending it
+    # made the site bounce every scene to /?aspxerrorpath=... (an ASP.NET error page),
+    # which has no title and so left item['title'] None.  Only the age gate matters.
+    cookies = [{"name": "ageConfirmed", "value": "true"}]
 
     start_urls = [
         'https://rodneymoorestore.com',
@@ -32,21 +33,23 @@ class SiteRodneyMooreClipsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="grid-item"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+                # the age-gate cookie has to ride along on the scene requests too,
+                # otherwise each one bounces to /AgeConfirmation and has no title
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
+                                     meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_duration(self, response):
-        duration = response.xpath('//div[@class="release-date"]/span[contains(text(), "Length:")]/following-sibling::text()')
+        # Reads "37 mins."  The old version stripped [0-9a-z] before looking for the
+        # digits, so it could never match, and (\d) would have caught only one of them.
+        duration = response.xpath('//div[@class="release-date"]/span[contains(text(), "Length:")]/following-sibling::text()').get()
         if duration:
-            duration = duration.get()
-            duration = re.sub(r'[0-9a-z]+', '', duration)
-            duration = re.search(r'(\d)min', duration)
-            if duration:
-                duration = duration.group(1)
-                return str(int(duration) * 60)
+            minutes = re.search(r'(\d+)\s*min', duration, re.IGNORECASE)
+            if minutes:
+                return str(int(minutes.group(1)) * 60)
         return None
 
     def get_performers(self, response):

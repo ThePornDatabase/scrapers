@@ -25,7 +25,7 @@ class SiteCockNinjaStudiosSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article[contains(@class, "pb_post")]')
         for scene in scenes:
             scenedate = scene.xpath('.//span[@class="published"]/text()')

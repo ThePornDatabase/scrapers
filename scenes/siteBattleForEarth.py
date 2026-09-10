@@ -32,7 +32,7 @@ class SiteBattleForEarthSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//script[@id="wix-viewer-model"]/text()').get()
         jsondata = json.loads(scenes)
         jsondata = jsondata['siteFeaturesConfigs']['router']

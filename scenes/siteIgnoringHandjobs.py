@@ -36,7 +36,7 @@ class SiteIgnoringHandjobsSpider(BaseSceneScraper):
             yield scrapy.Request(start_url, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//li[contains(@class, "rpwe-li")]')
         for scene in scenes:
             scenedate = scene.xpath('.//time[contains(@class, "published")]/@datetime').get()
@@ -58,14 +58,14 @@ class SiteIgnoringHandjobsSpider(BaseSceneScraper):
         return ["Handjob"]
 
     def get_id(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "id" in meta and meta['id']:
             return meta['id']
         sceneid = re.search(r'.*/(.*?)/', response.url).group(1)
         return sceneid
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if not image or image in response.url:
             image = meta['orig_image']

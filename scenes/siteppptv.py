@@ -48,7 +48,7 @@ class SitePPPTVSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performer_list = meta['performer_list']['scenes']
         scenes = response.xpath('//turbo-frame//div[contains(@class, "col-md-4")]')
         for scene in scenes:

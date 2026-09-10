@@ -29,7 +29,7 @@ class SiteGlassDeskProductionsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.json()
         scenes = scenes['data']
         for scene in scenes:
@@ -48,7 +48,7 @@ class SiteGlassDeskProductionsSpider(BaseSceneScraper):
             yield scrapy.Request(f"https://glassdeskproductions.mymember.site/api/videos/{item['id']}", callback=self.get_scene_details, meta=meta)
 
     def get_scene_details(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
         scene = response.json()
 

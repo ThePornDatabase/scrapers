@@ -30,7 +30,7 @@ class SiteTheLisaAnnSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="update_details"]')
         for scene in scenes:
             duration = scene.xpath('.//div[contains(@class,"update_counts")]/text()')

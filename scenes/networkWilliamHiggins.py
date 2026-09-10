@@ -49,7 +49,7 @@ class NetworkWilliamHigginsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "set-overview")]')
         for scene in scenes:
             image = scene.xpath('./a/div/img[1]/@src')
@@ -65,7 +65,7 @@ class NetworkWilliamHigginsSpider(BaseSceneScraper):
 
     def parse_scene(self, response):
         item = SceneItem()
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)

@@ -20,7 +20,8 @@ class SiteNewMFXSpider(BaseSceneScraper):
     headers = {
         'host': 'newmfx.com',
         'referer': 'https://newmfx.com/latest-videos?page=3',
-        'cookie': '_clck=td4lmq|1|f39|0; XSRF-TOKEN=eyJpdiI6IjI5VktTTFVtQWRLWUgyc3pNMUNZRFE9PSIsInZhbHVlIjoibDJDb3RCNkxXcGR1OWUzcG5JOG40VG43US9VK28xNHJtWjRERTJrNzZZM2dZbnR3bGhPcDJxNXhLSzZJQVo0T3A3dS9Dcks4NDZxWE44UzdubTE1UXhDcTlSb2phOWhTdEJmWFpGSWlMSnFFVGZ3a0Mvc1BWdlBmRjdyRTBReHYiLCJtYWMiOiI1ZDhjMjIzZjg5NTkyYTdkM2ViYmYzZTBkMDI2MGNiMzg4NWZlNTNlMzI0NzMzMmUzZWJjZWMyNmEzY2YyM2E4IiwidGFnIjoiIn0%3D; laravel_session=eyJpdiI6IjN2N3BpL3kyUlNMenppcTNFRTVwY0E9PSIsInZhbHVlIjoiaGtGclE0VWlVZlZtNFgxdmZBY2RDV2NqZ3F6YXROeWRZRDM4ZTdHVnpXRGo2WklnTXg4bEUzV3VJV3pJb0lFTmxuaG8wazZ5Vk5ISk9nUnIzZTFSWEJUWklEWUJpZmFlbkxMeitGZERQb3h6WWZHRFVrT0pmdVdFb2tlUVhMa1QiLCJtYWMiOiI0OGNiNjUwY2U2OGMxYTI5NjdjZWI3ZGY1Mjg1Y2Y5ZmE0YWU1Njk0MWI4YTkxMWEwZDI1NDllNTUyNTQ5MDI5IiwidGFnIjoiIn0%3D; _clsk=erukl|1658121750401|7|1|l.clarity.ms/collect',
+        # A Chrome cookie header used to sit here carrying laravel_session plus the
+        # _clck/_clsk Microsoft Clarity tracking ids.  Removed: it identified a browser.
     }
 
     selector_map = {
@@ -78,7 +79,7 @@ class SiteNewMFXSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="item-list-video"]')
         for scene in scenes:
             image = scene.xpath('./a/img/@src')

@@ -1,8 +1,6 @@
 import re
 import string
 from tpdb.BaseSceneScraper import BaseSceneScraper
-true = True
-false = False
 
 
 class SiteBondageLifeSpider(BaseSceneScraper):
@@ -12,7 +10,8 @@ class SiteBondageLifeSpider(BaseSceneScraper):
         'https://www.bondagelife.com',
     ]
 
-    cookies = [{"domain":".houseofgord.com","expirationDate":1763819185.391213,"hostOnly":false,"httpOnly":false,"name":"legal_accepted2","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"yes"},{"domain":".houseofgord.com","expirationDate":1757026557.214118,"hostOnly":false,"httpOnly":true,"name":"_hofg_session_v3","path":"/","sameSite":"unspecified","secure":true,"session":false,"storeId":"0","value":"149ae63c574d840b770dd3b9e56d5598"}]
+    # Legal-accept flag only; the _hofg_session_v3 session cookie was removed.
+    cookies = {"legal_accepted2": "yes"}
 
     selector_map = {
         'external_id': r'',

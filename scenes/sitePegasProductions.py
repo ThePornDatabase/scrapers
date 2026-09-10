@@ -42,7 +42,7 @@ class SitePegasProductionsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for scene in jsondata:
             blocklist = [8204, 1, 8108, 9742, 88, 8005, 11669, 11659, 9747, 8951]
@@ -64,7 +64,7 @@ class SitePegasProductionsSpider(BaseSceneScraper):
         return []
 
     def get_title(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         title = super().get_title(response)
         if not title:
             title = meta['orig_title']

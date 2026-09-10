@@ -16,14 +16,21 @@ class SiteXesPLSpider(BaseSceneScraper):
 
     cookies = [{"name": "lang_select", "value": "eng"}]
 
+    # The scene page was rebuilt and its details table is gone entirely: the cast
+    # now sits in a.videoHeroPerformer, the release date in a <time datetime>, and
+    # the synopsis in div.videoDescription.
     selector_map = {
         'title': '//h1//text()',
-        'description': '//article/p/text()',
-        'date': '//td[contains(text(), "Add date")]/following-sibling::td/text()',
+        'description': '//*[contains(@class, "videoDescription")]//text()',
+        # The scene page's only <time> elements are a countdown banner (a future
+        # date, which check_item then drops) and a comment timestamp -- the real
+        # release date is on the listing card, so get_scenes passes it via meta.
+        'date': '',
+        're_date': r'(\d{4}-\d{2}-\d{2})',
         'image': '//meta[@property="og:image"]/@content',
-        'performers': '//td[contains(text(), "Actors")]/following-sibling::td/ul/li/a/text()',
-        'tags': '//td[contains(text(), "Categories")]/following-sibling::td/ul/li/a/text()',
-        'duration': '//td[contains(text(), "Duration")]/following-sibling::td/text()',
+        'performers': '//a[contains(@class, "videoHeroPerformer")]/span/text()',
+        'tags': '//a[contains(@href, "kategoria,") or contains(@href, "tag,")]/text()',
+        'duration': '',
         'trailer': '',
         'external_id': r',(\d+),',
         'pagination': '/katalog_filmow,%s.html',
@@ -31,11 +38,21 @@ class SiteXesPLSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[@class="big-box-video"]//h2/a[contains(@href, "epizod")]/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        meta = self.copy_meta(response)
+        # div.big-box-video became div.videoCatalogCard, whose body holds the h2 link
+        for card in response.xpath('//*[contains(@class, "videoCatalogCard")][.//h2/a]'):
+            scene = card.xpath('.//h2/a[contains(@href, "epizod")]/@href').get()
+            if not scene or not re.search(self.get_selector_map('external_id'), scene):
+                continue
+            scenedate = card.xpath('.//time[contains(@class, "videoCatalogCard__date")]/@datetime').get()
+            if scenedate:
+                meta['date'] = scenedate.strip()[:10]
+            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+
+    def get_description(self, response):
+        """Strip the "Show full description" toggle the theme injects into the text."""
+        description = super().get_description(response)
+        return re.sub(r'\s*Show full description\s*', ' ', description).strip()
 
     def get_image_from_link(self, image):
         if image:

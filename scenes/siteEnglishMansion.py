@@ -28,7 +28,7 @@ class SiteEnglishMansionSpider(BaseSceneScraper):
         yield scrapy.Request(url, callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//td[contains(text(), "Movie Update")]//ancestor::table[1]')
         for scene in scenes:
             item = self.init_scene()

@@ -2,6 +2,7 @@ import re
 import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.spiders.scenes._natscms import resolve_block_id
 
 
 class SiteJoonMaliSpider(BaseSceneScraper):
@@ -28,9 +29,29 @@ class SiteJoonMaliSpider(BaseSceneScraper):
         'type': 'Scene',
     }
 
+
+    # cms_block_id belongs to a block in the tour's layout, so it changes whenever
+    # the tour is re-laid-out -- and when it does the API answers
+    # {"error":"cms_block_id ... not found"} and the spider silently yields
+    # nothing. It is therefore looked up once per crawl; the literal below is only
+    # the fallback used if that lookup fails, so this can only ever help.
+    nats_site = 'https://www.joonmali.com'
+    nats_block_fallback = '104660'
+
+    @property
+    def nats_block_id(self):
+        if getattr(self, '_nats_block_id', None) is None:
+            self._nats_block_id = resolve_block_id(self.nats_site, self.nats_block_fallback)
+            if self._nats_block_id != self.nats_block_fallback:
+                print('*** %s: cms_block_id %s -> %s' % (
+                    self.name, self.nats_block_fallback, self._nats_block_id))
+        return self._nats_block_id
+
     def get_next_page_url(self, base, page):
         page = str((int(page) - 1) * 24)
-        return self.get_selector_map('pagination') % page
+        pagination = self.get_selector_map('pagination').replace(
+            'cms_block_id=104660', 'cms_block_id=' + self.nats_block_id)
+        return pagination % page
 
     async def start(self):
         url = "https://www.joonmali.com/videos"
@@ -60,7 +81,7 @@ class SiteJoonMaliSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['sets']
 

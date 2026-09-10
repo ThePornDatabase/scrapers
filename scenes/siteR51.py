@@ -15,16 +15,27 @@ class SiteR51Spider(BaseSceneScraper):
         'https://r51.com',
     ]
 
+    # Same platform as the CzechAv network and GlaminoGirls: /pages/page-N/ is gone
+    # and the whole listing is served on the root, with the cards linking straight to
+    # /video/<slug>/.  parse_scene below already reads the schema.org VideoObject,
+    # which the rebuild kept.
     selector_map = {
-        'external_id': r'.*/(.*?)/',
-        'pagination': '/pages/page-%s/',
+        'external_id': r'/video/(.+?)/',
+        'pagination': '',
         'type': 'Scene',
     }
 
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.parse, meta=meta,
+                                 headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//section[contains(@data-section, "vertical")]//h3/parent::a[1]/@href').getall()
-        for scene in scenes:
+        meta = self.copy_meta(response)
+        scenes = response.xpath('//a[contains(@href, "/video/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 

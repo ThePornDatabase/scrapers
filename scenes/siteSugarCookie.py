@@ -49,7 +49,7 @@ class SiteSugarcookieSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         # ~ scenes = response.xpath('//article/div[@class="cb-meta"]/h2/a/@href').getall()
         scenes = response.xpath('//article[contains(@id, "post")]')
         for scene in scenes:

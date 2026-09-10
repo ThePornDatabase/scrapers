@@ -34,7 +34,7 @@ class SiteMyDeepDarkSecretJSONSpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         responsedata = re.sub(r'<[^<]+?>', '', response.text)
-        meta = response.meta
+        meta = self.copy_meta(response)
         categories =[{"id": 11, "name": "Asian Girls"}, {"id": 6, "name": "Barely Legal Porn"}, {"id": 15, "name": "Big Boobs"}, {"id": 9, "name": "Big Butt"}, {"id": 13, "name": "Black Girls"}, {"id": 2, "name": "Interracial Anal"}, {"id": 1, "name": "Interracial Creampies"}, {"id": 4, "name": "Interracial MILF Porn"}, {"id": 3, "name": "Interracial Orgy"}, {"id": 5, "name": "Interracial Porn"}]
         jsondata = json.loads(responsedata)
         for scene in jsondata:

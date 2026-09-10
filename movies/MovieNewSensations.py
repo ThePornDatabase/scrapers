@@ -38,7 +38,7 @@ class MovieNewSensationsSpider(BaseSceneScraper):
     }
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -54,7 +54,7 @@ class MovieNewSensationsSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//div[contains(@class,"modelBlock")]')
         for movie in movies:
             meta['image'] = movie.xpath('./a//img/@src0_2x').get()
@@ -64,7 +64,7 @@ class MovieNewSensationsSpider(BaseSceneScraper):
                 yield scrapy.Request(movie, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="dvdScene"]')
         if len(scenes) > 1:
             item = self.init_scene()
@@ -148,7 +148,7 @@ class MovieNewSensationsSpider(BaseSceneScraper):
                     yield item
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = self.init_scene()
         item['network'] = 'New Sensations'

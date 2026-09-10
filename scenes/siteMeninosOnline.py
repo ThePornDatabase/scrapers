@@ -23,14 +23,16 @@ class SiteMeninosOnlineSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="pnl-mini"]')
         for scene in scenes:
             scenedate = scene.xpath('.//span[@class="duration"]/text()').get()
-            meta['date'] = self.parse_date(scenedate, date_formats=['%m-%d-%Y']).strftime('%Y-%m-%d')
+            if scenedate:
+                scenedate = self.parse_date(scenedate, date_formats=['%m-%d-%Y'])
+                meta['date'] = scenedate.strftime('%Y-%m-%d') if scenedate else None
 
             scene = scene.xpath('./a[1]/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
+            if scene and re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_title(self, response):

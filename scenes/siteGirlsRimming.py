@@ -64,7 +64,7 @@ class SiteGirlsRimmingSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_tags(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if self.get_selector_map('tags'):
             tags = self.process_xpath(response, self.get_selector_map('tags')).get()
             if tags:

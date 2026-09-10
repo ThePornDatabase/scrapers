@@ -47,23 +47,37 @@ class CzechAvSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': "//h2[@class='nice-title']/text()",
+        # h2.nice-title is gone; the full title (with the episode prefix) is in og:title
+        'title': "//meta[@property='og:title']/@content",
         'date': '//script[contains(@type, "json")]/text()',
         're_date': r'uploadDate[\'\"].*?(\d{4}-\d{2}-\d{2})',
         'description': '//script[contains(@type, "json")]/text()',
         're_description': r'description[\'\"].*?[\'\"](.*?)[\'\"]',
         'image': "//meta[@property='og:image']/@content",
         'tags': "",
-        'external_id': '/tour\\/preview\\/(.+)/',
-        'trailer': '',
-        'pagination': '/tour/videos/page-%s/'
+        'external_id': r'/video/(.+?)/',
+        'trailer': '//script[contains(@type, "json")]/text()',
+        're_trailer': r'contentUrl[\'\"]\s*:\s*[\'\"](https?://[^\'\"]+)',
+        # /tour/videos/page-N/ 404s; each site now serves its whole listing on the
+        # root.  The /page-N/ variants answer 404 and just reshuffle the same set,
+        # so there is no pagination left to walk.
+        'pagination': ''
     }
 
+    async def start(self):
+        # The base builds page one out of 'pagination', which is empty here
+        meta = {}
+        meta['page'] = self.page
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.parse, meta=meta,
+                                 headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
-        scenes = response.xpath(
-            '//div[contains(@class, "episode-list")]//div[contains(@class,"episode__preview")]//a/@href').getall()
-        for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        # div.episode-list is gone; the cards link straight to /video/<slug>/
+        scenes = response.xpath('//a[contains(@href, "/video/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_tags(self, response):
         tags = response.xpath('//script[contains(@type, "json")]/text()')

@@ -40,7 +40,7 @@ class SiteThicc18Spider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()['data']['video']['list']['result']['edges']
         for jsonrow in jsondata:
             item = SceneItem()
@@ -75,7 +75,7 @@ class SiteThicc18Spider(BaseSceneScraper):
             yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
 
     def get_images(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
         jsondata = response.json()['data']['asset']['batch']['result'][0]['serve']
         item['image'] = jsondata['uri']

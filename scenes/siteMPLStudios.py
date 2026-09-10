@@ -26,10 +26,14 @@ class SiteMPLStudiosSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//div[contains(@class, "box1") and contains(@class, "mb-3")]')
         for scene in scenes:
-            item = SceneItem()
+            item = self.init_scene()
             item['title'] = scene.xpath('.//span[@class="ellipsis"]/@title').get()
             item['performers'] = scene.xpath('.//span[@class="ellipsis"]/a[contains(@href, "portfolio")]/text()').getall()
-            item['image'] = self.format_link(response, scene.xpath('./div/a/img/@data-src').get())
+            # the cover is a plain src now; the lazy-load data-src attribute is gone
+            image = scene.xpath('./div/a/img/@src').get()
+            if not image:
+                continue
+            item['image'] = self.format_link(response, image)
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['id'] = scene.xpath('./@data-id').get()
             pathsegment = re.search(r'videoPreview/(\d+)/', item['image'])
@@ -43,7 +47,9 @@ class SiteMPLStudiosSpider(BaseSceneScraper):
                 pathsegment = "290"
             item['trailer'] = f"https://cdn.mplstudios.com/v3Assets/videoPreview/{pathsegment}/{item['id']}/{item['id']}_1280x720.mp4"
             item['description'] = ''
-            item['url'] = response.url
+            # was response.url, which gave every scene the listing URL
+            link = scene.xpath('.//a[contains(@href, "/update/")]/@href').get()
+            item['url'] = self.format_link(response, link) if link else response.url
             dates = scene.xpath('.//span[@class="ellipsis"]/text()').getall()
             item['date'] = self.parse_date('today').isoformat()
             for date in dates:

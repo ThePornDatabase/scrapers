@@ -2,8 +2,6 @@ import re
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-true = True
-false = False
 
 
 class MovieRodneyMooreSpider(BaseSceneScraper):
@@ -15,7 +13,8 @@ class MovieRodneyMooreSpider(BaseSceneScraper):
         'https://rodneymoorestore.com'
     ]
 
-    cookies = [{"domain":"rodneymoorestore.com","expirationDate":1731270263.137922,"hostOnly":true,"httpOnly":false,"name":"etoken","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"a1=4c7d32ea10e344ad388c4639d696ea072f0a697fccde25af35c5043a38ec4cbd&a2=d1927f7ca7856ddb0b2b5c38de2c311a6fb3796186660563f4c0b3dbd7e76905&a3=99470726519224"},{"domain":"rodneymoorestore.com","hostOnly":true,"httpOnly":false,"name":"use_lang","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"val=en"},{"domain":"rodneymoorestore.com","hostOnly":true,"httpOnly":false,"name":"defaults","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"{'hybridView':''}"},{"domain":"rodneymoorestore.com","expirationDate":1761593063.949509,"hostOnly":true,"httpOnly":false,"name":"ageConfirmed","path":"/","sameSite":"unspecified","secure":false,"session":false,"storeId":"0","value":"true"}]
+    # Age gate and language only; the etoken value was removed.
+    cookies = {"ageConfirmed": "true", "defaults": "{'hybridView':''}", "use_lang": "val=en"}
 
     custom_scraper_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
@@ -43,7 +42,7 @@ class MovieRodneyMooreSpider(BaseSceneScraper):
     }
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -60,14 +59,14 @@ class MovieRodneyMooreSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//div[@class="grid-item"]/a/@href').getall()
         for movie in movies:
             movieurl = self.format_link(response, movie)
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h2[contains(text(), "Scene List")]/../following-sibling::div[contains(@class, "item-grid-scene")]/div[@class="grid-item"]/article[1]/div[1]/a/@href').getall()
         if len(scenes) > 1:
             item = SceneItem()
@@ -151,7 +150,7 @@ class MovieRodneyMooreSpider(BaseSceneScraper):
                 yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
 

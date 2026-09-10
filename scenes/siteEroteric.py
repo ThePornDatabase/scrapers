@@ -28,7 +28,7 @@ class SiteErotericSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article')
         for scene in scenes:
             meta['id'] = re.search(r'(\d+)', scene.xpath('./@id').get()).group(1)

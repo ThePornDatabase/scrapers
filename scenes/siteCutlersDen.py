@@ -30,7 +30,7 @@ class SiteCutlersDenSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "videothumb")]')
         for scene in scenes:
             sceneid = scene.xpath('./@class')

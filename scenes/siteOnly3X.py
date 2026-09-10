@@ -1,3 +1,4 @@
+import os.path
 import re
 import scrapy
 
@@ -12,6 +13,11 @@ class Only3XSpider(BaseSceneScraper):
     start_urls = [
         'https://only3x.com'
     ]
+
+    # only3x runs on the AdultEmpire platform, which redirects every request to
+    # /AgeConfirmation until this cookie is set.  Without it the listing and the
+    # scene pages all returned the age-gate shell, so the crawl parsed nothing.
+    cookies = [{"name": "ageConfirmed", "value": "true"}]
 
     custom_scraper_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
@@ -32,7 +38,9 @@ class Only3XSpider(BaseSceneScraper):
         'duration': '//span[contains(text(), "Length")]/following-sibling::text()',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="video-performer"]/a//text()',
-        'tags': '//span[contains(text(), "Tags")]/following-sibling::a[@data-label="Tag"]/text()',
+        # The tag run is now labelled "Attributes:" and its anchors carry
+        # data-label="Attribute"; the old data-label="Tag" markup is gone.
+        'tags': '//strong[contains(text(), "Attributes")]/following-sibling::a/text()',
         'external_id': r'/(\d+)/',
         'trailer': '',
         'pagination': '/watch-newest-only-3x-clips-and-scenes.html?page=%s&hybridview=member'
@@ -43,12 +51,15 @@ class Only3XSpider(BaseSceneScraper):
         for scene in scenes:
             parsescene = True
             link = self.format_link(response, scene)
-            with open('dupelist-only3x.txt', 'r', encoding="utf-8") as file1:
-                for i in file1.readlines():
-                    if link in i:
-                        # ~ print(f"Already scraped scene: {link}")
-                        parsescene = False
-                        break
+            # Only3XProper writes this file; on a run where it has not been created
+            # yet the open() below used to abort the whole crawl.
+            if os.path.exists('dupelist-only3x.txt'):
+                with open('dupelist-only3x.txt', 'r', encoding="utf-8") as file1:
+                    for i in file1.readlines():
+                        if link in i:
+                            # ~ print(f"Already scraped scene: {link}")
+                            parsescene = False
+                            break
             if parsescene and re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 

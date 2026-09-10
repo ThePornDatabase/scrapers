@@ -52,7 +52,7 @@ class MoviesAdultDVDEmpirePerformerSpider(BasePerformerScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(meta['base'], meta['pagination'], meta['page']),
@@ -65,14 +65,14 @@ class MoviesAdultDVDEmpirePerformerSpider(BasePerformerScraper):
         return self.format_url(base, pagination.format(page))
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="row"]/div[contains(@class, "col-xs-6")]/div/a/@href').getall()
         for performer in performers:
             yield scrapy.Request(
                 url=self.format_link(response, performer), callback=self.parse_performer, meta=meta)
 
     def get_gender(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['pagination'][-1:] == 'F':
             return "Female"
         if meta['pagination'][-1:] == 'M':

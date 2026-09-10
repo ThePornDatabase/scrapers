@@ -33,7 +33,7 @@ class LetsDoeItSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         responsetext = response.xpath('//*').getall()
         responsetext = "".join(responsetext)
         scenes = re.findall(r'a\ target=\"_self\" class=\"-g-vc-fake\"\ href=\"(.*?.html)\"', responsetext)

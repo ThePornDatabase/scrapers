@@ -33,7 +33,7 @@ class SiteWatch4FetishSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[@class="video-post"]')
         for scene in scenes:
             altimage = scene.xpath('.//img/@src0_1x')
@@ -52,7 +52,7 @@ class SiteWatch4FetishSpider(BaseSceneScraper):
         return performers2
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if not image:
             if "altimage" in meta:
@@ -60,7 +60,7 @@ class SiteWatch4FetishSpider(BaseSceneScraper):
         return image
 
     def get_image_blob(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if not image or "/content/" not in image:
             if "altimage" in meta:

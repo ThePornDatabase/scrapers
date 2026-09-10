@@ -61,7 +61,7 @@ class NetworkOnlyAllSitesSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -87,9 +87,12 @@ class NetworkOnlyAllSitesSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination').format(page, str(year), str(month)))
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[@class="item-row" and .//i[contains(@class,"fa-film")]]')
+        # the row container changed from <div class="item-row"> to <span class="item-row">
+        scenes = response.xpath('//*[@class="item-row" and .//i[contains(@class,"fa-film")]]')
         for scene in scenes:
-            item = SceneItem()
+            # init_scene() seeds description/tags/type etc; a bare SceneItem() left the
+            # pipeline raising KeyError on fields this spider never sets
+            item = self.init_scene()
 
             title = scene.xpath('.//div[contains(@class,"personalContent")]//p//text()')
             if title:
@@ -100,7 +103,8 @@ class NetworkOnlyAllSitesSpider(BaseSceneScraper):
             date = scene.xpath('.//div[contains(@class,"personalContent")]/div/span[1]/span[2]/following-sibling::text()')
             if date:
                 date = date.get().strip()
-                item['date'] = dateparser.parse(date, date_formats=['%m.%d.%Y']).isoformat()
+                # the site writes dd.mm.yyyy, not mm.dd.yyyy
+                item['date'] = dateparser.parse(date, date_formats=['%d.%m.%Y']).isoformat()
 
             site = scene.xpath('.//div[contains(@class,"personalContent")]/div/span[1]/span[1]/text()')
             if site:
@@ -120,7 +124,8 @@ class NetworkOnlyAllSitesSpider(BaseSceneScraper):
 
             performers = scene.xpath('.//div[contains(@class,"personalContent")]//p/a/text()')
             if performers:
-                performers = list(map(lambda x: x.strip(), performers.getall()))
+                # was computed and then thrown away
+                item['performers'] = list(map(lambda x: x.strip(), performers.getall()))
 
             url = scene.xpath('./div/img/following-sibling::a/@href')
             if url:
@@ -129,4 +134,6 @@ class NetworkOnlyAllSitesSpider(BaseSceneScraper):
             item['trailer'] = ''
             item['tags'] = ''
 
-        return item
+            # was "return item" after the loop, so at most one scene came back and an
+            # empty listing raised UnboundLocalError
+            yield item

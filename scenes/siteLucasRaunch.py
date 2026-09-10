@@ -27,7 +27,7 @@ class SiteLucasRaunchSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[@class="scene-thumbnail"]/..')
         for scene in scenes:
             scenedate = scene.xpath('.//h6//text()')

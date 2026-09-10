@@ -46,7 +46,7 @@ class NetworkMentalPassSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     url = self.get_next_page_url(meta['url'], meta['page'], meta['pagination'], meta['items'])
@@ -62,7 +62,7 @@ class NetworkMentalPassSpider(BaseSceneScraper):
         return self.format_url(url, pagination % str(page))
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article')
         for scene in scenes:
             item = SceneItem()

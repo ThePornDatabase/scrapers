@@ -131,12 +131,12 @@ class NetworkKinkSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     yield scrapy.Request(url=self.get_next_page_url(self.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "shoot-thumbnail")]/ancestor::div[@class="col"]')
         for scene in scenes:
             parse_scene = True
@@ -203,7 +203,7 @@ class NetworkKinkSpider(BaseSceneScraper):
         if force_fields:
             force_fields = force_fields.split(",")
 
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
 
         item['title'] = self.get_title(response)

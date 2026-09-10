@@ -62,7 +62,7 @@ class SiteElegantAngelSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -71,7 +71,7 @@ class SiteElegantAngelSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="scene-preview-container"]')
         for scene in scenes:
             image = scene.xpath('./a/img/@src')

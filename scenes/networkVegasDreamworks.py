@@ -91,7 +91,7 @@ class NetworkVegasDreamworksSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     url = meta['url']
@@ -105,7 +105,7 @@ class NetworkVegasDreamworksSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article|//div[contains(@class,"entry-content")]')
         for scene in scenes:
             meta['date'] = get_scenedate(scene)
@@ -127,13 +127,13 @@ class NetworkVegasDreamworksSpider(BaseSceneScraper):
         return ''
 
     def get_site(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['site']:
             return meta['site']
         return tldextract.extract(response.url).domain
 
     def get_date(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['date']:
             return meta['date']
         return date.today().isoformat()

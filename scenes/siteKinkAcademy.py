@@ -13,21 +13,26 @@ class SiteKinkAcademySpider(BaseSceneScraper):
 
     start_url = 'https://www.kinkacademy.com'
 
+    # /category/experts/page/N/ 404s now, as do the commented skill-level paths.  The
+    # surviving listing is /videos/, and its own "page 2..95" links 404 as well, so
+    # the site is effectively serving a single page of 24 -- get_next_page_url
+    # therefore returns /videos/ for page one and nothing after it.
     paginations = [
-        # ~ '/category/skill-level/basic-skill/page/%s/',
-        # ~ '/category/skill-level/intermediate-skill/page/%s/',
-        # ~ '/category/skill-level/advanced-skill/page/%s/',
-        '/category/experts/page/%s/',
+        '/videos/',
     ]
 
     selector_map = {
         'title': '//meta[@name="twitter:title"]/@content',
-        'description': '//figure[@class="featured-image"]/../following-sibling::p[1]/text()',
+        # figure.featured-image is gone; og:description carries the synopsis
+        'description': '//meta[@property="og:description"]/@content',
         'date': '//meta[@property="article:published_time"]/@content',
         're_date': r'(\d{4}-\d{2}-\d{2})',
         'image': '//figure[@class="featured-image"]/img/@src',
         'performers': '',
-        'tags': '//p[@class="entry-meta"]/span[@class="categories"]/span[@class="terms"]/a/text()',
+        # p.entry-meta is gone.  The scene page carries many articles (its own plus
+        # related), so their class lists cannot be told apart there -- the tags come
+        # from the listing card instead, via meta.  See get_scenes.
+        'tags': '',
         'duration': '',
         'trailer': '',
         'external_id': r'.*/(.*?)/',
@@ -36,6 +41,8 @@ class SiteKinkAcademySpider(BaseSceneScraper):
     }
 
     def get_next_page_url(self, base, page, pagination):
+        if '%s' not in pagination:
+            return self.format_url(base, pagination) if int(page) == 1 else None
         return self.format_url(base, pagination % page)
 
     async def start(self):
@@ -56,21 +63,39 @@ class SiteKinkAcademySpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+                nextpage = self.get_next_page_url(response.url, meta['page'], meta['pagination'])
+                if nextpage:
+                    print('NEXT PAGE: ' + str(meta['page']))
+                    yield scrapy.Request(url=nextpage, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//article[contains(@class, "format-video")]/header/figure')
-        for scene in scenes:
-            meta['orig_image'] = scene.xpath('.//img/@src')
-            if meta['orig_image']:
-                meta['orig_image'] = meta['orig_image'].get()
+        meta = self.copy_meta(response)
+        for article in response.xpath('//article[contains(@class, "format-video")]'):
+            figure = article.xpath('./header/figure')
+            if not figure:
+                continue
+            meta['orig_image'] = figure.xpath('.//img/@src').get()
 
-            scene = scene.xpath('./a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
+            # WordPress writes this scene's own taxonomy onto the article element as
+            # category-<slug> and tag-<slug> classes; the housekeeping ones are dropped
+            classes = (article.attrib.get('class') or '').split()
+            skip = {'video', 'members-only', 'free'}
+            tags = []
+            for cls in classes:
+                for prefix in ('category-', 'tag-'):
+                    if cls.startswith(prefix):
+                        slug = cls[len(prefix):]
+                        if slug in skip or re.fullmatch(r'\d+', slug):
+                            continue
+                        name = string.capwords(re.sub(r'\d+$', '', slug).replace('-', ' ').strip())
+                        if name and name not in tags:
+                            tags.append(name)
+            meta['tags'] = tags
+
+            scene = figure.xpath('./a/@href').get()
+            if scene and re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_performers(self, response):

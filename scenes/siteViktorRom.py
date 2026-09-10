@@ -34,7 +34,7 @@ class SiteViktorRomSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class,"col-lg-6 col-12")]/div[contains(@class, "h4 pt-3")]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

@@ -27,7 +27,7 @@ class SiteFilthyFemdomSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="item-thumb"]/div[1]')
         for scene in scenes:
             sceneid = scene.xpath('./@class').get()

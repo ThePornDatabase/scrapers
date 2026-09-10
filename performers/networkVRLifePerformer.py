@@ -42,7 +42,7 @@ class networkVRLifePerformerSpider(BasePerformerScraper):
     
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = self.get_performers(response)
         count = 0
         for performer in performers:
@@ -51,7 +51,7 @@ class networkVRLifePerformerSpider(BasePerformerScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 body = self.create_post_data(meta['page'])
                 headers = self.headers
@@ -72,7 +72,7 @@ class networkVRLifePerformerSpider(BasePerformerScraper):
         return f"action=virtualreal_get_performers&sort=rating&sortDirection=DESC&index={(page-1)}&itemsPerPage=15"
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         json_data = response.json()['performers']
         for json_row in json_data:
             response = HtmlResponse(url=response.url, body=json_row, encoding='utf-8')

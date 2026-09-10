@@ -79,7 +79,7 @@ class MovieAdultTimeAPISpider(BaseSceneScraper):
         return self.call_algolia_movie(response.meta['page'], token, response.meta['url'])
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if response.status == 200:
             movies = self.get_movies(response)
             # ~ print(f"Movies Len: {len(list(movies))}")
@@ -98,7 +98,7 @@ class MovieAdultTimeAPISpider(BaseSceneScraper):
                 yield self.call_algolia_movie(next_page, response.meta['token'], response.meta['url'])
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for scene in response.json()['results'][0]['hits']:
             # ~ print(scene)
             item = SceneItem()
@@ -284,7 +284,7 @@ class MovieAdultTimeAPISpider(BaseSceneScraper):
                         yield self.check_item(item, self.days)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = response.meta['movie']
         for scene in response.json()['results'][0]['hits']:
             item = SceneItem()

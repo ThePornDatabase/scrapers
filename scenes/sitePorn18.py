@@ -52,13 +52,13 @@ class SitePorn18Spider(BaseSceneScraper):
                              cookies=self.cookies)
 
     def get_model_pages(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         models = response.xpath('//a[@class="item" and contains(@href, "/models/")]/@href').getall()
         for model in models:
             yield scrapy.Request(url=self.format_link(response, model), callback=self.get_scenes, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="item-inner"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

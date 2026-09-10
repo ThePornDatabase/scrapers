@@ -45,7 +45,7 @@ class NetworkWowNetworkSpider(BaseSceneScraper):
         'performers': '//div[@id="video-about"]/div[@id="video-actors"]/a/text()',
         'tags': '//div[@class="tags-list"]/a[@class="label"]/text()',
         'external_id': '/([a-z0-9-]+?)/?$',
-        'trailer': '//video/source/@src',
+        # 'trailer': '//video/source/@src',
         'pagination': '/category/movies/page/%s/?filter=latest'
     }
 

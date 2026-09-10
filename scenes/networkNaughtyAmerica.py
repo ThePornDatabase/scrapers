@@ -37,10 +37,8 @@ class NaughtyAmericaSpider(BaseSceneScraper):
             # 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -63,7 +61,7 @@ class NaughtyAmericaSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="scene-grid-item"]/a[contains(@href,"/scene/")]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

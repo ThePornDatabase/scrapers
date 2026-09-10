@@ -29,7 +29,7 @@ class SitePornstarPlatinumSpider(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//div[@id="videos-list"]//div[contains(@class,"item no-nth")]')
         for scene in scenes:
-            meta = response.meta
+            meta = self.copy_meta(response)
             performers = []
             performers = scene.xpath('.//div[@class="video-meta-container"]/div[contains(@class, "left")]/text()')
             if performers:

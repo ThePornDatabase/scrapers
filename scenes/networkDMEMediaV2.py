@@ -88,7 +88,7 @@ class NetworkDMEMediaV2Spider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "videothumb")]|//div[contains(@class,"item-thumb")]')
         for scene in scenes:
             image2 = scene.xpath('.//img/@src')
@@ -132,7 +132,7 @@ class NetworkDMEMediaV2Spider(BaseSceneScraper):
         return image
 
     def get_image_blob(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if 'image_blob' not in self.get_selector_map():
             image = self.get_image(response)
             image_blob = self.get_image_blob_from_link(image)

@@ -21,7 +21,7 @@ class SiteTNVGirlsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         models = response.xpath('//div[@class="model"]//img/@id').getall()
         for model in models:
             modelid = re.search(r'target-(\d+)', model).group(1)

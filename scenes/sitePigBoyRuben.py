@@ -32,7 +32,7 @@ class SitePigBoyRubenSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="thumb"]/a[1]/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

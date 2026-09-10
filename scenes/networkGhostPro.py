@@ -1,5 +1,6 @@
 import re
 import json
+from urllib.parse import urlparse
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -48,7 +49,9 @@ class SiteGhostProSpider(BaseSceneScraper):
             jsondata = jsondata['props']['pageProps']['contents']['data']
             for scene in jsondata:
                 item = SceneItem()
-                site = re.search(r'https://www\.(.*?)\.', response.url).group(1)
+                # Was re.search(r'https://www\.(.*?)\.') - a site that redirects away
+                # from www made that return None and .group(1) raised.
+                site = urlparse(response.url).netloc.replace('www.', '').split('.')[0]
                 item['title'] = scene['title']
                 item['description'] = re.sub('<[^<]+?>', '', scene['description'])
                 if 'trailer_screencap' in scene and scene['trailer_screencap'] and 'tussinee' not in response.url:

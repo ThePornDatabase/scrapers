@@ -1,85 +1,71 @@
-import json
-from scrapy.http import Request
+import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
 
 
 class SiteFit18Spider(BaseSceneScraper):
     name = 'Fit18'
+    network = 'Fit 18'
+    parent = 'Fit 18'
+    site = 'Fit 18'
 
-    headers = {
-        "Content-Type": "application/json",
-        "apollographql-client-name": "fit18:site",
-        "apollographql-client-version": "1.0",
-        "argonath-api-key": "77cd9282-9d81-4ba8-8868-ca9125c76991",
+    # The old fit18.team18media.app GraphQL API no longer resolves.  The site is now a
+    # server-rendered Next.js app, but every listing is capped at 12 entries and the
+    # rest is loaded client-side, so the crawl also walks the model pages to reach
+    # what it can (about 27 scenes).  The previous scraper only asked for the newest
+    # 15, so this is no worse in practice.
+    start_urls = [
+        'https://fit18.com/videos',
+    ]
+
+    selector_map = {
+        'title': '//h1[contains(@class, "video-title-component")]/text()',
+        'description': '//div[contains(@class, "video-description-component")]/p//text()',
+        # Neither the listing nor the scene page publishes a release date or duration
+        'date': '',
+        'image': '//picture//img[contains(@src, "videothumb")]/@src | (//picture//img/@src)[1]',
+        'performers': '//div[contains(@class, "video-models-component")]//a/text()',
+        'tags': '//div[contains(@class, "video-tags-component")]/a/text()',
+        'external_id': r'/video/(.*?)/?$',
+        'trailer': '',
+        'pagination': '',
+        'type': 'Scene',
     }
 
     async def start(self):
-        scenequery = {
-            "operationName": "ListVideo",
-            "variables": {
-                "after": "",
-                "limit": 15
-            },
-            "query": "query ListVideo($order: [OrderEntry!], $after: ID, $limit: Int) {\n  video {\n    list(input: {order: $order, after: $after, first: $limit}) {\n      result {\n        edges {\n          node {\n            videoId\n            title\n            duration\n     description {\n              long\n            }\n            talent {\n              type\n              talent {\n                talentId\n                name\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
-        }
-        url = "https://fit18.team18media.app/graphql"
-        scenequery = json.dumps(scenequery)
-        yield Request(url, headers=self.headers, body=scenequery, method="POST", callback=self.get_scenes)
+        meta = {}
+        meta['page'] = self.page
+        for url in (self.start_urls[0], 'https://fit18.com/models'):
+            yield scrapy.Request(url, callback=self.parse, meta=meta,
+                                 headers=self.headers, cookies=self.cookies)
 
-    selector_map = {
-        'title': '',
-        'description': '',
-        'date': '',
-        'image': '',
-        'performers': '',
-        'tags': '',
-        'external_id': r'',
-        'trailer': '',
-        'pagination': ''
-    }
+    def parse(self, response, **kwargs):
+        yield from self.get_scenes(response)
+
+        # Model pages carry that model's scenes, which reach a little further than
+        # the 12 the /videos listing renders.
+        for model in response.xpath('//a[starts-with(@href, "/model/")]/@href').getall():
+            yield scrapy.Request(url=self.format_link(response, model),
+                                 callback=self.parse_models, meta=response.meta,
+                                 headers=self.headers)
+
+    def parse_models(self, response):
+        yield from self.get_scenes(response)
 
     def get_scenes(self, response):
-        meta = response.meta
-        jsondata = response.json()['data']['video']['list']['result']['edges']
-        for jsonrow in jsondata:
-            item = SceneItem()
-            sceneid = jsonrow['node']['videoId']
-            item['id'] = sceneid.replace(":", "-")
-            item['title'] = self.cleanup_title(jsonrow['node']['title'])
-            item['duration'] = jsonrow['node']['duration']
-            item['description'] = self.cleanup_description(jsonrow['node']['description']['long'])
-            item['performers'] = []
-            for performer in jsonrow['node']['talent']:
-                item['performers'].append(performer['talent']['name'])
+        for link in response.xpath('//a[starts-with(@href, "/video/")]/@href').getall():
+            yield scrapy.Request(url=self.format_link(response, link),
+                                 callback=self.parse_scene, meta=response.meta,
+                                 headers=self.headers)
 
-            item['site'] = "Fit 18"
-            item['network'] = "Fit 18"
-            item['parent'] = "Fit 18"
-            item['url'] = "https://fit18.com/videos/" + sceneid.replace(':', '%3A')
-            item['date'] = self.parse_date('today').isoformat()
-            item['trailer'] = ''
-            item['tags'] = []
-            meta['item'] = item.copy()
-            imagedata = jsonrow['node']['videoId'].split(":")
+    def get_image(self, response):
+        """Return '' rather than the site root when no thumbnail is present.
 
-            imagequery = {
-                "operationName": "BatchFindAssetQuery",
-                "variables": {
-                    "paths": [
-                        "/members/models/" + imagedata[0] + "/scenes/" + imagedata[1] + "/videothumb.jpg",
-                    ]
-                },
-                "query": "query BatchFindAssetQuery($paths: [String!]!) {\n  asset {\n    batch(input: {paths: $paths}) {\n      result {\nserve {\n uri\n}\n}\n}\n}\n}\n"}
-            url = "https://fit18.team18media.app/graphql"
-            imagequery = json.dumps(imagequery)
-            yield Request(url, headers=self.headers, body=imagequery, method="POST", callback=self.get_images, meta=meta)
-
-    def get_images(self, response):
-        meta = response.meta
-        item = meta['item']
-        jsondata = response.json()['data']['asset']['batch']['result'][0]['serve']
-        item['image'] = jsondata['uri']
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
-        if item['id'] and item['title']:
-            yield item
+        The base implementation runs format_link() on an empty match, which resolves
+        to the domain and yields an 'image' of https://fit18.com.
+        """
+        image = response.xpath(self.get_selector_map('image')).get() or ''
+        image = image.strip()
+        if not image:
+            return ''
+        return self.format_link(response, image)

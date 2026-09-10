@@ -26,7 +26,7 @@ class SiteRimTeensSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h2[contains(./span/text(), "LATEST")]/following-sibling::div[1]//article')
         for scene in scenes:
             duration = scene.xpath('.//span[contains(@class, "video-duration")]/text()')

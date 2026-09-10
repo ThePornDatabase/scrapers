@@ -63,7 +63,7 @@ class SiteInkedVixensXXXSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = re.search(r'(\[.*\])', response.text).group(1)
         jsondata = json.loads(jsondata)
         for scene in jsondata:

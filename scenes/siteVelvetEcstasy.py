@@ -14,18 +14,21 @@ class SiteVelvetEcstasySpider(BaseSceneScraper):
         'https://www.velvetecstasy.com',
     ]
 
+    # The numbered tour pages are gone -- /visitors/tour01.htm and every other
+    # tourNN.htm 404s.  What survives is a single /visitors/tour.htm carrying the
+    # ten newest scenes with their dates, cast, synopsis, tags and runtime, and a
+    # /visitors/scenes.htm archive grid that publishes no dates at all and so is no
+    # use to the date filter.  The markup inside the update blocks is unchanged.
     selector_map = {
         'external_id': r'',
-        'pagination': '/visitors/tour%s.htm',
+        'pagination': '/visitors/tour.htm',
         'type': 'Scene',
     }
 
     def get_next_page_url(self, base, page):
-        if page < 10:
-            page = "0" + str(page)
-        else:
-            page = str(page)
-        return self.format_url(base, self.get_selector_map('pagination') % page)
+        # one listing page only; asking for it again is dropped by the dupefilter,
+        # which is what stops pagination
+        return self.format_url(base, self.get_selector_map('pagination'))
 
     def get_scenes(self, response):
         scenes = response.xpath('//table[@width="1200" and @cellpadding="5"]')

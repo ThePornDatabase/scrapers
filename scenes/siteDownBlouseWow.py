@@ -33,7 +33,7 @@ class SiteDownBlouseWowSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.get_scenes, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="itemminfo"]/p[1]/a/@href').getall()
         for scene in scenes:
             if "join" not in scene:

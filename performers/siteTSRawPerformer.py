@@ -1,5 +1,6 @@
 import re
 from tpdb.BasePerformerScraper import BasePerformerScraper
+from tpdb.spiders.scenes._natscms import resolve_block_id
 
 
 class SiteTSRawSpider(BasePerformerScraper):
@@ -19,9 +20,27 @@ class SiteTSRawSpider(BasePerformerScraper):
         'pagination': '/index.php?section=1681&start=%s'
     }
 
+
+    # cms_block_id belongs to a block in the tour's layout, so it changes whenever
+    # the tour is re-laid-out -- and when it does the API answers
+    # {"error":"cms_block_id ... not found"} and the spider silently yields
+    # nothing. It is therefore looked up once per crawl; the literal below is only
+    # the fallback used if that lookup fails, so this can only ever help.
+    nats_site = 'https://www.tsraw.com'
+    nats_block_fallback = '102035'
+
+    @property
+    def nats_block_id(self):
+        if getattr(self, '_nats_block_id', None) is None:
+            self._nats_block_id = resolve_block_id(self.nats_site, self.nats_block_fallback)
+            if self._nats_block_id != self.nats_block_fallback:
+                print('*** %s: cms_block_id %s -> %s' % (
+                    self.name, self.nats_block_fallback, self._nats_block_id))
+        return self._nats_block_id
+
     def get_next_page_url(self, base, page):
         index = str((int(page) - 1) * 72)
-        url = f"https://nats.islanddollars.com/tour_api.php/content/data-values?cms_block_id=102035&cms_data_type_id=4&start={index}&count=72&orderby=name_asc&text_search=&data_details_search=%7B%22100009%22:%5B%22TSRAW%22%5D%7D"
+        url = f"https://nats.islanddollars.com/tour_api.php/content/data-values?cms_block_id={self.nats_block_id}&cms_data_type_id=4&start={index}&count=72&orderby=name_asc&text_search=&data_details_search=%7B%22100009%22:%5B%22TSRAW%22%5D%7D"
         return url
 
     def get_detail(self, performer, detail_name):

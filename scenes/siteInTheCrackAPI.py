@@ -56,7 +56,7 @@ class SiteInTheCrackSpider(BaseSceneScraper):
         if local_run:
             local_run = True
 
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene = json.loads(response.text)
         item = self.init_scene()
         item['site'] = "In The Crack"

@@ -73,3 +73,14 @@ class DickDrainersSpider(BaseSceneScraper):
         title = super().get_title(response)
         title = title.encode('ascii', 'ignore').decode()
         return title
+    
+    def get_duration(Self, response):
+        duration = response.xpath('//div[contains(@class, "videoInfo")]/p[contains(text(), "min")]/text()')
+        if duration:
+            duration = duration.get()
+            duration = duration.replace("\r", "").replace("\n", "").replace("\t", "").replace("&nbsp;", "").strip()
+            duration = re.sub(r'[^a-z0-9]+', '', duration.lower())
+            duration = re.search(r'(\d+)min', duration)
+            if duration:
+                return str(int(duration.group(1)) * 60)
+        return None

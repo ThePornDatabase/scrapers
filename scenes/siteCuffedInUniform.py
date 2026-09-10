@@ -12,6 +12,10 @@ class SiteCuffedInUniformSpider(BaseSceneScraper):
         'https://www.cuffedinuniform.com',
     ]
 
+    # WordPress "Age Gate" plugin: without this cookie every page is the
+    # interstitial.  The domain is required so it survives the /page/1/ redirect.
+    cookies = [{"name": "age_gate", "value": "18", "domain": ".cuffedinuniform.com", "path": "/"}]
+
     selector_map = {
         'title': './/h2/a/text()',
         'description': './/div[contains(@class, "entry-content-excerpt")]/p//text()',

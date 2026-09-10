@@ -29,7 +29,7 @@ class SiteM2MClubSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "updateItem")]')
         for scene in scenes:
             image = scene.xpath('.//img/@src0_4x')

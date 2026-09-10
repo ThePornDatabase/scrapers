@@ -15,8 +15,11 @@ class siteHeavyOnHottiesSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//h2/span/following-sibling::text()',
-        'description': '//div[contains(@class,"comment-section")]/div/p/text()',
+        # The title block moved from h2 to h1: <h1><span><a>Model</a></span>In: "Title"</h1>
+        'title': '//h1/span/following-sibling::text()',
+        # The old comment-section selector only picked up the members-only login
+        # prompt; the site publishes no public scene description.
+        'description': '',
         'date': '//span[@class="released title"]/strong/text()',
         'date_formats': ['%b %d, %Y'],
         'image': '//video/@poster',

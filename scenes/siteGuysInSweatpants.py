@@ -1,5 +1,7 @@
 import re
+
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -11,30 +13,65 @@ class SiteGuysInSweatpantsSpider(BaseSceneScraper):
 
     cookies = {"pp-accepted": "true"}
 
+    start_urls = [
+        'https://guysinsweatpants.com',
+    ]
+
+    # The site moved onto a /tour/ build: /scenes is a 404 and li.gallery-item-1 is
+    # gone, along with h1.title and the div.meta block every field hung off.  The
+    # listing is /tour/categories/movies.html (movies_N.html from page 2), cards are
+    # div.item-video, and the scene page keeps its facts in labelled
+    # span.update-info-title / span.update-info-value pairs.
     selector_map = {
-        'title': '//h1[@class="title"]/text()',
-        'description': '//h1[@class="title"]/following-sibling::div[@class="meta"]/following-sibling::p[1]/text()',
-        'date': '//h1[@class="title"]/following-sibling::div[@class="meta"]/span/text()',
+        'title': '//h3[contains(@class, "highlight")]/text()',
+        'description': '//div[contains(@class, "update-info-block") and contains(@class, "text-larger")]//text()',
+        'date': '//span[contains(text(), "RELEASE DATE")]/following-sibling::span[1]/text()',
         're_date': r'(\w+ \d{1,2}, \d{4})',
-        'date_formats': ['%b %d, %Y'],
-        'image': '//img[@class="bkg"]/@src',
-        'performers': '//h1[@class="title"]/following-sibling::div[@class="meta"]/span/a/text()',
+        'date_formats': ['%B %d, %Y'],
+        'image': '',
+        'performers': '//span[contains(text(), "CAST")]/following-sibling::span[1]//a/text()',
         'tags': '',
-        'duration': '',
+        'duration': '//span[contains(text(), "SCENE LENGTH")]/following-sibling::span[1]/text()',
         'trailer': '',
-        'external_id': r'.*/(.*?)$',
-        'pagination': '',
+        'external_id': r'/trailers/([^/?]+)\.html',
+        'pagination': '/tour/categories/movies_%s.html',
         'type': 'Scene',
     }
 
-    async def start(self):
-        meta = {}
-        meta['page'] = self.page
-        yield scrapy.Request("https://guysinsweatpants.com/scenes", callback=self.get_scenes, meta=meta, headers=self.headers, cookies=self.cookies)
+    def get_next_page_url(self, base, page):
+        if int(page) == 1:
+            return self.format_url(base, '/tour/categories/movies.html')
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//li[@class="gallery-item-1"]/a[not(contains(./div[@class="title"]/text(), "Coming")) and not(contains(./div[@class="title"]/text(), ":"))]/@href').getall()
-        for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+        for card in response.xpath('//div[contains(@class, "item-video")]'):
+            link = card.xpath('.//div[contains(@class, "item-title")]//a/@href').get()
+            if not link or not re.search(self.get_selector_map('external_id'), link):
+                continue
+
+            meta = dict(response.meta)
+            # the still is only on the card; the scene page shows the player instead
+            image = card.xpath('.//img/@src0_1x').get() or card.xpath('.//img/@src').get()
+            if image:
+                meta['image'] = self.format_link(response, image)
+            preview = card.xpath('.//div[@data-videosrc]/@data-videosrc').get()
+            if preview:
+                meta['trailer'] = self.format_link(response, preview)
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_image(self, response):
+        return response.meta.get('image', '')
+
+    def get_trailer(self, response):
+        return response.meta.get('trailer', '')
+
+    def get_duration(self, response):
+        runtime = response.xpath(self.get_selector_map('duration')).get()
+        if runtime:
+            runtime = re.search(r'(?:(\d+):)?(\d{1,2}):(\d{2})', runtime)
+            if runtime:
+                hours, minutes, seconds = (int(x) if x else 0 for x in runtime.groups())
+                return str(hours * 3600 + minutes * 60 + seconds)
+        return None

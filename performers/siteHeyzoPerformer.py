@@ -32,7 +32,7 @@ class SiteHeyzoPerformerSpider(BasePerformerScraper):
         return 'Female'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="actor_list"]//ul[not(@class)]//a[1]')
         for performer in performers:
             meta['name'] = performer.xpath('./img/@alt').get()
@@ -83,7 +83,7 @@ class SiteHeyzoPerformerSpider(BasePerformerScraper):
         return height
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if ".com/" not in image:
             return self.format_link(response, meta['alt_image'])

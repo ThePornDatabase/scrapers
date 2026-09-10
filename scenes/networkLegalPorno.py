@@ -28,6 +28,7 @@ class LegalPornoSpider(BaseSceneScraper):
         'trailer': '',
         'pagination': '/new-videos/%s'
         # ~ 'pagination': 'https://www.analvids.com/studios/latinhot_studio/%s'
+        # ~ 'pagination': 'https://www.analvids.com//model/193473/akina_asmus/%s'
         # ~ 'pagination': 'https://www.analvids.com/filter/%s?studio=latinhot_studio'
     }
 
@@ -43,7 +44,7 @@ class LegalPornoSpider(BaseSceneScraper):
         return response.xpath('//span[contains(text(), "Studio")]/following-sibling::a/text()').get().strip()
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="card-scene"]/div[1]/a/@href|//div[contains(@class,"card-scene") and contains(./div/@class, "view")]/div[1]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=scene, callback=self.parse_scene, meta=meta)
@@ -89,6 +90,6 @@ class LegalPornoSpider(BaseSceneScraper):
                        'claudiamarie', 'rawwhitemeat', 'industryinvaders', 'cockyboys', 'touchmywife', 'blackbullchallenge', 'topwebmodels', 'realsexpass', 'riggsfilms', 'pervfect', 'mollyredwolf', 'bluepillmen', 'blacksonmoms', 'peter\'skingdom',
                        'pornmuschimovie', 'chickpass', 'grooby', 'pornpros', 'lubed', 'povd', 'facials4k', 'girlcum', 'exotic4k', 'nannyspy', 'castingcouch-x', 'mom4k', 'bluebirdfilms', 'dreamtranny', 'pornworld', 'randyblue',
                        'bradmontanastudio', 'interracialvision', 'melinamay', 'primalfetish', 'sexmex', 'sexmex', 'alexlegend', 'aglaeaproductions', 'dripdrop', 'dripdropprod', 'artemixxx', 'theartemixxx', 'bradmontanaproductions',
-                       'madbros', 'madbrosx', 'girlfriendsfilms', 'realkingcobra', 'brandnewamateurs']
+                       'madbros', 'madbrosx', 'girlfriendsfilms', 'realkingcobra', 'brandnewamateurs', 'dickhddaily']
             if not any(x in item['site'].lower().replace(" ", "").replace("-", "").replace("_", "") for x in matches):
                 yield self.check_item(item, self.days)

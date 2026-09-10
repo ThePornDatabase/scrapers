@@ -14,7 +14,9 @@ class SiteBoysHalfwayHouseSpider(BaseSceneScraper):
     ]
 
     selector_map = {
-        'title': '//div[@class="p-5"]/h2[contains(@class, "blckTitle")]/text()',
+        # The blckTitle class is gone; og:title carries it as "Scene: <name>"
+        'title': '//meta[@property="og:title"]/@content',
+        're_title': r'(?:Scene:\s*)?(.*)',
         'description': '//div[@class="p-5"]/p/text()',
         'date': '',
         'image': '//meta[@property="og:image"]/@content',
@@ -27,7 +29,7 @@ class SiteBoysHalfwayHouseSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="wrapperSceneTitle"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

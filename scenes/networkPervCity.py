@@ -42,7 +42,7 @@ class NetworkPervCitySpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="videoBlock"]')
         for scene in scenes:
             duration = scene.xpath('.//div[@class="runtime"]/text()')

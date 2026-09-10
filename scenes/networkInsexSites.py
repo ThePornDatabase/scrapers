@@ -16,12 +16,40 @@ def match_site(argument):
     return match.get(argument, '')
 
 
+INSEX = 'https://www.insex.com'
+INSEX_BASE = 'https://www.insex.com/is/'
+
+INSEX_DOMAINS = [
+    'hardtied.com',
+    'infernalrestraints.com',
+    'realtimebondage.com',
+    'sexuallybroken.com',
+    'topgrl.com',
+]
+
+INSEX_START_URLS_FULL = [
+    [INSEX, '/is/home.php?p=%%s&s=&d=%s&o=oldest' % d, INSEX_BASE, d] for d in INSEX_DOMAINS
+]
+
+INSEX_START_URLS_UPDATE = [
+    [INSEX, '/is/home.php?p=%%s&s=&d=%s&o=newest' % d, INSEX_BASE, d] for d in INSEX_DOMAINS
+]
+
+
 class InsexSitesSpider(BaseSceneScraper):
     name = 'InsexSites'
     network = "Insex Network"
     parent = "Insex Network"
 
-    cookies = {'consent': 'yes', 'dig': 'dig-intersec'}
+    # The network consolidated onto insex.com: the per-domain /ht/, /ir/, /rtb/,
+    # /sb/ and /tg/ paths are gone and every site is served from
+    # /is/home.php?d=<domain>, so the sites are still individually addressable.
+    # Two cookies are needed -- 'consent' alone leaves the listing an empty shell;
+    # 'verified' is what the agechecker.net popup sets and without it the page
+    # renders navigation only.
+    cookies = {'verified': 'true', 'consent': 'yes', 'dig': 'dig-intersec'}
+
+
 
     # Note: The primary index page at insexondemand.com doesn't have all of the releases listed.
     #       Also, the individual site pages seem to have a bug.  If you go in normal order, when you reach
@@ -34,21 +62,8 @@ class InsexSitesSpider(BaseSceneScraper):
     #       Because of that, I put in an '-a full=true' flag which when used in combination with '-a limit_pages=all'
     #       will use the reverse date order and do a full import.
 
-    start_urls_full = [
-        ['https://www.hardtied.com/', '/ht/home.php?p=%s&s=&d=&o=oldest', 'https://www.hardtied.com/ht/'],
-        ['https://www.infernalrestraints.com/', '/ir/home.php?p=%s&s=&d=&o=oldest', 'https://www.infernalrestraints.com/ir/'],
-        ['https://www.realtimebondage.com/', '/rtb/home.php?p=%s&s=&d=&o=oldest', 'https://www.realtimebondage.com/rtb/'],
-        ['https://www.sexuallybroken.com/', '/sb/home.php?p=%s&s=&d=&o=oldest', 'https://www.sexuallybroken.com/sb/'],
-        ['https://www.topgrl.com/', '/tg/home.php?p=%s&s=&d=&o=oldest', 'https://www.topgrl.com/tg/'],
-    ]
-
-    start_urls_update = [
-        ['https://www.hardtied.com/', '/ht/home.php?p=%s&s=&d=&o=newest', 'https://www.hardtied.com/ht/'],
-        ['https://www.infernalrestraints.com/', '/ir/home.php?p=%s&s=&d=&o=newest', 'https://www.infernalrestraints.com/ir/'],
-        ['https://www.realtimebondage.com/', '/rtb/home.php?p=%s&s=&d=&o=newest', 'https://www.realtimebondage.com/rtb/'],
-        ['https://www.sexuallybroken.com/', '/sb/home.php?p=%s&s=&d=&o=newest', 'https://www.sexuallybroken.com/sb/'],
-        ['https://www.topgrl.com/', '/tg/home.php?p=%s&s=&d=&o=newest', 'https://www.topgrl.com/tg/'],
-    ]
+    start_urls_full = INSEX_START_URLS_FULL
+    start_urls_update = INSEX_START_URLS_UPDATE
 
     selector_map = {
         'title': '//div[contains(@class, "has-text-weight-bold")]/text()',
@@ -74,7 +89,8 @@ class InsexSitesSpider(BaseSceneScraper):
         for link in links:
             yield scrapy.Request(url=self.get_next_page_url(link[0], self.page, link[1]),
                                  callback=self.parse,
-                                 meta={'page': self.page, 'pagination': link[1], 'baseurl': link[2]},
+                                 meta={'page': self.page, 'pagination': link[1], 'baseurl': link[2],
+                                       'sitedomain': link[3]},
                                  headers=self.headers,
                                  cookies=self.cookies)
 
@@ -87,7 +103,7 @@ class InsexSitesSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 pagination = meta['pagination']
                 print('NEXT PAGE: ' + str(meta['page']))
@@ -101,7 +117,7 @@ class InsexSitesSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//figure/a[contains(@href,"play.php")]/@href').getall()
         for scene in scenes:
             if meta['baseurl']:
@@ -110,9 +126,18 @@ class InsexSitesSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        site = tldextract.extract(response.url).domain
-        if site:
-            site = match_site(site)
+        """Every page is served from insex.com now, so the response URL no longer
+        identifies the site -- it comes from the d= parameter the listing was
+        requested with, falling back to the slug the scene page prints as a tag."""
+        domain = response.meta.get('sitedomain') or ''
+        site = match_site(domain.replace('.com', ''))
+        if not site:
+            for tag in response.xpath('//span[@class="tag is-dark"]/text()').getall():
+                site = match_site(tag.strip().lower())
+                if site:
+                    break
+        if not site:
+            site = match_site(tldextract.extract(response.url).domain)
         return site
 
     def get_date(self, response):

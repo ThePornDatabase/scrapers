@@ -25,7 +25,7 @@ class SiteNakedNewsSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = json.loads(response.text)
         scenes = scenes['segments']
         for scene in scenes:
@@ -43,7 +43,7 @@ class SiteNakedNewsSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene = json.loads(response.text)
         if scene:
             item = self.init_scene()

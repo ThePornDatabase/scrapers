@@ -11,406 +11,110 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
     name = 'MyModelSite'
 
     studios = {
-        "aeriefans.com": {
-            "api": "aerie-saunders.mymember.site",
-            "name": "Aerie Saunders",
-        },
-        "aglaeaproductions.com": {
-            "api": "aglaeaproductions.mymember.site",
-            "name": "Aglaea X",
-        },
-        "aliceshawbelly.com": {
-            "api": "aliceshawbelly.mymember.site",
-            "name": "Alice Shaw",
-        },
-        "allinthestepfamily.com": {
-            "api": "all-in-the-step-family.mymember.site",
-            "name": "All in the Step-Family"
-        },
-        "alterpic.com": {
-            "api": "alterpic.mymember.site",
-            "name": "Alterpic",
-        },
-        "amieesfetishhouse.com": {
-            "api": "amiees-fetish-house.mymember.site",
-            "name": "Amiees Fetish House",
-        },
-        "asianmassagemaster.com": {
-            "api": "asianmassagemaster.mymember.site",
-            "name": "Asian Massage Master",
-        },
-        "anistarxxx.com": {
-            "api": "anistarxxx.mymember.site",
-            "name": "AnniStar XXX",
-        },
-        "bdsmkinkyplay.com": {
-            "api": "bdsmkinkyplay.mymember.site",
-            "name": "BDSM Kinky Play",
-        },
-        "beverlybluexxx.com": {
-            "api": "beverlybluexxx.mymember.site",
-            "name": "BeverlyBlueXxX",
-        },
-        "bigmilkymommygf.com": {
-            "api": "big-milky-mommy-gf.mymember.site",
-            "name": "Big Milk Mommy GF",
-        },
-        "bindastimesuk.com": {
-            "api": "bindastimesuk.mymember.site",
-            "name": "Bindastimesuk",
-        },
-        "bondageliberation.com": {
-            "api": "bondageliberation.mymember.site",
-            "name": "Bondage Liberation",
-        },
-        "bondagefashionmexico.com": {
-            "api": "bondage-fashion-mx.mymember.site",
-            "name": "Bondage Fashion Mexico",
-        },
-        "brookesballoons.com": {
-            "api": "brookesballoons.mymember.site",
-            "name": "BrookesBalloons",
-        },
-        "castersworldwide.com": {
-            "api": "castersworldwide.mymember.site",
-            "name": "Casters Worldwide",
-        },
-        "chloestoybox.com": {
-            "api": "chloestoybox.mymember.site",
-            "name": "Chloe Toy",
-        },
-        "clubsteffi.fun": {
-            "api": "clubsteffi.mymember.site",
-            "name": "ClubSteffi",
-        },
-        "cristalkinky.com": {
-            "api": "cristalkinky.mymember.site",
-            "name": "Cristal Kinky",
-        },
-        "cruel-women.com": {
-            "api": "cruel-women.mymember.site",
-            "name": "Cruel Women",
-        },
-        "curvymary.com": {
-            "api": "curvy-mary.mymember.site",
-            "name": "Curvy Mary",
-        },
-        "dannijones.com": {
-            "api": "dannijones.mymember.site",
-            "name": "Danni Jones",
-        },
-        "deemariexxx.com": {
-            "api": "deemariexxx.mymember.site",
-            "name": "Dee Marie",
-        },
-        "europornvids.com": {
-            "api": "europornvids.mymember.site",
-            "name": "Euro Porn Vids",
-        },
-        "faexcheta.com": {
-            "api": "faexcheta.mymember.site",
-            "name": "Fae and Cheta",
-        },
-        "friskyfairyk.com": {
-            "api": "friskyfairyk.mymember.site",
-            "name": "xoXokmarie",
-        },
-        "girlsofhel.com": {
-            "api": "girls-of-hel.mymember.site",
-            "name": "Girls of HEL",
-        },
-        "glass-dp.com": {
-            "api": "glassdp.mymember.site",
-            "name": "Glassdp",
-        },
-        "glassdeskproductions.com": {
-            "api": "glassdeskproductions.mymember.site",
-            "name": "GlassDeskProductions",
-        },
-        "goddesslesley.com": {
-            "api": "goddesslesley.mymember.site",
-            "name": "Goddess Lesley",
-        },
-        "goddessrobin.com": {
-            "api": "goddessrobin.mymember.site",
-            "name": "Goddess Robin",
-        },
-        "greatbritishfeet.com": {
-            "api": "greatbritishfeet.mymember.site",
-            "name": "Great British Feet",
-        },
-        "greendoorlive.tv": {
-            "api": "greendoorlivetv.mymember.site",
-            "name": "The World Famous Green Door",
-        },
-        "heatheraustin.live": {
-            "api": "heather-austin.mymember.site",
-            "name": "Heather Austin",
-        },
-        "heavybondage4life.com": {
-            "api": "heavybondage4life.mymember.site",
-            "name": "Heavybondage4Life",
-        },
-        "hornyadventures.com": {
-            "api": "hornyadventurestv.mymember.site",
-            "name": "Horny Adventures",
-        },
-        "hornysilver.com": {
-            "api": "hornysilver.mymember.site",
-            "name": "Hornysilver",
-        },
-        "hotwifeheidihaze.com": {
-            "api": "heidi-haze.mymember.site",
-            "name": "Heidi Haze",
-        },
-        "islandboyvids.com": {
-            "api": "islandboyvids.mymember.site",
-            "name": "Island Boy Vids",
-        },
-        "josyblack.tv": {
-            "api": "josyblack.mymember.site",
-            "name": "Josy Black",
-        },
-        "juteandroses.com": {
-            "api": "juteandroses.mymember.site",
-            "name": "Jute and Roses",
-        },
-        "kingnoirexxx.com": {
-            "api": "kingnoirexxx.mymember.site",
-            "name": "KingNoireXXX",
-        },
-        "kinkography.com": {
-            "api": "kinkography.mymember.site",
-            "name": "Kinkography",
-        },
-        "kinkyponygirl.com": {
-            "api": "kinkyponygirl.mymember.site",
-            "name": "KinkyPonygirl",
-        },
-        "kinkyrubberdreams.com": {
-            "api": "kinkyrubberdreams.mymember.site",
-            "name": "Glowing Darkness",
-        },
-        "kitehkawasaki.com": {
-            "api": "kitehkawasaki.mymember.site",
-            "name": "Kiteh Kawasaki",
-        },
-        "labelladx.com": {
-            "api": "labelladx.mymember.site",
-            "name": "LaBellaDiablaX",
-        },
-        "lady-asmondena.com": {
-            "api": "ladyasmondena.mymember.site",
-            "name": "Lady Asmondena",
-        },
-        "lamodelsdoporn.com": {
-            "api": "lamodelsdoporn.mymember.site",
-            "name": "LA Models Do Porn",
-        },
-        "latexkittyxxx.com": {
-            "api": "latexkittyxxx.mymember.site",
-            "name": "Latexkittyxxx",
-        },
-        "latexlolanoir.com": {
-            "api": "latexlolanoir.mymember.site",
-            "name": "Lola Noir",
-        },
-        "latexrapturefans.com": {
-            "api": "latexrapturefans.mymember.site",
-            "name": "LatexRapture",
-        },
-        "letseatcakexx.com": {
-            "api": "letseatcakexx.mymember.site",
-            "name": "Lets Eat Cake",
-        },
-        "loonerlanding.com": {
-            "api": "loonerlanding.mymember.site",
-            "name": "Looner Landing",
-        },
-        "lukespov.vip": {
-            "api": "lukespov.mymember.site",
-            "name": "Luke's POV",
-        },
-        "marvalstudio.com": {
-            "api": "marvalstudio.mymember.site",
-            "name": "MarValStudio",
-        },
-        "michaelfittnation.com": {
-            "api": "michaelfittnation.mymember.site",
-            "name": "Michael Fitt",
-        },
-        "milenaangel.club": {
-            "api": "milenaangel.mymember.site",
-            "name": "MilenaAngel",
-        },
-        "mondofetiche.com": {
-            "api": "mondofetiche.mymember.site",
-            "name": "Mondo Fetiche",
-        },
-        "mrhappyendings.com": {
-            "api": "mrhappyendings.mymember.site",
-            "name": "Mr Happy Endings",
-        },
-        "mymember.site/Goddessjazzy": {
-            "api": "goddessjazzy.mymember.site",
-            "name": "Goddess Jazzy",
-        },
-        "mymember.site/androprince-cs-chamber/": {
-            "api": "androprince-cs-chamber.mymember.site",
-            "name": "AndroPrince C's Chamber",
-        },
-        "mymember.site/aoikamogawa": {
-            "api": "aoikamogawa.mymember.site",
-            "name": "Aoi Kamogawa",
-        },
-        "mymember.site/eroticious": {
-            "api": "eroticious.mymember.site",
-            "name": "eroticious",
-        },
-        "mymember.site/kyara-in-ropes": {
-            "api": "kyara-in-ropes.mymember.site",
-            "name": "Kyara in Ropes",
-        },
-        "mymember.site/latex-desire": {
-            "api": "latex-desire.mymember.site",
-            "name": "LatexDesire",
-        },
-        "mymember.site/linaroselina": {
-            "api": "linaroselina.mymember.site",
-            "name": "Lina Roselina",
-        },
-        "mymember.site/mr-rains-sexy-wrestling": {
-            "api": "mr-rains-sexy-wrestling.mymember.site",
-            "name": "Mr Rains Sexy Wrestling",
-        },
-        "mymember.site/officialemyang": {
-            "api": "officialemyang.mymember.site",
-            "name": "Official Em Yang",
-        },
-        "rubber-passion.com": {
-            "api": "rubberpassion.mymember.site",
-            "name": "Rubber Passion",
-        },
-        "mymember.site/rubbobjectdoll": {
-            "api": "rubbobjectdoll.mymember.site",
-            "name": "RubbobjectDoll",
-        },
-        "nicoledupapillon.net": {
-            "api": "nicole-dupapillon.mymember.site",
-            "name": "Nicole DuPapillon",
-        },
-        "nikitzo.com": {
-            "api": "nikitzo.mymember.site",
-            "name": "NIKITZO",
-        },
-        "nikkidavisxo.com": {
-            "api": "nikkidavisxo.mymember.site",
-            "name": "NikkiDavisXO",
-        },
-        "nylon-encasement.com": {
-            "api": "nylon-encasement.mymember.site",
-            "name": "Nylon Encasement",
-        },
-        "peacockcouple.com": {
-            "api": "peacockcouple.mymember.site",
-            "name": "PeacockCouple",
-        },
-        "pedal-passion.com": {
-            "api": "pedal-passion.mymember.site",
-            "name": "Pedal Passion",
-        },
-        "pervfect.net": {
-            "api": "pervfect.mymember.site",
-            "name": "Pervfect",
-        },
-        "psilosirenxxx.com": {
-            "api": "psilosirenxxx.mymember.site",
-            "name": "PsiloSiren",
-        },
-        "realkingcobraxxx.com": {
-            "api": "realkingcobraxxx.mymember.site",
-            "name": "RealKingCobra",
-        },
-        "riggsfilms.vip": {
-            "api": "riggsfilms.mymember.site",
-            "name": "Riggs Films",
-        },
-        "royalfetishxxx.com": {
-            "api": "royalfetishxxx.mymember.site",
-            "name": "RoyalFetishXXX",
-        },
-        "rubber-pervs.com": {
-            "api": "rubberpervs.mymember.site",
-            "name": "Rubber-Pervs",
-        },
-        "rubberdollemmalee.com": {
-            "api": "rubberdollemmalee.mymember.site",
-            "name": "Rubberdoll Emma Lee",
-        },
-        "sam-serenity.com": {
-            "api": "sam-serenity.mymember.site",
-            "name": "Sam Serenity",
-        },
-        "sexyhippies.com": {
-            "api": "sexyhippies.mymember.site",
-            "name": "Sexy Hippies",
-        },
-        "shemalevalentina.com": {
-            "api": "shemalevalentina.mymember.site",
-            "name": "Shemale Valentina",
-        },
-        "sinnerxxx.vip": {
-            "api": "sinnersworld.mymember.site",
-            "name": "Sinnersworld",
-        },
-        "slutwife.club": {
-            "api": "slutwife-club.mymember.site",
-            "name": "SLUTWIFE CLUB",
-        },
-        "spanishxbarbiiexxx.com": {
-            "api": "spanishxbarbiie.mymember.site",
-            "name": "Spanish Barbie",
-        },
-        "strong-men.com": {
-            "api": "strong-men.mymember.site",
-            "name": "Strong-Men",
-        },
-        "tabooseduction.com": {
-            "api": "tabooseduction.mymember.site",
-            "name": "TabooSeduction",
-        },
-        "taboosexstories4k.com": {
-            "api": "taboosexstories4k.mymember.site",
-            "name": "Taboo Sex Stories",
-        },
-        "the-strapon-site.com": {
-            "api": "thestraponsite.mymember.site",
-            "name": "The Strapon Site",
-        },
-        "theextortionarium.com": {
-            "api": "the-extortionarium.mymember.site",
-            "name": "The Extortionarium",
-        },
-        "thegoonhole.com": {
-            "api": "thegoonhole.mymember.site",
-            "name": "The Goonhole",
-        },
-        "thekandikjewel.com": {
-            "api": "thekandikjewel.mymember.site",
-            "name": "The Kandi K Jewel",
-        },
-        "unlimited.lovely-anita.com": {
-            "api": "lovelyanita.mymember.site",
-            "name": "Lovely Anita",
-        },
-        "whatlizannelikes.com": {
-            "api": "whatlizannelikes.mymember.site",
-            "name": "What Lizanne Likes",
-        },
-        "yourfitcrush.com": {
-            "api": "yourfitcrush.mymember.site",
-            "name": "Your Fit Crush",
-        },
+        'aeriefans.com': {'api': 'aerie-saunders.mymember.site', 'name': 'Aerie Saunders'},
+        'aglaeaproductions.com': {'api': 'aglaeaproductions.mymember.site', 'name': 'Aglaea X'},
+        'aliceshawbelly.com': {'api': 'aliceshawbelly.mymember.site', 'name': 'Alice Shaw'},
+        'allinthestepfamily.com': {'api': 'all-in-the-step-family.mymember.site', 'name': 'All in the Step-Family'},
+        'alterpic.com': {'api': 'alterpic.mymember.site', 'name': 'Alterpic'},
+        'amieesfetishhouse.com': {'api': 'amiees-fetish-house.mymember.site', 'name': 'Amiees Fetish House'},
+        'anistarxxx.com': {'api': 'anistarxxx.mymember.site', 'name': 'AnniStar XXX'},
+        'asianmassagemaster.com': {'api': 'asianmassagemaster.mymember.site', 'name': 'Asian Massage Master'},
+        'bdsmkinkyplay.com': {'api': 'bdsmkinkyplay.mymember.site', 'name': 'BDSM Kinky Play'},
+        'beverlybluexxx.com': {'api': 'beverlybluexxx.mymember.site', 'name': 'BeverlyBlueXxX'},
+        'bigmilkymommygf.com': {'api': 'big-milky-mommy-gf.mymember.site', 'name': 'Big Milk Mommy GF'},
+        'bindastimesuk.com': {'api': 'bindastimesuk.mymember.site', 'name': 'Bindastimesuk'},
+        'bondagefashionmexico.com': {'api': 'bondage-fashion-mx.mymember.site', 'name': 'Bondage Fashion Mexico'},
+        'bondageliberation.com': {'api': 'bondageliberation.mymember.site', 'name': 'Bondage Liberation'},
+        'brookesballoons.com': {'api': 'brookesballoons.mymember.site', 'name': 'BrookesBalloons'},
+        'castersworldwide.com': {'api': 'castersworldwide.mymember.site', 'name': 'Casters Worldwide'},
+        'chloestoybox.com': {'api': 'chloestoybox.mymember.site', 'name': 'Chloe Toy'},
+        'clubsteffi.fun': {'api': 'clubsteffi.mymember.site', 'name': 'ClubSteffi'},
+        'cristalkinky.com': {'api': 'cristalkinky.mymember.site', 'name': 'Cristal Kinky'},
+        'cruel-women.com': {'api': 'cruel-women.mymember.site', 'name': 'Cruel Women'},
+        'curvymary.com': {'api': 'curvy-mary.mymember.site', 'name': 'Curvy Mary'},
+        'dannijones.com': {'api': 'dannijones.mymember.site', 'name': 'Danni Jones'},
+        'deemariexxx.com': {'api': 'deemariexxx.mymember.site', 'name': 'Dee Marie'},
+        'europornvids.com': {'api': 'europornvids.mymember.site', 'name': 'Euro Porn Vids'},
+        'faexcheta.com': {'api': 'faexcheta.mymember.site', 'name': 'Fae and Cheta'},
+        'friskyfairyk.com': {'api': 'friskyfairyk.mymember.site', 'name': 'xoXokmarie'},
+        'girlsofhel.com': {'api': 'girls-of-hel.mymember.site', 'name': 'Girls of HEL'},
+        'glass-dp.com': {'api': 'glassdp.mymember.site', 'name': 'Glassdp'},
+        'glassdeskproductions.com': {'api': 'glassdeskproductions.mymember.site', 'name': 'GlassDeskProductions'},
+        'goddesslesley.com': {'api': 'goddesslesley.mymember.site', 'name': 'Goddess Lesley'},
+        'goddessrobin.com': {'api': 'goddessrobin.mymember.site', 'name': 'Goddess Robin'},
+        'greatbritishfeet.com': {'api': 'greatbritishfeet.mymember.site', 'name': 'Great British Feet'},
+        'greendoorlive.tv': {'api': 'greendoorlivetv.mymember.site', 'name': 'The World Famous Green Door'},
+        'heatheraustin.live': {'api': 'heather-austin.mymember.site', 'name': 'Heather Austin'},
+        'heavybondage4life.com': {'api': 'heavybondage4life.mymember.site', 'name': 'Heavybondage4Life'},
+        'hornyadventures.com': {'api': 'hornyadventurestv.mymember.site', 'name': 'Horny Adventures'},
+        'hornysilver.com': {'api': 'hornysilver.mymember.site', 'name': 'Hornysilver'},
+        'hotwifeheidihaze.com': {'api': 'heidi-haze.mymember.site', 'name': 'Heidi Haze'},
+        'islandboyvids.com': {'api': 'islandboyvids.mymember.site', 'name': 'Island Boy Vids'},
+        'josyblack.tv': {'api': 'josyblack.mymember.site', 'name': 'Josy Black'},
+        'juteandroses.com': {'api': 'juteandroses.mymember.site', 'name': 'Jute and Roses'},
+        'kingnoirexxx.com': {'api': 'kingnoirexxx.mymember.site', 'name': 'KingNoireXXX'},
+        'kinkography.com': {'api': 'kinkography.mymember.site', 'name': 'Kinkography'},
+        'kinkyponygirl.com': {'api': 'kinkyponygirl.mymember.site', 'name': 'KinkyPonygirl'},
+        'kinkyrubberdreams.com': {'api': 'kinkyrubberdreams.mymember.site', 'name': 'Glowing Darkness'},
+        'kitehkawasaki.com': {'api': 'kitehkawasaki.mymember.site', 'name': 'Kiteh Kawasaki'},
+        'labelladx.com': {'api': 'labelladx.mymember.site', 'name': 'LaBellaDiablaX'},
+        'lady-asmondena.com': {'api': 'ladyasmondena.mymember.site', 'name': 'Lady Asmondena'},
+        'lamodelsdoporn.com': {'api': 'lamodelsdoporn.mymember.site', 'name': 'LA Models Do Porn'},
+        'latexkittyxxx.com': {'api': 'latexkittyxxx.mymember.site', 'name': 'Latexkittyxxx'},
+        'latexlolanoir.com': {'api': 'latexlolanoir.mymember.site', 'name': 'Lola Noir'},
+        'latexrapturefans.com': {'api': 'latexrapturefans.mymember.site', 'name': 'LatexRapture'},
+        'letseatcakexx.com': {'api': 'letseatcakexx.mymember.site', 'name': 'Lets Eat Cake'},
+        'loonerlanding.com': {'api': 'loonerlanding.mymember.site', 'name': 'Looner Landing'},
+        'lukespov.vip': {'api': 'lukespov.mymember.site', 'name': "Luke's POV"},
+        'marvalstudio.com': {'api': 'marvalstudio.mymember.site', 'name': 'MarValStudio'},
+        'michaelfittnation.com': {'api': 'michaelfittnation.mymember.site', 'name': 'Michael Fitt'},
+        'milenaangel.club': {'api': 'milenaangel.mymember.site', 'name': 'MilenaAngel'},
+        'mondofetiche.com': {'api': 'mondofetiche.mymember.site', 'name': 'Mondo Fetiche'},
+        'mrhappyendings.com': {'api': 'mrhappyendings.mymember.site', 'name': 'Mr Happy Endings'},
+        'mymember.site/androprince-cs-chamber/': {'api': 'androprince-cs-chamber.mymember.site', 'name': "AndroPrince C's Chamber"},
+        'mymember.site/aoikamogawa': {'api': 'aoikamogawa.mymember.site', 'name': 'Aoi Kamogawa'},
+        'mymember.site/clips-of-bondage': {'api': 'clips-of-bondage.mymember.site', 'name': 'Clips of Bondage'},
+        'mymember.site/eroticious': {'api': 'eroticious.mymember.site', 'name': 'eroticious'},
+        'mymember.site/Goddessjazzy': {'api': 'goddessjazzy.mymember.site', 'name': 'Goddess Jazzy'},
+        'mymember.site/kyara-in-ropes': {'api': 'kyara-in-ropes.mymember.site', 'name': 'Kyara in Ropes'},
+        'mymember.site/las-vegas-amateurs': {'api': 'las-vegas-amateurs.mymember.site', 'name': 'Las Vegas Amateurs'},
+        'mymember.site/latex-desire': {'api': 'latex-desire.mymember.site', 'name': 'LatexDesire'},
+        'mymember.site/linaroselina': {'api': 'linaroselina.mymember.site', 'name': 'Lina Roselina'},
+        'mymember.site/mr-rains-sexy-wrestling': {'api': 'mr-rains-sexy-wrestling.mymember.site', 'name': 'Mr Rains Sexy Wrestling'},
+        'mymember.site/officialemyang': {'api': 'officialemyang.mymember.site', 'name': 'Official Em Yang'},
+        'mymember.site/rubbobjectdoll': {'api': 'rubbobjectdoll.mymember.site', 'name': 'RubbobjectDoll'},
+        'nicoledupapillon.net': {'api': 'nicole-dupapillon.mymember.site', 'name': 'Nicole DuPapillon'},
+        'nikitzo.com': {'api': 'nikitzo.mymember.site', 'name': 'NIKITZO'},
+        'nikkidavisxo.com': {'api': 'nikkidavisxo.mymember.site', 'name': 'NikkiDavisXO'},
+        'nylon-encasement.com': {'api': 'nylon-encasement.mymember.site', 'name': 'Nylon Encasement'},
+        'peacockcouple.com': {'api': 'peacockcouple.mymember.site', 'name': 'PeacockCouple'},
+        'pedal-passion.com': {'api': 'pedal-passion.mymember.site', 'name': 'Pedal Passion'},
+        'pervfect.net': {'api': 'pervfect.mymember.site', 'name': 'Pervfect'},
+        'psilosirenxxx.com': {'api': 'psilosirenxxx.mymember.site', 'name': 'PsiloSiren'},
+        'realkingcobraxxx.com': {'api': 'realkingcobraxxx.mymember.site', 'name': 'RealKingCobra'},
+        'riggsfilms.vip': {'api': 'riggsfilms.mymember.site', 'name': 'Riggs Films'},
+        'royalfetishxxx.com': {'api': 'royalfetishxxx.mymember.site', 'name': 'RoyalFetishXXX'},
+        'rubber-passion.com': {'api': 'rubberpassion.mymember.site', 'name': 'Rubber Passion'},
+        'rubber-pervs.com': {'api': 'rubberpervs.mymember.site', 'name': 'Rubber-Pervs'},
+        'rubberdollemmalee.com': {'api': 'rubberdollemmalee.mymember.site', 'name': 'Rubberdoll Emma Lee'},
+        'sam-serenity.com': {'api': 'sam-serenity.mymember.site', 'name': 'Sam Serenity'},
+        'sexyhippies.com': {'api': 'sexyhippies.mymember.site', 'name': 'Sexy Hippies'},
+        'shemalevalentina.com': {'api': 'shemalevalentina.mymember.site', 'name': 'Shemale Valentina'},
+        'sinnerxxx.vip': {'api': 'sinnersworld.mymember.site', 'name': 'Sinnersworld'},
+        'slutwife.club': {'api': 'slutwife-club.mymember.site', 'name': 'SLUTWIFE CLUB'},
+        'spanishxbarbiiexxx.com': {'api': 'spanishxbarbiie.mymember.site', 'name': 'Spanish Barbie'},
+        'strong-men.com': {'api': 'strong-men.mymember.site', 'name': 'Strong-Men'},
+        'swimwearbondage.com': {'api': 'swimwearbondage.mymember.site', 'name': 'Swimwear Bondage'},
+        'tabooseduction.com': {'api': 'tabooseduction.mymember.site', 'name': 'TabooSeduction'},
+        'taboosexstories4k.com': {'api': 'taboosexstories4k.mymember.site', 'name': 'Taboo Sex Stories'},
+        'the-strapon-site.com': {'api': 'thestraponsite.mymember.site', 'name': 'The Strapon Site'},
+        'theextortionarium.com': {'api': 'the-extortionarium.mymember.site', 'name': 'The Extortionarium'},
+        'thegoonhole.com': {'api': 'thegoonhole.mymember.site', 'name': 'The Goonhole'},
+        'thekandikjewel.com': {'api': 'thekandikjewel.mymember.site', 'name': 'The Kandi K Jewel'},
+        'unlimited.lovely-anita.com': {'api': 'lovelyanita.mymember.site', 'name': 'Lovely Anita'},
+        'whatlizannelikes.com': {'api': 'whatlizannelikes.mymember.site', 'name': 'What Lizanne Likes'},
+        'yourfitcrush.com': {'api': 'yourfitcrush.mymember.site', 'name': 'Your Fit Crush'},
+        'zlatexa.com': {'api': 'zlatexa.mymember.site', 'name': 'Zlatexa'},
     }
 
     selector_map = {
@@ -433,7 +137,7 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(meta['api_url'], self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['data']
         for scene in jsondata:
@@ -445,7 +149,7 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
             yield scrapy.Request(scene_url, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
         scene = response.json()
 
@@ -486,6 +190,9 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
 
             # ~ item['performers_data'] = self.get_performers_data(item['performers'], meta['site'])
 
+        if "Swimsuit Bondage" in item['performers']:
+            item['performers'].remove("Swimsuit Bondage")
+    
         item['url'] = f"https://{meta['studio_url']}/videos/{item['id']}-{slugify(item['title'])}"
 
         item['site'] = meta['site']
@@ -506,5 +213,6 @@ class SiteMyModelSiteSpider(BaseSceneScraper):
                 perf['extra']['gender'] = "Female"
                 perf['network'] = site
                 perf['site'] = site
-                performers_data.append(perf)
+                if "swimsuit bondage" not in perf['name'].lower():
+                    performers_data.append(perf)
         return performers_data

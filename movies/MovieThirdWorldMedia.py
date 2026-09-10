@@ -39,7 +39,7 @@ class SiteThirdWorldMediaMovieSpider(BaseSceneScraper):
     }
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -55,14 +55,14 @@ class SiteThirdWorldMediaMovieSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//div[@class="grid-item"]/a/@href').getall()
         for movie in movies:
             movie_url = self.format_link(response, movie)
             yield scrapy.Request(movie_url, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         sceneurls = response.xpath('//div[contains(@class,"item-grid-scene")]//article/div[1]/a/@href').getall()
         sceneurls = list(filter(lambda x: len(x) > 0, sceneurls))
         if len(sceneurls) > 1:
@@ -142,7 +142,7 @@ class SiteThirdWorldMediaMovieSpider(BaseSceneScraper):
                     yield item
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         scenelist = meta['scenelist']
         item = SceneItem()

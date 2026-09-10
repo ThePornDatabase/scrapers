@@ -53,7 +53,7 @@ class SiteWestCoastGangbangsSpider(BaseSceneScraper):
                              cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@href, "previews") and contains(@href, ".htm")]/@href').getall()
         for scene in scenes:
             scene = scene.replace("..", "")

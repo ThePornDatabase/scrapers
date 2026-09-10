@@ -27,7 +27,7 @@ class SiteMomComesFirstSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="et_pb_image_container"]')
         for scene in scenes:
             image = scene.xpath('./a/img/@src')

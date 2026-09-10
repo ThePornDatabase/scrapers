@@ -37,7 +37,7 @@ class networkGlobeTwatters(BaseSceneScraper):
     def get_scenes(self, response):
         scenes = response.xpath('//article/a/@href').getall()
 
-        meta = response.meta
+        meta = self.copy_meta(response)
         site = response.xpath('//div[contains(@class,"amp-logo-footer")]//a/@title').get()
         site = re.match(r'\b[\w\s?]*\s?\b', site).group(0).strip()
         meta['site'] = site

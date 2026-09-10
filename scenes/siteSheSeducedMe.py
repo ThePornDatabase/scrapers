@@ -31,7 +31,7 @@ class SiteSheSeducedMeSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@id, "packageinfo")]')
         for scene in scenes:
             duration = scene.xpath('./following-sibling::div[contains(@class, "update_counts")]')

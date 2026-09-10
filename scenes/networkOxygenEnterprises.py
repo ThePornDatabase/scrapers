@@ -35,7 +35,7 @@ class Spider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="item-wrapper"]/a/@href').getall()
         for scene in scenes:
             if "?nats" in scene:

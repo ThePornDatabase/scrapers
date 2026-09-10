@@ -38,7 +38,7 @@ class SiteKarupsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="item-inside"]')
         for scene in scenes:
             site = scene.xpath('.//span[contains(@class, "site") and not(contains(@class, "date"))]/text()').get()
@@ -68,7 +68,7 @@ class SiteKarupsSpider(BaseSceneScraper):
         return ''
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = self.process_xpath(response, self.get_selector_map('image')).get()
 
         if not image:

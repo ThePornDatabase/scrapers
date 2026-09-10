@@ -28,7 +28,7 @@ class MovieEBoobStoreSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article[contains(@class, "list-item")]/div[1]/a/@href').getall()
         for scene in scenes:
             if "?nats" in scene:

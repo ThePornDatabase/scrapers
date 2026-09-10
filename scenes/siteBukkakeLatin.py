@@ -29,7 +29,7 @@ class SiteBukkakeLatinSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "video-latest-list")]')
         for scene in scenes:
             sceneid = scene.xpath('./@data-id').get()

@@ -28,7 +28,7 @@ class NetworkModelMediaSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.start_delphine_1, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_delphine_1(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         csrf_token = response.xpath('//meta[@name="csrf-token"]/@content').get()
         headers = {
             'Accept-Language': 'en-US,en',
@@ -39,7 +39,7 @@ class NetworkModelMediaSpider(BaseSceneScraper):
             yield scrapy.Request(f"{meta['link']}/adult_confirmation_and_accept_cookie", method="POST", callback=self.start_delphine_2, meta=meta, headers=headers, cookies=self.cookies)
 
     def start_delphine_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         link = meta['link']
         yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 

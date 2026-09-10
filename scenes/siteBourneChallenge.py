@@ -29,7 +29,7 @@ class SiteBourneChallengeSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="card-title"]/a/@href').getall()
         for scene in scenes:
             sceneid = re.search(r'(\d{4})/(\d{2})/(.*)/', scene)

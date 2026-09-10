@@ -20,7 +20,7 @@ class SiteSexTapesSpider(BaseSceneScraper):
         yield scrapy.Request('https://sextapes.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
         if buildId:
             meta['buildID'] = buildId.group(1)
@@ -36,7 +36,7 @@ class SiteSexTapesSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -47,7 +47,7 @@ class SiteSexTapesSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['pageProps']['contents']['data']
         for scene in jsondata:

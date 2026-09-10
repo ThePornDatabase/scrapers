@@ -1,6 +1,8 @@
 import re
 import string
+
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 
@@ -14,78 +16,62 @@ class SiteTransEroticaSpider(BaseSceneScraper):
         'https://tour.transerotica.com',
     ]
 
+    # The tour was rebuilt onto the shared Grooby template, so div.updateItem,
+    # h1.title_bar, div.updateDetails and the meta keywords tag list are all gone.
+    # Cards are div.sexyvideo_outer and the scene pages use the same
+    # trailerpage_info / set_tags markup as networkGrooby.
     selector_map = {
-        'title': '//h1[@class="title_bar"]/text()',
-        'description': '//div[@class="updateDetails"]/p[contains(text(), "Description:")]/text()',
-        'image': '//video/@poster',
-        'performers': '//h1/following-sibling::div[@class="updateDetails"]//span[contains(@class, "tour_update_models")]/a/text()',
-        'tags': '//meta[@name="keywords"]/@content',
-        'duration': '//h1/following-sibling::div[@class="updateDetails"]//span[contains(@class, "upddate")]',
-        'trailer': '//video/source/@src',
+        'title': '//div[@class="trailerpage_info"]/p[contains(@class, "trailertitle")]/text()|//div[@class="trailer_toptitle_left"]//text()',
+        'description': '//div[@class="trailerpage_info"]/p[not(contains(@class, "trailertitle"))]/text()|//div[@class="trailer_videoinfo"]/p[not(./b)]/text()',
+        'image': '//div[@class="trailerdata"]/div[contains(@class, "trailerposter")]/img/@src0_2x|//div[@class="videohere"]/img[contains(@src,".jpg")]/@src',
+        'performers': '//div[@class="trailerpage_info"]//a[contains(@href, "/models/")]/text()|//div[@class="trailer_videoinfo"]//a[contains(@href, "/models/")]/text()',
+        'tags': './/div[@class="set_tags"]/ul/li/a/text()',
+        'trailer': '//div[@class="trailerdata"]/div[contains(@class, "trailermp4")]/text()',
         'external_id': r'.*/(.*?)\.htm',
-        'pagination': '/categories/movies_%s_d.html',
+        'pagination': '/categories/movies/%s/latest/',
         'type': 'Scene',
     }
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[@class="updateItem"]')
-        for scene in scenes:
-            scenedate = scene.xpath('.//comment()[contains(., "upddate")]')
+        for card in response.xpath('//div[contains(@class, "sexyvideo_outer")]'):
+            meta = dict(response.meta)
+
+            # the runtime and the release date only exist on the card
+            scenedate = card.xpath('.//i[contains(@class, "fa-calendar")]/following-sibling::text()').get()
             if scenedate:
-                scenedate = scenedate.get()
-                scenedate = re.search(r'(\d{2}/\d{2}/\d{4})', scenedate)
-                if scenedate:
-                    scenedate = scenedate.group(1)
-                    meta['date'] = self.parse_date(scenedate, date_formats=['%m/%d/%Y']).strftime('%Y-%m-%d')
+                scenedate = scenedate.lower().replace("added", "").strip()
+                meta['date'] = self.parse_date(scenedate, date_formats=['%d %b %Y']).isoformat()
 
-            scene = scene.xpath('./div[1]/a/@href').get()
-            if re.search(self.get_selector_map('external_id'), scene):
-                if "?nats" in scene:
-                    scene = re.search(r'(.*?)\?nats', scene).group(1)
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
+            runtime = card.xpath('.//div[@class="video_stats"]//text()').getall()
+            runtime = re.search(r'(?:(\d+):)?(\d{1,2}):(\d{2})', ' '.join(runtime))
+            if runtime:
+                hours, minutes, seconds = (int(x) if x else 0 for x in runtime.groups())
+                meta['duration'] = str(hours * 3600 + minutes * 60 + seconds)
 
-    def get_description(self, response):
-        description = super().get_description(response)
-        if "Description:" in description:
-            description = description.replace("Description:", "").strip()
-        return description
+            title = card.xpath('.//h4/a/text()').get()
+            if title:
+                meta['title'] = self.cleanup_title(title)
+
+            scene = card.xpath('.//h4/a/@href|.//div[@class="videohere"]/a/@href').get()
+            if scene and scene.startswith("//"):
+                scene = "https:" + scene
+            if scene and re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene,
+                                     meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_duration(self, response):
-        duration = response.xpath('//h1/following-sibling::div[@class="updateDetails"]//span[contains(@class, "upddate")]/text()')
-        if duration:
-            duration = duration.get()
-            duration = re.sub(r'[^a-z0-9]', "", duration.replace("&nbsp;", "").lower())
-            minutes = 0
-            seconds = 0
+        return response.meta.get('duration')
 
-            minutes = re.search(r'(\d+)min', duration)
-            if minutes:
-                minutes = int(minutes.group(1)) * 60
-            else:
-                minutes = 0
-
-            seconds = re.search(r'(\d+)sec', duration)
-            if seconds:
-                seconds = int(seconds.group(1))
-            else:
-                seconds = 0
-            return str(minutes + seconds)
-        return None
+    def get_trailer(self, response):
+        """Scenes without a preview publish the literal string 'no_trailer'."""
+        trailer = (super().get_trailer(response) or '').strip()
+        if not trailer or 'no_trailer' in trailer:
+            return ''
+        return trailer
 
     def get_tags(self, response):
-        performers = self.get_performers(response)
-        tags = response.xpath('//meta[@name="keywords"]/@content')
-        if tags:
-            tags = tags.get()
-            tags = tags.split(",")
-            tags = list(map(lambda x: string.capwords(x.strip()), tags))
-            for tag in tags:
-                if tag in performers:
-                    tags.remove(tag)
-            if "Trans" not in tags:
-                tags.append("Trans")
-            if "Transerotica" in tags:
-                tags.remove("Transerotica")
-            return tags
-        return []
+        tags = [string.capwords(x.strip()) for x in
+                response.xpath(self.get_selector_map('tags')).getall() if x.strip()]
+        if "Trans" not in tags:
+            tags.append("Trans")
+        return tags

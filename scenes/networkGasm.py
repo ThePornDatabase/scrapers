@@ -56,7 +56,7 @@ class GasmSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page, meta['profile']), callback=self.parse, meta=meta, dont_filter=True)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = self.get_scenes(response)
         count = 0
         for scene in scenes:
@@ -70,7 +70,7 @@ class GasmSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['profile']), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class,"_results_item") and contains(@class, "_results_posts_item")]/div[@class="post_item video"]/..')
         for scene in scenes:
             link = self.format_link(response, scene.xpath('./div[1]/div[@class="post_video"]/a/@href').get())

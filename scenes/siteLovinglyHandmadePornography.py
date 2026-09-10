@@ -31,7 +31,7 @@ class SiteLovinglyHandmadePornographySpider(BaseSceneScraper):
 
     def get_scenes(self, response):
         # ~ print(response.text)
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes1 = response.xpath('//video/ancestor::a[1]/@href').getall()
         scenes2 = response.xpath('//img[contains(@class, "gif_thumb")]/ancestor::a[1]/@href').getall()
         scenes = list(set(scenes1 + scenes2))

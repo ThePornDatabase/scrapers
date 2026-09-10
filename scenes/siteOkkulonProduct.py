@@ -33,14 +33,14 @@ class SiteOkkulonProductSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests3, meta=response.meta)
 
     def start_requests3(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if response.text and len(response.text) > 5:
             meta['tagdata'] = json.loads(response.text)
         link = 'https://okkulon.com/wp-json/wp/v2/product_tag?per_page=100&page=2'
         yield scrapy.Request(link, callback=self.start_requests4, meta=response.meta)
 
     def start_requests4(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         meta['page'] = self.page
 
         if response.text and len(response.text) > 5:
@@ -56,7 +56,7 @@ class SiteOkkulonProductSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = self.init_scene()

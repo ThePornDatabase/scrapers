@@ -28,6 +28,11 @@ class Only3XProperSpider(BaseSceneScraper):
         ['/watch-newest-only-3x-clips-and-scenes.html?page=%s&series=60751&hybridview=member', 'Whore House']
     ]
 
+    # only3x runs on the AdultEmpire platform, which redirects every request to
+    # /AgeConfirmation until this cookie is set.  Without it the listing and the
+    # scene pages all returned the age-gate shell, so the crawl parsed nothing.
+    cookies = [{"name": "ageConfirmed", "value": "true"}]
+
     custom_scraper_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62',
         'AUTOTHROTTLE_ENABLED': True,
@@ -47,7 +52,9 @@ class Only3XProperSpider(BaseSceneScraper):
         'duration': '//span[contains(text(), "Length")]/following-sibling::text()',
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@class="video-performer"]/a//text()',
-        'tags': '//span[contains(text(), "Tags")]/following-sibling::a[@data-label="Tag"]/text()',
+        # The tag run is now labelled "Attributes:" and its anchors carry
+        # data-label="Attribute"; the old data-label="Tag" markup is gone.
+        'tags': '//strong[contains(text(), "Attributes")]/following-sibling::a/text()',
         'external_id': r'/(\d+)/',
         'trailer': '',
         'pagination': '/watch-newest-only-3x-clips-and-scenes.html?page=%s&hybridview=member'
@@ -69,7 +76,7 @@ class Only3XProperSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -78,7 +85,7 @@ class Only3XProperSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath(
             '//article/div/a/@href').getall()
         for scene in scenes:
@@ -105,13 +112,17 @@ class Only3XProperSpider(BaseSceneScraper):
         return ""
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = SceneItem()
 
         item['title'] = self.get_title(response)
         item['description'] = self.get_description(response)
         item['site'] = meta['site']
         item['date'] = self.get_date(response)
+        # A handful of scenes ship without a Released line; without a date the
+        # pipeline has nothing to compare against and errors out on the item.
+        if not item['date']:
+            return
         item['image'] = self.get_image(response)
         if 'image' not in item or not item['image']:
             item['image'] = None

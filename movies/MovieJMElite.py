@@ -49,7 +49,7 @@ class MovieJMEliteSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath(
             '//a[@class="video-item"]/@href').getall()
         for scene in scenes:
@@ -57,7 +57,7 @@ class MovieJMEliteSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_movie, cookies=self.cookies, headers=self.headers, meta=meta)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[@class="scene-item"]/@href').getall()
         item = SceneItem()
         item['title'] = self.get_title(response)
@@ -90,7 +90,7 @@ class MovieJMEliteSpider(BaseSceneScraper):
             yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
         jsondata = response.xpath('//script[contains(text(), "datePublished")]/text()').get()

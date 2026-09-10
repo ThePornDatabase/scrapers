@@ -16,6 +16,9 @@ class NetworkPornhub_7Spider(BaseSceneScraper):
         ["/model/shinaryen/videos?page=%s", "Shinaryen", "Pornhub: Shinaryen"],
         ["/model/isabella-seduction/videos?page=%s", "Isabella Seduction", "Pornhub: Isabella Seduction"],
         ["/model/bearuby/videos?page=%s", "Bea Ruby", "Pornhub: Bea Ruby"],
+        ["/pornstar/saffron-bacchus/videos?page=%s", "Saffron Bacchus", "Pornhub: Saffron Bacchus"],
+        ["/model/mradventurepov/videos?page=%s", "MrAdventurePOV", "Pornhub: MrAdventurePOV"],
+        ["/model/aewin11/videos?page=%s", "Aewin11", "Pornhub: Aewin11"],
     ]
 
     selector_map = {
@@ -78,13 +81,13 @@ class NetworkPornhub_7Spider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "channels" in response.url:
             scenes = response.xpath('//ul[contains(@id, "showAllChanelVideos")]//li[contains(@class, "VideoListItem")]/div/div[@class="phimage"]/a/@href').getall()
         else:
@@ -94,7 +97,7 @@ class NetworkPornhub_7Spider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = []
         new_perf = response.xpath('//div[contains(@class,"pornstarsWrapper")]/a/@data-mxptext|//div[contains(@class,"pornstarsWrapper")]/a/img/following-sibling::text()[1]')
         if new_perf:

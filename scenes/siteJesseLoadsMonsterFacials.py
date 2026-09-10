@@ -1,9 +1,28 @@
 import re
 from datetime import date, timedelta
+
+from PIL import Image, ImageOps
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.BaseOCR import BaseOCR
 
 from tpdb.items import SceneItem
+
+
+class JesseLoadsOCR(BaseOCR):
+    """The performer name is only published as a 360x40 GIF, and the shared
+    pre-processing reads about two thirds of them -- the rest come back empty,
+    which silently drops the item back to the un-spaced URL slug ("Ciciwilde"
+    instead of "Cici Wilde") for both the title and the performer.  The glyphs are
+    small and low contrast, so upscaling before stretching the histogram reads all
+    of them."""
+
+    @staticmethod
+    def _image_pre_processing(image: Image.Image) -> Image.Image:
+        image = image.convert('L')
+        image = image.resize((image.width * 3, image.height * 3), Image.LANCZOS)
+        image = ImageOps.autocontrast(image)
+        return ImageOps.expand(image, 20, fill=255)
 
 
 class SiteJesseLoadsXSpider(BaseSceneScraper):
@@ -80,9 +99,9 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
                     if sceneid:
                         if sceneid != item['id']:
                             item['id'] = sceneid
-                            item['title'] = self.cleanup_title(sceneid)
-                            item['title'] = re.sub(r'(?!\w)iii$', ' III', item['id'])
-                            item['title'] = re.sub(r'(?![^i ])ii$', ' II', item['id'])
+                            title = re.sub(r'(?!\w)iii$', ' III', item['id'])
+                            title = re.sub(r'(?![^i ])ii$', ' II', title)
+                            item['title'] = self.cleanup_title(title)
             else:
                 item['image'] = ''
                 item['image_blob'] = ''
@@ -90,7 +109,7 @@ class SiteJesseLoadsXSpider(BaseSceneScraper):
             if item['image']:
                 performer_image = "https://jesseloadsmonsterfacials.com/visitors/" + scene.xpath('.//img[contains(@src,"fft")]/@src').get()
 
-                ocr = BaseOCR()
+                ocr = JesseLoadsOCR()
                 image_data = self.get_image_from_link(performer_image)
                 text = ocr.get_data_from_image(image_data)
                 if text and len(text) > 5:

@@ -16,8 +16,8 @@ class AdultEmpireCashScraper(BaseSceneScraper):
         # ~ # 'https://www.mypervyfamily.com/',  # Moved to AdulttimeAPI scraper
         'https://www.conorcoxxx.com',
         'https://www.hornyhousehold.com',
-         'https://jayspov.net', # Now Cloudflared
-        # 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
+        'https://jayspov.net', # Now Cloudflared
+        # ~ # 'https://www.filthykings.com/',  # Moved to AdulttimeAPI scraper
         'https://thirdworldxxx.com',
         'https://latinoguysporn.com',
         # ~ # 'https://cospimps.com',
@@ -75,11 +75,18 @@ class AdultEmpireCashScraper(BaseSceneScraper):
             yield scrapy.Request(f"{link}/tour", callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         yield scrapy.Request(url=self.get_next_page_url(meta['link'], self.page), callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
+        if "18lust" in response.url:
+            scenes = response.xpath('//div[@class="grid-item"]//a[contains(@class, "screen")]/@href').getall()
+            for scene in scenes:
+                meta = {}
+                meta['site'] = "18Lust"
+                url = self.format_link(response, scene)
+                yield scrapy.Request(url, callback=self.parse_scene, meta=meta)
         if "spankmonster" in response.url:
             scenes = response.xpath('//a[@class="still-screen"]/@href').getall()
             for scene in scenes:
@@ -171,7 +178,7 @@ class AdultEmpireCashScraper(BaseSceneScraper):
                 meta['site'] = "Hotwives Cheating"
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
         elif "thirdworld" in response.url:
-            meta = response.meta
+            meta = self.copy_meta(response)
             scenes = response.xpath('//div[@class="scene-preview-container"]')
             for scene in scenes:
                 meta['site'] = "Third World Media"

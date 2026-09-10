@@ -29,7 +29,7 @@ class NetworkBrokeStraightboysPerformerPerformerSpider(BasePerformerScraper):
         return 'Male'
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.xpath('//div[@class="tnTle"]/a|//div[@class="model-ebox"]/span/a')
         for performer in performers:
             meta['name'] = performer.xpath('./text()|./div/text()').get()

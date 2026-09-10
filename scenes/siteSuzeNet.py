@@ -29,7 +29,7 @@ class SiteSuzeNetSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "item-video")]')
         for scene in scenes:
             origimage = scene.xpath('.//img/@src0_4x|.//img/@src0_3x|.//img/@src0_2x|.//img/@src0_1x')
@@ -51,7 +51,7 @@ class SiteSuzeNetSpider(BaseSceneScraper):
         return None
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if ".jpg" in image or ".png" in image:
             return image

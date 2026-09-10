@@ -24,7 +24,7 @@ class SiteModelMediaAsiaSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.json()
         scenes = scenes['data']['list']
         for scene in scenes:

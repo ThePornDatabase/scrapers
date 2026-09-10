@@ -60,7 +60,7 @@ class MovieElegantAngelSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(self.start_url, self.page, meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -77,14 +77,14 @@ class MovieElegantAngelSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//div[@class="grid-item"]/a/@href').getall()
         for movie in movies:
             movieurl = self.format_link(response, movie)
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h2[contains(text(), "Scene List")]/../following-sibling::div[contains(@class, "item-grid-scene")]/div[@class="grid-item"]/article[1]/div[1]/a/@href').getall()
         if len(scenes) > 1 or not len(scenes):
             item = self.init_scene()
@@ -170,7 +170,7 @@ class MovieElegantAngelSpider(BaseSceneScraper):
                     yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
 

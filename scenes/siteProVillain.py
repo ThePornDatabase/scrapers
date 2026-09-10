@@ -26,7 +26,7 @@ class SiteProVillainSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article')
         for scene in scenes:
             scenedate = scene.xpath('.//time/@datetime')
@@ -51,7 +51,7 @@ class SiteProVillainSpider(BaseSceneScraper):
         return ['BDSM', 'Bondage', 'Damsel in Distress', 'Gag', 'Domination', 'Submissive', 'Slave Training', 'Bondage Sex']
 
     def get_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         image = super().get_image(response)
         if image in response.url:
             image = meta['orig_image']

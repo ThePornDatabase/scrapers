@@ -26,7 +26,7 @@ class NetworkNookiesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="video-card-text"]')
         for scene in scenes:
             scenedate = scene.xpath('.//span[@class="date"]/text()')
@@ -55,14 +55,16 @@ class NetworkNookiesSpider(BaseSceneScraper):
             return "Nookies"
 
     def get_image(self, response):
-        image = response.xpath('//div[@class="video-box"]/div[@class="player"]/div[@class="responsive-image"]/img/@src')
+        image = response.xpath('//div[contains(@id, "trailer")]/div[contains(@class, "responsive")]/img/@src')
         if not image:
-            image = response.xpath('//script[contains(text(), "fluidPlayer")]/text()')
-            if image:
-                image = re.search(r'posterImage.*?(http.*?)[\'\"]', image.get())
+            image = response.xpath('//div[@class="video-box"]/div[@class="player"]/div[@class="responsive-image"]/img/@src')
+            if not image:
+                image = response.xpath('//script[contains(text(), "fluidPlayer")]/text()')
                 if image:
-                    image = image.group(1)
-        else:
+                    image = re.search(r'posterImage.*?(http.*?)[\'\"]', image.get())
+                    if image:
+                        image = image.group(1)
+        if image:
             image = image.get()
         if image:
             image = image.replace(" ", "%20")

@@ -44,13 +44,13 @@ class NetworkSmutPuppetSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta={'site': sitename})
 
     def get_site(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['site']:
             return meta['site'].strip()
         return "Smut Puppet"
 
     def get_parent(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['site']:
             return meta['site'].strip()
         return "Smut Puppet"

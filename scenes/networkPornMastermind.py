@@ -49,7 +49,7 @@ class NetworkPornMastermindSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta)
@@ -58,7 +58,7 @@ class NetworkPornMastermindSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "thumb")]')
         for scene in scenes:
             title = scene.xpath('./p/a[contains(@href, "?id=")]/following-sibling::strong[1]/text()|./p/strong/a[contains(@href, "?id=")]/text()').getall()

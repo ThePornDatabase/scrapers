@@ -61,6 +61,52 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
         ['Clips4Sale', 'Clips4Sale: Portia Everly', 'Clips4Sale: Portia Everly', '235967', 'Portia-Everly'],
         ['Clips4Sale', 'Clips4Sale: KingDom Of Infinity', 'Clips4Sale: KingDom Of Infinity', '292343', 'kingdom-of-infinity'],
         ['Clips4Sale', 'Clips4Sale: FJ Squirts', 'Clips4Sale: FJ Squirts', '304649', 'fj-squirts'],
+        ['Clips4Sale', 'Clips4Sale: Fox Smoulder Fetish Clips', 'Clips4Sale: Fox Smoulder Fetish Clips', '82595', 'fox-smoulder-fetish-clips'],        
+        ['Clips4Sale', 'Clips4Sale: Mistress Lunatika', 'Clips4Sale: Mistress Lunatika', '320813', 'mistress-lunatika'],
+        ['Clips4Sale', 'Clips4Sale: Mistress Boo', 'Clips4Sale: Mistress Boo', '258831', 'mistress-boo'],
+        ['Clips4Sale', 'Clips4Sale: Fuck n Fetish', 'Clips4Sale: Fuck n Fetish', '80227', 'fucknfetish'],
+        ['Clips4Sale', 'Clips4Sale: Roped Prose Productions', 'Clips4Sale: Roped Prose Productions', '68947', 'roped-prose-productions'],
+        ['Clips4Sale', 'Clips4Sale: alaskalovesfetish', 'Clips4Sale: alaskalovesfetish', '422417', 'alaskalovesfetish'],
+        ['Clips4Sale', 'Clips4Sale: Rough Ink', 'Clips4Sale: Rough Ink', '509769', 'rough-ink'],
+        ['Clips4Sale', 'Clips4Sale: Mistress Nina Morovic', 'Clips4Sale: Mistress Nina Morovic', '244083', 'mistress-nina-morovic'],
+        ['Clips4Sale', 'Clips4Sale: Miss Kirsch', 'Clips4Sale: Miss Kirsch', '303959', 'miss-kirsch'],
+        ['Clips4Sale', 'Clips4Sale: Mistress Youko', 'Clips4Sale: Mistress Youko', '196595', 'mistress-youko'],
+        ['Clips4Sale', 'Clips4Sale: ASX', 'Clips4Sale: ASX', '326621', 'asx'],
+        ['Clips4Sale', 'Clips4Sale: slave m', 'Clips4Sale: slave m', '13628', 'slave-m'],
+        ['Clips4Sale', 'Clips4Sale: MissErinia', 'Clips4Sale: MissErinia', '354757', 'misserinia'],
+        ['Clips4Sale', 'Clips4Sale: SQ Bossy Delilah', 'Clips4Sale: SQ Bossy Delilah', '16207', 'sq-bossy-delilah'],
+        ['Clips4Sale', 'Clips4Sale: The KinkyBoy', 'Clips4Sale: The KinkyBoy', '317141', 'the-kinkyboy'],
+        ['Clips4Sale', 'Clips4Sale: Show Some Restraint', 'Clips4Sale: Show Some Restraint', '177461', 'show-some-restraint'],
+        ['Clips4Sale', 'Clips4Sale: Domiiscz store', 'Clips4Sale: Domiiscz store', '246527', 'domiiscz-store'],
+        ['Clips4Sale', 'Clips4Sale: Cybill Troy Femdom Antisex League', 'Clips4Sale: Cybill Troy Femdom Antisex League', '40408', 'cybill-troy-femdom-antisex-league'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Brighid', 'Clips4Sale: Mistress Brighid', '328745', 'mistress-brighid'], 
+        ['Clips4Sale', 'Clips4Sale: Strafkamer', 'Clips4Sale: Strafkamer', '97459', 'strafkamer'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Celene', 'Clips4Sale: Mistress Celene', '200277', 'mistress-celene'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Vixen', 'Clips4Sale: Mistress Vixen', '27428', 'mistress-vixen'], 
+        ['Clips4Sale', 'Clips4Sale: Domina Diably', 'Clips4Sale: Domina Diably', '433653', 'domina-diably'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Lotusx', 'Clips4Sale: Mistress Lotusx', '262799', 'mistress-lotusx'], 
+        ['Clips4Sale', 'Clips4Sale: Goddess Charlie Cake', 'Clips4Sale: Goddess Charlie Cake', '241107', 'goddess-charlie-cake'],
+        ['Clips4Sale', 'Clips4Sale: Miss Flora', 'Clips4Sale: Miss Flora', '248503', 'miss-flora'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Amarena', 'Clips4Sale: Mistress Amarena', '223973', 'mistress-amarena'], 
+        ['Clips4Sale', 'Clips4Sale: Lillithid', 'Clips4Sale: Lillithid', '346861', 'lillithid'], 
+        ['Clips4Sale', 'Clips4Sale: Hecate Reigns', 'Clips4Sale: Hecate Reigns', '186311', 'hecate-reigns'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress April', 'Clips4Sale: Mistress April', '401793', 'mistress-april'], 
+        ['Clips4Sale', 'Clips4Sale: Jessica Sol', 'Clips4Sale: Jessica Sol', '460943', 'jessica-sol'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Tirza Nl', 'Clips4Sale: Mistress Tirza Nl', '204569', 'mistress-tirza-nl'], 
+        ['Clips4Sale', 'Clips4Sale: Sophiamayy', 'Clips4Sale: Sophiamayy', '232295', 'sophiamayy'], 
+        ['Clips4Sale', 'Clips4Sale: Anouschka Femme Fatale', 'Clips4Sale: Anouschka Femme Fatale', '139051', 'anouschka-femme-fatale'], 
+        ['Clips4Sale', 'Clips4Sale: Squishysaxs Sadistic Queens', 'Clips4Sale: Squishysaxs Sadistic Queens', '125293', 'squishysaxs-sadistic-queens'], 
+        ['Clips4Sale', 'Clips4Sale: Predicamentbondage', 'Clips4Sale: Predicamentbondage', '296897', 'predicamentbondage'], 
+        ['Clips4Sale', 'Clips4Sale: Quioyja', 'Clips4Sale: Quioyja', '301623', 'quioyja'], 
+        ['Clips4Sale', 'Clips4Sale: Peggingonly', 'Clips4Sale: Peggingonly', '218729', 'peggingonly'], 
+        ['Clips4Sale', 'Clips4Sale: Hotvaleria S Fetish Clip Store', 'Clips4Sale: Hotvaleria S Fetish Clip Store', '47227', 'hotvaleria-s-fetish-clip-store'], 
+        ['Clips4Sale', 'Clips4Sale: Mistress Raven Uk Dominatrix', 'Clips4Sale: Mistress Raven Uk Dominatrix', '111366', 'mistress-raven-uk-dominatrix'], 
+        ['Clips4Sale', 'Clips4Sale: Demoness J', 'Clips4Sale: Demoness J', '170097', 'demoness-j'],        
+        ['Clips4Sale', 'Clips4Sale: Fetish Lady - Blowjobs & Handjobs', 'Clips4Sale: Fetish Lady - Blowjobs & Handjobs', '11578', 'fetish-lady---blowjobs---handjobs'],
+        ['Clips4Sale', 'Clips4Sale: Bound And Milked', 'Clips4Sale: Bound And Milked', '12683', 'bound-and-milked'], 
+        ['Clips4Sale', 'Clips4Sale: Laxfanat Latex Pierced Public Girl', 'Clips4Sale: Laxfanat Latex Pierced Public Girl', '48871', 'laxfanat-latex-pierced-public-girl'], 
+        ['Clips4Sale', 'Clips4Sale: Lustful Orchid', 'Clips4Sale: Lustful Orchid', '168825', 'lustful-orchid'],
+        # ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
         # ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
         # ['Clips4Sale', 'Clips4Sale: ', 'Clips4Sale: ', '', ''],
     ]
@@ -96,7 +142,7 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['store'], meta['storename']), callback=self.parse, meta=meta)
@@ -160,7 +206,7 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
                 yield self.check_item(item, self.days)
 
     def get_site(self, response, scene):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "Missa X" in meta['storedsite']:
             title = re.sub(r'[^a-z0-9]+', '', scene['title'].lower())
             if "allherluv" in title:
@@ -175,13 +221,13 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
         return tldextract.extract(response.url).domain
 
     def get_parent(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['parent']:
             return meta['parent']
         return tldextract.extract(response.url).domain
 
     def get_network(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['network']:
             return meta['network']
         return tldextract.extract(response.url).domain
@@ -207,6 +253,7 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
             "dame-olgas-fetish-clips": "Dame Olga",
             "darling-kiyomi": "Darling Kiyomi",
             "divine-goddess-amber": "Divine Goddess Amber",
+            "domiiscz-store": "Samantha Boobs",
             "evansfeet": "Lis Evans",
             "goddess-alessa": "Goddess Alessa",
             "goddess-lavey": "Harley LaVey",
@@ -228,6 +275,8 @@ class SiteClips4Sale_4Spider(BaseSceneScraper):
             "mistress-euryale": "Elis Euryale",
             "mistress-jessica-starling": "Jessica Starling",
             "mistress-nikita-femdom": "Mistress Nikita",
+            "mistress-nina-morovic": "Mistress Nina Morovic",
+            "mistress-youko": "Mistress Youko",
             "natalie-wonder": "Natalie Wonder",
             "parannanza": "Parannanza",
             "princess-camryn": "Princess Camryn",

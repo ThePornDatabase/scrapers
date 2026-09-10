@@ -84,7 +84,7 @@ class SiteStockyDudesSpider(BaseSceneScraper):
         if count:
             if ('page' in response.meta and
                     response.meta['page'] < self.limit_pages):
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 meta['pagingData']['from'] += count
 

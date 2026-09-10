@@ -28,7 +28,7 @@ class SiteJOIBabesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "bg-content1")]/a')
         for scene in scenes:
             duration = scene.xpath('.//span[contains(@class, "semibold")]/text()')

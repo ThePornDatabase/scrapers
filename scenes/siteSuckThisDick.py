@@ -1,4 +1,6 @@
 import re
+import string
+from urllib.parse import urlsplit, urlunsplit, quote
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -9,41 +11,96 @@ class SiteSuckThisDickSpider(BaseSceneScraper):
     parent = 'Suck This Dick'
     site = 'Suck This Dick'
 
-    start_urls = [
-        'https://suckthisdick.com',
-    ]
+    start_url = 'https://suckthisdick.com'
 
     selector_map = {
-        'title': '//h1[1]/text()',
-        'description': '//div[contains(@class, "column mcb-column")]/div/p[not(contains(text(), "Posted by"))]/text()',
-        'date': '//span[contains(@class,"update_date")]/text()',
-        'image': '//div[@class="mcb-wrap-inner"]//video/@poster',
-        'performers': '',
-        'tags': '',
-        'external_id': r'.*/(.*?)/',
-        'trailer': '//div[contains(@class, "post-wrapper-content")]/div[1]/div/div/div[@class="mcb-wrap-inner"]//video/source[1]/@src',
-        'pagination': '/latest-videos/page/%s/'
+        'external_id': r'',
+        'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc',
+        'type': 'Scene',
     }
 
-    def get_scenes(self, response):
-        scenes = response.xpath('//h4[@class="entry-title"]/a/@href').getall()
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request(self.start_url, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def start_requests_2(self, response):
+        meta = self.copy_meta(response)
+        buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
+        if buildId:
+            meta['buildID'] = buildId.group(1)
+            link = self.get_next_page_url(self.start_url, self.page, meta['buildID'])
+            yield scrapy.Request(link, callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def parse(self, response, **kwargs):
+        scenes = self.get_scenes(response)
+        count = 0
         for scene in scenes:
-            if re.search(self.get_selector_map('external_id'), scene):
-                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+            count += 1
+            yield scene
 
-    # ~ #  The date code was used for the initial fill scrape.  It's pretty inaccurate,
-    # ~ #  so going forward commenting it out so that current date is used.  Leaving
-    # ~ #  the function in as a comment in case it's needed later though.
-    # ~ def get_date(self, response):
-    # ~ image = response.xpath('//div[@class="mcb-wrap-inner"]//video/@poster')
-    # ~ if image:
-    # ~ image = image.get()
-    # ~ year = re.search(r'uploads/(\d{4})/', image)
-    # ~ month = re.search(r'uploads/\d+/(\d{1,2})/', image)
-    # ~ if month and year:
-    # ~ date = year.group(1) + "-" + month.group(1) + "-01"
-    # ~ return self.parse_date(date).isoformat()
-    # ~ return self.parse_date('today').isoformat()
+        if count:
+            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
+                meta = self.copy_meta(response)
+                meta['page'] = meta['page'] + 1
+                print('NEXT PAGE: ' + str(meta['page']))
+                yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def get_tags(self, response):
-        return ['Blowjob']
+    def get_next_page_url(self, base, page, buildID):
+        pagination = self.get_selector_map('pagination')
+        pagination = pagination.replace("<buildID>", buildID)
+        return self.format_url(base, pagination % page)
+
+    @staticmethod
+    def clean_url(url):
+        """Percent-encode unsafe characters (e.g. spaces) in the URL path."""
+        if not url:
+            return url
+        parts = urlsplit(url)
+        return urlunsplit(parts._replace(path=quote(parts.path, safe='/')))
+
+    def get_scenes(self, response):
+        jsondata = response.json()
+        jsondata = jsondata['pageProps']['contents']['data']
+        for scene in jsondata:
+            item = self.init_scene()
+            item['title'] = self.cleanup_title(scene['title'])
+            item['description'] = self.cleanup_description(scene['description'])
+            item['date'] = self.parse_date(re.search(r'(\d{4}/\d{2}/\d{2})', scene['publish_date']).group(1), date_formats=['%Y/%m/%d']).strftime('%Y-%m-%d')
+            item['image'] = self.clean_url(scene['trailer_screencap'])
+            if ".mp4" not in item['image']:
+                item['image_blob'] = self.get_image_blob_from_link(item['image'])
+            else:
+                item['image'] = ""
+                item['image_blob'] = ""
+            item['performers'], item['performers_data'] = self.get_performers_data(scene['models_thumbs'])
+            item['tags'] = scene['tags']
+            if "seconds_duration" in scene and scene['seconds_duration']:
+                item['duration'] = scene['seconds_duration']
+            else:
+                item['duration'] = None
+            item['id'] = scene['id']
+            item['url'] = f"{self.start_url}/videos/{scene['slug']}"
+            item['site'] = self.site
+            item['parent'] = self.parent
+            item['network'] = self.network
+            item['type'] = self.get_selector_map('type')
+            yield self.check_item(item, self.days)
+
+    def get_performers_data(self, models):
+        performers = []
+        performers_data = []
+        for model in models:
+            if not model.get('name'):
+                continue
+            name = string.capwords(model['name'])
+            thumb = self.clean_url(model['thumb'])
+            performers.append(name)
+            performers_data.append({
+                "name": name,
+                "image": thumb,
+                "image_blob": self.get_image_blob_from_link(thumb),
+                "site": self.site,
+                "network": self.network,
+            })
+        return performers, performers_data

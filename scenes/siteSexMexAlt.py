@@ -10,9 +10,9 @@ class SiteSexMexAltSpider(BaseSceneScraper):
     site = 'SexMex'
 
     start_urls = [
-        'https://exposedlatinas.com',
+        # ~ 'https://exposedlatinas.com',
         # ~ 'https://sexmexamateurs.com',
-        # ~ 'https://transqueens.com',
+        'https://transqueens.com',
     ]
 
     selector_map = {
@@ -28,7 +28,9 @@ class SiteSexMexAltSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"col-lg-4 col-md-4 col-xs-16 thumb")]')
+        # the grid went from four columns to three, so the card class changed from
+        # col-lg-4 col-md-4 to col-lg-3 col-md-3; match on the thumb marker instead
+        scenes = response.xpath('//div[contains(@class, "col-xs-16") and contains(@class, "thumb")]')
         for scene in scenes:
             item = SceneItem()
 

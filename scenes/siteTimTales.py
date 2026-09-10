@@ -32,7 +32,7 @@ class SiteTimTalesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "video-item")]')
         for scene in scenes:
             sceneid = scene.xpath('./div/@id')

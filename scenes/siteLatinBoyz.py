@@ -31,7 +31,7 @@ class SiteLatinBoyzSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//header[contains(@class, "item-header")]')
         for scene in scenes:
             tags = scene.xpath('./following-sibling::footer/ul/li/a/text()')

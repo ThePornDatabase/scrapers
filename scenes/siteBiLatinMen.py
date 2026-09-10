@@ -40,7 +40,7 @@ class SiteBiLatinMenSpider(BaseSceneScraper):
             return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         page = int(meta['page'])
         if page == 1:
             scenes = response.xpath('//div[contains(@class, "update-item") and not(contains(.//a/@href, "erotic_stories")) and not(contains(.//a/@href, "erotic_art")) and not(contains(.//h3/a/text(), "Pics:")) and not(contains(.//h2/text(), "Free Stuff"))]')

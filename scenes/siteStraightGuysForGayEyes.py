@@ -28,7 +28,7 @@ class SiteStraightGuysForGayEyesSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@href, "/trailers/")]/../..')
         for scene in scenes:
             image = scene.xpath('.//a[contains(@href, "/trailers/")]/img/@src0_1x').get()

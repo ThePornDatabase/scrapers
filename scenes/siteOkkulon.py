@@ -44,7 +44,7 @@ class SiteOkkulonSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = self.init_scene()
@@ -56,7 +56,7 @@ class SiteOkkulonSpider(BaseSceneScraper):
             item['title'] = string.capwords(unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).strip()))
 
             test_title = re.sub(r'[^a-z]+', '', item['title'].lower())
-            for tag_id in scene['tags']:
+            for tag_id in scene.get('tags') or []:
                 for tag in meta['tagdata']:
                     if tag['id'] == tag_id:
                         if re.sub(r'[^a-z]+', '', tag['name'].lower()) in test_title:

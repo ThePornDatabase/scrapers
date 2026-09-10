@@ -57,7 +57,7 @@ class SiteVRNetworkAPISpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = json.loads(response.text)
         for movie in scenes['data']['items']:
             meta['id'] = movie['slug']
@@ -69,7 +69,7 @@ class SiteVRNetworkAPISpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = response.json()
         movie = movie['data']['item']
         base_url = meta['base_url']

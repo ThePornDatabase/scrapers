@@ -26,7 +26,7 @@ class SiteCadeMaddoxSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="updateDetails"]')
         for scene in scenes:
             scenedate = scene.xpath('.//div[@class="details"]/span[@class="availdate"][1]/text()')

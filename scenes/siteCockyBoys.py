@@ -28,7 +28,7 @@ class SiteCockyBoysSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//section[contains(@class,"previewThumb")]')
         for scene in scenes:
             sceneid = scene.xpath('./@id')

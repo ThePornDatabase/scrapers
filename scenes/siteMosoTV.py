@@ -23,7 +23,7 @@ class SiteMosoMonsterSpider(BaseSceneScraper):
         return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         for scene in jsondata['data']['videos']:
             meta['id'] = scene['id']
@@ -32,7 +32,7 @@ class SiteMosoMonsterSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
         scene = response.json()
         item['id'] = meta['id']

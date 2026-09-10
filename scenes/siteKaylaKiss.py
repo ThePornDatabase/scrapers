@@ -26,7 +26,7 @@ class SiteKaylaKissSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "item-video")]')
         for scene in scenes:
             scenedate = scene.xpath('.//div[@class="date"]/text()').get()

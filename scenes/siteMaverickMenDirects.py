@@ -27,7 +27,7 @@ class SiteMaverickMenDirectsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="videobox2"]/figure/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

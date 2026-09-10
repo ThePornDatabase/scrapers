@@ -37,7 +37,7 @@ class LegalPornoSpider(BaseSceneScraper):
         return "Legal Porno"
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//article[@class="card scene"]/a[1]/@href').getall()
         for scene in scenes:
             if "http:" not in scene:

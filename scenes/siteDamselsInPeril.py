@@ -9,8 +9,14 @@ class SiteDamselsInPerilSpider(BaseSceneScraper):
     parent = 'Damsels In Peril'
     site = 'Damsels In Peril'
 
+    # /show.php?a=247_N no longer renders: it returns the raw page template with
+    # its [ahref1]/[name1] placeholders unfilled, so get_scenes found itemv blocks
+    # whose links had no lid= and crashed on the match.  The video listing has moved
+    # to /?videos, which serves the newest ~24 scenes.  There is no pagination left
+    # for non-members: ?videos&p=N and the site's own search.php?...&at=N offset both
+    # return that same first page, and everything older sits behind /members/.
     start_urls = [
-        'https://damselsinperil.com',
+        'https://damselsinperil.com/?videos',
     ]
 
     selector_map = {
@@ -24,12 +30,20 @@ class SiteDamselsInPerilSpider(BaseSceneScraper):
         'duration': '',
         'trailer': '',
         'external_id': r'.*/(\d+)/',
-        'pagination': '/show.php?a=247_%s',
+        'pagination': '',
         'type': 'Scene',
     }
 
+    async def start(self):
+        # The base implementation builds page one out of 'pagination', which is
+        # empty here because the listing is a single page.
+        meta = {}
+        meta['page'] = self.page
+        yield scrapy.Request(self.start_urls[0], callback=self.parse, meta=meta,
+                             headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="itemv"]')
         for scene in scenes:
             title = scene.xpath('.//div[@class="nm-name"]/p[1]/text()')
@@ -52,9 +66,10 @@ class SiteDamselsInPerilSpider(BaseSceneScraper):
                     duration = float(duration) * 60
                     meta['duration'] = str(int(duration))
 
-            scene = scene.xpath('./a/@href').get()
-            meta['id'] = re.search(r'lid=(\d+)', scene).group(1)
-            if meta['id']:
+            scene = scene.xpath('./a/@href').get() or ''
+            sceneid = re.search(r'lid=(\d+)', scene)
+            if sceneid:
+                meta['id'] = sceneid.group(1)
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_duration(self, response):

@@ -26,7 +26,7 @@ class Spider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//h3/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):

@@ -29,7 +29,7 @@ class SiteRickysRoomSpider(BaseSceneScraper):
         yield scrapy.Request('https://rickysroom.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
         if buildId:
             meta['buildID'] = buildId.group(1)
@@ -47,7 +47,7 @@ class SiteRickysRoomSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -57,7 +57,7 @@ class SiteRickysRoomSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['pageProps']['contents']['data']
         for scene in jsondata:
@@ -69,7 +69,7 @@ class SiteRickysRoomSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['pageProps']['content']
         item = self.init_scene()
@@ -108,8 +108,14 @@ class SiteRickysRoomSpider(BaseSceneScraper):
         item['date'] = self.parse_date(jsondata['publish_date'], date_formats=['%Y/%m/%d']).strftime('%Y-%m-%d')
 
         item['id'] = jsondata['id']
-        item['image'] = jsondata['thumb'].replace(" ", "%20")
-        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+        if "trailer_screencap" in jsondata and jsondata['trailer_screencap']:
+            image = jsondata['trailer_screencap'].replace(" ", "%20")
+        else:
+            image = jsondata['thumb'].replace(" ", "%20")
+        if image:
+            item['image'] = image
+            item['image_blob'] = self.get_image_blob_from_link(item['image'])
+
         item['tags'] = jsondata['tags']
         item['url'] = f"https://rickysroom.com/videos/{jsondata['slug']}"
 

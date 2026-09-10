@@ -33,7 +33,7 @@ class SiteMassageGirls18Spider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "thumb")]/a/@href').getall()
         for scene in scenes:
             if "&nats" in scene:

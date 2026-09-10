@@ -26,7 +26,7 @@ class SiteCollegeUniformSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="update_details" and .//div[@class="update_counts" and contains(text(), "video")]]')
         for scene in scenes:
             sceneid = scene.xpath('./@data-setid')
@@ -45,7 +45,7 @@ class SiteCollegeUniformSpider(BaseSceneScraper):
             yield scene
 
         if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-            meta = response.meta
+            meta = self.copy_meta(response)
             meta['page'] = meta['page'] + 1
             print('NEXT PAGE: ' + str(meta['page']))
             yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)

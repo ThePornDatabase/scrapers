@@ -22,7 +22,7 @@ class SiteMomsTeachingTeensSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//comment()[contains(., "START EPISODE")]/following-sibling::tr[2]')
         for scene in scenes:
             item = SceneItem()

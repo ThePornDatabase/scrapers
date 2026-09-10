@@ -1,5 +1,6 @@
+import re
 import string
-import time
+
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -27,10 +28,8 @@ class SiteLifeSelectorSpider(BaseSceneScraper):
             # ~ 'tpdb.helpers.scrapy_flare.FlareMiddleware': 542,
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
             'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
         },
         'DOWNLOAD_HANDLERS': {
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -46,60 +45,79 @@ class SiteLifeSelectorSpider(BaseSceneScraper):
         'performers': '',
         'tags': '',
         'trailer': '',
-        'external_id': r'',
-        'pagination': '/game/listGames?format=partial&offset=%s&gameType=all&order=releaseDate&_=%s'
+        'external_id': r'/game/(\d+)/',
+        'pagination': '/games?page=%s'
     }
+
+    # /game/listGames no longer returns a partial -- it falls through to the full
+    # /games page -- and div.episodeBlock.notOrdered is gone with it.  Cards are
+    # div.story.thumbnail now and no longer carry the synopsis, so the game page is
+    # visited for its og:description.  As before, the site publishes no release
+    # date, no tags and no trailer.
 
     async def start(self):
         meta = {}
         meta['page'] = self.page
         meta['playwright'] = True
         for link in self.start_urls:
-            yield scrapy.Request("https://lifeselector.com", callback=self.start_requests2, meta=meta, headers=self.headers, cookies=self.cookies)
-
-    def start_requests2(self, response):
-        meta = response.meta
-        for link in self.start_urls:
-            yield scrapy.Request(url=self.get_next_page_url(link, meta['page']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+            yield scrapy.Request(url=self.get_next_page_url(link, meta['page']), callback=self.parse,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_next_page_url(self, base, page):
-        page = str((int(page) - 1) * 20)
-        timestamp = str(int(time.time()))
-        return self.format_url(base, self.get_selector_map('pagination') % (page, timestamp))
+        return self.format_url(base, self.get_selector_map('pagination') % page)
 
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class, "episodeBlock") and contains(@class, "notOrdered")]')
-        for scene in scenes:
-            item = SceneItem()
-            item['title'] = self.cleanup_title(scene.xpath('./div/h3[@class="game-title"]/text()').get())
-            item['description'] = ""
-            description = scene.xpath('.//div[@class="story"]//text()')
-            if description:
-                item['description'] = " ".join(list(map(lambda x: x.strip(), description.getall()))).strip().replace("\n", "").replace("\t", "").replace("\r", "")
-            item['date'] = ''
-            item['image'] = ""
-            item['image_blob'] = ""
-            image = scene.xpath('./a[1]/img/@src')
+        for card in response.xpath('//div[contains(@class, "story") and contains(@class, "thumbnail")]'):
+            link = card.xpath('.//a[contains(@href, "/game/")]/@href').get()
+            # member-plus cards are rendered blurred with no link at all
+            if not link or not re.search(self.get_selector_map('external_id'), link):
+                continue
+
+            meta = dict(response.meta)
+            meta['id'] = re.search(self.get_selector_map('external_id'), link).group(1)
+            meta['title'] = self.cleanup_title(
+                (card.xpath('.//a[contains(@class, "title")]/text()').get() or '').strip())
+
+            performers = card.xpath('.//div[contains(@class, "actors")]/a/text()').getall()
+            meta['performers'] = [x.strip() for x in performers if x.strip()]
+
+            # the srcsets run small to large, so the last one holds the widest crop
+            image = ''
+            srcsets = card.xpath('.//source/@data-srcset').getall()
+            if srcsets:
+                candidates = re.findall(r'(https?://\S+?)\s+\dx', srcsets[-1])
+                image = candidates[-1] if candidates else ''
+            if not image:
+                image = card.xpath('.//img/@data-src').get() or ''
             if image:
-                item['image'] = self.format_link(response, image.get())
-                if "list/soft/1.jpg" in item['image']:
-                    item['image'] = item['image'].replace("list/soft/1", "poster/soft/1_size1200")
-                item['image_blob'] = self.get_image_blob_from_link(item['image'])
-            performers = scene.xpath('.//div[@class="models"]/a/text()')
-            item['performers'] = []
-            if performers:
-                item['performers'] = performers.getall()
-            tags = scene.xpath('.//div[@class="tags"]/a/text()')
-            item['tags'] = []
-            if tags:
-                item['tags'] = list(map(lambda x: string.capwords(x.strip()), tags.getall()))
-            item['trailer'] = ''
-            trailer = scene.xpath('.//div[contains(@class,"action")]/button[contains(@class, "trailer")]/@data-video-src')
-            if trailer:
-                item['trailer'] = self.format_link(response, trailer.get())
-            item['id'] = scene.xpath('./@id').get()
-            item['network'] = "Life Selector"
-            item['parent'] = "Life Selector"
-            item['site'] = "Life Selector"
-            item['url'] = self.format_link(response, scene.xpath('./a[1]/@href').get())
-            yield self.check_item(item, self.days)
+                meta['image'] = self.format_link(response, image)
+
+            yield scrapy.Request(url=self.format_link(response, link), callback=self.parse_scene,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_title(self, response):
+        title = response.meta.get('title')
+        if not title:
+            title = self.cleanup_title(response.xpath('//h1//text()').get() or '')
+        return title
+
+    def get_description(self, response):
+        description = response.xpath('//meta[@property="og:description"]/@content').get() or ''
+        return self.cleanup_description(re.sub(r'\s+', ' ', description))
+
+    def get_image(self, response):
+        return response.meta.get('image', '')
+
+    def get_performers(self, response):
+        """Taken from the card -- the game page lists related models alongside the
+        cast, with no way to tell them apart."""
+        return response.meta.get('performers', [])
+
+    def get_date(self, response):
+        return None
+
+    def get_tags(self, response):
+        return []
+
+    def get_trailer(self, response):
+        return ''

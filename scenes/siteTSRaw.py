@@ -1,5 +1,6 @@
 import re
 from tpdb.BaseSceneScraper import BaseSceneScraper
+from tpdb.spiders.scenes._natscms import resolve_block_id
 
 
 class SiteTSRawSpider(BaseSceneScraper):
@@ -19,13 +20,31 @@ class SiteTSRawSpider(BaseSceneScraper):
         'pagination': '/index.php?section=1681&start=%s'
     }
 
+
+    # cms_block_id belongs to a block in the tour's layout, so it changes whenever
+    # the tour is re-laid-out -- and when it does the API answers
+    # {"error":"cms_block_id ... not found"} and the spider silently yields
+    # nothing. It is therefore looked up once per crawl; the literal below is only
+    # the fallback used if that lookup fails, so this can only ever help.
+    nats_site = 'https://www.tsraw.com'
+    nats_block_fallback = '102013'
+
+    @property
+    def nats_block_id(self):
+        if getattr(self, '_nats_block_id', None) is None:
+            self._nats_block_id = resolve_block_id(self.nats_site, self.nats_block_fallback)
+            if self._nats_block_id != self.nats_block_fallback:
+                print('*** %s: cms_block_id %s -> %s' % (
+                    self.name, self.nats_block_fallback, self._nats_block_id))
+        return self._nats_block_id
+
     def get_next_page_url(self, base, page):
         index = str((int(page) - 1) * 48)
-        url = f"https://nats.islanddollars.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=48&start={index}&cms_area_id=cc6bd0ac-a417-47d1-9868-7855b25986e5&cms_block_id=102013&orderby=published_desc&content_type=video&status=enabled&text_search=&data_type_search=%7B%22100001%22:%22164%22%7D"
+        url = f"https://nats.islanddollars.com/tour_api.php/content/sets?cms_set_ids=&data_types=1&content_count=1&count=48&start={index}&cms_area_id=cc6bd0ac-a417-47d1-9868-7855b25986e5&cms_block_id={self.nats_block_id}&orderby=published_desc&content_type=video&status=enabled&text_search=&data_type_search=%7B%22100001%22:%22164%22%7D"
         return url
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         scenes = jsondata['sets']
         for scene in scenes:

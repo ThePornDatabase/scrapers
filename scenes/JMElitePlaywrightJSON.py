@@ -1,5 +1,6 @@
 import re
 import json
+import base64
 import scrapy
 from scrapy.utils.project import get_project_settings
 
@@ -34,10 +35,8 @@ class JMElitePlaywrightJSONSpider(BaseSceneScraper):
     # ~ 'DOWNLOADER_MIDDLEWARES': {
     # ~ 'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
     # ~ 'tpdb.custommiddlewares.CustomProxyMiddleware': 350,
-    # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-    # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-    # ~ 'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-    # ~ 'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+    # ~ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    # ~ 'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
     # ~ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 100,
     # ~ },
     # ~ 'DOWNLOAD_HANDLERS': {
@@ -95,29 +94,37 @@ class JMElitePlaywrightJSONSpider(BaseSceneScraper):
     def get_scenes(self, response):
         jsondata = json.loads(response.text)
         taglist = jsondata['facets']['tags']
-        scenelist = jsondata['contents']['data']
+        # The API used to wrap the listing as contents.data; contents is now the
+        # list itself, and its entries no longer carry description, duration, tags
+        # or an id -- the runtime moved into the base64 mixpanel blob and the id
+        # into routes.details.  This mirrors the sibling JMPlaywrightJSON scraper,
+        # which was already ported to the new shape.
+        scenelist = jsondata['contents']
         for scene in scenelist:
             item = SceneItem()
             item['title'] = self.cleanup_title(scene['title'])
-            item['description'] = scene['description']
-            item['description'] = re.sub('<[^<]+?>', '', item['description']).replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ").strip()
-            item['duration'] = str(int(scene['duration']) * 60)
+            item['description'] = ""
+            if "mixpanel" in scene and scene['mixpanel']:
+                mixpanel = json.loads(base64.b64decode(scene['mixpanel']))
+                if mixpanel.get('contentDuration'):
+                    item['duration'] = str(mixpanel['contentDuration'])
             item['date'] = scene['publication_date']['iso']
             item['image'] = scene['poster']['thumbnail']['srcSet']
             item['image'] = re.search(r'^(http.*?)\s', item['image']).group(1)
             item['image_blob'] = self.get_image_blob_from_link(item['image'])
             item['type'] = 'Scene'
-            item['id'] = scene['id']
-            item['url'] = self.format_link(response, scene['routes']['content']).replace("www.", "")
+            item['url'] = self.format_link(response, scene['routes']['details']).replace("www.", "")
+            item['id'] = re.search(r'content/(.*?)/', item['url']).group(1)
             item['site'] = "Jacquie et Michel Elite"
             item['parent'] = "Jacquie et Michel Elite"
             item['network'] = "Jacquie et Michel"
             item['tags'] = []
-            for tag in scene['tags']:
-                for tagref in taglist:
-                    if tag == tagref['id']:
-                        item['tags'].append(tagref['name'])
-                        break
+            if "tags" in scene and scene['tags']:
+                for tag in scene['tags']:
+                    for tagref in taglist:
+                        if tag == tagref['id']:
+                            item['tags'].append(tagref['name'])
+                            break
             item['performers'] = []
             item['trailer'] = ''
 

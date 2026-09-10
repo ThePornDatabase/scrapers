@@ -49,7 +49,7 @@ class networkManojobSpider(BaseSceneScraper):
 
             if count:
                 if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                    meta = response.meta
+                    meta = self.copy_meta(response)
                     meta['page'] = meta['page'] + 1
                     print('NEXT PAGE: ' + str(meta['page']))
                     url = meta['siteurl']
@@ -64,18 +64,18 @@ class networkManojobSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="card scene"]/a/@href').getall()
         for scene in scenes:
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_site(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         return meta['site']
 
     def get_parent(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         return meta['site']
 
     def get_title(self, response):

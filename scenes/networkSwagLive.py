@@ -59,7 +59,7 @@ class NetworkSwagLiveSpider(BaseSceneScraper):
             yield scrapy.Request(link, callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         pagination = response.url
         meta['pagination'] = re.sub(r'page=\d+', 'page=%s', pagination.replace("limit=100", "limit=10"))
         link = meta['pagination'] % meta['page']
@@ -74,14 +74,14 @@ class NetworkSwagLiveSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 link = meta['pagination'] % meta['page']
                 yield scrapy.Request(link, callback=self.parse, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         jsondata = response.json()
 
@@ -97,7 +97,7 @@ class NetworkSwagLiveSpider(BaseSceneScraper):
             yield scrapy.Request(meta['url'], callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         item = self.init_scene()
         item['id'] = meta['id']
@@ -128,7 +128,7 @@ class NetworkSwagLiveSpider(BaseSceneScraper):
         yield scrapy.Request(trans_url, callback=self.parse_translations, meta=meta)
 
     def parse_translations(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
         jsondata = response.json()
         item['title'] = ''

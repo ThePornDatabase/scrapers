@@ -25,7 +25,7 @@ class SiteHotGuysFuckPerformerSpider(BasePerformerScraper):
     }
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()
         jsondata = jsondata['models']['data']
         for model in jsondata:
@@ -35,7 +35,7 @@ class SiteHotGuysFuckPerformerSpider(BasePerformerScraper):
                 yield scrapy.Request(link, callback=self.parse_performer, meta=meta, headers=self.headers)
 
     def parse_performer(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         model = response.json()
         model['slug'] = meta['slug']
         item = PerformerItem()

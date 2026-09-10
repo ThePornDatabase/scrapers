@@ -24,7 +24,7 @@ class SiteDungeonCorpv2Spider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[contains(@class, "update_info")]/ancestor::div[1]')
         for scene in scenes:
             scenedate = scene.xpath('.//i[contains(@class, "clock")]/following-sibling::text()[1]')
@@ -69,7 +69,7 @@ class SiteDungeonCorpv2Spider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def get_id(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         sceneid = response.xpath('//span[@class="shootid"]/text()')
         validid = False
         if sceneid:
@@ -89,7 +89,7 @@ class SiteDungeonCorpv2Spider(BaseSceneScraper):
         return description.replace("( ", "(").replace(" )", ")")
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
 
         item['title'] = self.cleanup_title(meta['title'])

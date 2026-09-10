@@ -23,8 +23,9 @@ class NetworkCash4RealSpider(BaseSceneScraper):
         'trailer': '//script[contains(text(), "video_content")]/text()',
         're_trailer': r'playsinline src=\"(.*?\.mp4)',
         'external_id': r'trailers/(.*).html',
-        'pagination': '/tour/categories/Movies_%s_d.html'
-        # 'pagination': '/tour/updates/page_%s.html'
+        # /tour/categories/Movies_N_d.html is gone; the updates listing is the one
+        # that still serves the /tour/trailers/ links get_scenes looks for.
+        'pagination': '/tour/updates/page_%s.html'
     }
 
     def get_next_page_url(self, base, page):

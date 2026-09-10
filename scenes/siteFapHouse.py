@@ -21,7 +21,9 @@ class SiteFapHouseSpider(BaseSceneScraper):
         'date_formats': ['%d.%m.%Y'],
         'image': '//meta[@property="og:image"]/@content',
         'performers': '//div[@data-el="RelatedTags"]//a[contains(@href, "/pornstars/")]/span[2]/text()',
-        'tags': '//div[@data-el="RelatedTags"]//a[contains(@class, "__category") and contains(@href, "/videos")]/text()',
+        # the category chips lost their __category class; they are identified by
+        # data-test-id now and hang off /c/<slug>/videos
+        'tags': '//div[@data-el="RelatedTags"]//a[@data-test-id="video-category-link"]/text()',
         'duration': '//span[contains(@class, "video-duration")]/text()',
         'external_id': r'.*/(.*?)$',
         'pagination': '',
@@ -48,7 +50,7 @@ class SiteFapHouseSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['pagination']), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
@@ -57,9 +59,14 @@ class SiteFapHouseSpider(BaseSceneScraper):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
-        scenes = response.xpath('//div[@class="thumb__main"]/a/@href').getall()
-        for scene in scenes:
+        # div.thumb__main is gone -- the grid is div.thumb[data-el="Thumb"] now, and
+        # its link carries a base64 "#vep=..." tracking fragment that has to come off
+        # or every scene looks distinct on each crawl.  The scene page itself is
+        # unchanged.
+        meta = self.copy_meta(response)
+        scenes = response.xpath('//div[contains(@class, "thumb")][@data-el="Thumb"]//a[contains(@href, "/videos/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            scene = scene.split('#')[0]
             if re.search(self.get_selector_map('external_id'), scene):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 

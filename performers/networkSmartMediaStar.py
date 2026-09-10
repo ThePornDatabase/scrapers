@@ -36,14 +36,40 @@ class SmartMediaStarPerformerSpider(BasePerformerScraper):
         'tsvirtuallovers': "Trans"
     }
 
+    def _referer_for(self, url):
+        if 'tsvirtuallovers' in url:
+            return 'https://tsvirtuallovers.com/videos/'
+        if 'realitylovers' in url:
+            return 'https://realitylovers.com/videos/'
+        return None
+
+    async def start(self):
+        for url in self.start_urls:
+            page = self.page
+            headers = dict(self.headers) if self.headers else {}
+            referer = self._referer_for(url)
+            if referer:
+                headers['Referer'] = referer
+            yield scrapy.Request(
+                url=self.get_next_page_url(url, page),
+                callback=self.parse,
+                meta={'page': page},
+                headers=headers,
+                cookies=self.cookies,
+            )
+
     def get_gender(self, response):
         site = super().get_site(response)
         return self.site_genders[site]
 
     def get_performers(self, response):
+        headers = dict(self.headers) if self.headers else {}
+        referer = self._referer_for(response.url)
+        if referer:
+            headers['Referer'] = referer
         performers = response.xpath('//a[contains(@class,"girlsCategory-girlItem")]/@href').getall()
         for performer in performers:
-            yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, cookies=self.cookies, headers=self.headers)
+            yield scrapy.Request(url=self.format_link(response, performer), callback=self.parse_performer, cookies=self.cookies, headers=headers)
 
     def get_image(self, response):
         image = super().get_image(response)

@@ -149,7 +149,7 @@ class ProjectOneServicePerformerSpider(BasePerformerScraper):
                 yield self.get_next_page(response)
 
     def get_next_page(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         query = {

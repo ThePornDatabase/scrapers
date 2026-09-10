@@ -13,8 +13,8 @@ class CouplesCinemaSpider(BaseSceneScraper):
         'https://www.couplescinema.com'
     ]
 
+    # The 'couplescinema' session id was removed; locale is all that is needed here.
     cookies = {
-        'couplescinema': '4urdfnv2e95pqbrs77e0jnha7l',
         'couplescinema_locale': 'en'
     }
 

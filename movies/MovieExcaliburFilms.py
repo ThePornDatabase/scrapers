@@ -36,7 +36,7 @@ class MovieExcaliburFilmsSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@class, "searchTitle18")]')
         for scene in scenes:
             meta['title'] = scene.xpath('./text()').get()

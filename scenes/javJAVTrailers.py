@@ -38,7 +38,11 @@ class JavJAVTrailersSpider(BaseSceneScraper):
         meta['page'] = self.page
 
         if self.limit_pages == 1:
-            self.limit_pages = 10
+            # The listing is ordered by release date with upcoming titles first, and
+            # check_item drops anything dated in the future.  As of Sept 2026 the first
+            # already-released title sits around page 50, so a 10-page default returned
+            # nothing at all.
+            self.limit_pages = 60
 
         if self.days == 20:
             self.days = 99999
@@ -47,7 +51,7 @@ class JavJAVTrailersSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="card-container"]/a/@href').getall()
         for scene in scenes:
             yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
@@ -56,12 +60,12 @@ class JavJAVTrailersSpider(BaseSceneScraper):
         item = SceneItem()
         item = self.prep_item(item)
 
-        jsondata = response.xpath('//script[contains(text(), "__NUXT__")]/text()')
-        if jsondata:
-            jsondata = jsondata.get()
-            jsondata = re.search(r'(video:.*?),popunder', jsondata)
-            if jsondata:
-                jsondata = jsondata.group(1)
+        # The __NUXT__ payload no longer carries the video blob (no ",popunder" marker,
+        # no director/casts/image keys), so this is usually ''.  Every use below has a
+        # DOM fallback; '' rather than None lets those run instead of raising.
+        jsondata = response.xpath('//script[contains(text(), "__NUXT__")]/text()').get() or ''
+        jsondata = re.search(r'(video:.*?),popunder', jsondata)
+        jsondata = jsondata.group(1) if jsondata else ''
 
         contentid = False
         sceneid = response.xpath('//span[contains(text(), "DVD ID:")]/following-sibling::text()[1]')

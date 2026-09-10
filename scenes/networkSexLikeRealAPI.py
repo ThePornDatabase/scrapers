@@ -28,7 +28,7 @@ class SexLikeRealSpider(BaseSceneScraper):
         'image': '//meta[@name="twitter:image1"]/@content or //meta[@name="twitter:image2"]/@content or //meta[@name="twitter:image3"]/@content or //meta[@name="twitter:image"]/@content',
         'trailer': '',
         'pagination': '/v3/scenes?page=%s&perPage=24&sort=recent&type=new'
-        # 'pagination': '/v3/scenes?studios=89&page=%s&perPage=24&sort=mostRecent'
+        # 'pagination': '/v3/scenes?studios=233&page=%s&perPage=24&sort=mostRecent'
         # 'pagination': '/v3/scenes?studios=245&page=%s&perPage=24&sort=mostRecent'
         # 'pagination': '/v3/scenes?studios=556&page=%s&perPage=24&sort=mostRecent'
     }
@@ -54,13 +54,13 @@ class SexLikeRealSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta, headers=self.headers)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         json = response.json()
         for scene in json['data']:
             meta['id'] = scene['id']
@@ -69,7 +69,7 @@ class SexLikeRealSpider(BaseSceneScraper):
                 yield scrapy.Request(url, callback=self.parse_scene, meta=meta, headers=self.headers)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scene = response.json()
         scene = scene['data']
         item = self.init_scene()
@@ -120,7 +120,7 @@ class SexLikeRealSpider(BaseSceneScraper):
                         'porncornvr', 'povmasters', 'puretaboo', 'realjamvr', 'realvr', 'realitylovers', 'sexbabesvr', 'sinsvr', 'slrmilfvr',
                         'stripzvr', 'swallowbay', 'tranzvr', 'vrcosplayx', 'vrbangers', 'vrbgay', 'vrbtrans',
                         'vrconk', 'vrhush', 'vrlatina', 'virtualrealamateur', 'virtualrealpassion', 'virtualrealporn',
-                        'virtualrealtrans', 'virtualtaboo', 'wankitnowvr', 'wankzvr', 'wearecrazy', 'lustreality']
+                        'virtualrealtrans', 'virtualtaboo', 'wankitnowvr', 'wankzvr', 'wearecrazy']
 
             matches = [re.sub(r'[^a-z0-9]', '', x) for x in raw_matches]
 

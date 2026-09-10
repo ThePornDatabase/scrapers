@@ -1,6 +1,9 @@
-import re
+import datetime
 import json
+import re
+
 import scrapy
+
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 
@@ -9,6 +12,10 @@ class NetworkFanCentroSpider(BaseSceneScraper):
     name = 'FanCentro'
     network = 'FanCentro'
 
+    # /lapi/feed is a 404 now and no replacement endpoint answers, so the feed can
+    # no longer be paged.  The profile page server-renders its first page of results
+    # into window.__REACT_QUERY_STATE__ under a "ModelFeed" query, which is where
+    # the clips come from -- newest first, which is what an update run needs.
     start_urls = [
         ['Just Lucy', True, 'justlucy94'],
         ['Mdemma', True, 'mdemma'],
@@ -29,78 +36,77 @@ class NetworkFanCentroSpider(BaseSceneScraper):
     }
 
     async def start(self):
-        meta = {}
-
         for link in self.start_urls:
-            meta['page'] = self.page
-            meta['siteid'] = link[2]
-            meta['site'] = link[0]
-            meta['parse_performer'] = link[1]
-            yield scrapy.Request(url=self.get_next_page_url(self.page, meta), callback=self.parse, meta=meta, headers=self.headers)
+            meta = {'page': self.page, 'site': link[0], 'parse_performer': link[1], 'siteid': link[2]}
+            yield scrapy.Request(url=f"https://fancentro.com/{link[2]}", callback=self.parse,
+                                 meta=meta, headers=self.headers, cookies=self.cookies)
 
-    def parse(self, response):
-        meta = response.meta
-        scenes = self.get_scenes(response)
-        count = 0
-        for scene in scenes:
-            count += 1
-            yield scene
-        if count:
-            if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta['page'] = meta['page'] + 1
-                print('NEXT PAGE: ' + str(meta['page']))
-                yield scrapy.Request(url=self.get_next_page_url(meta['page'], meta), callback=self.parse, meta=meta, headers=self.headers)
-
-    def get_next_page_url(self, page, meta):
-        link = f"https://fancentro.com/lapi/feed?filter%5BprofileAlias%5D={meta['siteid']}&filter%5BwithInactive%5D=1&filter%5BcontentSection%5D=clip&thumbnailSizes%5Bclip.cover%5D=Ewe1mwK819%2CQYHojytoKM%2Cwv8oBuQHGy%2CAgZ4mIATPd%2CuDrXbF6zst%2CuaKV7hnDcF%2CuaKV7hnDc2&thumbnailSizes%5Bprofile.avatar%5D=wv8oBuQHGy&thumbnailSizes%5BpostResource.image%5D=uaKV7hnDc2%2CvRDNthbb3h%2CRS8qPJQXEw%2CuDrXbF6zst&fields%5Bprofiles%5D=alias%2Cavatar%2CprofileData&fields%5Bposts%5D=title%2Cbody%2CpublishDate%2CisDateHidden%2Cprice%2Cpolls%2CisPinned%2Cresources%2CpostAttachments%2CpostTags&page%5Bnumber%5D={page}&page%5Bsize%5D=10&sort=-publishDate"
-        return link
+    def parse(self, response, **kwargs):
+        yield from self.get_scenes(response)
 
     def get_scenes(self, response):
-        meta = response.meta
-        jsondata = json.loads(response.text)
-        if "included" in jsondata:
-            jsondata = jsondata['included']
-            cliptags = []
-            for entry in jsondata:
-                if entry['type'] == "clipTags":
-                    cliptags.append(entry)
-            for entry in jsondata:
-                if entry['type'] == "clips":
-                    scene = entry
-                    item = SceneItem()
+        meta = self.copy_meta(response)
 
-                    item['id'] = scene['id']
-                    item['title'] = scene['attributes']['title']
-                    item['description'] = scene['attributes']['description']
-                    item['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', scene['attributes']['publishDate']).group(1)
-                    item['duration'] = scene['attributes']['length']
-                    if meta['parse_performer']:
-                        item['performers'] = [meta['site']]
-                    else:
-                        item['performers'] = []
+        state = re.search(r'window\.__REACT_QUERY_STATE__\s*=\s*(.*?);?\s*</script>', response.text, re.S)
+        if not state:
+            print(f"*** No embedded feed state on the {meta['siteid']} profile page")
+            return
+        try:
+            queries = json.loads(state.group(1)).get('queries') or []
+        except ValueError:
+            return
 
-                    item['tags'] = []
-                    if "relationships" in entry and "clipTags" in entry['relationships'] and entry['relationships']['clipTags']['data']:
-                        for tag in entry['relationships']['clipTags']['data']:
-                            for clipentry in cliptags:
-                                if tag['id'] == clipentry['id']:
-                                    item['tags'].append(clipentry['attributes']['alias'])
-                                    break
+        for query in queries:
+            if 'ModelFeed' not in json.dumps(query.get('queryKey')):
+                continue
+            pages = ((query.get('state') or {}).get('data') or {}).get('pages') or []
+            for entry in (i for p in pages for i in p.get('items', [])):
+                # the feed mixes text posts in with the clips
+                if entry.get('type') != 'video':
+                    continue
 
-                    for imagekey in scene['attributes']['coverUrl']:
-                        image = imagekey
-                    item['image'] = scene['attributes']['coverUrl'][image]
-                    if item['image']:
-                        item['image_blob'] = self.get_image_blob_from_link(item['image'])
+                item = SceneItem()
+                item['id'] = entry.get('id')
+                item['title'] = self.cleanup_title(entry.get('title') or '')
+                if not item['title']:
+                    continue
+                item['description'] = self.cleanup_description(entry.get('description') or '')
 
-                    item['trailer'] = ""
+                published = entry.get('publishedAt')
+                if published:
+                    # epoch milliseconds
+                    item['date'] = datetime.datetime.fromtimestamp(
+                        int(published) / 1000, datetime.timezone.utc).strftime('%Y-%m-%d')
+                else:
+                    item['date'] = None
 
-                    item['type'] = "Scene"
-                    item['site'] = f"FanCentro: {meta['site']}"
-                    item['parent'] = f"FanCentro: {meta['site']}"
-                    item['network'] = "FanCentro"
+                item['duration'] = self.duration_to_seconds(entry.get('duration') or '')
 
-                    item['url'] = f"https://fancentro.com/{meta['siteid']}/clips/{item['id']}/"
+                image = ((entry.get('thumb') or {}).get('src') or '').strip()
+                item['image'] = image
+                item['image_blob'] = self.get_image_blob_from_link(image) if image else None
 
-                    if item['id'] and item['title']:
-                        yield self.check_item(item, self.days)
+                item['performers'] = [meta['site']] if meta['parse_performer'] else []
+                # the feed publishes tags as False when a clip carries none
+                tags = entry.get('tags')
+                item['tags'] = [t for t in tags if t] if isinstance(tags, list) else []
+
+                item['trailer'] = ''
+                item['type'] = 'Scene'
+                item['site'] = f"FanCentro: {meta['site']}"
+                item['parent'] = f"FanCentro: {meta['site']}"
+                item['network'] = "FanCentro"
+
+                link = entry.get('link') or f"/{meta['siteid']}/clips/{item['id']}/"
+                item['url'] = f"https://fancentro.com{link}"
+
+                item = self.check_item(item, self.days)
+                if item:
+                    yield item
+
+    def duration_to_seconds(self, value):
+        parsed = re.search(r'(?:(\d+):)?(\d{1,2}):(\d{2})$', (value or '').strip())
+        if not parsed:
+            return None
+        hours, minutes, seconds = (int(x) if x else 0 for x in parsed.groups())
+        return str(hours * 3600 + minutes * 60 + seconds)

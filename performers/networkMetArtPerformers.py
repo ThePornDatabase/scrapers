@@ -36,7 +36,7 @@ class NetworkMetArtPerformerSpider(BasePerformerScraper):
     ]
 
     def get_performers(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         performers = response.json()['models']
         for performer in performers:
             perf_name = performer['name']

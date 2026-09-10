@@ -55,7 +55,7 @@ class VixenIntimatesScraper(BaseSceneScraper):
             )
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = response.json()['data']['findVideos']
         scenes = jsondata['edges']
         headers = self.headers.copy()
@@ -74,7 +74,7 @@ class VixenIntimatesScraper(BaseSceneScraper):
                 )
 
         if 'page' in response.meta and response.meta['page'] < self.limit_pages and jsondata['pageInfo']['hasNextPage']:
-            meta = response.meta
+            meta = self.copy_meta(response)
             meta['page'] = meta['page'] + 1
 
             print('NEXT PAGE: ' + str(meta['page']))
@@ -88,7 +88,7 @@ class VixenIntimatesScraper(BaseSceneScraper):
             )
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         data = response.json()['data']['findOneVideo']
         scene = SceneItem()
 

@@ -58,7 +58,7 @@ class MovieDorcelClubSpider(BaseSceneScraper):
             yield scrapy.Request(url=self.get_next_page_url(link, self.page), callback=self.parse, meta={'page': self.page})
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = self.get_movies(response)
         count = 0
         for movie in movies:
@@ -75,14 +75,14 @@ class MovieDorcelClubSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page']), callback=self.parse, meta=meta)
 
     def get_movies(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movies = response.xpath('//a[@class="movie thumbnail"]/@href').getall()
         for movie in movies:
             movieurl = self.format_link(response, movie)
             yield scrapy.Request(movieurl, callback=self.parse_movie, meta=meta)
 
     def parse_movie(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//span[@class="scenes"]/text()').get()
         scenes = int(re.search(r'\:\s+?(\d+)', scenes).group(1))
         if scenes > 1:
@@ -164,7 +164,7 @@ class MovieDorcelClubSpider(BaseSceneScraper):
                 yield scrapy.Request(self.format_link(response, sceneurl), callback=self.parse_scene, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         movie = meta['movie']
         item = SceneItem()
         item['title'] = self.cleanup_title(response.xpath('//h1[@class="title"]/text()').get().strip())

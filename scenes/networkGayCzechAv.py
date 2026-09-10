@@ -30,15 +30,27 @@ class NetworkGayCzechAvSpider(BaseSceneScraper):
         're_duration': r'duration[\'\"].*?[\'\"](.*?)[\'\"]',
         'image': "//meta[@property='og:image']/@content",
         'tags': "",
-        'external_id': '.*/(.*?)/',
-        'trailer': '',
-        'pagination': '/pages/page-%s/'
+        'external_id': r'/video/(.+?)/',
+        'trailer': '//script[contains(@type, "json")]/text()',
+        're_trailer': r'contentUrl[\'\"]\s*:\s*[\'\"](https?://[^\'\"]+)',
+        # Same rebuild as the CzechAv, GlaminoGirls and R51 sites: /pages/page-N/ is
+        # gone and each site serves its whole listing on the root, with the cards
+        # linking straight to /video/<slug>/.
+        'pagination': ''
     }
 
+    async def start(self):
+        meta = {}
+        meta['page'] = self.page
+        for link in self.start_urls:
+            yield scrapy.Request(link, callback=self.parse, meta=meta,
+                                 headers=self.headers, cookies=self.cookies)
+
     def get_scenes(self, response):
-        scenes = response.xpath('//div[contains(@class,"gap--150")]//h3/ancestor::a/@href').getall()
-        for scene in scenes:
-            yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
+        scenes = response.xpath('//a[contains(@href, "/video/")]/@href').getall()
+        for scene in dict.fromkeys(scenes):
+            if re.search(self.get_selector_map('external_id'), scene):
+                yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene)
 
     def get_tags(self, response):
         tags = response.xpath('//script[contains(@type, "json")]/text()')

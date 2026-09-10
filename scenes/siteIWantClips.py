@@ -30,14 +30,14 @@ class SiteIWantClipsSpider(BaseSceneScraper):
         yield scrapy.Request(url=self.get_next_page_url(self.start_url, page + 1), callback=self.parse_token, meta={'page': page, 'url': self.start_url}, cookies=self.cookies, dont_filter=True)
 
     def parse_token(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         token_script = response.xpath('//script[contains(text(), "let typesenseIndex = \'prod_content\'") and contains(text(), "apiKey")]/text()').get()
         meta['token'] = re.search(r"\'apiKey\'.*?\'(.*?)\'", token_script).group(1)
         meta['host'] = re.search(r'host: \'(.*?)\'', token_script).group(1)
         return self.call_algolia(response.meta['page'], meta)
 
     def parse(self, response, **kwargs):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if response.status == 200:
             scenes = self.get_scenes(response)
             count = 0

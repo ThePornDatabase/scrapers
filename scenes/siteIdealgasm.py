@@ -4,8 +4,6 @@ import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
-true = True
-false = False
 
 
 class SiteIdealgasmSpider(BaseSceneScraper):
@@ -21,7 +19,8 @@ class SiteIdealgasmSpider(BaseSceneScraper):
         'pagination': '/_next/data/<buildID>/videos.json?page=%s&order_by=publish_date&sort_by=desc&tag=idealgasm'
     }
 
-    cookies = [{"domain":".idealgasmplus.com","expirationDate":1779916448.200898,"hostOnly":false,"httpOnly":true,"name":"nats","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"MzAwMDA3OTkuMy4yNjYuNTY3LjM3OS4wLjAuMC4w"},{"domain":".idealgasmplus.com","expirationDate":1779916448.20093,"hostOnly":false,"httpOnly":true,"name":"nats_cookie","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"https%253A%252F%252Fidealgasmplus.com%252F"},{"domain":".idealgasmplus.com","expirationDate":1785964448.200981,"hostOnly":false,"httpOnly":true,"name":"nats_sess","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"ab2806c9a5787a7c3e67f89ac0e6b8f9"},{"domain":".idealgasmplus.com","expirationDate":1779916448.201003,"hostOnly":false,"httpOnly":true,"name":"nats_landing","path":"/","sameSite":"lax","secure":true,"session":false,"storeId":"0","value":"No%2BLanding%2BPage%2BURL"},{"domain":"idealgasmplus.com","hostOnly":true,"httpOnly":false,"name":"close-warning","path":"/","sameSite":"unspecified","secure":false,"session":true,"storeId":"0","value":"1"}]
+    # Warning flag only; the NATS affiliate/session cookies were removed.
+    cookies = {"close-warning": "1"}
 
     def _xhr_headers(self, page):
         return {
@@ -46,7 +45,7 @@ class SiteIdealgasmSpider(BaseSceneScraper):
         yield scrapy.Request('https://idealgasmplus.com', callback=self.start_requests_2, meta=meta, headers=self.headers, cookies=self.cookies)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
 
         buildId = re.search(r'\"buildId\":\"(.*?)\"', response.text)
         if buildId:
@@ -63,7 +62,7 @@ class SiteIdealgasmSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['buildID']), callback=self.parse, meta=meta, headers=self._xhr_headers(meta['page']), cookies=self.cookies)

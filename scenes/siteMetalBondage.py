@@ -20,6 +20,12 @@ class SiteMetalBondageSpider(BaseSceneScraper):
         'https://www.metalbondage.com',
     ]
 
+    # The site runs the WordPress "Age Gate" plugin; without this cookie every
+    # request is served the interstitial instead of the updates listing.  The
+    # domain is required: /updatespage/page/1/ 301s to /updatespage/, and Scrapy
+    # drops a domain-less cookie across a redirect.
+    cookies = [{"name": "age_gate", "value": "18", "domain": ".metalbondage.com", "path": "/"}]
+
     selector_map = {
         'external_id': r'.*/(.*?)/',
         'pagination': '/updatespage/page/%s/'

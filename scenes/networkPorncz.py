@@ -76,10 +76,8 @@ class PornCZSpider(BaseSceneScraper):
             # ~ "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
         # ~ },
         'DOWNLOADER_MIDDLEWARES': {
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
             'scrapy.downloadermiddlewares.retry.RetryMiddleware': 500,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 300,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 301,
             'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': 100,
         }
     }

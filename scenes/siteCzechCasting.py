@@ -23,7 +23,7 @@ class SiteCzechCastingSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//a[contains(@href, "/video/") and h3]/ancestor::div[contains(@class, "model-item")]')
         for scene in scenes:
             perf_image = scene.xpath('.//div[contains(@class, "media-wrapper")]/following-sibling::img/@src')
@@ -34,7 +34,7 @@ class SiteCzechCastingSpider(BaseSceneScraper):
                     yield scrapy.Request(url=self.format_link(response, scene), callback=self.parse_scene, meta=meta)
 
     def parse_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenedata = response.xpath('//script[contains(@type, "ld+json")]/text()').get()
         scene = json.loads(scenedata)
         item = self.init_scene()

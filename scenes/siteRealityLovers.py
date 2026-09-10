@@ -29,10 +29,8 @@ class SiteRealityLoversSpider(BaseSceneScraper):
         "HTTPCACHE_ENABLED": False,
         'DOWNLOADER_MIDDLEWARES': {
             'tpdb.middlewares.TpdbSceneDownloaderMiddleware': 543,
-            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-            'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
-            'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 400,
-            'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 401,
+            'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
         },
     }
 
@@ -46,13 +44,13 @@ class SiteRealityLoversSpider(BaseSceneScraper):
         yield scrapy.Request(link, callback=self.start_requests_primed, meta=meta)
 
     def start_requests_primed(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         for link in self.start_urls:
             meta['link'] = link
             yield scrapy.Request(url=self.get_next_page_url(link, self.page, meta['reg_pagination']), callback=self.start_requests_2, meta=meta)
 
     def start_requests_2(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         yield scrapy.Request(url=self.get_next_page_url(meta['link'], self.page, meta['json_pagination']), callback=self.parse, meta=meta)
 
 
@@ -65,21 +63,21 @@ class SiteRealityLoversSpider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 url = self.get_next_page_url(response.url, meta['page'], meta['reg_pagination'])
                 print('NEXT PAGE: ' + str(meta['page']) + f"  Url: {url}")
                 yield scrapy.Request(url, callback=self.mid_index, meta=meta)
 
     def mid_index(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['json_pagination']), callback=self.parse, meta=meta)
 
     def get_next_page_url(self, base, page, pagination):
         return self.format_url(base, pagination % page)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = json.loads(response.text)
         for scene in scenes['contents']:
             sceneid = scene['id']
@@ -89,7 +87,7 @@ class SiteRealityLoversSpider(BaseSceneScraper):
                 yield scrapy.Request(link, callback=self.mid_scene, meta=meta)
 
     def mid_scene(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         link = meta['link']
         yield scrapy.Request(link, callback=self.parse_scene, meta=meta)
 

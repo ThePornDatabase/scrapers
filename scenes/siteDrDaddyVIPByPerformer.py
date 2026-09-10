@@ -21,7 +21,7 @@ class SiteDrDaddyVIPByPerformerSpider(BaseSceneScraper):
         yield scrapy.Request('https://www.drdaddyvip.com/models/models_d.html', callback=self.get_models, meta=meta)
 
     def get_models(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         models = response.xpath('//div[contains(@class,"pornstar-item")]')
         for model in models:
             name = string.capwords(model.xpath('.//div[contains(@class, "pornstar-name")]/a/text()').get().strip())
@@ -40,7 +40,7 @@ class SiteDrDaddyVIPByPerformerSpider(BaseSceneScraper):
             yield scrapy.Request(url=url, callback=self.parse_model, meta=meta)
 
     def parse_model(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         birthday = response.xpath('//section[contains(@id, "model-bio-cel")]//div[contains(@class, "model-bio-item")]/b[contains(text(), "BIRTH")]/following-sibling::text()')
         if birthday:
             birthday = birthday.get().strip()
@@ -76,7 +76,7 @@ class SiteDrDaddyVIPByPerformerSpider(BaseSceneScraper):
                 yield scrapy.Request(url=self.format_link(response, scene), callback=self.get_scenes, meta=meta)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = self.init_scene()
 
         item['performers_data'] = meta['performers_data']

@@ -49,7 +49,7 @@ class SiteKailaniKaiSpider(BaseSceneScraper):
                                  cookies=self.cookies)
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         jsondata = json.loads(response.text)
         for scene in jsondata:
             item = self.init_scene()
@@ -92,7 +92,7 @@ class SiteKailaniKaiSpider(BaseSceneScraper):
                 yield scrapy.Request(imageurl, callback=self.get_scene_image, meta=meta)
 
     def get_scene_image(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         item = meta['item']
         jsondata = json.loads(response.text)
         image = jsondata['guid']['rendered']

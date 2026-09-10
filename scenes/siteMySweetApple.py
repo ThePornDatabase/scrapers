@@ -28,7 +28,7 @@ class SiteMySweetAppleSpider(BaseSceneScraper):
     }
 
     def get_scenes(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         scenes = response.xpath('//div[@class="latest_updates_block"][1]//div[@class="update_details"]')
         for scene in scenes:
             link = self.format_link(response, scene.xpath('./a[1]/@href').get())

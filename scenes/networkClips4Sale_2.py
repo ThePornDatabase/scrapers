@@ -116,7 +116,7 @@ class SiteClips4Sale_2Spider(BaseSceneScraper):
 
         if count:
             if 'page' in response.meta and response.meta['page'] < self.limit_pages:
-                meta = response.meta
+                meta = self.copy_meta(response)
                 meta['page'] = meta['page'] + 1
                 print('NEXT PAGE: ' + str(meta['page']))
                 yield scrapy.Request(url=self.get_next_page_url(response.url, meta['page'], meta['store'], meta['storename']), callback=self.parse, meta=meta)
@@ -180,7 +180,7 @@ class SiteClips4Sale_2Spider(BaseSceneScraper):
                 yield self.check_item(item, self.days)
 
     def get_site(self, response, scene):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if "Missa X" in meta['storedsite']:
             title = re.sub(r'[^a-z0-9]+', '', scene['title'].lower())
             if "allherluv" in title:
@@ -195,13 +195,13 @@ class SiteClips4Sale_2Spider(BaseSceneScraper):
         return tldextract.extract(response.url).domain
 
     def get_parent(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['parent']:
             return meta['parent']
         return tldextract.extract(response.url).domain
 
     def get_network(self, response):
-        meta = response.meta
+        meta = self.copy_meta(response)
         if meta['network']:
             return meta['network']
         return tldextract.extract(response.url).domain
