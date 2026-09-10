@@ -3,8 +3,6 @@ import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import dateparser
-import re
 
 def get_birthday_from_age(age):
     age = int(age.strip())

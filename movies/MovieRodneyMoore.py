@@ -1,4 +1,6 @@
 import re
+import string
+
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -23,7 +25,6 @@ class MovieRodneyMooreSpider(BaseSceneScraper):
         'AUTOTHROTTLE_MAX_DELAY': 10,
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         "LOG_LEVEL": 'INFO',
         "EXTENSIONS": {'scrapy.extensions.logstats.LogStats': None},

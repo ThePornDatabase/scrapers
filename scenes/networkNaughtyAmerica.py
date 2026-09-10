@@ -1,5 +1,4 @@
 import re
-from scrapy.utils.project import get_project_settings
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -47,7 +46,6 @@ class NaughtyAmericaSpider(BaseSceneScraper):
     }
 
     async def start(self):
-        settings = get_project_settings()
         meta = {}
         meta['page'] = self.page
         meta['playwright'] = True

@@ -1,6 +1,5 @@
 import scrapy
 import re
-import tldextract
 from urllib.parse import urlparse
 
 from tpdb.BasePerformerScraper import BasePerformerScraper

@@ -1,7 +1,6 @@
 import re
 import string
 from slugify import slugify
-import unicodedata
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 

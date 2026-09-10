@@ -1,13 +1,7 @@
 import re
 import html
 import string
-from PIL import Image
-import base64
-from io import BytesIO
-from requests import get
-import os.path
 from datetime import date, datetime, timedelta
-from pathlib import Path
 import unidecode
 import dateparser
 import scrapy

@@ -1,4 +1,3 @@
-import re
 import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper

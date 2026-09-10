@@ -1,9 +1,9 @@
-import scrapy
 import re
 from datetime import datetime
-import time
-import datetime
+
 import dateparser
+import scrapy
+
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 
@@ -51,7 +51,7 @@ class networkAllJapanesePassPerformerSpider(BasePerformerScraper):
         date = self.process_xpath(response, self.get_selector_map('birthday')).get()
         if date:
             if re.search('\d{4}-\d{2}-\d{2}', date):
-                date = datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
+                date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
                 return dateparser.parse(date.strip()).isoformat()
         return ''
 

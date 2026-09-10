@@ -103,9 +103,6 @@ class NetworkOxygenEnterprisesPerformerSpider(BasePerformerScraper):
         elif "jeffsmodels" in base:
             pagination = "/models/?page=%s&gender=female"
         return self.format_url(base, pagination % page)
-    
-    def get_gender(self, response):
-        return 'Female'
 
     def get_performers(self, response):
         performers = response.xpath('//div[@class="item-wrapper"]/a[1]/@href').getall()
@@ -121,6 +118,7 @@ class NetworkOxygenEnterprisesPerformerSpider(BasePerformerScraper):
             return 'Transgender Female'
         elif "jeffsmodels" in response.url:
             return 'Female'
+        return None
 
     def get_birthplace_code(self, response):
         birthplace = self.get_birthplace(response)

@@ -2,7 +2,6 @@ import re
 import requests
 import scrapy
 import urllib.parse
-from tpdb.helpers.http import Http
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
 

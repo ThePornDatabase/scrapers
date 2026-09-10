@@ -18,22 +18,26 @@ class MovieErotikSpider(BaseSceneScraper):
         'performers': '//div[@class="star-grid-element"]//div[@class="star-image"]/a/div/div/div/span/text()',
         'tags': '//section[contains(@class, "details-movie")]//div[@class="inner-wrapper"]//div[@class="details-element"]/h4[contains(text(), "Categories")]/following-sibling::a/text()',
         'external_id': r'',
-        'pagination': '/dvd/search/movies?filter[studio][]=99&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: GGG
-        'pagination': '/dvd/search/movies?filter[studio][]=157&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Deutscheland Porno
-        'pagination': '/dvd/search/movies?filter[studio][]=441&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Mannermagnet
-        'pagination': '/dvd/search/movies?filter[studio][]=111&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: 666
-        'pagination': '/dvd/search/movies?filter[studio][]=784&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Aische Perverse
-        'pagination': '/dvd/search/movies?filter[studio][]=9&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: AlexD
-        'pagination': '/dvd/search/movies?filter[studio][]=440&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Amateur Check In
-        'pagination': '/dvd/search/movies?filter[studio][]=1498&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Anny Aurora
-        'pagination': '/dvd/search/movies?filter[studio][]=1679&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Anstoss
-        'pagination': '/dvd/search/movies?filter[studio][]=1487&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Blue Movie
-        'pagination': '/dvd/search/movies?filter[studio][]=724&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Color Climax
-        'pagination': '/dvd/search/movies?filter[studio][]=1704&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Create-X
-        'pagination': '/dvd/search/movies?filter[studio][]=1416&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Danger Women
-        'pagination': '/dvd/search/movies?filter[studio][]=605&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: Gang Bang Amateure
-        'pagination': '/dvd/search/movies?filter[studio][]=87&itemsPerPage=48&page=%s&source=moviesoverview', # Studio: MMV
+        'pagination': '',
         'type': 'Movie',
+    }
+
+    pagination = {
+        'GGG': '/dvd/search/movies?filter[studio][]=99&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Deutscheland Porno': '/dvd/search/movies?filter[studio][]=157&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Mannermagnet': '/dvd/search/movies?filter[studio][]=441&itemsPerPage=48&page=%s&source=moviesoverview',
+        '666': '/dvd/search/movies?filter[studio][]=111&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Aische Perverse': '/dvd/search/movies?filter[studio][]=784&itemsPerPage=48&page=%s&source=moviesoverview',
+        'AlexD': '/dvd/search/movies?filter[studio][]=9&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Amateur Check In': '/dvd/search/movies?filter[studio][]=440&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Anny Aurora': '/dvd/search/movies?filter[studio][]=1498&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Anstoss': '/dvd/search/movies?filter[studio][]=1679&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Blue Movie': '/dvd/search/movies?filter[studio][]=1487&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Color Climax': '/dvd/search/movies?filter[studio][]=724&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Create-X': '/dvd/search/movies?filter[studio][]=1704&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Danger Women': '/dvd/search/movies?filter[studio][]=1416&itemsPerPage=48&page=%s&source=moviesoverview',
+        'Gang Bang Amateure': '/dvd/search/movies?filter[studio][]=605&itemsPerPage=48&page=%s&source=moviesoverview',
+        'MMV': '/dvd/search/movies?filter[studio][]=87&itemsPerPage=48&page=%s&source=moviesoverview',
     }
 
     custom_scraper_settings = {
@@ -44,8 +48,18 @@ class MovieErotikSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 4,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 4,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 4,
     }
+
+    def start_requests(self):
+        meta = {}
+        meta['page'] = self.page
+
+        studio = self.settings.get('STUDIO')
+        for link in self.start_urls:
+            yield scrapy.Request(url=self.get_next_page_url(link, self.page, studio), callback=self.parse, meta=meta, headers=self.headers, cookies=self.cookies)
+
+    def get_next_page_url(self, base, page, studio=None):
+        return self.format_url(base, self.pagination.get(studio) % page)
 
     def get_scenes(self, response):
         meta = self.copy_meta(response)

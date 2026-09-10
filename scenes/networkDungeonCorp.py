@@ -1,10 +1,7 @@
 import scrapy
 import re
-import html
-import string
 import dateparser
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from scrapy import Selector
 true = True
 false = False
 

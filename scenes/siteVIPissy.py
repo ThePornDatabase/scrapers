@@ -1,6 +1,5 @@
 import re
 import scrapy
-import tldextract
 import html
 
 from tpdb.BaseSceneScraper import BaseSceneScraper

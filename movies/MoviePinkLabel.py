@@ -2,12 +2,9 @@ import dateparser
 import scrapy
 import json
 import re
-import scrapy
 import string
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from tpdb.items import SceneItem
-import dateparser
 
 class PinkLabelSpider(BaseSceneScraper):
     name = 'PinkLabel'

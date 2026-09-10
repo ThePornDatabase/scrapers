@@ -1,10 +1,4 @@
 import scrapy
-import time
-import datetime
-import dateparser
-import re
-true = True
-false = False
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -63,7 +57,6 @@ class PornCZSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 1,
         # 'DOWNLOAD_DELAY': 60,
         # 'RANDOMIZE_DOWNLOAD_DELAY': True,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'SPIDERMON_ENABLED': False,
         'DOWNLOAD_FAIL_ON_DATALOSS': True,

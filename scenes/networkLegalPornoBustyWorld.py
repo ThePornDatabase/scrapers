@@ -2,7 +2,6 @@ import re
 import string
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
-from scrapy.utils.project import get_project_settings
 
 
 class LegalPornoSpider(BaseSceneScraper):

@@ -1,6 +1,5 @@
 import re
 import string
-from datetime import date, timedelta
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
@@ -52,7 +51,7 @@ class SiteFreaksInsideSpider(BaseSceneScraper):
         archives = response.xpath('//td/font/a[contains(@href, "newsarchive")]/@href').getall()
         for archive in archives:
             archive = self.format_link(response, archive)
-            archive_year = re.search(r'year=(\d{4})', archive).group(1)
+            # ~ archive_year = re.search(r'year=(\d{4})', archive).group(1)
             # ~ archive_month = re.search(r'month=(\d{1,2})', archive).group(1)
             # ~ archive_date = f"{archive_year}-{archive_month}-30"
 

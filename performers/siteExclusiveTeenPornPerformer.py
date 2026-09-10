@@ -1,7 +1,7 @@
 import re
 import string
 import scrapy
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 

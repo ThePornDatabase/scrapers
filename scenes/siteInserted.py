@@ -1,6 +1,5 @@
 import re
 import json
-from datetime import date, timedelta
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem
 

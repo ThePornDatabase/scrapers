@@ -38,7 +38,6 @@ class sitePinupFilesPerformerSpider(BasePerformerScraper):
         'CONCURRENT_REQUESTS': 2,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 2,
         'RETRY_ENABLED': False,
         "HTTPERROR_ALLOWED_CODES": [500],
     }

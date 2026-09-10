@@ -1,6 +1,5 @@
 import scrapy
 import re
-import dateparser
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 

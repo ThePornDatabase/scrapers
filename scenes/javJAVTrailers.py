@@ -67,12 +67,12 @@ class JavJAVTrailersSpider(BaseSceneScraper):
         jsondata = re.search(r'(video:.*?),popunder', jsondata)
         jsondata = jsondata.group(1) if jsondata else ''
 
-        contentid = False
+        # ~ contentid = False
         sceneid = response.xpath('//span[contains(text(), "DVD ID:")]/following-sibling::text()[1]')
         if not sceneid:
             sceneid = response.xpath('//span[contains(text(), "Content ID:")]/following-sibling::text()[1]')
             print(f"    * Using Content_ID for: {sceneid.get().strip().upper()}")
-            contentid = True
+            # ~ contentid = True
         if sceneid:
             item['id'] = sceneid.get().strip().upper()
 

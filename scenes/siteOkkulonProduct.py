@@ -67,7 +67,7 @@ class SiteOkkulonProductSpider(BaseSceneScraper):
             item['date'] = re.search(r'(\d{4}-\d{2}-\d{2})', scene['date']).group(1)
             item['title'] = string.capwords(unidecode.unidecode(html.unescape(re.sub('<[^<]+?>', '', scene['title']['rendered'])).strip()))
 
-            test_title = re.sub(r'[^a-z]+', '', item['title'].lower())
+            # ~ test_title = re.sub(r'[^a-z]+', '', item['title'].lower())
             for tag_id in scene['product_tag']:
                 for tag in meta['tagdata']:
                     if tag['id'] == tag_id:

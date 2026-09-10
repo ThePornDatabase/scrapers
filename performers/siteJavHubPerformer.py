@@ -1,5 +1,6 @@
-import html
 import json
+import re
+
 from tpdb.BasePerformerScraper import BasePerformerScraper
 from tpdb.items import PerformerItem
 

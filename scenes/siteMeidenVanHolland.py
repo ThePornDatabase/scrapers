@@ -1,10 +1,7 @@
 import re
-from datetime import date, timedelta
-import codecs
 import string
 import json
 import scrapy
-from tpdb.items import SceneItem
 
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
@@ -67,7 +64,6 @@ class SiteMedienVanHolldandSpider(BaseSceneScraper):
         'AUTOTHROTTLE_MAX_DELAY': 10,
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         'RETRY_ENABLED': True,
         'HANDLE_HTTPSTATUS_LIST': [307,404,403],

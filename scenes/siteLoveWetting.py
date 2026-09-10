@@ -1,7 +1,6 @@
 import re
 import scrapy
 import requests
-from datetime import date, timedelta
 import string
 
 from tpdb.BaseSceneScraper import BaseSceneScraper

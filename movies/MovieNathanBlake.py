@@ -24,7 +24,6 @@ class MovieNathanBlakeSpider(BaseSceneScraper):
         'CONCURRENT_REQUESTS': 1,
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
-        'CONCURRENT_REQUESTS_PER_DOMAIN': 1,
         "LOG_LEVEL": 'INFO',
         "EXTENSIONS": {'scrapy.extensions.logstats.LogStats': None},
     }

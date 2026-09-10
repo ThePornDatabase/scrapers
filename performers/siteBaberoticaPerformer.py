@@ -1,6 +1,5 @@
 import re
 import warnings
-import dateparser
 import scrapy
 from tpdb.BasePerformerScraper import BasePerformerScraper
 

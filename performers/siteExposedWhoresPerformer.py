@@ -1,8 +1,5 @@
 import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
 # Note: Age is listed on the website, but is as of being put on the site.

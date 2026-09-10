@@ -5,7 +5,6 @@ import scrapy
 from datetime import datetime
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from slugify import slugify
-from tpdb.helpers.http import Http
 import requests
 true = True
 false = False

@@ -1,7 +1,5 @@
 import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import dateparser
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
@@ -60,7 +58,7 @@ class siteJapanHDVPerformerSpider(BasePerformerScraper):
 
 
     def get_aliases(self, response):
-        image = self.process_xpath(response, self.get_selector_map('aliases')).get()
+        aliases = self.process_xpath(response, self.get_selector_map('aliases')).get()
         if aliases:
             aliases = aliases.split(", ").trim()
             return aliases

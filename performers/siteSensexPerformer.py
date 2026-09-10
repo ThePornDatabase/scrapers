@@ -1,8 +1,6 @@
 import re
-import scrapy
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
-from scrapy.utils.project import get_project_settings
 from tpdb.items import PerformerItem
 
 

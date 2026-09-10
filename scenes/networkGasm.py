@@ -41,7 +41,7 @@ class GasmSpider(BaseSceneScraper):
 
     def get_next_page_url(self, base, page, profile):
         pagination = f"/studio/profile/{profile}?page=%s"
-        return self.format_url(base, self.get_selector_map('pagination') % page)
+        return self.format_url(base, pagination % page)
 
     async def start(self):
         yield scrapy.Request("https://www.gasm.com", callback=self.start_requests_2, dont_filter=True)

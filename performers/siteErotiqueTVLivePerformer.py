@@ -1,9 +1,6 @@
 import scrapy
 import re
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import dateparser
-from urllib.parse import urlparse
 
 from tpdb.BasePerformerScraper import BasePerformerScraper
 
@@ -41,12 +38,6 @@ class siteErotiqueTVLivePerformerSpider(BasePerformerScraper):
                 url=self.format_link(response, performer),
                 callback=self.parse_performer
             )
-
-    def get_cupsize(self, response):
-        if 'cupsize' in self.selector_map:
-            cupsize = self.process_xpath(response, self.get_selector_map('cupsize')).get().strip().replace("-","")
-            return cupsize
-        return ''
 
     def get_height(self, response):
         if 'height' in self.selector_map:

@@ -1,6 +1,5 @@
 import string
 import json
-import requests
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 from tpdb.items import SceneItem

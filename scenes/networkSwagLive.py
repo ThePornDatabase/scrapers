@@ -1,10 +1,8 @@
 import re
 import requests
-import codecs
 from cleantext import clean
 from datetime import datetime
 import string
-import json
 import scrapy
 from tpdb.BaseSceneScraper import BaseSceneScraper
 
